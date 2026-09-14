@@ -1,0 +1,422 @@
+I need you to generate a complete codebase for a Multi-Vendor Meal Marketplace platform following Clean Architecture principles.
+
+## PROJECT OVERVIEW
+The platform connects food vendors (restaurants, caterers, home chefs) with customers. Customers can browse meals, place one-time orders, or schedule recurring meal batches. Vendors manage their meals and orders. Multiple payment options are supported (Momo, Orange Money, Visa/Mastercard).
+
+## REQUIRED DOCUMENTATION TO READ
+First, read and analyze these files from the /docs directory:
+1. REQUIREMENTS.md - Complete functional and non-functional requirements
+2. ARCHITECTURE.md - Microservices architecture, data flow, tech stack
+3. API_CONTRACT.md - All API endpoints with request/response formats
+
+## CLEAN ARCHITECTURE LAYERS TO IMPLEMENT
+
+### Backend Structure (Each Microservice):
+src/main/java/com/mealmarket/
+├── domain/
+│ ├── model/ # Entities (Vendor, Meal, Order, etc.)
+│ ├── repository/ # Ports (interfaces)
+│ ├── service/ # Domain services / Use Cases
+│ └── exception/ # Domain exceptions
+├── application/
+│ ├── dto/ # Request/Response DTOs
+│ ├── mapper/ # MapStruct mappers
+│ └── service/ # Application services
+├── infrastructure/
+│ ├── persistence/ # JPA repositories (adapters)
+│ ├── config/ # Security, Kafka, Redis config
+│ ├── event/ # Kafka producers/consumers
+│ ├── web/ # REST controllers
+│ ├── security/ # JWT, Keycloak integration
+│ └── client/ # Feign clients for service-to-service
+└── shared/
+├── util/ # Common utilities
+└── constant/ # Application constants
+
+### Frontend Structure (Angular - Clean Architecture):
+src/app/
+├── core/
+│ ├── domain/
+│ │ ├── models/ # Interfaces/Classes (Vendor, Meal, Order)
+│ │ ├── use-cases/ # Business logic interfaces
+│ │ └── repositories/ # Abstract data access interfaces
+│ ├── application/
+│ │ ├── services/ # Use case implementations
+│ │ └── mappers/ # Data transformers
+│ └── infrastructure/
+│ ├── api/ # HTTP services (adapters)
+│ ├── store/ # NgRx state management
+│ ├── auth/ # Authentication, guards
+│ └── config/ # Environment configs
+├── modules/
+│ ├── auth/ # Authentication module
+│ ├── payment/ # Payment module
+│ ├── marketplace/ # Marketplace (lazy-loaded)
+│ │ ├── shop-order/ # Customer facing
+│ │ └── vendor-admin/ # Vendor dashboard
+│ └── admin/ # Admin UI (lazy-loaded)
+└── shared/
+├── components/ # Reusable components
+├── directives/ # Custom directives
+└── pipes/ # Custom pipes
+
+## BACKEND MICROSERVICES TO GENERATE
+
+### 1. Meal Management Microservice (Port 8081)
+- Domain: Vendor, Meal, Category, Ingredient, Order, Schedule, Rating
+- Use Cases: Vendor registration, Meal CRUD, Order creation, Schedule management, Rating submission, Search/filter meals
+- Infrastructure: PostgreSQL (meal_db), Kafka producer (OrderCreatedEvent), WebSocket for vendor notifications
+- Controllers: VendorController, MealController, OrderController, ScheduleController, RatingController, SearchController
+
+### 2. Payment Microservice (Port 8082)
+- Domain: Cart, Invoice, Transaction, PaymentMethod, ScheduledPayment
+- Use Cases: Cart management, Checkout, Payment processing (Momo/Orange/Card), Invoice generation, Recurring payments
+- Infrastructure: PostgreSQL (payment_db), Kafka consumer (OrderCreatedEvent), Payment gateway integrations
+- Controllers: CartController, CheckoutController, PaymentController, InvoiceController, ScheduledPaymentController
+
+### 3. API Gateway (Port 8080)
+- Spring Cloud Gateway with route configuration
+- Redis for rate limiting
+- JWT validation
+- Circuit breaker (Resilience4j)
+
+## GENERATE FOR EACH SERVICE:
+
+### For Each Microservice:
+- Complete Gradle build.gradle (or build.gradle.kts) with all dependencies
+- settings.gradle (or settings.gradle.kts) for multi-module setup
+- Application properties/yml (dev, prod profiles)
+- Domain entities with JPA annotations
+- Repository interfaces (ports)
+- Use case implementations (services)
+- REST controllers with OpenAPI/Swagger annotations
+- DTOs and MapStruct mappers
+- Exception handling (global exception handler)
+- Kafka configuration (producer/consumer)
+- Security configuration (JWT + Keycloak)
+- Logging configuration (Logback)
+- Unit and integration tests (JUnit 5, Mockito, Testcontainers)
+- Dockerfile
+
+### For API Gateway:
+- Route configuration for all services
+- Rate limiting with Redis
+- JWT validation filter
+- Logging filter
+
+### For Infrastructure:
+- Docker Compose file with all services:
+  - PostgreSQL (meal_db, payment_db)
+  - Keycloak (with realm configuration)
+  - MinIO (S3-compatible storage)
+  - Redis (cache)
+  - Kafka + Zookeeper
+- Flyway migration scripts for both databases
+- Kubernetes manifests (deployments, services, ingress, configmaps, secrets, HPA)
+
+### For Frontend:
+- Complete Angular project structure
+- Environment configurations (dev, prod)
+- Core module with:
+  - HTTP interceptor for JWT
+  - Authentication guard
+  - Error handler
+  - Base API service
+- Lazy-loaded modules:
+  - Auth (Login, Register, Social Login)
+  - Payment (Cart, Checkout, Payment Methods)
+  - Marketplace (Browse, Search, Order, Schedule)
+  - Vendor Admin (Meal Management, Order Management, Dashboard)
+  - Admin (Vendor Management, Settings, Analytics)
+- NgRx state management for:
+  - Auth state
+  - Cart state
+  - Order state
+  - Schedule state
+- Tailwind CSS configuration
+- Chart.js for dashboards
+- jsPDF for receipt generation
+- Unit tests (Jest) and E2E tests (Cypress)
+
+## CLEAN ARCHITECTURE RULES TO FOLLOW:
+1. Domain layer has NO dependencies on infrastructure
+2. Domain models are plain Java objects (no JPA annotations in domain)
+3. Application layer orchestrates use cases
+4. Infrastructure layer implements ports (repositories, event publishers)
+5. Dependency inversion: infrastructure depends on domain/application, not vice versa
+6. Use interfaces for repository ports
+7. DTOs are separate from domain models
+8. Mappers handle transformations between layers
+
+## GRADLE CONFIGURATION REQUIREMENTS:
+
+### Root Project Structure:
+meal-marketplace/
+├── build.gradle # Root build script
+├── settings.gradle # Module definitions
+├── gradle.properties # Gradle properties
+├── gradlew # Gradle wrapper
+├── gradlew.bat # Gradle wrapper (Windows)
+└── gradle/
+└── wrapper/
+├── gradle-wrapper.jar
+└── gradle-wrapper.properties
+
+
+### Root build.gradle (buildscript dependencies, plugins):
+plugins {
+id 'java'
+id 'org.springframework.boot' version '3.2.0' apply false
+id 'io.spring.dependency-management' version '1.1.4' apply false
+id 'org.flywaydb.flyway' version '9.22.3' apply false
+id 'com.diffplug.spotless' version '6.23.3' apply false
+id 'org.sonarqube' version '4.4.1.3373' apply false
+}
+
+allprojects {
+group = 'com.mealmarket'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+mavenCentral()
+maven { url 'https://repo.spring.io/milestone' }
+maven { url 'https://repo.spring.io/snapshot' }
+}
+}
+
+subprojects {
+apply plugin: 'java'
+apply plugin: 'io.spring.dependency-management'
+
+java {
+toolchain {
+languageVersion = JavaLanguageVersion.of(17)
+}
+}
+
+dependencyManagement {
+imports {
+mavenBom "org.springframework.boot:spring-boot-dependencies:3.2.0"
+}
+}
+
+dependencies {
+// Lombok
+compileOnly 'org.projectlombok:lombok'
+annotationProcessor 'org.projectlombok:lombok'
+testCompileOnly 'org.projectlombok:lombok'
+testAnnotationProcessor 'org.projectlombok:lombok'
+
+// Testing
+testImplementation 'org.springframework.boot:spring-boot-starter-test'
+testImplementation 'org.testcontainers:testcontainers:1.19.7'
+testImplementation 'org.testcontainers:postgresql:1.19.7'
+testImplementation 'org.testcontainers:kafka:1.19.7'
+}
+
+tasks.withType(Test).configureEach {
+useJUnitPlatform()
+}
+}
+
+### Each Microservice build.gradle:
+plugins {
+id 'org.springframework.boot'
+id 'io.spring.dependency-management'
+id 'java'
+id 'com.diffplug.spotless'
+}
+
+dependencies {
+// Spring Boot Starters
+implementation 'org.springframework.boot:spring-boot-starter-web'
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+implementation 'org.springframework.boot:spring-boot-starter-security'
+implementation 'org.springframework.boot:spring-boot-starter-validation'
+implementation 'org.springframework.boot:spring-boot-starter-actuator'
+implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+// Spring Cloud
+implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+// Database
+implementation 'org.postgresql:postgresql'
+implementation 'org.flywaydb:flyway-core'
+
+// Kafka
+implementation 'org.springframework.kafka:spring-kafka'
+
+// Redis
+implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+// MapStruct
+implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+// OpenAPI / Swagger
+implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+// JWT
+implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+// Logging
+implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+// Micrometer / Prometheus
+implementation 'io.micrometer:micrometer-registry-prometheus'
+
+// Resilience4j
+implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+
+// Testcontainers
+testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+testImplementation 'org.testcontainers:postgresql'
+testImplementation 'org.testcontainers:kafka'
+}
+
+spotless {
+java {
+googleJavaFormat()
+removeUnusedImports()
+trimTrailingWhitespace()
+endWithNewline()
+}
+}
+
+### Gradle Properties (gradle.properties):
+Gradle Settings
+org.gradle.jvmargs=-Xmx2048m
+org.gradle.parallel=true
+org.gradle.caching=true
+org.gradle.daemon=true
+
+Spring Boot Settings
+spring.boot.version=3.2.0
+spring.cloud.version=2023.0.0
+
+Dependency Versions
+mapstruct.version=1.5.5.Final
+testcontainers.version=1.19.7
+
+### Settings.gradle:
+rootProject.name = 'meal-marketplace'
+
+include 'meal-service'
+include 'payment-service'
+include 'gateway'
+include 'common'
+
+// Set project directories
+project(':meal-service').projectDir = file('backend/meal-service')
+project(':payment-service').projectDir = file('backend/payment-service')
+project(':gateway').projectDir = file('backend/gateway')
+project(':common').projectDir = file('backend/common')
+
+
+## PROJECT STRUCTURE:
+meal-marketplace/
+├── backend/
+│ ├── common/ # Shared library
+│ │ ├── src/main/java/
+│ │ ├── build.gradle
+│ │ └── Dockerfile
+│ ├── meal-service/
+│ │ ├── src/main/java/com/mealmarket/
+│ │ ├── src/main/resources/
+│ │ ├── src/test/
+│ │ ├── build.gradle
+│ │ └── Dockerfile
+│ ├── payment-service/
+│ │ ├── src/main/java/com/mealmarket/payment/
+│ │ ├── src/main/resources/
+│ │ ├── src/test/
+│ │ ├── build.gradle
+│ │ └── Dockerfile
+│ └── gateway/
+│ ├── src/main/java/com/mealmarket/gateway/
+│ ├── src/main/resources/
+│ ├── build.gradle
+│ └── Dockerfile
+├── frontend/
+│ ├── src/app/
+│ ├── src/assets/
+│ ├── src/environments/
+│ ├── angular.json
+│ ├── package.json
+│ └── tailwind.config.js
+├── k8s/
+│ ├── namespaces/
+│ ├── configmaps/
+│ ├── secrets/
+│ ├── deployments/
+│ ├── services/
+│ └── ingress/
+├── docs/
+│ ├── REQUIREMENTS.md
+│ ├── ARCHITECTURE.md
+│ └── API_CONTRACT.md
+├── build.gradle
+├── settings.gradle
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── gradle/
+│ └── wrapper/
+│ ├── gradle-wrapper.jar
+│ └── gradle-wrapper.properties
+
+## TECHNICAL DECISIONS (Gradle-Specific):
+- Use Gradle 8.5+ with wrapper
+- Use Spring Boot 3.2.0 with Spring Cloud 2023.0.0
+- Use Java 17 (LTS)
+- Use PostgreSQL 15 for both databases
+- Use Flyway for database migrations
+- Use MapStruct for DTO mapping (annotation processor)
+- Use Kafka for event-driven communication
+- Use Redis for caching and rate limiting
+- Use Keycloak for IAM (self-hosted)
+- Use MinIO for image storage
+- Use Angular 18+ for frontend
+- Use Tailwind CSS for styling
+- Use NgRx for state management
+- Use Chart.js for dashboards
+- Use jsPDF for receipt generation
+- Use Docker for containerization
+- Use Kubernetes (AKS) for orchestration
+- Use GitHub Actions for CI/CD
+- Use Spotless for code formatting (Google Java Format)
+- Use Testcontainers for integration testing
+
+## CONSTRAINTS:
+- All code must follow Clean Architecture principles
+- Use Jakarta EE (not javax)
+- Use Java 17 features where appropriate (records, switch expressions, text blocks)
+- All DTOs should be Java records
+- Use @Valid for request validation
+- Use @Slf4j for logging (Lombok)
+- Use @RequiredArgsConstructor for dependency injection (Lombok)
+
+## PHASE 1 DELIVERY:
+Generate a complete, working codebase that includes:
+
+1. All entities and database schema (Flyway migrations)
+2. All core APIs documented in API_CONTRACT.md
+3. Basic frontend with authentication, browse, and order placement
+4. Docker setup to run everything locally
+5. Unit tests for critical business logic (JUnit 5 + Mockito)
+6. Integration tests using Testcontainers
+7. README with setup instructions for Gradle
+
+## EXECUTION INSTRUCTIONS:
+1. Generate the complete project structure with all files
+2. Do not skip any files
+3. Make the code production-ready with proper error handling, logging, and security
+4. Ensure all dependencies are correctly declared in build.gradle files
+5. Include Gradle wrapper for build reproducibility
+6. Use Java records for DTOs
+7. Use Jakarta EE annotations
+8. Follow Spring Boot best practices with Gradle
+
+**Ask me for clarification if any requirement is unclear before generating.**

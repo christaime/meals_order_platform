@@ -1,0 +1,11 @@
+rootProject.name = 'meal-marketplace'
+
+include 'common'
+include 'gateway'
+include 'meal-service'
+include 'payment-service'
+
+project(':meal-service').projectDir = file('backend/meal-service')
+project(':payment-service').projectDir = file('backend/payment-service')
+project(':gateway').projectDir = file('backend/gateway')
+project(':common').projectDir = file('backend/common')

@@ -1,0 +1,15 @@
+
+spring:
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    com.mealmarket: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

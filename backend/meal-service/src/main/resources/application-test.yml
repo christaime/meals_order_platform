@@ -1,0 +1,186 @@
+# ─── Application-specific ───────────────────────────────────────
+app:
+  openapi:
+    server-url: http://localhost:8080
+    contact-email: support@mealmarket.com
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+      - http://localhost:3000
+
+spring:
+  application:
+    name: meal-service
+
+  # ─── Database ─────────────────────────────────────────────────
+  # Placeholders — overridden at runtime by Testcontainers
+  # via @DynamicPropertySource (see AbstractIntegrationTest).
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///meal_db
+    username: mealuser
+    password: mealpass123
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+    clean-disabled: false   # allow clean between test runs if needed
+
+  # ─── Kafka ────────────────────────────────────────────────────
+  # Disabled in tests — no broker available.
+  # Events are mocked / verified at the service layer instead.
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: meal-service-test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+    listener:
+      auto-startup: false   # don't try to connect during tests
+
+  # ─── Redis ────────────────────────────────────────────────────
+  # Disabled in tests — no Redis available.
+  # Caching is a cross-cutting concern, not part of the integration test scope.
+  cache:
+    type: none
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 4
+          max-idle: 2
+          min-idle: 0
+
+  # ─── Security / Keycloak ──────────────────────────────────────
+  # Overridden per test class with @WithMockUser / custom @WithMockJwt.
+  # The issuer-uri below is a dummy value so the context still starts.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/mealmarket
+          jwk-set-uri: http://localhost:8080/realms/mealmarket/protocol/openid-connect/certs
+
+  # ─── File Upload ──────────────────────────────────────────────
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  # ─── Jackson ──────────────────────────────────────────────────
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# ─── Server ─────────────────────────────────────────────────────
+# port=0 → random free port for each test run (avoids collisions)
+server:
+  port: 0
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+
+# ─── MinIO ──────────────────────────────────────────────────────
+# Disabled in tests — no MinIO container needed for persistence/web tests.
+minio:
+  enabled: false
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  bucket: meal-images-test
+  public-url: http://localhost:9000
+
+# ─── SpringDoc / OpenAPI ────────────────────────────────────────
+# Disabled in tests — no need to generate OpenAPI docs.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# ─── Actuator / Monitoring ──────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: false
+
+# ─── Logging ────────────────────────────────────────────────────
+# Quieter in tests — focus on warnings/errors. Flip com.mealmarket to DEBUG
+# locally if you need to inspect SQL or adapter behavior.
+logging:
+  level:
+    root: WARN
+    com.mealmarket: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    org.testcontainers: INFO
+    com.github.dockerjava: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# ─── Feign Clients ──────────────────────────────────────────────
+# Short timeouts in tests — fail fast if a stub is missing.
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 1000
+        readTimeout: 1000
+        loggerLevel: basic
+
+# ─── Application Specific ───────────────────────────────────────
+mealmarket:
+  storage:
+    max-image-size: 5242880  # 5MB in bytes
+    allowed-image-types:
+      - image/jpeg
+      - image/png
+      - image/webp

@@ -1,0 +1,181 @@
+# ─── Application-specific ───────────────────────────────────────
+app:
+  openapi:
+    server-url: http://localhost:8081
+    contact-email: support@mealmarket.com
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+      - http://localhost:3000
+
+spring:
+  application:
+    name: meal-service
+
+  # ─── Database ─────────────────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:5432/meal_db
+    username: mealuser
+    password: mealpass123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+  # ─── Kafka ────────────────────────────────────────────────────
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: meal-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+
+  # ─── Redis ────────────────────────────────────────────────────
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 2
+
+  # ─── Security / Keycloak ──────────────────────────────────────
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/mealmarket
+          jwk-set-uri: http://localhost:8080/realms/mealmarket/protocol/openid-connect/certs
+
+  # ─── File Upload ──────────────────────────────────────────────
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  # ─── Jackson ──────────────────────────────────────────────────
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# ─── Server ─────────────────────────────────────────────────────
+server:
+  port: 8081
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+
+# ─── MinIO ──────────────────────────────────────────────────────
+minio:
+  enabled: true
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  bucket: meal-images
+  public-url: http://localhost:9000
+
+# ─── SpringDoc / OpenAPI ────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    filter: true
+    try-it-out-enabled: true
+    enabled: true
+    # Group selector
+    groups-order: ASC
+    doc-expansion: none
+  show-actuator: false
+  packages-to-scan: com.mealmarket.meal.infrastructure.web
+  default-produces-media-type: application/json
+
+# ─── Actuator / Monitoring ──────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,loggers
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# ─── Logging ────────────────────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.mealmarket: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/meal-service.log
+
+# ─── Feign Clients ──────────────────────────────────────────────
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+# ─── Application Specific ───────────────────────────────────────
+mealmarket:
+  storage:
+    max-image-size: 5242880  # 5MB in bytes
+    allowed-image-types:
+      - image/jpeg
+      - image/png
+      - image/webp

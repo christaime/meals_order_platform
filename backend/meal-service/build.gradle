@@ -1,0 +1,98 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
+    id 'com.diffplug.spotless'
+}
+
+dependencies {
+    // ─── Internal Modules ───────────────────────────────────────
+    implementation project(':common')
+
+    // ─── Spring Boot Starters ──────────────────────────────────
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // ─── Database ──────────────────────────────────────────────
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core:9.22.3'
+
+    // ─── Kafka ─────────────────────────────────────────────────
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // ─── Feign Clients ─────────────────────────────────────────
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // ─── MapStruct ─────────────────────────────────────────────
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // ─── OpenAPI / Swagger ─────────────────────────────────────
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // ─── MinIO ─────────────────────────────────────────────────
+    implementation 'io.minio:minio:8.5.7'
+
+    // ─── Logging ───────────────────────────────────────────────
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+    // ─── Monitoring ────────────────────────────────────────────
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'          // ← Must be 1.16.16+
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'  // ← CRITICAL!
+
+
+    // ─── Testing ───────────────────────────────────────────────
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:kafka'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+
+    // Testcontainers Core
+    testImplementation 'org.testcontainers:testcontainers:1.21.3'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:kafka'
+    testImplementation 'com.redis.testcontainers:testcontainers-redis:1.6.4'
+
+    // Testcontainers BOM — manages all module versions
+    testImplementation platform('org.testcontainers:testcontainers-bom:1.21.3')
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.0"
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
