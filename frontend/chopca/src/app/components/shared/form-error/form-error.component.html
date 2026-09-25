@@ -1,0 +1,9 @@
+@if (message()) {
+<div
+  class="flex items-start gap-1.5 text-error font-label text-xs leading-tight mt-1"
+  role="alert"
+  aria-live="polite">
+  <app-icon [name]="icon()" size="sm" class="shrink-0 mt-0.5" />
+  <span>{{ message() }}</span>
+</div>
+}

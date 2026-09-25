@@ -1,0 +1,12 @@
+export const environment = {
+  production: true,
+  useMockServices: false,
+  apiUrl: 'https://api.chopca.cm/api/v1',
+  turnstileSiteKey: '0x4AAAAAAE5RiI1HJe_SE42A',
+  googleMapsApiKey:"AIzaSyCpKHlclKRd2gwJiC56KO08UIC_ucaB-Cg",
+  keycloak: {
+    url: 'http://localhost:8080',
+    realm: 'mealmarket',
+    clientId: 'meal-marketplace-frontend',
+  },
+};

@@ -1,0 +1,30 @@
+<div class="w-full overflow-x-auto no-scrollbar py-1.5">
+  <div class="flex items-center gap-2 min-w-max px-0.5">
+    @for (category of categories(); track category.id) {
+    <button
+      type="button"
+      (click)="selectCategory(category)"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-label-md font-semibold transition-all duration-200 border cursor-pointer select-none"
+      [class.bg-primary]="selectedCategoryId() === category.id"
+      [class.text-on-primary]="selectedCategoryId() === category.id"
+      [class.border-primary]="selectedCategoryId() === category.id"
+      [class.shadow-sm]="selectedCategoryId() === category.id"
+      [class.bg-surface-container-lowest]="selectedCategoryId() !== category.id"
+      [class.text-on-surface-variant]="selectedCategoryId() !== category.id"
+      [class.border-outline-variant]="selectedCategoryId() !== category.id"
+      [class.hover:bg-surface-container-low]="selectedCategoryId() !== category.id"
+      [class.hover:text-on-surface]="selectedCategoryId() !== category.id"
+    >
+      @if (category.icon) {
+      <app-icon
+        [name]="category.icon"
+        size="sm"
+        [class.text-on-primary]="selectedCategoryId() === category.id"
+        [class.text-primary]="selectedCategoryId() !== category.id"
+      />
+      }
+      <span>{{ category.name }}</span>
+    </button>
+    }
+  </div>
+</div>

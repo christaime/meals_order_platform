@@ -1,0 +1,81 @@
+<div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm
+            flex flex-col gap-5">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-heading text-lg md:text-xl font-bold text-on-surface m-0">
+        Temps de Préparation &amp; Cuisson
+      </h2>
+      <p class="font-body text-xs text-on-surface-variant m-0">
+        Indiquez au livreur et au gourmand le délai exact avant départ cuisine.
+      </p>
+    </div>
+
+    <div class="w-10 h-10 rounded-full shrink-0
+                bg-surface-container
+                flex items-center justify-center">
+      <app-icon name="timer" size="md" class="text-primary" />
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Presets grid
+       ═══════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+
+    @for (preset of presets(); track preset.label) {
+    <button
+      type="button"
+      (click)="onPresetClick(preset)"
+      [attr.aria-pressed]="isActive(preset)"
+      class="flex flex-col items-start gap-1
+               p-4 rounded-lg
+               text-left cursor-pointer
+               border-0 transition-all
+               disabled:cursor-not-allowed"
+      [class.bg-primary-fixed]="isActive(preset)"
+      [class.text-on-primary-fixed]="isActive(preset)"
+      [class.ring-2]="isActive(preset)"
+      [class.ring-primary]="isActive(preset)"
+      [class.shadow-sm]="isActive(preset)"
+      [class.bg-surface-container-low]="!isActive(preset)"
+      [class.text-on-surface]="!isActive(preset)"
+      [class.hover:bg-surface-container]="!isActive(preset)">
+
+        <span
+          class="font-label text-[11px] font-semibold"
+          [class.text-primary]="preset.recommended && isActive(preset)"
+          [class.text-on-surface-variant]="!isActive(preset)">
+          {{ preset.label }}
+        </span>
+
+      <span class="font-heading text-base font-bold">
+          {{ preset.range }}
+        </span>
+
+    </button>
+    }
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Info banner
+       ═══════════════════════════════════════════════════════ -->
+  @if (activePreset()) {
+  <div class="flex items-start gap-3 p-4 rounded-lg bg-surface-container-low">
+
+    <app-icon name="info" size="md" class="text-secondary shrink-0 mt-0.5" />
+
+    <span class="font-body text-xs text-on-surface leading-relaxed">
+        Délai moyen estimé actuellement affiché sur votre vitrine :
+        <strong class="text-primary font-bold">{{ activePreset()!.range }}</strong>.
+        Les livreurs sont notifiés 10 minutes avant la fin de ce chrono.
+      </span>
+
+  </div>
+  }
+
+</div>

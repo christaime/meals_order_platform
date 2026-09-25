@@ -12,6 +12,9 @@ import java.util.UUID;
  * Request to update a meal's descriptive fields.
  *
  * Cannot change moderationStatus — that goes through {@link ModerationRequest}.
+ *
+ * Null = field unchanged. To clear the image, send an empty string (not null),
+ * so the service can distinguish "not touched" from "removed".
  */
 public record UpdateMealRequest(
 
@@ -24,8 +27,11 @@ public record UpdateMealRequest(
         @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
         BigDecimal price,
 
-        @Size(max = 500, message = "Image URL cannot exceed 500 characters")
-        String imageUrl,
+        /**
+         * MinIO storage ref. Null = unchanged. Empty string = cleared.
+         */
+        @Size(max = 512, message = "Image storage ref cannot exceed 512 characters")
+        String imageStorageRef,
 
         @PositiveOrZero(message = "Preparation time cannot be negative")
         Integer prepTimeMinutes,

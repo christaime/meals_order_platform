@@ -1,0 +1,11 @@
+<h2 mat-dialog-title class="flex items-center gap-2">
+  <mat-icon class="text-primary">location_on</mat-icon>
+  Nouvel emplacement
+</h2>
+
+<mat-dialog-content class="!max-h-[80vh]">
+  <app-location-form
+    [location]="prefill"
+    (saved)="onSaved($event)"
+    (cancelled)="onCancelled()" />
+</mat-dialog-content>

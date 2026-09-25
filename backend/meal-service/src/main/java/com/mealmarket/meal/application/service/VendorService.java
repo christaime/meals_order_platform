@@ -9,7 +9,9 @@ import com.mealmarket.meal.application.dto.CreateVendorRequest;
 import com.mealmarket.meal.application.dto.UpdateVendorRequest;
 import com.mealmarket.meal.application.dto.VendorResponse;
 import com.mealmarket.meal.application.dto.VendorSummaryResponse;
+import com.mealmarket.meal.application.exception.VendorAlreadyRegisteredException;
 import com.mealmarket.meal.application.mapper.VendorDtoMapper;
+import com.mealmarket.meal.application.port.IamPort;
 import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.CategoryType;
 import com.mealmarket.meal.domain.model.ModerationStatus;
@@ -30,6 +32,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,31 +45,31 @@ public class VendorService {
     private final VendorStatusHistoryRepository historyRepository;
     private final CategoryRepository categoryRepository;
     private final VendorDtoMapper dtoMapper;
+    private final IamPort iamPort;
+    private final MediaService mediaService;
 
     // ═══════════════════════════════════════════════════════════
     //  Registration
     // ═══════════════════════════════════════════════════════════
 
-    /**
-     * Register a new vendor.
-     * The {@code keycloakUserId} is provided by the caller (controller/facade),
-     * which has already created the user in Keycloak.
-     */
     @Transactional
     public VendorResponse registerVendor(
             CreateVendorRequest request,
+            String email,
             UUID keycloakUserId
     ) {
-        log.info("Registering new vendor with email: {}", request.email());
+        log.info("Registering new vendor with email: {}", email);
 
-        // 1. Email uniqueness
-        if (vendorRepository.existsByEmail(request.email())) {
+        if (vendorRepository.existsByUserId(keycloakUserId)) {
+            throw new VendorAlreadyRegisteredException(keycloakUserId);
+        }
+
+        if (vendorRepository.existsByEmail(email)) {
             throw new ConflictException(
-                    "A vendor with this email already exists: " + request.email()
+                    "A vendor with this email already exists: " + email
             );
         }
 
-        // 2. Business name uniqueness
         if (vendorRepository.existsByBusinessName(request.businessName())) {
             throw new ConflictException(
                     "A vendor with this business name already exists: "
@@ -74,22 +77,26 @@ public class VendorService {
             );
         }
 
-        // 3. Resolve initial cuisines
         List<Category> cuisines = resolveCuisines(request.cuisineCategoryIds());
 
-        // 4. Create the domain object (always PENDING)
+        iamPort.assignRealmRole(keycloakUserId.toString(), "VENDOR");
+
         Vendor vendor = Vendor.builder()
                 .userId(keycloakUserId)
                 .businessName(request.businessName())
                 .description(request.description())
                 .address(request.address())
-                .email(request.email())
+                .email(email)
                 .phone(request.phone())
                 .ratingAvg(BigDecimal.ZERO)
                 .totalRatings(0)
                 .state(VendorState.pending())
                 .deliveryRadius(request.deliveryRadius() != null ? request.deliveryRadius() : 10)
                 .pickupAddress(request.pickupAddress())
+                .profileImageStorageRef(request.profileImageStorageRef())
+                .coverImageStorageRef(request.coverImageStorageRef())
+                .idCardFrontStorageRef(request.idCardFrontStorageRef())
+                .idCardBackStorageRef(request.idCardBackStorageRef())
                 .categories(cuisines)
                 .distributionLocations(new ArrayList<>())
                 .createdAt(Instant.now())
@@ -98,12 +105,19 @@ public class VendorService {
 
         Vendor saved = vendorRepository.save(vendor);
 
-        // 5. Record initial state change in history
+        // Mark all provided images as USED
+        markUsed(
+                saved.getProfileImageStorageRef(),
+                saved.getCoverImageStorageRef(),
+                saved.getIdCardFrontStorageRef(),
+                saved.getIdCardBackStorageRef()
+        );
+
         historyRepository.save(
                 VendorStateChange.builder()
                         .vendorId(saved.getId())
                         .fromStatus(null)
-                        .toStatus(VendorState.VendorStatus.PENDING)
+                        .toStatus(VendorStatus.PENDING)
                         .reason("Vendor registered")
                         .changedBy(UUIDConstant.ALL_ZERO)
                         .changeType(VendorState.StateChangeType.SYSTEM)
@@ -126,9 +140,6 @@ public class VendorService {
         return dtoMapper.toResponse(vendor);
     }
 
-    /**
-     * Fetch the profile of the currently authenticated vendor (by Keycloak userId).
-     */
     @Transactional(readOnly = true)
     public VendorResponse getOwnProfile(UUID userId) {
         log.debug("Fetching profile for user: {}", userId);
@@ -138,9 +149,6 @@ public class VendorService {
         return dtoMapper.toResponse(vendor);
     }
 
-    /**
-     * Fetch a vendor only if it is ACTIVE (approved for public display).
-     */
     @Transactional(readOnly = true)
     public VendorResponse getApprovedVendorById(UUID vendorId) {
         log.debug("Fetching approved vendor: {}", vendorId);
@@ -164,9 +172,6 @@ public class VendorService {
         return vendorRepository.search(request).map(dtoMapper::toResponse);
     }
 
-    /**
-     * Search only ACTIVE vendors — used for public-facing endpoints.
-     */
     @Transactional(readOnly = true)
     public DataPage<VendorSummaryResponse> searchApprovedVendors(
             VendorSearchRequest request
@@ -178,7 +183,7 @@ public class VendorService {
                 .businessName(request.getBusinessName())
                 .email(request.getEmail())
                 .phone(request.getPhone())
-                .status(VendorStatus.ACTIVE)                    // ← forced
+                .status(VendorStatus.ACTIVE)
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
                 .categoryIds(request.getCategoryIds())
@@ -202,12 +207,10 @@ public class VendorService {
 
         Vendor existing = findVendorOrThrow(vendorId);
 
-        // Ownership check
         if (!existing.getUserId().equals(userId)) {
             throw new ForbiddenException("You can only update your own profile");
         }
 
-        // Uniqueness re-check if business name is being changed
         if (request.businessName() != null
                 && !request.businessName().equalsIgnoreCase(existing.getBusinessName())
                 && vendorRepository.existsByBusinessName(request.businessName())) {
@@ -217,7 +220,6 @@ public class VendorService {
             );
         }
 
-        // Uniqueness re-check if email is being changed
         if (request.email() != null
                 && !request.email().equalsIgnoreCase(existing.getEmail())
                 && vendorRepository.existsByEmail(request.email())) {
@@ -226,10 +228,20 @@ public class VendorService {
             );
         }
 
-        // Resolve cuisines if provided
         List<Category> cuisines = request.cuisineCategoryIds() != null
                 ? resolveCuisines(request.cuisineCategoryIds())
                 : existing.getCategories();
+
+        // Resolve each image ref (null = keep, "" = clear, value = replace)
+        String prevProfile = existing.getProfileImageStorageRef();
+        String prevCover   = existing.getCoverImageStorageRef();
+        String prevCniF    = existing.getIdCardFrontStorageRef();
+        String prevCniB    = existing.getIdCardBackStorageRef();
+
+        String newProfile = resolveRef(request.profileImageStorageRef(), prevProfile);
+        String newCover   = resolveRef(request.coverImageStorageRef(),   prevCover);
+        String newCniF    = resolveRef(request.idCardFrontStorageRef(),  prevCniF);
+        String newCniB    = resolveRef(request.idCardBackStorageRef(),   prevCniB);
 
         Vendor updated = Vendor.builder()
                 .id(existing.getId())
@@ -251,8 +263,10 @@ public class VendorService {
                         ? request.deliveryRadius() : existing.getDeliveryRadius())
                 .pickupAddress(request.pickupAddress() != null
                         ? request.pickupAddress() : existing.getPickupAddress())
-                .profileImageUrl(existing.getProfileImageUrl())
-                .coverImageUrl(existing.getCoverImageUrl())
+                .profileImageStorageRef(newProfile)
+                .coverImageStorageRef(newCover)
+                .idCardFrontStorageRef(newCniF)
+                .idCardBackStorageRef(newCniB)
                 .categories(cuisines)
                 .distributionLocations(existing.getDistributionLocations())
                 .createdAt(existing.getCreatedAt())
@@ -260,44 +274,85 @@ public class VendorService {
                 .build();
 
         Vendor saved = vendorRepository.save(updated);
+
+        // Sync MinIO metadata for each changed ref
+        syncRef(prevProfile, newProfile);
+        syncRef(prevCover,   newCover);
+        syncRef(prevCniF,    newCniF);
+        syncRef(prevCniB,    newCniB);
+
         log.info("Vendor updated: {}", saved.getId());
         return dtoMapper.toResponse(saved);
     }
 
     @Transactional
-    public VendorResponse uploadProfileImage(
+    public VendorResponse updateProfileImage(
             UUID vendorId,
-            String imageUrl,
+            String imageStorageRef,
             UUID userId
     ) {
-        log.info("Uploading profile image for vendor: {}", vendorId);
+        log.info("Updating profile image for vendor: {}", vendorId);
 
         Vendor existing = findVendorOrThrow(vendorId);
         verifyOwnership(existing, userId);
 
+        String previous = existing.getProfileImageStorageRef();
+
         Vendor updated = baseCopy(existing)
-                .profileImageUrl(imageUrl)
+                .profileImageStorageRef(imageStorageRef)
                 .build();
 
-        return dtoMapper.toResponse(vendorRepository.save(updated));
+        Vendor saved = vendorRepository.save(updated);
+        syncRef(previous, imageStorageRef);
+        return dtoMapper.toResponse(saved);
     }
 
     @Transactional
-    public VendorResponse uploadCoverImage(
+    public VendorResponse updateCoverImage(
             UUID vendorId,
-            String imageUrl,
+            String imageStorageRef,
             UUID userId
     ) {
-        log.info("Uploading cover image for vendor: {}", vendorId);
+        log.info("Updating cover image for vendor: {}", vendorId);
 
         Vendor existing = findVendorOrThrow(vendorId);
         verifyOwnership(existing, userId);
 
+        String previous = existing.getCoverImageStorageRef();
+
         Vendor updated = baseCopy(existing)
-                .coverImageUrl(imageUrl)
+                .coverImageStorageRef(imageStorageRef)
                 .build();
 
-        return dtoMapper.toResponse(vendorRepository.save(updated));
+        Vendor saved = vendorRepository.save(updated);
+        syncRef(previous, imageStorageRef);
+        return dtoMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public VendorResponse updateCniImages(
+            UUID vendorId,
+            String frontStorageRef,
+            String backStorageRef,
+            UUID userId
+    ) {
+        log.info("Updating CNI images for vendor: {}", vendorId);
+
+        Vendor existing = findVendorOrThrow(vendorId);
+        verifyOwnership(existing, userId);
+
+        String prevFront = existing.getIdCardFrontStorageRef();
+        String prevBack  = existing.getIdCardBackStorageRef();
+
+        Vendor updated = baseCopy(existing)
+                .idCardFrontStorageRef(frontStorageRef)
+                .idCardBackStorageRef(backStorageRef)
+                .build();
+
+        Vendor saved = vendorRepository.save(updated);
+        syncRef(prevFront, frontStorageRef);
+        syncRef(prevBack,  backStorageRef);
+        return dtoMapper.toResponse(saved);
     }
 
     @Transactional
@@ -324,13 +379,6 @@ public class VendorService {
     //  Delete (Moderation-aware — using VendorState)
     // ═══════════════════════════════════════════════════════════
 
-    /**
-     * Hard delete a vendor. Only allowed when the vendor has never been
-     * published to customers:
-     * - PENDING → hard delete
-     * - INACTIVE → hard delete
-     * - ACTIVE / SUSPENDED / BANNED → refuse (must be deactivated first)
-     */
     @Transactional
     public void deleteVendor(UUID vendorId, UUID adminId) {
         log.info("Deleting vendor: {} by admin: {}", vendorId, adminId);
@@ -347,7 +395,9 @@ public class VendorService {
             );
         }
 
-        // PENDING or INACTIVE → hard delete
+        // Release all images — the vendor is gone, they're orphans now
+        releaseAllImages(existing);
+
         vendorRepository.deleteById(vendorId);
         log.info("Vendor deleted: {}", vendorId);
     }
@@ -383,9 +433,47 @@ public class VendorService {
     }
 
     /**
-     * Resolves a list of category IDs into {@link Category} objects.
-     * Ensures each category is of type CUISINE and APPROVED.
+     * Resolve an image ref from an update request.
+     *   requested == null → keep current
+     *   requested == ""   → clear
+     *   otherwise         → replace
      */
+    private String resolveRef(String requested, String current) {
+        if (requested == null) return current;
+        return requested.isBlank() ? null : requested;
+    }
+
+    /**
+     * Sync MinIO metadata for a single ref change:
+     *   old → PENDING, new → USED. No-op if equal.
+     */
+    private void syncRef(String previous, String next) {
+        if (Objects.equals(previous, next)) return;
+        if (previous != null && !previous.isBlank()) mediaService.markPending(previous);
+        if (next != null && !next.isBlank()) mediaService.markUsed(next);
+    }
+
+    private void markUsed(String... refs) {
+        for (String r : refs) {
+            if (r != null && !r.isBlank()) mediaService.markUsed(r);
+        }
+    }
+
+    private void releaseAllImages(Vendor vendor) {
+        markPending(
+                vendor.getProfileImageStorageRef(),
+                vendor.getCoverImageStorageRef(),
+                vendor.getIdCardFrontStorageRef(),
+                vendor.getIdCardBackStorageRef()
+        );
+    }
+
+    private void markPending(String... refs) {
+        for (String r : refs) {
+            if (r != null && !r.isBlank()) mediaService.markPending(r);
+        }
+    }
+
     private List<Category> resolveCuisines(List<UUID> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) {
             return new ArrayList<>();
@@ -428,18 +516,16 @@ public class VendorService {
                 .state(existing.getState())
                 .deliveryRadius(existing.getDeliveryRadius())
                 .pickupAddress(existing.getPickupAddress())
-                .profileImageUrl(existing.getProfileImageUrl())
-                .coverImageUrl(existing.getCoverImageUrl())
+                .profileImageStorageRef(existing.getProfileImageStorageRef())
+                .coverImageStorageRef(existing.getCoverImageStorageRef())
+                .idCardFrontStorageRef(existing.getIdCardFrontStorageRef())
+                .idCardBackStorageRef(existing.getIdCardBackStorageRef())
                 .categories(existing.getCategories())
                 .distributionLocations(existing.getDistributionLocations())
                 .createdAt(existing.getCreatedAt())
                 .updatedAt(Instant.now());
     }
 
-    /**
-     * Fetch the vendor entity for the currently authenticated user.
-     * Used internally by other services (not exposed via API).
-     */
     public Vendor getOwnProfileEntity(UUID userId) {
         return vendorRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(

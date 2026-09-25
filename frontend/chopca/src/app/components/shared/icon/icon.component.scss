@@ -1,0 +1,18 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  user-select: none;
+}
+
+.icon {
+  font-size: inherit;
+  line-height: 1;
+}
+
+.icon-sm { font-size: 1rem; }     /* 16px */
+.icon-md { font-size: 1.25rem; }  /* 20px */
+.icon-lg { font-size: 1.5rem; }   /* 24px */
+.icon-xl { font-size: 2rem; }     /* 32px */
+

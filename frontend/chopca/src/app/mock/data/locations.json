@@ -1,0 +1,62 @@
+[
+  {
+    "id": "loc-akwa",
+    "vendorId": "vendor-maman-pauline",
+    "vendorBusinessName": "Chez Maman Pauline",
+    "name": "Akwa",
+    "address": "Akwa, Douala",
+    "phone": "+237612345678",
+    "latitude": 4.0480,
+    "longitude": 9.7021,
+    "deliveryRadius": 5,
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "loc-bonapriso",
+    "vendorId": "vendor-grill-rond-point",
+    "vendorBusinessName": "Le Grill du Rond-Point",
+    "name": "Bonapriso",
+    "address": "Bonapriso, Douala",
+    "phone": "+237623456789",
+    "latitude": 4.0180,
+    "longitude": 9.7080,
+    "deliveryRadius": 7,
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-05T09:00:00Z",
+    "updatedAt": "2025-08-05T09:00:00Z"
+  },
+  {
+    "id": "loc-bastos",
+    "vendorId": "vendor-saveurs-bamileke",
+    "vendorBusinessName": "Saveurs Bamiléké",
+    "name": "Bastos",
+    "address": "Bastos, Yaoundé",
+    "phone": "+237634567890",
+    "latitude": 3.8950,
+    "longitude": 11.5180,
+    "deliveryRadius": 6,
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-06T10:00:00Z",
+    "updatedAt": "2025-08-06T10:00:00Z"
+  },
+  {
+    "id": "loc-omnisports",
+    "vendorId": "vendor-chef-enya",
+    "vendorBusinessName": "Chef Enya & Co.",
+    "name": "Omnisports",
+    "address": "Omnisports, Yaoundé",
+    "phone": "+237645678901",
+    "latitude": 3.8780,
+    "longitude": 11.5250,
+    "deliveryRadius": 8,
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-07T11:00:00Z",
+    "updatedAt": "2025-08-07T11:00:00Z"
+  }
+]

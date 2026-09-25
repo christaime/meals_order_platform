@@ -17,6 +17,13 @@
 -- User references (created_by_id, performed_by_id, changed_by, etc.)
 -- hold the Keycloak `sub` claim parsed as UUID.
 -- No users table yet — deferred to Phase 2.
+--
+-- MEDIA
+-- -----
+-- Images are stored in MinIO. The DB only keeps the object key
+-- (storage ref), never the URL. URLs are computed at read time
+-- by MediaStoragePort (see MediaUrlResolver in the mapper layer).
+-- Object keys look like "meal_image/<uuid>.jpg", "vendor_logo/<uuid>.png".
 -- ============================================================
 
 -- Enable UUID extension
@@ -130,9 +137,11 @@ CREATE TABLE vendors (
     delivery_radius INTEGER NOT NULL DEFAULT 10,
     pickup_address VARCHAR(255),
 
-    -- Profile
-    profile_image_url VARCHAR(500),
-    cover_image_url VARCHAR(500),
+    -- Profile (MinIO object keys — URLs are derived at read time)
+    profile_image_storage_ref   VARCHAR(512),
+    cover_image_storage_ref     VARCHAR(512),
+    id_card_front_storage_ref   VARCHAR(512),
+    id_card_back_storage_ref    VARCHAR(512),
 
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -246,7 +255,10 @@ CREATE TABLE meals (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
-    image_url VARCHAR(500),
+
+    -- MinIO object key — URL derived at read time
+    image_storage_ref VARCHAR(512),
+
     is_available BOOLEAN NOT NULL DEFAULT TRUE,
     average_rating DECIMAL(3, 2) NOT NULL DEFAULT 0.00,
     total_ratings INTEGER NOT NULL DEFAULT 0,

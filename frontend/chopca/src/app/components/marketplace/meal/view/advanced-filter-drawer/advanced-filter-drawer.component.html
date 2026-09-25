@@ -1,0 +1,143 @@
+<!-- Trigger Button -->
+<button
+  type="button"
+  (click)="openDrawer()"
+  class="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors shadow-xs"
+>
+  <app-icon name="tune" size="sm" class="text-primary" />
+  <span class="font-label-md text-xs font-semibold">Filtres</span>
+</button>
+
+<!-- Backdrop & Backdrop Modal -->
+@if (isOpen()) {
+<div
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 transition-opacity"
+  (click)="closeDrawer()"
+></div>
+
+<!-- Slide Drawer -->
+<aside
+  class="fixed inset-y-0 right-0 w-full max-w-md bg-surface-container-lowest z-50 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-250"
+>
+  <!-- Drawer Header -->
+  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <app-icon name="tune" class="text-primary" />
+      <h2 class="font-headline-sm text-lg font-bold text-on-surface">Filtres avancés</h2>
+    </div>
+    <button
+      type="button"
+      (click)="closeDrawer()"
+      class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors"
+    >
+      <app-icon name="close" size="sm" />
+    </button>
+  </div>
+
+  <!-- Drawer Body / Filter Options -->
+  <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
+
+    <!-- Max Price Slider -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+          Prix Maximum
+        </label>
+        <span class="font-body-md text-sm font-bold text-primary">
+            {{ draftFilters().maxPrice }} FCFA
+          </span>
+      </div>
+      <input
+        type="range"
+        min="1000"
+        max="20000"
+        step="500"
+        [value]="draftFilters().maxPrice"
+        (input)="updateMaxPrice($event)"
+        class="w-full accent-primary cursor-pointer"
+      />
+      <div class="flex justify-between text-[10px] text-on-surface-variant font-medium">
+        <span>1 000 FCFA</span>
+        <span>20 000 FCFA</span>
+      </div>
+    </div>
+
+    <!-- Max Prep Time Slider -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+          Temps de préparation max
+        </label>
+        <span class="font-body-md text-sm font-bold text-primary">
+            {{ draftFilters().maxPrepTime }} min
+          </span>
+      </div>
+      <input
+        type="range"
+        min="15"
+        max="90"
+        step="5"
+        [value]="draftFilters().maxPrepTime"
+        (input)="updateMaxPrepTime($event)"
+        class="w-full accent-primary cursor-pointer"
+      />
+    </div>
+
+    <!-- Minimum Rating Options -->
+    <div class="flex flex-col gap-2">
+      <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+        Note minimale
+      </label>
+      <div class="flex items-center gap-2">
+        @for (stars of [0, 3, 4, 4.5]; track stars) {
+        <button
+          type="button"
+          (click)="setMinRating(stars)"
+          class="flex-1 py-2 rounded-xl border text-xs font-semibold transition-all"
+          [class.bg-primary]="draftFilters().minRating === stars"
+          [class.text-on-primary]="draftFilters().minRating === stars"
+          [class.border-primary]="draftFilters().minRating === stars"
+          [class.bg-surface-container-low]="draftFilters().minRating !== stars"
+          [class.text-on-surface-variant]="draftFilters().minRating !== stars"
+          [class.border-outline-variant]="draftFilters().minRating !== stars"
+        >
+          {{ stars === 0 ? 'Toutes' : stars + '+ ★' }}
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Availability Toggle -->
+    <div class="flex items-center justify-between pt-2 border-t border-outline-variant">
+      <div class="flex flex-col">
+        <span class="font-label-md text-sm font-bold text-on-surface">Disponible immédiatement</span>
+        <span class="text-xs text-on-surface-variant">Exclure les plats épuisés</span>
+      </div>
+      <input
+        type="checkbox"
+        [checked]="draftFilters().availableOnly"
+        (change)="toggleAvailableOnly()"
+        class="w-5 h-5 accent-primary rounded cursor-pointer"
+      />
+    </div>
+  </div>
+
+  <!-- Drawer Footer Actions -->
+  <div class="p-5 border-t border-outline-variant bg-surface-container-low flex items-center gap-3">
+    <button
+      type="button"
+      (click)="resetFilters()"
+      class="px-4 py-3 rounded-full border border-outline-variant text-on-surface font-label-md text-xs font-semibold hover:bg-surface-container transition-colors"
+    >
+      Réinitialiser
+    </button>
+    <button
+      type="button"
+      (click)="onApply()"
+      class="flex-1 py-3 rounded-full bg-primary text-on-primary font-label-md text-xs font-bold hover:bg-primary-container transition-colors shadow-sm"
+    >
+      Appliquer les filtres
+    </button>
+  </div>
+</aside>
+}

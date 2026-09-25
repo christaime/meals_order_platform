@@ -1,0 +1,11 @@
+<h2 mat-dialog-title class="flex items-center gap-2">
+  <mat-icon class="text-primary">local_fire_department</mat-icon>
+  Nouvel ingrédient
+</h2>
+
+<mat-dialog-content>
+  <app-ingredient-form
+    [ingredient]="prefill"
+    (saved)="onSaved($event)"
+    (cancelled)="onCancelled()" />
+</mat-dialog-content>

@@ -1,0 +1,65 @@
+<footer
+  class="w-full bg-surface-container-low
+         border-t border-outline-variant/40
+         py-8">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12
+              flex flex-col md:flex-row items-center justify-between
+              gap-6">
+
+    <!-- ─── Left: trust line + payment methods ───────────── -->
+    <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+
+      <!-- Location trust line -->
+      <div class="flex items-center gap-2">
+        <app-icon name="verified" size="md" class="text-secondary" />
+        <span class="font-label text-xs text-on-surface">
+          Chop ça! Cameroun • Yaoundé &amp; Douala &amp; Bafoussam &amp; Limbé
+        </span>
+      </div>
+
+      <!-- Separator (desktop only) -->
+      <span class="hidden sm:inline text-outline-variant">•</span>
+
+      <!-- Payment methods -->
+      <div class="flex items-center gap-2 font-label text-xs text-on-surface-variant">
+        <span>Paiements certifiés :</span>
+        @for (method of paymentMethods; track method) {
+        <span
+          class="bg-surface-container-highest
+                   px-2 py-0.5 rounded
+                   text-on-surface font-semibold">
+            {{ method }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- ─── Right: support + legal ───────────────────────── -->
+    <div class="flex items-center gap-6">
+
+      <!-- WhatsApp Pro support -->
+      <a
+        [href]="whatsappUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5
+               text-secondary hover:underline
+               font-label text-xs font-semibold
+               no-underline transition-colors">
+        <app-icon name="chat" size="sm" />
+        <span>Assistance WhatsApp Pro (+237)</span>
+      </a>
+
+      <!-- Legal links -->
+      <a
+        routerLink="/mentions-legales"
+        class="font-label text-xs text-on-surface-variant
+               hover:text-on-surface no-underline
+               transition-colors">
+        Mentions Légales &amp; Conditions
+      </a>
+    </div>
+
+  </div>
+</footer>

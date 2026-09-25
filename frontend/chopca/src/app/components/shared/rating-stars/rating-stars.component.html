@@ -1,0 +1,22 @@
+<span class="rating" [class]="'rating-' + size()">
+  <span class="stars" aria-hidden="true">
+    @for (fill of starFills(); track $index) {
+      <span class="star-wrapper">
+        <app-icon name="star" size="sm" class="star-empty" />
+        @if (fill > 0) {
+          <span class="star-filled" [style.width.%]="fill">
+            <app-icon name="star" [filled]="true" size="sm" />
+          </span>
+        }
+      </span>
+    }
+  </span>
+
+  @if (showValue()) {
+    <span class="value">{{ rating().toFixed(1) }}</span>
+  }
+
+  @if (count() !== null && count()! > 0) {
+    <span class="count">({{ count() }} avis)</span>
+  }
+</span>

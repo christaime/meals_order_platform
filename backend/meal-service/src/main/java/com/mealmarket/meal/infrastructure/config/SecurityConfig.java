@@ -58,8 +58,11 @@ public class SecurityConfig {
 
                         // ─── Public endpoints (no auth) ────────────────────
                         .requestMatchers("/api/v1/public/**").permitAll()
+                        .requestMatchers("/api/v1/reference/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/media").authenticated()
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/media/url").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/media").authenticated()
                         // ─── Swagger / OpenAPI ─────────────────────────────
                         .requestMatchers(
                                 "/v3/api-docs/**",

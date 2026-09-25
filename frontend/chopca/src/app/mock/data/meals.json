@@ -1,0 +1,63 @@
+[
+  {
+    "id": "meal-ndole-royal",
+    "vendorId": "vendor-maman-pauline",
+    "vendorBusinessName": "Chez Maman Pauline",
+    "name": "Ndolé Royal Crevettes & Viande Fumée",
+    "description": "Feuilles de ndolé fraîches cuisinées aux arachides concassées, grosses crevettes fraîches et bœuf fumé. Servi avec miondo ou plantains mûrs.",
+    "price": 4500,
+    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+    "isAvailable": true,
+    "averageRating": 4.9,
+    "totalRatings": 184,
+    "prepTimeMinutes": 35,
+    "cuisines": [
+      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "cat-plat-resistance", "name": "Plat de résistance", "iconUrl": null, "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-ndole", "name": "Feuilles de Ndolé", "isAllergen": false },
+      { "id": "ing-arachide", "name": "Pâte d'arachides", "isAllergen": true },
+      { "id": "ing-crevette", "name": "Crevettes Kribi", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-akwa", "name": "Akwa", "address": "Akwa, Douala", "moderationStatus": "APPROVED" }
+    ],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T10:00:00Z",
+    "updatedAt": "2025-09-10T14:30:00Z"
+  },
+  {
+    "id": "meal-poisson-braise",
+    "vendorId": "vendor-grill-rond-point",
+    "vendorBusinessName": "Le Grill du Rond-Point",
+    "name": "Poisson Braisé au Pèbè & Rondelles",
+    "description": "Bar frais mariné aux épices du pays (djansang, pèbè, ail, gingembre), braisé au feu de bois. Servi avec bobolo chaud et sauce pimentée.",
+    "price": 3800,
+    "imageUrl": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800",
+    "isAvailable": true,
+    "averageRating": 4.8,
+    "totalRatings": 212,
+    "prepTimeMinutes": 40,
+    "cuisines": [
+      { "id": "cat-street-food", "name": "Street Food (Braises)", "iconUrl": null, "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "cat-poissons-viandes", "name": "Poissons & Viandes", "iconUrl": null, "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-poisson", "name": "Bar frais", "isAllergen": false },
+      { "id": "ing-pebe", "name": "Épices Pèbè", "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-bonapriso", "name": "Bonapriso", "address": "Bonapriso, Douala", "moderationStatus": "APPROVED" }
+    ],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-05T09:00:00Z",
+    "updatedAt": "2025-09-11T11:15:00Z"
+  }
+]

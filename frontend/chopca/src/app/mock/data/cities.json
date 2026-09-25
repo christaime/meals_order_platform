@@ -1,0 +1,14 @@
+[
+  { "id": "douala",     "name": "Douala",     "region": "Littoral" },
+  { "id": "yaounde",    "name": "Yaoundé",    "region": "Centre" },
+  { "id": "bafoussam",  "name": "Bafoussam",  "region": "Ouest" },
+  { "id": "bamenda",    "name": "Bamenda",    "region": "Nord-Ouest" },
+  { "id": "buea",       "name": "Buea",       "region": "Sud-Ouest" },
+  { "id": "kribi",      "name": "Kribi",      "region": "Sud" },
+  { "id": "limbe",      "name": "Limbé",      "region": "Sud-Ouest" },
+  { "id": "ngaoundere", "name": "Ngaoundéré", "region": "Adamaoua" },
+  { "id": "garoua",     "name": "Garoua",     "region": "Nord" },
+  { "id": "maroua",     "name": "Maroua",     "region": "Extrême-Nord" },
+  { "id": "bertoua",    "name": "Bertoua",    "region": "Est" },
+  { "id": "ebolowa",    "name": "Ebolowa",    "region": "Sud" }
+]

@@ -1,0 +1,119 @@
+<div class="flex flex-col gap-6">
+
+  <!-- ═════════ Name ═════════ -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Nom du plat</mat-label>
+    <mat-icon matPrefix>restaurant_menu</mat-icon>
+    <input
+      matInput
+      [formControl]="name"
+      placeholder="Ex: Mbongo Tchobi de Capitaine, Poulet DG…" />
+    @if (nameError()) {
+    <mat-error>{{ nameError() }}</mat-error>
+    }
+    <mat-hint>Mentionnez l'accompagnement signature pour booster les commandes.</mat-hint>
+  </mat-form-field>
+
+  <!-- ═════════ Cuisines (chips) ═════════ -->
+  <div class="flex flex-col gap-1">
+    <label class="text-xs font-semibold text-gray-700">
+      Origine culinaire &amp; spécialité
+    </label>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-chip-grid #cuisineGrid aria-label="Cuisines sélectionnées">
+        @for (c of selectedCuisines(); track c.id) {
+        <mat-chip-row (removed)="removeCuisine(c)">
+          {{ c.name }}
+          <button matChipRemove aria-label="Retirer">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+        }
+        <input
+          matInput
+          placeholder="Ajouter une cuisine…"
+          [matChipInputFor]="cuisineGrid"
+          [matAutocomplete]="cuisineAuto"
+          (input)="onCuisineFilterInput($event)" />
+      </mat-chip-grid>
+
+      <mat-autocomplete
+        #cuisineAuto="matAutocomplete"
+        (optionSelected)="addCuisine($event.option.value)">
+        @for (c of filteredCuisines(); track c.id) {
+        <mat-option [value]="c">{{ c.name }}</mat-option>
+        }
+      </mat-autocomplete>
+
+      @if (cuisineError()) {
+      <mat-error>{{ cuisineError() }}</mat-error>
+      }
+      <mat-hint>Choisissez jusqu'à 3 cuisines (minimum 1).</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- ═════════ Dish types (chips) ═════════ -->
+  <div class="flex flex-col gap-1">
+    <label class="text-xs font-semibold text-gray-700">
+      Type de plat
+    </label>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-chip-grid #dishGrid aria-label="Types de plat sélectionnés">
+        @for (d of selectedDishTypes(); track d.id) {
+        <mat-chip-row (removed)="removeDishType(d)">
+          {{ d.name }}
+          <button matChipRemove aria-label="Retirer">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+        }
+        <input
+          matInput
+          placeholder="Ajouter un type…"
+          [matChipInputFor]="dishGrid"
+          [matAutocomplete]="dishAuto"
+          (input)="onDishTypeFilterInput($event)" />
+      </mat-chip-grid>
+
+      <mat-autocomplete
+        #dishAuto="matAutocomplete"
+        (optionSelected)="addDishType($event.option.value)">
+        @for (d of filteredDishTypes(); track d.id) {
+        <mat-option [value]="d">{{ d.name }}</mat-option>
+        }
+      </mat-autocomplete>
+
+      @if (dishTypeError()) {
+      <mat-error>{{ dishTypeError() }}</mat-error>
+      }
+      <mat-hint>Plat principal, dessert, boisson… (minimum 1).</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- ═════════ Description ═════════ -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Description</mat-label>
+    <textarea
+      matInput
+      [formControl]="description"
+      rows="4"
+      maxlength="300"
+      placeholder="Décrivez le plat, ses saveurs, son origine…">
+    </textarea>
+    <mat-hint align="end">{{ descriptionLength() }}/300</mat-hint>
+  </mat-form-field>
+
+  <!-- ═════════ Image URL (temporary) ═════════ -->
+  <app-image-uploader
+    purpose="MEAL_IMAGE"
+    shape="wide"
+    label="Photographie du plat"
+    hint="JPG, PNG ou WebP, jusqu'à 8 Mo. Format 4:3 recommandé."
+    [mediaRef]="imageMedia()"
+    [maxSizeMb]="8"
+    (uploaded)="imageUploaded.emit($event)"
+    (cleared)="imageCleared.emit()" />
+
+</div>

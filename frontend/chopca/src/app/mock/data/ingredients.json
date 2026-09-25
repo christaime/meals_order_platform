@@ -1,0 +1,112 @@
+[
+  {
+    "id": "ing-ndole",
+    "name": "Feuilles de Ndolé",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-arachide",
+    "name": "Pâte d'arachides",
+    "isAllergen": true,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-crevette",
+    "name": "Crevettes Kribi",
+    "isAllergen": true,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-boeuf-fume",
+    "name": "Bœuf fumé",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-poisson",
+    "name": "Bar frais",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-pebe",
+    "name": "Épices Pèbè",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-haricot",
+    "name": "Graines de niébé",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-huile-palme",
+    "name": "Huile de palme rouge",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-poulet",
+    "name": "Poulet fermier",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  },
+  {
+    "id": "ing-plantain",
+    "name": "Plantain mûr",
+    "isAllergen": false,
+    "createdByType": "ADMIN",
+    "createdById": "admin-1",
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-08-01T08:00:00Z"
+  }
+]

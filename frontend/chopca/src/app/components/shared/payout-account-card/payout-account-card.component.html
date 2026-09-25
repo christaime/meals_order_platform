@@ -1,0 +1,37 @@
+<div
+  class="flex flex-col gap-2 p-4 rounded-lg bg-surface-container-low"
+  [class.opacity-80]="optional()">
+
+  <!-- Header row: label + status dot -->
+  <div class="flex items-center justify-between">
+    <span class="font-label text-sm font-bold text-on-surface">
+      {{ label() }}
+      @if (optional()) {
+        <span class="font-label text-[10px] font-normal text-on-surface-variant ml-1">
+          (Optionnel)
+        </span>
+      }
+    </span>
+
+    <span
+        class="inline-block rounded-full w-2 h-2"
+        [class.bg-secondary]="!optional()"
+        [class.bg-outline]="optional()">
+  </span>
+  </div>
+
+  <!-- Input -->
+  <input
+    [type]="inputType()"
+    [class]="INPUT_CLASSES + ' !bg-surface-container-lowest !py-2 text-sm'"
+    [formControl]="control()"
+    [placeholder]="placeholder()" />
+
+  <!-- Hint -->
+  @if (hint()) {
+  <span class="font-label text-[10px] text-on-surface-variant">
+      {{ hint() }}
+    </span>
+  }
+
+</div>

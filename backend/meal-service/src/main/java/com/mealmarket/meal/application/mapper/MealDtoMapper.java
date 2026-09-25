@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 /**
  * Maps between {@link Meal} (domain) and its DTOs.
  *
+ * Image handling:
+ * - {@code imageStorageRef} passes through untouched (the editor needs it for round-trip).
+ * - {@code imageUrl} is computed via {@link MediaUrlResolver}, which delegates to
+ *   the {@code MediaStoragePort}. Never persisted; always derived at read time.
+ *
  * Handles:
  * - Vendor flattening (Vendor → vendorId + vendorBusinessName)
  * - Category splitting (categories → cuisines + dishTypes)
@@ -24,7 +29,7 @@ import java.util.stream.Collectors;
  * - Location summarization
  * - Derived isActive
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = MediaUrlResolver.class)
 public interface MealDtoMapper {
 
     MealDtoMapper INSTANCE = Mappers.getMapper(MealDtoMapper.class);
@@ -35,11 +40,15 @@ public interface MealDtoMapper {
 
     @Mapping(target = "vendorId", source = "vendor.id")
     @Mapping(target = "vendorBusinessName", source = "vendor.businessName")
-    @Mapping(target = "cuisines", source = "categories", qualifiedByName = "mapCuisines")
-    @Mapping(target = "dishTypes", source = "categories", qualifiedByName = "mapDishTypes")
-    @Mapping(target = "ingredients", source = "ingredients", qualifiedByName = "mapIngredientSummaries")
+
+    @Mapping(target = "imageUrl",        source = "imageStorageRef", qualifiedByName = "toUrl")
+    @Mapping(target = "imageStorageRef", source = "imageStorageRef")
+
+    @Mapping(target = "cuisines",              source = "categories",            qualifiedByName = "mapCuisines")
+    @Mapping(target = "dishTypes",             source = "categories",            qualifiedByName = "mapDishTypes")
+    @Mapping(target = "ingredients",           source = "ingredients",           qualifiedByName = "mapIngredientSummaries")
     @Mapping(target = "distributionLocations", source = "distributionLocations", qualifiedByName = "mapLocationSummaries")
-    @Mapping(target = "isActive", source = ".", qualifiedByName = "deriveIsActive")
+    @Mapping(target = "isActive",              source = ".",                     qualifiedByName = "deriveIsActive")
     MealResponse toResponse(Meal meal);
 
     List<MealResponse> toResponseList(List<Meal> meals);
@@ -50,7 +59,10 @@ public interface MealDtoMapper {
 
     @Mapping(target = "vendorId", source = "vendor.id")
     @Mapping(target = "vendorBusinessName", source = "vendor.businessName")
-    @Mapping(target = "cuisines", source = "categories", qualifiedByName = "mapCuisines")
+
+    @Mapping(target = "imageUrl", source = "imageStorageRef", qualifiedByName = "toUrl")
+
+    @Mapping(target = "cuisines",  source = "categories", qualifiedByName = "mapCuisines")
     @Mapping(target = "dishTypes", source = "categories", qualifiedByName = "mapDishTypes")
     MealSummaryResponse toSummary(Meal meal);
 

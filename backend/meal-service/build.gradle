@@ -18,6 +18,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // ─── Database ──────────────────────────────────────────────
     implementation 'org.postgresql:postgresql'
@@ -28,6 +29,10 @@ dependencies {
 
     // ─── Feign Clients ─────────────────────────────────────────
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // ─── Resilience ─────────────────────────────────────────────
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // ─── MapStruct ─────────────────────────────────────────────
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'

@@ -1,0 +1,17 @@
+[
+  {
+    "value": "SMALL",
+    "label": "10 à 30",
+    "description": "Idéal pour chefs à domicile & traiteurs intimistes"
+  },
+  {
+    "value": "MEDIUM",
+    "label": "30 à 80",
+    "description": "Restaurants traditionnels et braises d'affluence"
+  },
+  {
+    "value": "LARGE",
+    "label": "80+",
+    "description": "Chaînes, traiteurs de mariages, banquets"
+  }
+]

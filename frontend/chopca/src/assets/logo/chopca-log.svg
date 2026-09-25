@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 120" width="440" height="120" fill="none">
+  <defs>
+    <!-- Terracotta pot gradient -->
+    <linearGradient id="potBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b83f00"/>
+      <stop offset="50%" stop-color="#a43700"/>
+      <stop offset="100%" stop-color="#732500"/>
+    </linearGradient>
+
+    <!-- Warm steam gradients -->
+    <linearGradient id="mainSteamGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#a43700" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#d95e09" stop-opacity="0.85"/>
+      <stop offset="85%" stop-color="#f59e0b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <linearGradient id="sideSteamGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#d95e09" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fef08a" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Group for Logo Wordmark and Steaming Pot Exclamation Mark -->
+  <g id="chop-ca-brand-logo" transform="translate(12, 10)">
+
+    <!-- 1. "Chop" - Pure deep black (#111111), ultra bold 900 -->
+    <text x="0" y="76"
+          font-family="'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif"
+          font-size="66"
+          font-weight="900"
+          letter-spacing="-1.5px"
+          fill="#111111">Chop</text>
+
+    <!-- 2. "Ça" - Attached directly with capital 'Ç', in brand primary terracotta (#a43700) -->
+    <text x="185" y="76"
+          font-family="'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif"
+          font-size="66"
+          font-weight="900"
+          letter-spacing="-1.5px"
+          fill="#a43700">Ça</text>
+
+    <!-- 3. Exclamation mark stylized as a cooking pot with rising aromatic steam -->
+    <g id="exclamation-pot" transform="translate(275, 0)">
+
+      <!-- Upper part of exclamation mark: Rising aromatic steam plumes -->
+      <!-- Center primary steam plume (vertical stroke of '!') -->
+      <path d="M 28 53
+               C 23 40, 33 29, 25 17
+               C 21 11, 26 5, 23 0"
+            stroke="url(#mainSteamGrad)"
+            stroke-width="5.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"/>
+
+      <!-- Left steam plume wisp -->
+      <path d="M 17 50
+               C 12 39, 16 28, 11 18
+               C 9 14, 11 8, 10 3"
+            stroke="url(#sideSteamGrad)"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            fill="none"/>
+
+      <!-- Right steam plume wisp (golden spices aroma) -->
+      <path d="M 38 52
+               C 44 42, 40 31, 44 21
+               C 46 16, 44 10, 42 5"
+            stroke="#f59e0b"
+            stroke-opacity="0.85"
+            stroke-width="3"
+            stroke-linecap="round"
+            fill="none"/>
+
+      <!-- Aroma sparkle droplets -->
+      <circle cx="28" cy="-5" r="2.2" fill="#f59e0b" opacity="0.9"/>
+      <circle cx="40" cy="1" r="1.6" fill="#d95e09" opacity="0.8"/>
+      <circle cx="10" cy="-2" r="1.4" fill="#fbbf24" opacity="0.75"/>
+
+      <!-- Lower part of exclamation mark (The Dot): African traditional cooking pot (Marmite) -->
+      <!-- Pot Left Handle -->
+      <path d="M 9 68 C 3 68, 3 75, 9 76"
+            stroke="#732500"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            fill="none"/>
+
+      <!-- Pot Right Handle -->
+      <path d="M 47 68 C 53 68, 53 75, 47 76"
+            stroke="#732500"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            fill="none"/>
+
+      <!-- Pot Belly -->
+      <path d="M 10 65
+               C 9 82, 14 92, 28 92
+               C 42 92, 47 82, 46 65
+               Z"
+            fill="url(#potBodyGrad)"/>
+
+      <!-- Pot Rim & Hot stew inside -->
+      <ellipse cx="28" cy="65" rx="18" ry="5" fill="#f59e0b" stroke="#732500" stroke-width="1.8"/>
+      <ellipse cx="28" cy="65" rx="15" ry="3.5" fill="#a43700"/>
+
+      <!-- Light sheen / highlight on round pot curve -->
+      <path d="M 15 70 C 14 77, 18 85, 23 88"
+            stroke="#ffffff"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            opacity="0.4"/>
+
+      <!-- Traditional 3 pot tripod legs -->
+      <path d="M 17 90 L 14 98" stroke="#732500" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M 28 92 L 28 99.5" stroke="#732500" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M 39 90 L 42 98" stroke="#732500" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

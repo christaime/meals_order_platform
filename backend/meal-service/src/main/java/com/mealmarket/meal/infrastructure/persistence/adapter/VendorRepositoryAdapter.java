@@ -93,6 +93,11 @@ public class VendorRepositoryAdapter implements VendorRepository {
     }
 
     @Override
+    public boolean existsByUserId(UUID userId) {
+        return jpaRepository.existsByUserId(userId);
+    }
+
+    @Override
     public boolean existsByBusinessName(String businessName) {
         return jpaRepository.existsByBusinessNameIgnoreCase(businessName);
     }
@@ -163,6 +168,7 @@ public class VendorRepositoryAdapter implements VendorRepository {
         return jpaRepository.existsByCategoryId(categoryId);
     }
 
+
     // ═══════════════════════════════════════════════════════════
     //  Helpers
     // ═══════════════════════════════════════════════════════════
@@ -201,8 +207,10 @@ public class VendorRepositoryAdapter implements VendorRepository {
                 .state(partial.getState())
                 .deliveryRadius(partial.getDeliveryRadius())
                 .pickupAddress(partial.getPickupAddress())
-                .profileImageUrl(partial.getProfileImageUrl())
-                .coverImageUrl(partial.getCoverImageUrl())
+                .profileImageStorageRef(partial.getProfileImageStorageRef())
+                .coverImageStorageRef(partial.getCoverImageStorageRef())
+                .idCardFrontStorageRef(partial.getIdCardFrontStorageRef())
+                .idCardBackStorageRef(partial.getIdCardBackStorageRef())
                 .categories(categories)
                 .distributionLocations(List.of()) // avoid deep recursion — set below
                 .createdAt(partial.getCreatedAt())
@@ -240,8 +248,10 @@ public class VendorRepositoryAdapter implements VendorRepository {
                 .state(vendor.getState())
                 .deliveryRadius(vendor.getDeliveryRadius())
                 .pickupAddress(vendor.getPickupAddress())
-                .profileImageUrl(vendor.getProfileImageUrl())
-                .coverImageUrl(vendor.getCoverImageUrl())
+                .profileImageStorageRef(vendor.getProfileImageStorageRef())
+                .coverImageStorageRef(vendor.getCoverImageStorageRef())
+                .idCardFrontStorageRef(vendor.getIdCardFrontStorageRef())
+                .idCardBackStorageRef(vendor.getIdCardBackStorageRef())
                 .categories(categories)
                 .distributionLocations(locationsWithVendor)
                 .createdAt(vendor.getCreatedAt())

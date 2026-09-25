@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 110" width="64" height="110" fill="none">
+  <defs>
+    <linearGradient id="potBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b83f00"/>
+      <stop offset="50%" stop-color="#a43700"/>
+      <stop offset="100%" stop-color="#732500"/>
+    </linearGradient>
+    <linearGradient id="mainSteamGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#a43700" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#d95e09" stop-opacity="0.85"/>
+      <stop offset="85%" stop-color="#f59e0b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="sideSteamGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#d95e09" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#fef08a" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(-9, 10)">
+    <!-- paste the exclamation-pot group contents here -->
+  </g>
+</svg>

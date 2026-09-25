@@ -19,13 +19,23 @@ import java.util.stream.Collectors;
 /**
  * Maps between {@link Vendor} (domain) and its DTOs.
  *
+ * Image handling:
+ * - {@code *StorageRef} fields pass through untouched (the editor needs them
+ *   for round-trip saves).
+ * - {@code *Url} fields are computed via {@link MediaUrlResolver}, which
+ *   delegates to the {@code MediaStoragePort}. Never persisted; always derived.
+ *
+ * CNI (idCardFront / idCardBack) URLs are only present on the full
+ * {@link VendorResponse}, never on {@link VendorSummaryResponse} — identity
+ * documents must not leak into public listings.
+ *
  * Handles:
  * - State flattening (VendorState → individual fields)
- * - Cusines filter (only CUISINE categories)
+ * - Cuisines filter (only CUISINE categories)
  * - Location summarization
  * - Category summarization
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = MediaUrlResolver.class)
 public interface VendorDtoMapper {
 
     VendorDtoMapper INSTANCE = Mappers.getMapper(VendorDtoMapper.class);
@@ -39,17 +49,29 @@ public interface VendorDtoMapper {
     @Mapping(target = "statusChangedAt", source = "state.changedAt")
     @Mapping(target = "statusChangedBy", source = "state.changedBy")
     @Mapping(target = "statusChangeType", source = "state.changeType")
-    @Mapping(target = "cuisines", source = "categories", qualifiedByName = "mapCuisines")
+
+    @Mapping(target = "profileImageUrl",         source = "profileImageStorageRef",  qualifiedByName = "toUrl")
+    @Mapping(target = "profileImageStorageRef",  source = "profileImageStorageRef")
+    @Mapping(target = "coverImageUrl",           source = "coverImageStorageRef",    qualifiedByName = "toUrl")
+    @Mapping(target = "coverImageStorageRef",    source = "coverImageStorageRef")
+    @Mapping(target = "idCardFrontUrl",          source = "idCardFrontStorageRef",   qualifiedByName = "toUrl")
+    @Mapping(target = "idCardFrontStorageRef",   source = "idCardFrontStorageRef")
+    @Mapping(target = "idCardBackUrl",           source = "idCardBackStorageRef",    qualifiedByName = "toUrl")
+    @Mapping(target = "idCardBackStorageRef",    source = "idCardBackStorageRef")
+
+    @Mapping(target = "cuisines",              source = "categories",            qualifiedByName = "mapCuisines")
     @Mapping(target = "distributionLocations", source = "distributionLocations", qualifiedByName = "mapLocationSummaries")
     VendorResponse toResponse(Vendor vendor);
 
     List<VendorResponse> toResponseList(List<Vendor> vendors);
 
     // ═══════════════════════════════════════════════════════════
-    //  Summary Response
+    //  Summary Response — only the profile image is exposed.
+    //  CNI URLs are deliberately omitted from summaries.
     // ═══════════════════════════════════════════════════════════
 
     @Mapping(target = "status", source = "state.status")
+    @Mapping(target = "profileImageUrl", source = "profileImageStorageRef", qualifiedByName = "toUrl")
     @Mapping(target = "cuisines", source = "categories", qualifiedByName = "mapCuisines")
     VendorSummaryResponse toSummary(Vendor vendor);
 

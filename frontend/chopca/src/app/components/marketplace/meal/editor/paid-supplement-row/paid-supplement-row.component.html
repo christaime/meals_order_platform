@@ -1,0 +1,24 @@
+<div class="flex items-center justify-between gap-2 p-2.5 rounded-lg
+            bg-surface-container-lowest
+            border border-outline-variant/40">
+
+  <span class="font-body text-sm text-on-surface truncate">
+    {{ supplement().name }}
+  </span>
+
+  <div class="flex items-center gap-2 shrink-0">
+    <span class="font-currency text-sm font-bold text-primary">
+      + {{ supplement().price.toLocaleString('fr-FR') }} FCFA
+    </span>
+
+    <button
+      type="button"
+      (click)="onRemove()"
+      [attr.aria-label]="'Retirer ' + supplement().name"
+      class="p-1 rounded-full border-0 bg-transparent
+             text-on-surface-variant cursor-pointer
+             hover:text-error transition-colors">
+      <app-icon name="delete" size="sm" />
+    </button>
+  </div>
+</div>

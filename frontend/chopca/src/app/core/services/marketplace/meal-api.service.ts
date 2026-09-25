@@ -1,0 +1,109 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import {
+  Meal,
+  MealSummary,
+  MealRequest,
+  MealSearchRequest,
+} from '@app/core/models/marketplace';
+import { DataPage } from '@app/core/models/shared';
+import { MealService } from './meal.service';
+import { environment } from '@environments/environment';
+
+/**
+ * Real implementation of MealService.
+ * Talks to the backend's meal API through the Gateway.
+ */
+@Injectable()
+export class MealApiService implements MealService {
+
+  private http = inject(HttpClient);
+
+  /** Public meal browsing endpoints. */
+  private readonly publicUrl = `${environment.apiUrl}/public/meals`;
+
+  /** Admin / vendor management endpoints. */
+  private readonly adminUrl = `${environment.apiUrl}/admin/meals`;
+
+  // ─── Reads ────────────────────────────────────────────────
+
+  getMeals(): Observable<MealSummary[]> {
+    // Fallback: fetch a large page and return just the content
+    const params = new HttpParams().set('size', '200');
+    return new Observable<MealSummary[]>(subscriber => {
+      this.http.get<DataPage<MealSummary>>(this.publicUrl, { params }).subscribe({
+        next: (page) => {
+          subscriber.next(page.content);
+          subscriber.complete();
+        },
+        error: (err) => subscriber.error(err),
+      });
+    });
+  }
+
+  getMealsByIds(ids: string[]): Observable<MealSummary[]> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.http.get<MealSummary[]>(this.publicUrl, { params });
+  }
+
+  search(request: MealSearchRequest): Observable<DataPage<MealSummary>> {
+    const params = this.buildSearchParams(request);
+    return this.http.get<DataPage<MealSummary>>(this.publicUrl, { params });
+  }
+
+  getMealById(id: string): Observable<Meal> {
+    return this.http.get<Meal>(`${this.publicUrl}/${id}`);
+  }
+
+  // ─── Writes ───────────────────────────────────────────────
+
+  createMeal(request: MealRequest): Observable<Meal> {
+    return this.http.post<Meal>(this.adminUrl, request);
+  }
+
+  updateMeal(id: string, request: Partial<MealRequest>): Observable<Meal> {
+    return this.http.patch<Meal>(`${this.adminUrl}/${id}`, request);
+  }
+
+  deleteMeal(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.adminUrl}/${id}`);
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────
+
+  /**
+   * Maps a `MealSearchRequest` to HTTP query params, matching
+   * the backend's `@RequestParam` expectations exactly.
+   *
+   * Array filters are sent as comma-separated values, e.g.
+   * `cuisineIds=abc,def,ghi` — Spring binds this to `List<UUID>`
+   * automatically.
+   */
+  private buildSearchParams(request: MealSearchRequest): HttpParams {
+    let params = new HttpParams();
+
+    if (request.keyword)               params = params.set('keyword', request.keyword);
+    if (request.vendorId)              params = params.set('vendorId', request.vendorId);
+    if (request.businessName)          params = params.set('businessName', request.businessName);
+
+    if (request.cuisineIds?.length)    params = params.set('cuisineIds', request.cuisineIds.join(','));
+    if (request.dishTypeIds?.length)   params = params.set('dishTypeIds', request.dishTypeIds.join(','));
+    if (request.excludeIngredientIds?.length)
+      params = params.set('excludeIngredientIds', request.excludeIngredientIds.join(','));
+
+    if (request.minPrice != null)      params = params.set('minPrice', request.minPrice.toString());
+    if (request.maxPrice != null)      params = params.set('maxPrice', request.maxPrice.toString());
+    if (request.minRating != null)     params = params.set('minRating', request.minRating.toString());
+
+    if (request.distributionLocationId)
+      params = params.set('distributionLocationId', request.distributionLocationId);
+
+    if (request.page != null)          params = params.set('page', request.page.toString());
+    if (request.size != null)          params = params.set('size', request.size.toString());
+    if (request.sortBy)                params = params.set('sortBy', request.sortBy);
+    if (request.sortDirection)         params = params.set('sortDirection', request.sortDirection);
+
+    return params;
+  }
+}

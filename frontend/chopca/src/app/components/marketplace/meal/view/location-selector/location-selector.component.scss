@@ -1,0 +1,8 @@
+:host {
+  display: inline-block;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    width: auto;
+  }
+}

@@ -38,7 +38,7 @@ public interface VendorRepository {
     Optional<Vendor> findByUserId(UUID userId);
 
     boolean existsByEmail(String email);
-
+    boolean existsByUserId(UUID userId);
     /**
      * Business name must be unique across the platform
      * to avoid customer confusion.

@@ -1,0 +1,115 @@
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12 py-8
+            flex flex-col gap-6">
+
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div class="flex flex-col gap-1">
+      <span class="text-[11px] uppercase tracking-widest
+                   text-primary font-bold">
+        Catalogue Culinaire
+      </span>
+      <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 m-0">
+        Mes Plats
+      </h1>
+      <p class="text-sm text-gray-600 m-0">
+        Gérez votre menu, les prix et la disponibilité de vos spécialités.
+      </p>
+    </div>
+
+    <a mat-flat-button color="primary" routerLink="/vendor/meals/new">
+      <mat-icon>add</mat-icon>
+      Nouveau plat
+    </a>
+  </div>
+
+  @if (loading()) {
+  <div class="flex items-center justify-center py-16">
+    <mat-spinner diameter="48" />
+  </div>
+  } @else if (error()) {
+  <mat-card appearance="outlined">
+    <mat-card-content class="flex items-center gap-3 py-6">
+      <mat-icon color="warn">error</mat-icon>
+      <span class="text-sm">{{ error() }}</span>
+    </mat-card-content>
+  </mat-card>
+  } @else if (meals().length === 0) {
+  <mat-card appearance="outlined">
+    <mat-card-content class="flex flex-col items-center
+                                gap-3 py-12 text-center">
+      <mat-icon class="!text-5xl !w-12 !h-12 opacity-40">
+        restaurant_menu
+      </mat-icon>
+      <h2 class="text-lg font-bold m-0">Aucun plat pour le moment</h2>
+      <p class="text-sm text-gray-600 m-0">
+        Créez votre première spécialité pour commencer à recevoir des commandes.
+      </p>
+      <a mat-flat-button color="primary"
+         routerLink="/vendor/meals/new" class="mt-2">
+        <mat-icon>add</mat-icon>
+        Créer un plat
+      </a>
+    </mat-card-content>
+  </mat-card>
+  } @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (meal of meals(); track meal.id) {
+    <mat-card
+      appearance="outlined"
+      class="cursor-pointer transition-shadow hover:shadow-md"
+      [routerLink]="['/vendor/meals', meal.id, 'edit']">
+
+      @if (meal.imageUrl) {
+      <img mat-card-image [src]="meal.imageUrl" [alt]="meal.name"
+           class="!h-40 !object-cover" />
+      } @else {
+      <div class="h-40 bg-gray-100 flex items-center justify-center">
+        <mat-icon class="!text-5xl !w-12 !h-12 opacity-30">
+          restaurant
+        </mat-icon>
+      </div>
+      }
+
+      <mat-card-content class="flex flex-col gap-2 pt-3">
+        <h3 class="text-base font-bold m-0 truncate">{{ meal.name }}</h3>
+
+        @if (meal.description) {
+        <p class="text-xs text-gray-600 m-0 line-clamp-2">
+          {{ meal.description }}
+        </p>
+        }
+
+        <div class="flex items-center gap-2 flex-wrap pt-1">
+              <span class="text-sm font-bold text-primary">
+                {{ meal.price | currency:'XAF':'symbol-narrow':'1.0-0' }}
+              </span>
+
+          <mat-chip-set>
+            @switch (meal.moderationStatus) {
+            @case ('APPROVED') {
+            <mat-chip highlighted color="primary">
+              <mat-icon>check_circle</mat-icon>
+              Publié
+            </mat-chip>
+            }
+            @case ('PENDING') {
+            <mat-chip highlighted>
+              <mat-icon>schedule</mat-icon>
+              En attente
+            </mat-chip>
+            }
+            @case ('REJECTED') {
+            <mat-chip highlighted class="!bg-red-100">
+              <mat-icon>cancel</mat-icon>
+              Rejeté
+            </mat-chip>
+            }
+            }
+          </mat-chip-set>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+  }
+
+</div>

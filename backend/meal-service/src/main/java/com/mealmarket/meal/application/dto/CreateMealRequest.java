@@ -15,6 +15,9 @@ import java.util.UUID;
  *
  * The vendor is NOT in the request — derived from the authenticated user.
  * moderationStatus is NOT in the request — always set to PENDING on creation.
+ *
+ * The image is passed as a MinIO storage reference (the object key returned
+ * by POST /api/v1/media). The URL is derived server-side on read.
  */
 public record CreateMealRequest(
 
@@ -29,8 +32,12 @@ public record CreateMealRequest(
         @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
         BigDecimal price,
 
-        @Size(max = 500, message = "Image URL cannot exceed 500 characters")
-        String imageUrl,
+        /**
+         * MinIO storage ref of the meal image (returned by POST /api/v1/media).
+         * Null = no image.
+         */
+        @Size(max = 512, message = "Image storage ref cannot exceed 512 characters")
+        String imageStorageRef,
 
         @PositiveOrZero(message = "Preparation time cannot be negative")
         Integer prepTimeMinutes,

@@ -1,0 +1,39 @@
+<div
+  class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
+         flex flex-col gap-space-md">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Section header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-center justify-between pb-space-sm">
+    <div class="flex items-center gap-space-sm">
+      <span
+        class="w-9 h-9 rounded-lg bg-secondary-fixed text-on-secondary-fixed
+               flex items-center justify-center shrink-0">
+        <app-icon name="local_fire_department" size="md" />
+      </span>
+      <div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">
+          Spécialités &amp; Terroirs Culinaires
+        </h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          (Sélectionnez au moins 1 spécialité)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Category pills — delegated to the shared selector
+       ═══════════════════════════════════════════════════════ -->
+  <app-category-pills-selector
+    categoryType="CUISINE"
+    [control]="cuisineControl()"
+    [label]="'Spécialités culinaires'"
+    [hint]="'Cliquez sur les tags correspondant à l\'ADN gastronomique de votre enseigne pour optimiser votre visibilité dans le filtre de recherche de l\'application.'"
+    [maxSelection]="maxSelection()"
+    [minSelection]="1"
+    [error]="error()"
+    [emptyMessage]="'Aucune spécialité disponible pour le moment.'"
+    (categoriesSelected)="categoriesSelected.emit($event)" />
+</div>

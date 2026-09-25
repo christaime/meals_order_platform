@@ -1,0 +1,18 @@
+<form [formGroup]="form" class="flex flex-col gap-8" novalidate>
+
+  <!-- Step 1 -->
+  @if (currentStepView() === 1) {
+  <app-step-identity [form]="form" />
+  }
+
+  <!-- Step 2 -->
+  @if (currentStepView() === 2) {
+  <app-step-composition [form]="form" />
+  }
+
+  <!-- Step 3 -->
+  @if (currentStepView() === 3) {
+  <app-step-pricing [form]="form" />
+  }
+
+</form>

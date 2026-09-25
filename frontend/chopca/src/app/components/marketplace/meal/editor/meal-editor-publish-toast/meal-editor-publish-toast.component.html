@@ -1,0 +1,46 @@
+<div
+  class="fixed bottom-6 right-6 z-50
+         transition-all duration-300"
+  [class.opacity-0]="!shown()"
+  [class.translate-y-24]="!shown()"
+  [class.pointer-events-none]="!shown()"
+  [class.opacity-100]="shown()"
+  [class.translate-y-0]="shown()"
+  [attr.aria-hidden]="!shown()"
+  role="status"
+  aria-live="polite">
+
+  <div class="bg-inverse-surface text-inverse-on-surface
+              p-4 rounded-xl shadow-modal
+              flex items-center gap-4 max-w-md">
+
+    <div class="w-10 h-10 rounded-full shrink-0
+                flex items-center justify-center"
+         [class]="iconBgClass()">
+      <app-icon [name]="iconName()" size="md" />
+    </div>
+
+    <div class="flex flex-col gap-0.5 min-w-0">
+      <p class="font-heading text-sm font-bold m-0">
+        {{ title() }}
+      </p>
+      @if (message()) {
+      <p class="font-body text-xs opacity-80 m-0">
+        {{ message() }}
+      </p>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="onClose()"
+      aria-label="Fermer"
+      class="p-1 rounded-full border-0 bg-transparent
+             text-inverse-on-surface/70 cursor-pointer
+             hover:text-inverse-on-surface hover:bg-white/10
+             transition-colors shrink-0">
+      <app-icon name="close" size="sm" />
+    </button>
+
+  </div>
+</div>

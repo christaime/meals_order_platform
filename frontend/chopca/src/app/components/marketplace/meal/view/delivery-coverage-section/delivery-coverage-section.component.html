@@ -1,0 +1,74 @@
+<section class="bg-surface-container-low border border-outline-variant rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-xs">
+  <!-- Header Title -->
+  <div class="flex items-center gap-3 mb-6">
+    <div class="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+      <app-icon name="local_shipping" size="md" />
+    </div>
+    <div>
+      <h2 class="text-base md:text-lg font-bold text-on-surface">
+        {{ title() }}
+      </h2>
+      <p class="text-xs text-on-surface-variant">
+        Repas chauds livrés directement à votre porte ou bureau.
+      </p>
+    </div>
+  </div>
+
+  <!-- Trust Highlights Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/60">
+      <app-icon name="timer" size="md" class="text-primary shrink-0 mt-0.5" />
+      <div class="flex flex-col">
+        <span class="text-xs font-bold text-on-surface">Livraison express</span>
+        <span class="text-xs text-on-surface-variant">30 à 45 min en moyenne</span>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/60">
+      <app-icon name="verified_user" size="md" class="text-primary shrink-0 mt-0.5" />
+      <div class="flex flex-col">
+        <span class="text-xs font-bold text-on-surface">Suivi en direct</span>
+        <span class="text-xs text-on-surface-variant">Notification à chaque étape</span>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/60">
+      <app-icon name="thermostat" size="md" class="text-primary shrink-0 mt-0.5" />
+      <div class="flex flex-col">
+        <span class="text-xs font-bold text-on-surface">Conteneurs isothermes</span>
+        <span class="text-xs text-on-surface-variant">Plats livrés à température idéale</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coverage Zones -->
+  <div class="flex flex-col gap-4">
+    <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+      Quartiers couverts actuellement
+    </span>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (zone of zones(); track zone.city) {
+      <div class="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <app-icon name="location_on" size="sm" class="text-primary" />
+            <span class="text-sm font-bold text-on-surface">{{ zone.city }}</span>
+          </div>
+          <app-badge variant="neutral" icon="schedule">
+            {{ zone.estimatedTime }}
+          </app-badge>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          @for (hood of zone.neighborhoods; track hood) {
+          <span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant text-xs font-medium border border-outline-variant/40">
+                {{ hood }}
+              </span>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>

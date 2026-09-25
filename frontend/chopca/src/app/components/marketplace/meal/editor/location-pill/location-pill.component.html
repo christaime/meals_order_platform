@@ -1,0 +1,35 @@
+<span [class]="pillClasses()">
+
+  <!-- Pending indicator -->
+  @if (showPendingIcon()) {
+    <app-icon
+      name="schedule"
+      size="sm"
+      [attr.title]="pendingTooltip()"
+      class="shrink-0" />
+  }
+
+  <!-- Name + address -->
+  <span class="flex flex-col min-w-0">
+    <span class="truncate leading-tight">{{ location().name }}</span>
+
+    @if (location().address) {
+      <span class="text-[10px] font-normal opacity-75 truncate leading-tight">
+        {{ location().address }}
+      </span>
+    }
+  </span>
+
+  <!-- Remove button -->
+  @if (removable()) {
+    <button
+      type="button"
+      (click)="onRemove()"
+      [attr.aria-label]="'Retirer ' + location().name"
+      class="inline-flex items-center justify-center
+             cursor-pointer border-0 bg-transparent p-0
+             transition-colors hover:text-error shrink-0">
+      <app-icon name="close" size="sm" />
+    </button>
+  }
+</span>

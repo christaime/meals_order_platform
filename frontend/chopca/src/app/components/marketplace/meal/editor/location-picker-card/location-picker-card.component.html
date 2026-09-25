@@ -1,0 +1,145 @@
+<div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm
+            flex flex-col gap-5">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-heading text-lg md:text-xl font-bold text-on-surface m-0">
+        Zones de Distribution
+      </h2>
+      <p class="font-body text-xs text-on-surface-variant m-0">
+        Indiquez où vos clients peuvent récupérer ou recevoir ce plat.
+      </p>
+    </div>
+
+    <span class="shrink-0 font-label text-[11px] font-semibold
+                 px-2.5 py-1 rounded
+                 bg-surface-container text-on-surface">
+      {{ selectedCount() }} {{ selectedCount() === 1 ? 'zone' : 'zones' }}
+    </span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Search + Add row
+       ═══════════════════════════════════════════════════════ -->
+  <div class="relative">
+
+    <div class="relative flex items-center">
+      <app-icon
+        name="location_on"
+        size="md"
+        class="absolute left-3.5 text-on-surface-variant pointer-events-none" />
+
+      <input
+        type="text"
+        [class]="INPUT_CLASSES + ' pl-11'"
+        placeholder="Rechercher un emplacement (ex: Akwa, Bonapriso, Bastos…)"
+        [value]="searchTerm()"
+        (input)="onSearchInput($event)"
+        autocomplete="off" />
+    </div>
+
+    <!-- ─── Search results dropdown ───────────────────────── -->
+    @if (isSearching()) {
+    <div class="absolute left-0 right-0 top-[calc(100%+0.375rem)]
+                  bg-surface-container-lowest
+                  border border-outline-variant
+                  rounded-xl shadow-modal
+                  max-h-72 overflow-y-auto
+                  z-30 py-1.5">
+
+      @if (isSearchLoading()) {
+      <div class="px-4 py-3 text-center
+                      font-body text-xs text-on-surface-variant">
+        Recherche…
+      </div>
+      }
+
+      @else if (showNoResults()) {
+      <div class="px-4 py-3 text-center
+                      font-body text-xs text-on-surface-variant">
+        Aucun emplacement trouvé.
+      </div>
+      }
+
+      @else {
+      @for (result of visibleSearchResults(); track result.id) {
+      <button
+        type="button"
+        (click)="onAddResult(result)"
+        class="w-full text-left
+                     px-4 py-2.5
+                     font-label text-xs
+                     bg-transparent border-0 cursor-pointer
+                     transition-colors
+                     flex items-start justify-between gap-3
+                     hover:bg-surface-container-low">
+
+              <span class="flex flex-col gap-0.5 min-w-0">
+                <span class="flex items-center gap-2">
+                  <span class="font-semibold truncate">{{ result.name }}</span>
+
+                  @if (result.moderationStatus === 'PENDING') {
+                    <span class="shrink-0 px-1.5 py-0.5 rounded
+                                 bg-tertiary-fixed text-on-tertiary-fixed
+                                 font-label text-[10px] font-semibold">
+                      En attente
+                    </span>
+                  }
+                </span>
+
+                <span class="text-on-surface-variant text-[11px] truncate">
+                  {{ result.address }}
+                </span>
+              </span>
+
+        <app-icon name="add" size="sm" class="text-primary shrink-0 mt-1" />
+      </button>
+      }
+      }
+
+    </div>
+    }
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Selected locations (pills)
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col gap-2">
+
+    <span class="font-label text-[11px] uppercase tracking-wider
+                 text-on-surface-variant font-bold">
+      Zones sélectionnées pour ce plat
+    </span>
+
+    @if (selectedLocations().length > 0) {
+    <div class="flex flex-wrap gap-2">
+      @for (location of selectedLocations(); track location.id) {
+      <app-location-pill
+        [location]="location"
+        (removed)="onRemove($event)" />
+      }
+    </div>
+    } @else {
+    <p class="font-body text-xs text-on-surface-variant italic m-0">
+      Aucun emplacement sélectionné pour le moment.
+    </p>
+    }
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Create new location (inline, with map picker)
+       ═══════════════════════════════════════════════════════ -->
+  <app-new-location-form
+    (created)="onNewLocationCreated($event)" />
+
+  <!-- ═══════════════════════════════════════════════════════
+       Error
+       ═══════════════════════════════════════════════════════ -->
+  <app-form-error [message]="error()" />
+
+</div>

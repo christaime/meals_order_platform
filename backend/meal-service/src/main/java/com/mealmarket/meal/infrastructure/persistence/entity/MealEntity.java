@@ -55,8 +55,8 @@ public class MealEntity {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(name = "image_url", length = 500)
-    private String imageUrl;
+    @Column(name = "image_storage_ref", length = 512)
+    private String imageStorageRef;
 
     @Column(name = "is_available")
     @Builder.Default

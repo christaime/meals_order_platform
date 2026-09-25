@@ -1,0 +1,26 @@
+<span [class]="pillClasses()">
+
+  <!-- Pending indicator -->
+  @if (showPendingIcon()) {
+    <app-icon
+      name="schedule"
+      size="sm"
+      [attr.title]="pendingTooltip()" />
+  }
+
+  <!-- Name -->
+  <span>{{ ingredient().name }}</span>
+
+  <!-- Remove button -->
+  @if (removable()) {
+    <button
+      type="button"
+      (click)="onRemove()"
+      [attr.aria-label]="'Retirer ' + ingredient().name"
+      class="inline-flex items-center justify-center
+             cursor-pointer border-0 bg-transparent p-0
+             transition-colors hover:text-error">
+      <app-icon name="close" size="sm" />
+    </button>
+  }
+</span>

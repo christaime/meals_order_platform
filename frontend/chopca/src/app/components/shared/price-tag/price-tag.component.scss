@@ -1,0 +1,37 @@
+:host { display: inline-flex; }
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-family: var(--font-currency);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
+}
+
+.currency {
+  font-size: 0.75em;
+  color: var(--color-on-surface-variant);
+  font-weight: 500;
+}
+
+/* Variants */
+.price-default .amount { font-size: 1.25rem; }
+.price-default .currency { font-size: 0.875rem; }
+
+.price-compact .amount { font-size: 1rem; }
+.price-compact .currency { font-size: 0.75rem; }
+
+.price-large .amount {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.price-large .currency {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}

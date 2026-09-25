@@ -19,7 +19,8 @@ public record MealResponse(
         String name,
         String description,
         BigDecimal price,
-        String imageUrl,
+        String imageUrl,          // computed from storageRef for display
+        String imageStorageRef,   // raw ref, for the editor to round-trip
 
         // ─── Availability & Stats ─────────────────────────────────
         Boolean isAvailable,

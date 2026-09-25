@@ -1,0 +1,104 @@
+<div class="flex flex-col gap-6">
+
+  <!-- ═════════ Prep time (slider) ═════════ -->
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between">
+      <label class="text-xs font-semibold text-gray-700">
+        Temps de préparation
+        <span class="text-red-500 ml-0.5">*</span>
+      </label>
+      <span class="text-sm font-bold text-primary">
+      {{ formatPrepTime(prepTimeMinutes.value) }}
+    </span>
+    </div>
+
+    <mat-slider
+      [min]="0"
+      [max]="480"
+      [step]="5"
+      [discrete]="true"
+      showTickMarks
+      class="w-full">
+      <input matSliderThumb [formControl]="prepTimeMinutes" />
+    </mat-slider>
+
+    <div class="flex items-center justify-between text-[11px] text-gray-500">
+      <span>0h</span>
+      <span>2h</span>
+      <span>4h</span>
+      <span>6h</span>
+      <span>8h</span>
+    </div>
+
+    @if (prepTimeError()) {
+    <span class="text-xs text-red-600">{{ prepTimeError() }}</span>
+    }
+  </div>
+
+  <!-- ═════════ Ingredients (chips + autocomplete + create) ═════════ -->
+  <div class="flex flex-col gap-1">
+    <label class="text-xs font-semibold text-gray-700">
+      Ingrédients
+    </label>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-chip-grid #ingredientGrid aria-label="Ingrédients sélectionnés">
+        @for (i of selectedIngredients(); track i.id) {
+        <mat-chip-row (removed)="removeIngredient(i)">
+          {{ i.name }}
+          @if (i.isAllergen) {
+          <mat-icon matChipTrailingIcon class="!text-amber-600">warning</mat-icon>
+          }
+          <button matChipRemove aria-label="Retirer">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+        }
+
+        <input
+          matInput
+          placeholder="Rechercher ou ajouter…"
+          [matChipInputFor]="ingredientGrid"
+          [matAutocomplete]="ingredientAuto"
+          (input)="onIngredientFilterInput($event)" />
+      </mat-chip-grid>
+
+      <mat-autocomplete
+        #ingredientAuto="matAutocomplete"
+        (optionSelected)="addIngredient($event.option.value)">
+        @for (i of filteredResults(); track i.id) {
+        <mat-option [value]="i">
+            <span class="flex items-center gap-2">
+              <span>{{ i.name }}</span>
+              @if (i.isAllergen) {
+                <span class="text-[10px] font-semibold px-1.5 py-0.5
+                             rounded bg-amber-100 text-amber-800">
+                  Allergène
+                </span>
+              }
+            </span>
+        </mat-option>
+        }
+      </mat-autocomplete>
+
+      @if (ingredientError()) {
+      <mat-error>{{ ingredientError() }}</mat-error>
+      }
+      <mat-hint>Tapez au moins 2 caractères pour rechercher.</mat-hint>
+    </mat-form-field>
+
+    <!-- Create new ingredient -->
+    @if (showCreateHint()) {
+    <button
+      type="button"
+      mat-stroked-button
+      color="primary"
+      class="self-start"
+      (click)="openCreateIngredientDialog()">
+      <mat-icon>add</mat-icon>
+      Créer « {{ ingredientFilter() }} »
+    </button>
+    }
+  </div>
+
+</div>

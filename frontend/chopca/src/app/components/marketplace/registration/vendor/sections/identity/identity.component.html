@@ -1,0 +1,156 @@
+<div
+  [formGroup]="form()"
+  class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
+         flex flex-col gap-space-md">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Section header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-center justify-between pb-space-sm">
+    <div class="flex items-center gap-space-sm">
+      <span
+        class="w-9 h-9 rounded-lg bg-primary-fixed text-primary
+               flex items-center justify-center shrink-0">
+        <app-icon name="storefront" size="md" />
+      </span>
+      <div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">
+          Section A • Établissement &amp; Propriétaire
+        </h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Données contractuelles de base enregistrées sur ChopÇa!
+        </p>
+      </div>
+    </div>
+
+    <span
+      class="px-space-sm py-0.5 rounded-full bg-primary-fixed text-primary
+             font-label-sm text-label-sm whitespace-nowrap">
+      Obligatoire
+    </span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Row 1: businessName + ownerName
+       ═══════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+
+    <!-- businessName -->
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Nom commercial de l'établissement</mat-label>
+      <input
+        matInput
+        formControlName="businessName"
+        maxlength="100"
+        minlength="2"
+        placeholder="ex: Le Chaudron Sawa"
+        autocomplete="organization" />
+      <mat-hint align="end">{{ businessNameLength() }}/100</mat-hint>
+      <mat-hint>Nom public affiché aux utilisateurs (2 à 100 car.).</mat-hint>
+      @if (form().get('businessName')?.hasError('required')
+      && form().get('businessName')?.touched) {
+      <mat-error>Le nom commercial est obligatoire.</mat-error>
+      }
+      @if (form().get('businessName')?.hasError('minlength')) {
+      <mat-error>Minimum 2 caractères.</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- ownerName -->
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Nom complet du gérant / propriétaire</mat-label>
+      <input
+        matInput
+        formControlName="ownerName"
+        maxlength="100"
+        minlength="2"
+        placeholder="ex: Pauline Ngo Moukoko"
+        autocomplete="name" />
+      <mat-hint align="end">{{ ownerNameLength() }}/100</mat-hint>
+      <mat-hint>Identité légale figurant sur la pièce d'identité officielle.</mat-hint>
+      @if (form().get('ownerName')?.hasError('required')
+      && form().get('ownerName')?.touched) {
+      <mat-error>Le nom du gérant est obligatoire.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Row 2: phone
+       ═══════════════════════════════════════════════════════ -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Numéro de téléphone joignable (OTP &amp; Commandes)</mat-label>
+    <span matPrefix class="flex items-center gap-1 pr-2">
+      <app-icon name="phone_iphone" size="md" class="text-primary" />
+      <span class="font-label-md text-label-md text-on-surface-variant">CMR</span>
+    </span>
+    <input
+      matInput
+      type="tel"
+      formControlName="phone"
+      placeholder="+237 6 99 00 11 22"
+      autocomplete="tel" />
+    <mat-hint>
+      Format standard CEMAC/Cameroun. Un SMS de confirmation sera envoyé
+      à ce contact.
+    </mat-hint>
+    @if (form().get('phone')?.hasError('required')
+    && form().get('phone')?.touched) {
+    <mat-error>Le numéro de téléphone est obligatoire.</mat-error>
+    }
+    @if (form().get('phone')?.hasError('pattern')) {
+    <mat-error>Format invalide. Exemple : +237 6 99 00 11 22</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Row 3: description
+       ═══════════════════════════════════════════════════════ -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Description de la cuisine / Histoire culinaire</mat-label>
+    <textarea
+      matInput
+      formControlName="description"
+      rows="4"
+      maxlength="2000"
+      placeholder="Racontez le savoir-faire de votre marmite, l'origine de vos épices et vos mets signatures...">
+    </textarea>
+    <mat-hint align="end">{{ descriptionLength() }}/2000</mat-hint>
+  </mat-form-field>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Quick inspirations
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-wrap items-center gap-1.5">
+    <span class="font-label-sm text-label-sm text-on-surface-variant">
+      Inspirations rapides :
+    </span>
+
+    <button
+      type="button"
+      (click)="onInspiration('Épices sauvages séchées au feu de bois.')"
+      class="px-2 py-0.5 rounded-full bg-surface-container-high
+             hover:bg-surface-container-highest text-on-surface
+             text-label-sm transition-colors">
+      + Fumage artisanal
+    </button>
+
+    <button
+      type="button"
+      (click)="onInspiration('Recettes traditionnelles de grands-mères du Wouri.')"
+      class="px-2 py-0.5 rounded-full bg-surface-container-high
+             hover:bg-surface-container-highest text-on-surface
+             text-label-sm transition-colors">
+      + Terroir ancestral
+    </button>
+
+    <button
+      type="button"
+      (click)="onInspiration('Produits 100% bio récoltés quotidiennement.')"
+      class="px-2 py-0.5 rounded-full bg-surface-container-high
+             hover:bg-surface-container-highest text-on-surface
+             text-label-sm transition-colors">
+      + Produits frais
+    </button>
+  </div>
+</div>

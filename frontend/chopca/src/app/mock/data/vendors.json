@@ -1,0 +1,118 @@
+[
+  {
+    "id": "vendor-maman-pauline",
+    "userId": "user-maman-pauline",
+    "businessName": "Chez Maman Pauline",
+    "description": "Maître Cuisinière Sawa — 22 ans de cuisine traditionnelle transmise de mère en fille. Spécialiste respectée des grands classiques de la gastronomie côtière camerounaise.",
+    "address": "Akwa, Douala",
+    "email": "pauline@chopca.cm",
+    "phone": "+237612345678",
+    "ratingAvg": 4.9,
+    "totalRatings": 184,
+    "status": "ACTIVE",
+    "statusReason": "Vendor activated",
+    "statusChangedAt": "2025-08-01T08:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "PRO",
+    "deliveryRadius": 5,
+    "pickupAddress": "Akwa, Douala",
+    "profileImageUrl": "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400",
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+    ],
+    "distributionLocations": [
+      { "id": "loc-akwa", "name": "Akwa", "address": "Akwa, Douala", "moderationStatus": "APPROVED" }
+    ],
+    "createdAt": "2025-08-01T08:00:00Z",
+    "updatedAt": "2025-09-10T14:30:00Z"
+  },
+  {
+    "id": "vendor-grill-rond-point",
+    "userId": "user-grill-rond-point",
+    "businessName": "Le Grill du Rond-Point",
+    "description": "Le meilleur du braisé au feu de bois. Spécialité de poisson et viandes grillées du Littoral.",
+    "address": "Bonapriso, Douala",
+    "email": "grill@chopca.cm",
+    "phone": "+237623456789",
+    "ratingAvg": 4.8,
+    "totalRatings": 212,
+    "status": "ACTIVE",
+    "statusReason": "Vendor activated",
+    "statusChangedAt": "2025-08-05T09:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "STARTER",
+    "deliveryRadius": 7,
+    "pickupAddress": "Bonapriso, Douala",
+    "profileImageUrl": "https://images.unsplash.com/photo-1583394293214-28ded15ee548?w=400",
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cat-street-food", "name": "Street Food (Braises)", "iconUrl": null, "type": "CUISINE" }
+    ],
+    "distributionLocations": [
+      { "id": "loc-bonapriso", "name": "Bonapriso", "address": "Bonapriso, Douala", "moderationStatus": "APPROVED" }
+    ],
+    "createdAt": "2025-08-05T09:00:00Z",
+    "updatedAt": "2025-09-11T11:15:00Z"
+  },
+  {
+    "id": "vendor-saveurs-bamileke",
+    "userId": "user-saveurs-bamileke",
+    "businessName": "Saveurs Bamiléké",
+    "description": "Authentiques plats de l'Ouest Cameroun. Koki, taro, achou préparés selon les traditions familiales.",
+    "address": "Bastos, Yaoundé",
+    "email": "bamileke@chopca.cm",
+    "phone": "+237634567890",
+    "ratingAvg": 4.7,
+    "totalRatings": 95,
+    "status": "ACTIVE",
+    "statusReason": "Vendor activated",
+    "statusChangedAt": "2025-08-06T10:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "FREE",
+    "deliveryRadius": 6,
+    "pickupAddress": "Bastos, Yaoundé",
+    "profileImageUrl": "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=400",
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+    ],
+    "distributionLocations": [
+      { "id": "loc-bastos", "name": "Bastos", "address": "Bastos, Yaoundé", "moderationStatus": "APPROVED" }
+    ],
+    "createdAt": "2025-08-06T10:00:00Z",
+    "updatedAt": "2025-09-08T16:00:00Z"
+  },
+  {
+    "id": "vendor-chef-enya",
+    "userId": "user-chef-enya",
+    "businessName": "Chef Enya & Co.",
+    "description": "Cuisine festive et raffinée. Le fameux Poulet DG et autres plats de célébration.",
+    "address": "Omnisports, Yaoundé",
+    "email": "enya@chopca.cm",
+    "phone": "+237645678901",
+    "ratingAvg": 4.95,
+    "totalRatings": 340,
+    "status": "ACTIVE",
+    "statusReason": "Vendor activated",
+    "statusChangedAt": "2025-08-07T11:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "ENTERPRISE",
+    "deliveryRadius": 8,
+    "pickupAddress": "Omnisports, Yaoundé",
+    "profileImageUrl": "https://images.unsplash.com/photo-1581349485608-9469926a8e5e?w=400",
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+    ],
+    "distributionLocations": [
+      { "id": "loc-omnisports", "name": "Omnisports", "address": "Omnisports, Yaoundé", "moderationStatus": "APPROVED" }
+    ],
+    "createdAt": "2025-08-07T11:00:00Z",
+    "updatedAt": "2025-09-12T09:00:00Z"
+  }
+]

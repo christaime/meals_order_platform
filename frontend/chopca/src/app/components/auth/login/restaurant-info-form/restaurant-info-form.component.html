@@ -1,0 +1,185 @@
+<div class="flex flex-col gap-6">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card: Restaurant identity
+       ═══════════════════════════════════════════════════════ -->
+  <div
+    class="bg-surface-container-lowest rounded-xl
+           p-6 md:p-8 shadow-sm
+           flex flex-col gap-5">
+
+    <!-- Card header -->
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <span class="inline-flex items-center gap-1.5
+                     font-label text-[11px] font-bold uppercase tracking-wider
+                     text-primary">
+          <app-icon name="storefront" size="sm" />
+          <span>Identité Cuisinière</span>
+        </span>
+        <h2 class="font-heading text-xl font-bold text-on-surface m-0">
+          Informations de votre restaurant
+        </h2>
+        <p class="font-body text-xs text-on-surface-variant m-0 mt-1">
+          Ces informations apparaîtront sur l'application publique pour vos convives.
+        </p>
+      </div>
+      <span class="font-heading text-lg font-bold text-outline-variant shrink-0">
+        01
+      </span>
+    </div>
+
+    <!-- Business name -->
+    <app-form-field
+      label="Nom commercial de votre cuisine / restaurant"
+      iconLeading="skillet"
+      [required]="true"
+      trailingHint="Visible sur le reçu MoMo/Orange"
+      [error]="businessNameError">
+
+      <input
+        appProjectedInput
+        type="text"
+        [class]="INPUT_CLASSES"
+        [formControl]="businessName"
+        placeholder="Ex: Le Chaudron Sawa de Bonapriso" />
+    </app-form-field>
+
+    <!-- Owner name -->
+    <app-form-field
+      label="Nom du responsable"
+      iconLeading="person"
+      [required]="true"
+      trailingHint="Gérant ou chef principal"
+      [error]="ownerNameError">
+
+      <input
+        appProjectedInput
+        type="text"
+        [class]="INPUT_CLASSES"
+        [formControl]="ownerName"
+        placeholder="Ex: Paul Biya" />
+    </app-form-field>
+
+    <!-- Description -->
+    <app-form-field
+      label="Description courte"
+      hint="Une phrase qui présente votre cuisine. Apparaîtra sur votre vitrine."
+      iconLeading="notes">
+
+      <textarea
+        appProjectedInput
+        [class]="INPUT_CLASSES"
+        [formControl]="description"
+        rows="2"
+        placeholder="Ex: Cuisine camerounaise traditionnelle transmise de mère en fille depuis 22 ans."></textarea>
+    </app-form-field>
+
+    <!-- Cuisine specialties (uses the shared pills selector) -->
+    <app-category-pills-selector
+      categoryType="CUISINE"
+      label="Type de cuisine et spécialités"
+      hint="Sélectionnez jusqu'à 3 étiquettes clés pour le référencement local"
+      [control]="cuisineIds"
+      [maxSelection]="3"
+      [minSelection]="1"
+      [error]="cuisineIdsError" />
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card: Location
+       ═══════════════════════════════════════════════════════ -->
+  <div
+    class="bg-surface-container-lowest rounded-xl
+           p-6 md:p-8 shadow-sm
+           flex flex-col gap-5">
+
+    <!-- Card header -->
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <span class="inline-flex items-center gap-1.5
+                     font-label text-[11px] font-bold uppercase tracking-wider
+                     text-primary">
+          <app-icon name="location_on" size="sm" />
+          <span>Localisation</span>
+        </span>
+        <h2 class="font-heading text-xl font-bold text-on-surface m-0">
+          Où vous trouver
+        </h2>
+        <p class="font-body text-xs text-on-surface-variant m-0 mt-1">
+          Indiquez où vos clients peuvent venir chercher leurs commandes.
+        </p>
+      </div>
+    </div>
+
+    <!-- City + District (two-column on desktop) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- City -->
+      <div class="flex flex-col gap-1">
+        <app-form-field
+          label="Ville d'opération"
+          iconLeading="location_city"
+          [required]="true"
+          [error]="cityIdError">
+
+          <select
+            appProjectedInput
+            [class]="INPUT_CLASSES + ' appearance-none cursor-pointer'"
+            [formControl]="cityId"
+            [disabled]="loadingCities()">
+
+            <option value="" disabled>
+              {{ loadingCities() ? 'Chargement…' : 'Sélectionner la ville' }}
+            </option>
+
+            @for (city of cities(); track city.id) {
+            <option [value]="city.id">
+              {{ city.name }} ({{ city.region }})
+            </option>
+            }
+          </select>
+        </app-form-field>
+
+        @if (citiesError()) {
+        <app-form-error [message]="citiesError()" />
+        }
+      </div>
+
+      <!-- District -->
+      <app-form-field
+        label="Quartier principal"
+        iconLeading="my_location"
+        [required]="true"
+        [error]="districtError">
+
+        <input
+          appProjectedInput
+          type="text"
+          [class]="INPUT_CLASSES"
+          [formControl]="district"
+          placeholder="Ex: Bonapriso, Akwa, Bastos" />
+      </app-form-field>
+
+    </div>
+
+    <!-- Address detail -->
+    <app-form-field
+      label="Adresse précise ou repère pour les coursiers"
+      hint="Donnez un repère clair : commerce à proximité, couleur de portail, point de repère."
+      iconLeading="pin_drop"
+      [required]="true"
+      [error]="addressDetailError">
+
+      <textarea
+        appProjectedInput
+        [class]="INPUT_CLASSES"
+        [formControl]="addressDetail"
+        rows="3"
+        placeholder="Ex: Face Collège Libermann, 2ème portail gris après la Pharmacie des Palmiers. Rue bitumée accessible moto & voiture."></textarea>
+    </app-form-field>
+
+  </div>
+
+</div>

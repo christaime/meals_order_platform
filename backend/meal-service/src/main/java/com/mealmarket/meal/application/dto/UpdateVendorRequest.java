@@ -15,6 +15,9 @@ import java.util.UUID;
  * - password (managed by Keycloak)
  * - status (managed via VendorState transitions)
  * - userId (immutable)
+ *
+ * Image refs: null = unchanged, empty string = cleared.
+ * CNI refs follow the same convention.
  */
 public record UpdateVendorRequest(
 
@@ -38,6 +41,30 @@ public record UpdateVendorRequest(
 
         @Size(max = 255, message = "Pickup address cannot exceed 255 characters")
         String pickupAddress,
+
+        /**
+         * MinIO storage ref of the profile image. Null = unchanged, "" = cleared.
+         */
+        @Size(max = 512, message = "Profile image storage ref cannot exceed 512 characters")
+        String profileImageStorageRef,
+
+        /**
+         * MinIO storage ref of the cover image. Null = unchanged, "" = cleared.
+         */
+        @Size(max = 512, message = "Cover image storage ref cannot exceed 512 characters")
+        String coverImageStorageRef,
+
+        /**
+         * MinIO storage ref of the CNI front side. Null = unchanged, "" = cleared.
+         */
+        @Size(max = 512, message = "ID card front storage ref cannot exceed 512 characters")
+        String idCardFrontStorageRef,
+
+        /**
+         * MinIO storage ref of the CNI back side. Null = unchanged, "" = cleared.
+         */
+        @Size(max = 512, message = "ID card back storage ref cannot exceed 512 characters")
+        String idCardBackStorageRef,
 
         /**
          * Full replacement list of cuisine category IDs.

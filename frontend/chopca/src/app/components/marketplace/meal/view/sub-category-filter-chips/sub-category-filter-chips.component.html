@@ -1,0 +1,33 @@
+<div class="w-full overflow-x-auto no-scrollbar py-1">
+  <div class="flex items-center gap-2 min-w-max">
+    @for (item of subCategories(); track item.id) {
+    <button
+      type="button"
+      (click)="selectSubCategory(item)"
+      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-label-sm font-medium transition-all duration-150 border cursor-pointer select-none"
+      [class.bg-secondary-container]="selectedSubCategoryId() === item.id"
+      [class.text-on-secondary-container]="selectedSubCategoryId() === item.id"
+      [class.border-secondary]="selectedSubCategoryId() === item.id"
+      [class.font-bold]="selectedSubCategoryId() === item.id"
+      [class.bg-surface-container-low]="selectedSubCategoryId() !== item.id"
+      [class.text-on-surface-variant]="selectedSubCategoryId() !== item.id"
+      [class.border-outline-variant]="selectedSubCategoryId() !== item.id"
+      [class.hover:bg-surface-container]="selectedSubCategoryId() !== item.id"
+    >
+      <span>{{ item.name }}</span>
+
+      @if (item.count !== undefined) {
+      <span
+        class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
+        [class.bg-surface-container-lowest]="selectedSubCategoryId() === item.id"
+        [class.text-secondary]="selectedSubCategoryId() === item.id"
+        [class.bg-surface-container-high]="selectedSubCategoryId() !== item.id"
+        [class.text-on-surface-variant]="selectedSubCategoryId() !== item.id"
+      >
+            {{ item.count }}
+          </span>
+      }
+    </button>
+    }
+  </div>
+</div>

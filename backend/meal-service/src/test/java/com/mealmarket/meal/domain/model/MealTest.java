@@ -189,19 +189,32 @@ class MealTest {
         final Meal updated = original
                 .withModerationStatus(ModerationStatus.APPROVED);
 
-        // Then
+        // Then — identity & core fields
         assertThat(updated.getId()).isEqualTo(original.getId());
         assertThat(updated.getVendor()).isEqualTo(original.getVendor());
         assertThat(updated.getName()).isEqualTo(original.getName());
         assertThat(updated.getDescription()).isEqualTo(original.getDescription());
         assertThat(updated.getPrice()).isEqualByComparingTo(original.getPrice());
-        assertThat(updated.getImageUrl()).isEqualTo(original.getImageUrl());
-        assertThat(updated.getIsAvailable()).isEqualTo(original.getIsAvailable());
-        assertThat(updated.getPrepTimeMinutes()).isEqualTo(original.getPrepTimeMinutes());
-        assertThat(updated.getIngredients()).isEqualTo(original.getIngredients());
-        assertThat(updated.getCreatedAt()).isEqualTo(original.getCreatedAt());
-    }
+        assertThat(updated.getImageStorageRef()).isEqualTo(original.getImageStorageRef());
 
+        // Availability & stats
+        assertThat(updated.getIsAvailable()).isEqualTo(original.getIsAvailable());
+        assertThat(updated.getAverageRating()).isEqualTo(original.getAverageRating());
+        assertThat(updated.getTotalRatings()).isEqualTo(original.getTotalRatings());
+        assertThat(updated.getPrepTimeMinutes()).isEqualTo(original.getPrepTimeMinutes());
+
+        // Relationships
+        assertThat(updated.getCategories()).isEqualTo(original.getCategories());
+        assertThat(updated.getIngredients()).isEqualTo(original.getIngredients());
+        assertThat(updated.getDistributionLocations()).isEqualTo(original.getDistributionLocations());
+
+        // Timestamps
+        assertThat(updated.getCreatedAt()).isEqualTo(original.getCreatedAt());
+
+        // The one field that DID change
+        assertThat(updated.getModerationStatus()).isEqualTo(ModerationStatus.APPROVED);
+        assertThat(original.getModerationStatus()).isNotEqualTo(ModerationStatus.APPROVED);
+    }
     // ══════════════════════════════════════════════════════════════════
     // 4. Allergen detection — hasAllergens()
     // ══════════════════════════════════════════════════════════════════

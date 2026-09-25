@@ -1,0 +1,80 @@
+<section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+  <!-- Top Hero Header -->
+  <div class="flex flex-col gap-2">
+    <h1 class="font-headline-lg text-2xl sm:text-3xl font-bold text-on-surface">
+      Restaurants & Restaurateurs Partenaires
+    </h1>
+    <p class="text-sm text-on-surface-variant max-w-2xl">
+      Découvrez les meilleurs établissements et traiteurs locaux livrant dans votre zone.
+    </p>
+  </div>
+
+  <!-- Search & Location Filter Toolbar -->
+  <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-surface-container-lowest p-4 rounded-3xl border border-outline-variant/40 shadow-xs">
+    <app-location-selector
+      [selectedLocation]="selectedLocation()"
+      (locationChange)="onLocationChange($event)"
+    />
+    <div class="flex-1">
+      <app-search-bar
+        [query]="searchQuery()"
+        placeholder="Rechercher un restaurant, un établissement..."
+        (search)="onSearchChange($event)"
+      />
+    </div>
+  </div>
+
+  <!-- Cuisine Category Selector -->
+  <app-category-chips
+    [selectedCategoryId]="selectedCategory()"
+    (categoryChange)="onCategoryChange($event)"
+  />
+
+  <!-- Vendors Directory Grid Section -->
+  <div class="min-h-[400px]">
+    @if (isLoading()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (item of skeletonArray(); track $index) {
+      <app-vendor-card-skeleton />
+      }
+    </div>
+    } @else if (vendors() && vendors()!.length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (vendor of vendors()!; track vendor.id) {
+      <app-vendor-card
+        [vendor]="vendor"
+        (selectVendor)="selectVendor.emit($event)"
+      />
+      }
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="mt-8 flex justify-center">
+      <app-pagination-controls
+        [currentPage]="currentPage()"
+        [totalItems]="totalVendors()"
+        [pageSize]="pageSize()"
+        (pageChange)="onPageChange($event)"
+      />
+    </div>
+    } @else {
+    <!-- Empty Results State -->
+    <div class="flex flex-col items-center justify-center text-center py-16 px-4 bg-surface-container-low/40 rounded-3xl border border-dashed border-outline-variant">
+      <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/50 mb-4">
+        <app-icon name="storefront" size="xl" />
+      </div>
+      <h3 class="font-bold text-lg text-on-surface mb-1">Aucun restaurant trouvé</h3>
+      <p class="text-xs text-on-surface-variant max-w-md mb-6">
+        Nous n'avons trouvé aucun restaurant correspondant à vos critères dans cette zone.
+      </p>
+      <button
+        type="button"
+        (click)="onResetFilters()"
+        class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-colors shadow-xs"
+      >
+        Réinitialiser la recherche
+      </button>
+    </div>
+    }
+  </div>
+</section>

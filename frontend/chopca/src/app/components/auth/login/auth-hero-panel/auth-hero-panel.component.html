@@ -1,0 +1,120 @@
+<section class="flex flex-col justify-between rounded-xl
+                bg-surface-container-low/70 p-space-lg md:p-space-xl
+                relative overflow-hidden shadow-sm
+                border border-surface-container-high/60">
+
+  <!-- Ambient decor -->
+  <div class="absolute -top-32 -left-32 w-80 h-80 rounded-full
+              bg-primary-fixed/20 blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full
+              bg-secondary-fixed/10 blur-3xl pointer-events-none"></div>
+
+  <div class="relative z-10 flex flex-col gap-space-lg">
+
+    <!-- Top row: brand pill + certified hub -->
+    <div class="flex flex-wrap items-center justify-between gap-space-md">
+      <div class="flex items-center gap-space-sm bg-surface-container-lowest/90
+                  px-space-md py-space-xs rounded-full shadow-sm">
+        <img alt="Logo officiel ChopÇa!"
+             class="h-6 w-auto object-contain"
+             src="assets/logo-chopca.svg" />
+        <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+          Plateforme Culinaire d'Élite
+        </span>
+      </div>
+      <div class="flex items-center gap-space-xs text-secondary font-label-md text-label-md">
+        <app-icon name="verified" size="md" />
+        <span>Hub Gastronomique Certifié</span>
+      </div>
+    </div>
+
+    <!-- Editorial headline -->
+    <div class="flex flex-col gap-space-xs max-w-2xl">
+      <h1 class="font-display text-headline-md lg:text-headline-lg text-primary
+                 font-bold leading-tight">
+        Le goût authentique du Cameroun, livré avec passion.
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        La première place de marché gastronomique interconnectant gourmets raffinés,
+        chefs locaux d'exception et maîtres des épices traditionnelles.
+      </p>
+    </div>
+
+    <!-- 3 role pillars -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm mt-space-xs">
+      @for (p of pillars; track p.title) {
+      <div class="bg-surface-container-lowest/90 p-space-sm rounded-lg shadow-sm
+                    flex flex-col justify-between gap-space-sm">
+        <div class="flex flex-col gap-space-xs">
+
+          <div [class]="pillarIconWrapClass(p.accent)">
+            <app-icon [name]="p.icon" size="md" />
+          </div>
+
+          <div [class]="pillarEyebrowClass(p.accent)">
+            {{ p.eyebrow }}
+          </div>
+
+          <h2 class="font-headline-sm text-headline-sm text-on-surface">
+            {{ p.title }}
+          </h2>
+
+          <p class="font-body-sm text-body-sm text-on-surface-variant
+                      leading-relaxed line-clamp-3">
+            {{ p.body }}
+          </p>
+        </div>
+
+        <div class="flex items-center gap-space-xs font-label-sm text-label-sm
+                      pt-space-xs bg-surface-container-low px-space-xs py-1 rounded">
+          <app-icon [name]="p.metaIcon" size="sm" class="text-secondary" />
+          <span class="text-on-surface">{{ p.metaLabel }}</span>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Metrics + testimonial -->
+  <div class="relative z-10 mt-space-md pt-space-sm flex flex-col gap-space-sm
+              bg-surface-container-lowest/80 backdrop-blur-sm p-space-md rounded-xl shadow-sm">
+
+    <div class="grid grid-cols-3 gap-space-sm pb-space-xs">
+      @for (m of metrics; track m.label) {
+      <div class="flex flex-col">
+        <div class="flex items-center gap-space-xs">
+          <span [class]="metricValueClass(m.tone)">{{ m.value }}</span>
+          @if (m.stars) {
+          <div class="flex text-amber-500">
+            @for (s of [1,2,3,4,5]; track s) {
+            <app-icon name="star" size="sm" />
+            }
+          </div>
+          }
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">
+            {{ m.label }}
+          </span>
+      </div>
+      }
+    </div>
+
+    <div class="flex items-center gap-space-md bg-surface-container-low/80 p-space-sm rounded-lg">
+      <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-surface-container-high">
+        <img class="w-full h-full object-cover"
+             alt="Portrait cheffe"
+             src="assets/testimonial-cheffe.jpg" />
+      </div>
+      <div class="flex flex-col min-w-0">
+        <p class="font-body-sm text-body-sm text-on-surface italic line-clamp-1">
+          « Chop ça! a permis à mon restaurant de toucher des centaines d'amateurs
+          de cuisine sawa sans contrainte logistique. »
+        </p>
+        <span class="font-label-sm text-label-sm text-primary font-bold">
+          Cheffe Mireille N. — Saveurs du Littoral
+        </span>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+/*
+ * The only non-Tailwind rule needed: rotate the chevron when the
+ * language dropdown is open. Tailwind can't express this without
+ * an extra custom utility in styles.css, and a 3-line SCSS rule
+ * is cheaper than adding to the global theme.
+ */
+:host ::ng-deep .rotate-180 {
+  transform: rotate(180deg);
+}

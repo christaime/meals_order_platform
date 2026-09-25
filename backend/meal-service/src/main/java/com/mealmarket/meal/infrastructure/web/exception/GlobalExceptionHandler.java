@@ -5,12 +5,15 @@ import com.mealmarket.common.exception.ConflictException;
 import com.mealmarket.common.exception.ForbiddenException;
 import com.mealmarket.common.exception.QuotaExceededException;
 import com.mealmarket.common.exception.ResourceNotFoundException;
+import com.mealmarket.meal.application.exception.MediaStorageException;
+import com.mealmarket.meal.application.exception.MediaValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -315,11 +318,23 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // Media Exception Handler
+
     private ErrorResponse.FieldError toFieldError(ConstraintViolation<?> cv) {
         return new ErrorResponse.FieldError(
                 cv.getPropertyPath().toString(),
                 cv.getMessage(),
                 cv.getInvalidValue()
         );
+    }
+
+    @ExceptionHandler(MediaValidationException.class)
+    ProblemDetail validation(MediaValidationException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(MediaStorageException.class)
+    ProblemDetail storage(MediaStorageException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 }

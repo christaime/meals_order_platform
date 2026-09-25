@@ -16,6 +16,11 @@ import java.util.UUID;
 /**
  * Maps between {@link Vendor} (domain) and {@link VendorEntity} (JPA).
  *
+ * Image handling:
+ * - The four {@code *StorageRef} fields (profile, cover, idCardFront, idCardBack)
+ *   are plain Strings on both sides; MapStruct maps them 1:1 with no configuration.
+ *   URL derivation is a presentation concern handled in {@code VendorDtoMapper}.
+ *
  * Relationship handling:
  * - {@code categories} and {@code distributionLocations} are IGNORED on the
  *   entity → domain direction. The adapter loads them separately via their
@@ -31,22 +36,23 @@ public interface VendorPersistenceMapper {
     //  Domain → Entity
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "categoryIds", source = "categories", qualifiedByName = "mapCategoryIds")
-    @Mapping(target = "distributionLocationIds", source = "distributionLocations", qualifiedByName = "mapLocationIds")
-    @Mapping(target = "status", source = "state.status")
-    @Mapping(target = "statusReason", source = "state.reason")
-    @Mapping(target = "statusChangedAt", source = "state.changedAt")
-    @Mapping(target = "statusChangedBy", source = "state.changedBy")
-    @Mapping(target = "statusChangeType", source = "state.changeType")
+    @Mapping(target = "categoryIds",             source = "categories",             qualifiedByName = "mapCategoryIds")
+    @Mapping(target = "distributionLocationIds", source = "distributionLocations",  qualifiedByName = "mapLocationIds")
+    @Mapping(target = "status",                  source = "state.status")
+    @Mapping(target = "statusReason",            source = "state.reason")
+    @Mapping(target = "statusChangedAt",         source = "state.changedAt")
+    @Mapping(target = "statusChangedBy",         source = "state.changedBy")
+    @Mapping(target = "statusChangeType",        source = "state.changeType")
     VendorEntity toEntity(Vendor vendor);
 
     // ═══════════════════════════════════════════════════════════
     //  Entity → Domain (lightweight)
-    //  Relationships are loaded separately by the adapter
+    //  Relationships are loaded separately by the adapter.
+    //  The four imageStorageRef fields map 1:1 (same names, same type).
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "state", source = ".", qualifiedByName = "buildState")
-    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "state",                 source = ".", qualifiedByName = "buildState")
+    @Mapping(target = "categories",            ignore = true)
     @Mapping(target = "distributionLocations", ignore = true)
     Vendor toDomain(VendorEntity entity);
 

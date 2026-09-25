@@ -22,6 +22,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.mealmarket.meal.domain.model.VendorState.VendorStatus;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,8 +51,8 @@ public class VendorController {
     // ═══════════════════════════════════════════════════════════
     //  PUBLIC — Registration
     // ═══════════════════════════════════════════════════════════
-
-    @PostMapping("/public/vendors/register")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/vendor/register")
     @Operation(
             summary = "Register a new vendor (public)",
             description = """
@@ -60,6 +63,10 @@ public class VendorController {
             2. Creates the user in Keycloak (external IAM).
             3. Creates the vendor in PENDING state.
             4. Records the initial state change in history.
+
+            **Images:** pass the four `*StorageRef` fields from prior calls to
+            `POST /api/v1/media` with the matching `MediaPurpose`
+            (VENDOR_LOGO, VENDOR_BANNER, ID_CARD_FRONT, ID_CARD_BACK).
 
             The vendor must be activated by an admin before being visible to customers.
             """
@@ -73,23 +80,25 @@ public class VendorController {
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "409", description = "Email or business name already exists")
     })
-    public ResponseEntity<VendorResponse> registerVendor(
+    public ResponseEntity<VendorResponse> registerVendor( @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody CreateVendorRequest request
     ) {
-        // NOTE: The Keycloak user creation is handled by a facade or filter before this call.
-        // The controller receives the keycloakUserId as a header or via the authentication flow.
-        // For MVP, we accept it via a request attribute set by an upstream filter/interceptor.
-        String keycloakUserId = (String) org.springframework.web.context.request.RequestContextHolder
-                .currentRequestAttributes()
-                .getAttribute("keycloakUserId", org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST);
-
+        String keycloakUserId = jwt.getSubject();
+        String email = jwt.getClaimAsString("email");
         if (keycloakUserId == null) {
             throw new IllegalStateException(
                     "keycloakUserId missing — upstream Keycloak registration filter not configured"
             );
         }
 
-        VendorResponse response = vendorService.registerVendor(request, UUID.fromString(keycloakUserId));
+        if (email == null || email.isBlank()) {
+            throw new IllegalStateException(
+                    "Email missing"
+            );
+        }
+
+        VendorResponse response = vendorService.registerVendor(request,email, UUID.fromString(keycloakUserId));
+        // Owner just created it — safe to include CNI in the response.
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -102,7 +111,7 @@ public class VendorController {
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(
             summary = "Get your own vendor profile (vendor only)",
-            description = "Returns the profile of the currently authenticated vendor."
+            description = "Returns the profile of the currently authenticated vendor, including CNI refs."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -114,6 +123,7 @@ public class VendorController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     public ResponseEntity<VendorResponse> getOwnProfile() {
+        // Owner — CNI fields intentionally included.
         return ResponseEntity.ok(
                 vendorService.getOwnProfile(currentUser.getUserId())
         );
@@ -126,9 +136,13 @@ public class VendorController {
             summary = "Update your own vendor profile (vendor only)",
             description = """
             Updates the profile of the authenticated vendor.
-            Ownership is enforced by the security context.
 
-            Note: Status changes are not allowed here — use the state endpoints.
+            **Images:** the four `*StorageRef` fields follow the null/empty-string convention:
+            - `null`  → keep the existing image
+            - `""`    → clear the image
+            - value   → replace with the new ref
+
+            Note: status changes are not allowed here — use the state endpoints.
             """
     )
     @ApiResponses(value = {
@@ -155,10 +169,13 @@ public class VendorController {
     @PreAuthorize("hasRole('VENDOR')")
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(
-            summary = "Upload/update your profile image (vendor only)",
+            summary = "Update your profile image (vendor only)",
             description = """
-            Updates the profile image URL of the authenticated vendor.
-            The actual file upload to MinIO is handled separately (e.g., via a `/files` endpoint).
+            Replaces the profile image with a new storage ref.
+
+            The ref must come from a prior call to `POST /api/v1/media` with
+            `purpose=VENDOR_LOGO`. The previous ref is marked PENDING in MinIO
+            and cleaned up automatically if not re-used within 24 hours.
             """
     )
     @ApiResponses(value = {
@@ -169,13 +186,13 @@ public class VendorController {
             ),
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
-    public ResponseEntity<VendorResponse> uploadProfileImage(
-            @Parameter(description = "Image URL (from file storage)", required = true)
-            @RequestParam String imageUrl
+    public ResponseEntity<VendorResponse> updateProfileImage(
+            @Parameter(description = "MinIO storage ref from POST /api/v1/media (purpose=VENDOR_LOGO)", required = true)
+            @RequestParam String imageStorageRef
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
         return ResponseEntity.ok(
-                vendorService.uploadProfileImage(vendor.getId(), imageUrl, currentUser.getUserId())
+                vendorService.updateProfileImage(vendor.getId(), imageStorageRef, currentUser.getUserId())
         );
     }
 
@@ -183,8 +200,13 @@ public class VendorController {
     @PreAuthorize("hasRole('VENDOR')")
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(
-            summary = "Upload/update your cover image (vendor only)",
-            description = "Updates the cover image URL of the authenticated vendor."
+            summary = "Update your cover image (vendor only)",
+            description = """
+            Replaces the cover image with a new storage ref.
+
+            The ref must come from a prior call to `POST /api/v1/media` with
+            `purpose=VENDOR_BANNER`.
+            """
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -194,13 +216,55 @@ public class VendorController {
             ),
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
-    public ResponseEntity<VendorResponse> uploadCoverImage(
-            @Parameter(description = "Image URL (from file storage)", required = true)
-            @RequestParam String imageUrl
+    public ResponseEntity<VendorResponse> updateCoverImage(
+            @Parameter(description = "MinIO storage ref from POST /api/v1/media (purpose=VENDOR_BANNER)", required = true)
+            @RequestParam String imageStorageRef
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
         return ResponseEntity.ok(
-                vendorService.uploadCoverImage(vendor.getId(), imageUrl, currentUser.getUserId())
+                vendorService.updateCoverImage(vendor.getId(), imageStorageRef, currentUser.getUserId())
+        );
+    }
+
+    @PutMapping("/vendor/profile/cni")
+    @PreAuthorize("hasRole('VENDOR')")
+    @SecurityRequirement(name = "bearer-jwt")
+    @Operation(
+            summary = "Update your CNI images (vendor only)",
+            description = """
+            Replaces the front and back sides of your national ID card (CNI).
+
+            Both refs must come from prior calls to `POST /api/v1/media` with
+            `purpose=ID_CARD_FRONT` and `purpose=ID_CARD_BACK` respectively.
+
+            **Moderation impact:** after updating CNI, the vendor's profile
+            may require re-verification by an admin (enforced in Phase 2).
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "CNI images updated",
+                    content = @Content(schema = @Schema(implementation = VendorResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid ref"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    public ResponseEntity<VendorResponse> updateCniImages(
+            @Parameter(description = "MinIO storage ref (purpose=ID_CARD_FRONT)", required = true)
+            @RequestParam String idCardFrontStorageRef,
+
+            @Parameter(description = "MinIO storage ref (purpose=ID_CARD_BACK)", required = true)
+            @RequestParam String idCardBackStorageRef
+    ) {
+        var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
+        return ResponseEntity.ok(
+                vendorService.updateCniImages(
+                        vendor.getId(),
+                        idCardFrontStorageRef,
+                        idCardBackStorageRef,
+                        currentUser.getUserId()
+                )
         );
     }
 
@@ -247,7 +311,10 @@ public class VendorController {
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(
             summary = "Get any vendor by ID (admin only)",
-            description = "Returns a vendor regardless of status."
+            description = """
+            Returns a vendor regardless of status, including CNI URLs
+            (admins need to review identity documents during moderation).
+            """
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -262,6 +329,7 @@ public class VendorController {
             @Parameter(description = "Vendor ID", required = true)
             @PathVariable UUID id
     ) {
+        // Admin — CNI fields intentionally included.
         return ResponseEntity.ok(vendorService.getVendorById(id));
     }
 
@@ -270,7 +338,10 @@ public class VendorController {
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(
             summary = "Search vendors (admin only)",
-            description = "Full search across all vendors, any status."
+            description = """
+            Full search across all vendors, any status.
+            Returns `VendorResponse` including CNI URLs (admins may need them).
+            """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paginated list of vendors"),
@@ -362,7 +433,7 @@ public class VendorController {
             summary = "Hard delete a vendor (admin only)",
             description = """
             Deletes a vendor following the moderation-aware rule:
-            - PENDING or INACTIVE → hard delete from DB
+            - PENDING or INACTIVE → hard delete from DB (all four images released)
             - ACTIVE / SUSPENDED / BANNED → refused (deactivate first)
 
             Note: BANNED vendors are preserved for history.
@@ -383,7 +454,7 @@ public class VendorController {
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  PUBLIC — Read (active vendors only)
+    //  PUBLIC — Read (active vendors only, CNI stripped)
     // ═══════════════════════════════════════════════════════════
 
     @GetMapping("/public/vendors/{id}")
@@ -391,7 +462,10 @@ public class VendorController {
             summary = "Get an active vendor by ID (public)",
             description = """
             Returns a vendor only if it is ACTIVE.
-            Used by customers to view vendor profiles.
+
+            **CNI is stripped** from the response — identity documents are
+            only visible to the owner (`GET /vendor/profile`) and admins
+            (`GET /admin/vendors/{id}`).
             """
     )
     @ApiResponses(value = {
@@ -406,7 +480,11 @@ public class VendorController {
             @Parameter(description = "Vendor ID", required = true)
             @PathVariable UUID id
     ) {
-        return ResponseEntity.ok(vendorService.getApprovedVendorById(id));
+        VendorResponse response = vendorService.getApprovedVendorById(id);
+        // Public endpoint — strip CNI regardless of who's calling.
+        // (An owner hitting this endpoint doesn't need CNI from here;
+        // they should call GET /vendor/profile instead.)
+        return ResponseEntity.ok(stripCni(response));
     }
 
     @GetMapping("/public/vendors")
@@ -414,7 +492,7 @@ public class VendorController {
             summary = "Search active vendors (public)",
             description = """
             Returns only ACTIVE vendors. Used by customers browsing the marketplace.
-            Returns summaries for lightweight payloads.
+            Returns summaries for lightweight payloads (no CNI, no storage refs).
             """
     )
     @ApiResponses(value = {
@@ -455,5 +533,50 @@ public class VendorController {
                 .build();
 
         return ResponseEntity.ok(vendorService.searchApprovedVendors(request));
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Helpers — CNI stripping
+    // ═══════════════════════════════════════════════════════════
+
+    /**
+     * Returns a copy of the response with CNI fields (URL + storage ref)
+     * nulled out. Used on public endpoints where the caller isn't the owner.
+     *
+     * Note: `VendorResponse` is a record, so we rebuild it manually.
+     */
+    private VendorResponse stripCni(VendorResponse v) {
+        if (v == null) return null;
+        return new VendorResponse(
+                v.id(),
+                v.userId(),
+                v.businessName(),
+                v.description(),
+                v.address(),
+                v.email(),
+                v.phone(),
+                v.ratingAvg(),
+                v.totalRatings(),
+                v.status(),
+                v.statusReason(),
+                v.statusChangedAt(),
+                v.statusChangedBy(),
+                v.statusChangeType(),
+                v.subscriptionTier(),
+                v.deliveryRadius(),
+                v.pickupAddress(),
+                v.profileImageUrl(),
+                v.profileImageStorageRef(),
+                v.coverImageUrl(),
+                v.coverImageStorageRef(),
+                null,   // idCardFrontUrl
+                null,   // idCardFrontStorageRef
+                null,   // idCardBackUrl
+                null,   // idCardBackStorageRef
+                v.cuisines(),
+                v.distributionLocations(),
+                v.createdAt(),
+                v.updatedAt()
+        );
     }
 }

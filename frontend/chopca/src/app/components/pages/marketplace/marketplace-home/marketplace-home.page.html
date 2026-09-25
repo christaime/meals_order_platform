@@ -1,0 +1,32 @@
+<main class="w-full bg-surface min-h-screen pt-20">
+  <div class="flex flex-col w-full">
+
+    <!-- Quick stats pills -->
+    <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <app-quick-stats-pills />
+    </section>
+
+    <!-- Meal catalog view -->
+    <app-meal-catalog-view
+      [meals]="meals()"
+      [isLoading]="isLoading()"
+      [totalMeals]="totalMeals()"
+      [pageSize]="pageSize()"
+      (addToCart)="onAddToCart($event)"
+      (viewMealDetails)="onViewMealDetails($event)"
+      (filterChange)="onFilterChange($event)" />
+
+    <!-- Delivery coverage section -->
+    <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <app-delivery-coverage-section />
+    </section>
+
+  </div>
+</main>
+
+<!-- Floating cart summary -->
+<app-floating-cart-summary
+  [itemCount]="cartItemCount()"
+  [totalAmount]="cartTotal()"
+  [vendorName]="cartVendorName()"
+  (openCart)="onOpenCart()" />

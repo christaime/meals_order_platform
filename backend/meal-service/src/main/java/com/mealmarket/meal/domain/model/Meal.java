@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
  * - meal.moderationStatus = APPROVED
  * - vendor.status = ACTIVE
  * - meal.isAvailable = true
+ *
+ * The image is stored as a MinIO object key (storage ref). The URL is
+ * derived by the mapper via the MediaStoragePort — never persisted here.
  */
 @Getter
 public class Meal {
@@ -47,8 +50,12 @@ public class Meal {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     private final BigDecimal price;
 
-    @Size(max = 500, message = "Image URL cannot exceed 500 characters")
-    private final String imageUrl;
+    /**
+     * MinIO object key for the meal image. Null = no image.
+     * The display URL is computed at read time, never stored.
+     */
+    @Size(max = 512, message = "Image storage ref cannot exceed 512 characters")
+    private final String imageStorageRef;
 
     // ─── Availability & Stats ─────────────────────────────────
     private final Boolean isAvailable;
@@ -77,7 +84,7 @@ public class Meal {
         this.name = builder.name;
         this.description = builder.description;
         this.price = builder.price;
-        this.imageUrl = builder.imageUrl;
+        this.imageStorageRef = builder.imageStorageRef;
         this.isAvailable = builder.isAvailable;
         this.averageRating = builder.averageRating;
         this.totalRatings = builder.totalRatings;
@@ -115,6 +122,10 @@ public class Meal {
                 && Boolean.TRUE.equals(isAvailable)
                 && vendor != null
                 && vendor.isActive();
+    }
+
+    public boolean hasImage() {
+        return imageStorageRef != null && !imageStorageRef.isBlank();
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -199,7 +210,7 @@ public class Meal {
             String name,
             String description,
             BigDecimal price,
-            String imageUrl,
+            String imageStorageRef,
             Integer prepTimeMinutes,
             List<Category> categories,
             List<Ingredient> ingredients,
@@ -210,7 +221,7 @@ public class Meal {
                 .name(name)
                 .description(description)
                 .price(price)
-                .imageUrl(imageUrl)
+                .imageStorageRef(imageStorageRef)
                 .isAvailable(true)
                 .averageRating(0.0)
                 .totalRatings(0)
@@ -236,8 +247,11 @@ public class Meal {
         return baseBuilder().isAvailable(isAvailable).build();
     }
 
-    public Meal withImage(String imageUrl) {
-        return baseBuilder().imageUrl(imageUrl).build();
+    /**
+     * Replace or clear the image. Pass null or "" to remove.
+     */
+    public Meal withImageRef(String imageStorageRef) {
+        return baseBuilder().imageStorageRef(imageStorageRef).build();
     }
 
     public Meal withCategories(List<Category> categories) {
@@ -259,7 +273,7 @@ public class Meal {
                 .name(this.name)
                 .description(this.description)
                 .price(this.price)
-                .imageUrl(this.imageUrl)
+                .imageStorageRef(this.imageStorageRef)
                 .isAvailable(this.isAvailable)
                 .averageRating(this.averageRating)
                 .totalRatings(this.totalRatings)
@@ -282,7 +296,7 @@ public class Meal {
         private String name;
         private String description;
         private BigDecimal price;
-        private String imageUrl;
+        private String imageStorageRef;
         private Boolean isAvailable = true;
         private Double averageRating = 0.0;
         private Integer totalRatings = 0;
@@ -299,7 +313,7 @@ public class Meal {
         public Builder name(String v) { this.name = v; return this; }
         public Builder description(String v) { this.description = v; return this; }
         public Builder price(BigDecimal v) { this.price = v; return this; }
-        public Builder imageUrl(String v) { this.imageUrl = v; return this; }
+        public Builder imageStorageRef(String v) { this.imageStorageRef = v; return this; }
         public Builder isAvailable(Boolean v) { this.isAvailable = v; return this; }
         public Builder averageRating(Double v) { this.averageRating = v; return this; }
         public Builder totalRatings(Integer v) { this.totalRatings = v; return this; }

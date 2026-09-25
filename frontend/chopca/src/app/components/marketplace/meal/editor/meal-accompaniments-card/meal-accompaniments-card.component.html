@@ -1,0 +1,101 @@
+<div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm
+            flex flex-col gap-5">
+
+  <!-- Header -->
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-heading text-lg md:text-xl font-bold text-on-surface m-0">
+        Accompagnements Payants
+      </h2>
+      <p class="font-body text-xs text-on-surface-variant m-0">
+        Sélectionnez des plats de votre catalogue marqués comme
+        <em>Accompagnement payant</em> que vos clients peuvent ajouter
+        à cette commande.
+      </p>
+    </div>
+
+    @if (count() > 0) {
+    <span class="font-label text-[11px] font-semibold
+                   px-2.5 py-1 rounded
+                   bg-surface-container text-on-surface">
+        {{ count() }} sélectionné{{ count() > 1 ? 's' : '' }}
+      </span>
+    }
+  </div>
+
+  <!-- Search -->
+  <div class="relative">
+    <div class="relative flex items-center">
+      <app-icon name="search" size="md"
+                class="absolute left-3.5 text-on-surface-variant pointer-events-none" />
+      <input
+        type="text"
+        [class]="INPUT_CLASSES + ' pl-11'"
+        placeholder="Rechercher dans vos accompagnements…"
+        [value]="searchTerm()"
+        (input)="onSearchInput($event)"
+        autocomplete="off" />
+    </div>
+
+    @if (isSearching()) {
+    <div class="absolute left-0 right-0 top-[calc(100%+0.375rem)]
+                  bg-surface-container-lowest
+                  border border-outline-variant
+                  rounded-xl shadow-modal
+                  max-h-72 overflow-y-auto z-30 py-1.5">
+      @if (isSearchLoading()) {
+      <div class="px-4 py-3 text-center font-body text-xs text-on-surface-variant">
+        Recherche…
+      </div>
+      } @else if (showNoResults()) {
+      <div class="px-4 py-3 text-center font-body text-xs text-on-surface-variant">
+        Aucun accompagnement trouvé.
+      </div>
+      } @else {
+      @for (result of visibleSearchResults(); track result.id) {
+      <button
+        type="button"
+        (click)="onAddResult(result)"
+        class="w-full text-left px-4 py-2.5
+                     font-label text-xs
+                     bg-transparent border-0 cursor-pointer
+                     transition-colors
+                     flex items-center justify-between gap-2
+                     hover:bg-surface-container-low">
+              <span class="flex items-center gap-2 min-w-0">
+                <span class="truncate">{{ result.name }}</span>
+                <span class="shrink-0 font-currency text-[11px] font-bold text-primary">
+                  +{{ result.price.toLocaleString('fr-FR') }} FCFA
+                </span>
+              </span>
+        <app-icon name="add" size="sm" class="text-primary shrink-0" />
+      </button>
+      }
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Selected supplements -->
+  @if (selectedSupplements().length > 0) {
+  <div class="flex flex-col gap-2">
+    @for (supplement of selectedSupplements(); track supplement.id) {
+    <app-paid-supplement-row
+      [supplement]="supplement"
+      (removed)="onRemove($event)" />
+    }
+  </div>
+  } @else {
+  <div class="flex items-center gap-3 p-4 rounded-lg bg-surface-container-low">
+    <app-icon name="restaurant" size="md" class="text-on-surface-variant shrink-0" />
+    <span class="font-body text-xs text-on-surface-variant italic">
+        Aucun accompagnement sélectionné. Créez d'abord un plat dans la
+        catégorie <strong>Accompagnement payant</strong>, puis ajoutez-le ici.
+      </span>
+  </div>
+  }
+
+  <!-- Error -->
+  <app-form-error [message]="error()" />
+
+</div>

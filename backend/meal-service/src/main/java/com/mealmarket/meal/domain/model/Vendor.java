@@ -66,8 +66,23 @@ public class Vendor {
     private final String pickupAddress;
 
     // ─── Profile ──────────────────────────────────────────────
-    private final String profileImageUrl;
-    private final String coverImageUrl;
+    /**
+     * MinIO object keys. URLs are computed at read time, never stored.
+     * The CNI refs are required for moderation but not for the domain's
+     * validity (a vendor can exist in PENDING without them; the moderation
+     * flow enforces their presence).
+     */
+    @Size(max = 512, message = "Profile image storage ref cannot exceed 512 characters")
+    private final String profileImageStorageRef;
+
+    @Size(max = 512, message = "Cover image storage ref cannot exceed 512 characters")
+    private final String coverImageStorageRef;
+
+    @Size(max = 512, message = "ID card front storage ref cannot exceed 512 characters")
+    private final String idCardFrontStorageRef;
+
+    @Size(max = 512, message = "ID card back storage ref cannot exceed 512 characters")
+    private final String idCardBackStorageRef;
 
     // ─── Classification ───────────────────────────────────────
     private final List<Category> categories;
@@ -96,8 +111,10 @@ public class Vendor {
         this.state = builder.state;
         this.deliveryRadius = builder.deliveryRadius;
         this.pickupAddress = builder.pickupAddress;
-        this.profileImageUrl = builder.profileImageUrl;
-        this.coverImageUrl = builder.coverImageUrl;
+        this.profileImageStorageRef = builder.profileImageStorageRef;
+        this.coverImageStorageRef = builder.coverImageStorageRef;
+        this.idCardFrontStorageRef = builder.idCardFrontStorageRef;
+        this.idCardBackStorageRef = builder.idCardBackStorageRef;
         this.categories = builder.categories != null ? new ArrayList<>(builder.categories) : new ArrayList<>();
         this.distributionLocations = builder.distributionLocations != null ? new ArrayList<>(builder.distributionLocations) : new ArrayList<>();
         this.subscriptionTier = builder.subscriptionTier;
@@ -107,6 +124,59 @@ public class Vendor {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Vendor copyOf(Vendor existing) {
+        return existing.baseBuilder().build();
+    }
+
+    private Builder baseBuilder() {
+        return Vendor.builder()
+                .id(this.id)
+                .userId(this.userId)
+                .businessName(this.businessName)
+                .description(this.description)
+                .address(this.address)
+                .email(this.email)
+                .phone(this.phone)
+                .ratingAvg(this.ratingAvg)
+                .totalRatings(this.totalRatings)
+                .state(this.state)
+                .deliveryRadius(this.deliveryRadius)
+                .pickupAddress(this.pickupAddress)
+                .profileImageStorageRef(this.profileImageStorageRef)
+                .coverImageStorageRef(this.coverImageStorageRef)
+                .idCardFrontStorageRef(this.idCardFrontStorageRef)
+                .idCardBackStorageRef(this.idCardBackStorageRef)
+                .categories(this.categories)
+                .distributionLocations(this.distributionLocations)
+                .subscriptionTier(this.subscriptionTier)
+                .createdAt(this.createdAt)
+                .updatedAt(Instant.now());
+    }
+
+    // convenience copy helpers
+    public Vendor withState(VendorState newState) {
+        return baseBuilder().state(newState).build();
+    }
+
+    public Vendor withProfileImageRef(String ref) {
+        return baseBuilder().profileImageStorageRef(ref).build();
+    }
+
+    public Vendor withCoverImageRef(String ref) {
+        return baseBuilder().coverImageStorageRef(ref).build();
+    }
+
+    public Vendor withCniRefs(String front, String back) {
+        return baseBuilder()
+                .idCardFrontStorageRef(front)
+                .idCardBackStorageRef(back)
+                .build();
+    }
+
+    public Vendor withCategories(List<Category> cuisines) {
+        return baseBuilder().categories(cuisines).build();
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -161,6 +231,14 @@ public class Vendor {
                 .collect(Collectors.toList());
     }
 
+    public boolean hasProfileImage() {
+        return profileImageStorageRef != null && !profileImageStorageRef.isBlank();
+    }
+
+    public boolean hasCni() {
+        return idCardFrontStorageRef != null && !idCardFrontStorageRef.isBlank()
+                && idCardBackStorageRef != null && !idCardBackStorageRef.isBlank();
+    }
     // ═══════════════════════════════════════════════════════════
     //  Manual Builder with Jakarta Validation
     // ═══════════════════════════════════════════════════════════
@@ -193,8 +271,10 @@ public class Vendor {
 
         private String pickupAddress;
 
-        private String profileImageUrl;
-        private String coverImageUrl;
+        private String profileImageStorageRef;
+        private String coverImageStorageRef;
+        private String idCardFrontStorageRef;
+        private String idCardBackStorageRef;
 
         private List<Category> categories;
         private List<DistributionLocation> distributionLocations;
@@ -216,9 +296,10 @@ public class Vendor {
         public Builder state(VendorState state) { this.state = state; return this; }
         public Builder deliveryRadius(Integer deliveryRadius) { this.deliveryRadius = deliveryRadius; return this; }
         public Builder pickupAddress(String pickupAddress) { this.pickupAddress = pickupAddress; return this; }
-        public Builder profileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; return this; }
-        public Builder coverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; return this; }
-        public Builder categories(List<Category> categories) { this.categories = categories; return this; }
+        public Builder profileImageStorageRef(String v) { this.profileImageStorageRef = v; return this; }
+        public Builder coverImageStorageRef(String v) { this.coverImageStorageRef = v; return this; }
+        public Builder idCardFrontStorageRef(String v) { this.idCardFrontStorageRef = v; return this; }
+        public Builder idCardBackStorageRef(String v) { this.idCardBackStorageRef = v; return this; }public Builder categories(List<Category> categories) { this.categories = categories; return this; }
         public Builder distributionLocations(List<DistributionLocation> distributionLocations) { this.distributionLocations = distributionLocations; return this; }
         public Builder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
         public Builder updatedAt(Instant updatedAt) { this.updatedAt = updatedAt; return this; }

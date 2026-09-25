@@ -1,0 +1,164 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col gap-4 pt-2"
+  novalidate>
+
+  <!-- City -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Ville</mat-label>
+    <mat-icon matPrefix>location_city</mat-icon>
+    <mat-select
+      [value]="selectedCityId()"
+      (selectionChange)="onCityChange($event.value)"
+      placeholder="Sélectionner une ville">
+      @for (city of cities(); track city.id) {
+      <mat-option [value]="city.id">
+        {{ city.name }}@if (city.region) { — {{ city.region }} }
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Places search -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Rechercher un lieu (optionnel)</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input
+      matInput
+      #searchInput
+      placeholder="Ex: Marché de Bonapriso, Douala…" />
+  </mat-form-field>
+
+  <!-- Map -->
+  @if (mapOptions() && markerOptions()) {
+  <div class="rounded-lg overflow-hidden border border-gray-200">
+    <google-map
+      height="260px"
+      width="100%"
+      [center]="mapCenter()"
+      [zoom]="mapZoom()"
+      [options]="mapOptions()!"
+      (mapClick)="onMapClick($event)">
+      <map-marker
+        [position]="markerPosition()"
+        [options]="markerOptions()!"
+        (mapDragend)="onMarkerDragEnd($event)">
+      </map-marker>
+    </google-map>
+  </div>
+  } @else {
+  <div class="rounded-lg border border-gray-200 bg-gray-50
+              h-[260px] flex items-center justify-center">
+    <span class="text-sm text-gray-500">Chargement de la carte…</span>
+  </div>
+  }
+
+  <!-- Coordinates -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Latitude</mat-label>
+      <input matInput type="number" step="0.0001" [formControl]="latitude" />
+      @if (latitudeError()) {
+      <mat-error>{{ latitudeError() }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Longitude</mat-label>
+      <input matInput type="number" step="0.0001" [formControl]="longitude" />
+      @if (longitudeError()) {
+      <mat-error>{{ longitudeError() }}</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- Name -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Nom de l'emplacement</mat-label>
+    <mat-icon matPrefix>storefront</mat-icon>
+    <input
+      matInput
+      [formControl]="name"
+      placeholder="Ex: Akwa, Bonapriso, Bastos…"
+      autocomplete="off" />
+    @if (nameError()) {
+    <mat-error>{{ nameError() }}</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- Address -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Adresse complète</mat-label>
+    <mat-icon matPrefix>location_on</mat-icon>
+    <input
+      matInput
+      [formControl]="address"
+      placeholder="Ex: Rue des Palmiers, Akwa, Douala" />
+    @if (addressError()) {
+    <mat-error>{{ addressError() }}</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- Phone + radius -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Téléphone (optionnel)</mat-label>
+      <mat-icon matPrefix>call</mat-icon>
+      <input
+        matInput
+        type="tel"
+        [formControl]="phone"
+        placeholder="+237 6 12 34 56 78" />
+      @if (phoneError()) {
+      <mat-error>{{ phoneError() }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rayon livraison (km)</mat-label>
+      <mat-icon matPrefix>explore</mat-icon>
+      <input
+        matInput
+        type="number"
+        min="0"
+        [formControl]="deliveryRadius" />
+      @if (deliveryRadiusError()) {
+      <mat-error>{{ deliveryRadiusError() }}</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (serverError()) {
+  <div class="flex items-start gap-2 p-3 rounded-lg
+                bg-red-50 text-red-900 text-xs">
+    <mat-icon class="!text-base !w-4 !h-4 mt-0.5">error</mat-icon>
+    <span>{{ serverError() }}</span>
+  </div>
+  }
+
+  <div class="flex items-center justify-end gap-2 pt-2">
+    <button
+      type="button"
+      mat-button
+      (click)="onCancel()"
+      [disabled]="submitting()">
+      Annuler
+    </button>
+
+    <button
+      type="submit"
+      mat-flat-button
+      color="primary"
+      [disabled]="submitting()">
+      @if (submitting()) {
+      <mat-spinner diameter="18" class="inline-block mr-2" />
+      <span>Enregistrement…</span>
+      } @else {
+      <mat-icon>check</mat-icon>
+      <span>{{ isEditMode() ? 'Enregistrer' : 'Créer' }}</span>
+      }
+    </button>
+  </div>
+
+</form>

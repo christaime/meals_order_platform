@@ -77,6 +77,16 @@ spring:
         jwt:
           issuer-uri: http://localhost:8080/realms/mealmarket
           jwk-set-uri: http://localhost:8080/realms/mealmarket/protocol/openid-connect/certs
+      client:
+        registration:
+          keycloak-admin:
+            client-id: meal-marketplace-backend
+            client-secret: bFcfLsXi9Y2wHkodCOcFczmVQPtSQH6D
+            authorization-grant-type: client_credentials
+            scope: openid
+        provider:
+          keycloak-admin:
+            token-uri: http://localhost:8080/realms/mealmarket/protocol/openid-connect/token
 
   # ─── File Upload ──────────────────────────────────────────────
   servlet:
@@ -104,12 +114,13 @@ server:
 
 # ─── MinIO ──────────────────────────────────────────────────────
 minio:
-  enabled: true
-  url: http://localhost:9000
-  access-key: minioadmin
-  secret-key: minioadmin123
-  bucket: meal-images
-  public-url: http://localhost:9000
+  enabled: true                    # Keep enabled—your adapter just points at Garage now
+  url: http://localhost:3900       # Garage S3 API endpoint
+  access-key: GK0514f8c0f3dbb3f683d53d65  # Set from env or paste generated value
+  secret-key: d4e2f9e1aa30b932d6bb80de7639b5ab1640d48533f6822a8c99428e6335de77
+  bucket: mealmarket-media
+  public-base-url: http://mealmarket-media.web.garage.localhost:3902
+  presigned-expiry-seconds: 3600
 
 # ─── SpringDoc / OpenAPI ────────────────────────────────────────
 springdoc:
@@ -179,3 +190,53 @@ mealmarket:
       - image/jpeg
       - image/png
       - image/webp
+
+# ─── Keycloak Specific ───────────────────────────────────────
+keycloak:
+  admin:
+    url: http://localhost:8080
+    realm: mealmarket
+    username: ${KEYCLOAK_ADMIN_USER}
+    password: ${KEYCLOAK_ADMIN_PASSWORD}
+    client-id: admin-cli
+
+resilience4j:
+  # ─── Default Retry Configuration ───
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 1s
+        # Use exponential backoff with jitter to avoid thundering herd
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        # Retry on network issues, not on client errors (4xx)
+        retryExceptions:
+          - org.springframework.web.client.ResourceAccessException
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException
+
+  # ─── Default Circuit Breaker Configuration ───
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        # Automatically transition from open to half-open to test recovery
+        automaticTransitionFromOpenStateToHalfOpenEnabled: true
+        # Count network errors as failures
+        recordExceptions:
+          - org.springframework.web.client.ResourceAccessException
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException
+
+  # ─── Default Rate Limiter ───
+  # Protects your app from overwhelming external services
+  ratelimiter:
+    configs:
+      default:
+        limitForPeriod: 50
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0

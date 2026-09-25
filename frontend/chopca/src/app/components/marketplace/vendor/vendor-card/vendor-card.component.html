@@ -1,0 +1,86 @@
+<article
+  (click)="onSelectVendor()"
+  class="group relative flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant/40 overflow-hidden shadow-[0_4px_16px_rgba(41,37,36,0.05)] hover:shadow-[0_12px_28px_rgba(41,37,36,0.1)] hover:border-outline transition-all duration-300 cursor-pointer h-full"
+>
+  <!-- Card Header Banner / Fallback Pattern -->
+  <div class="relative h-32 w-full bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center">
+    <div class="w-full h-full bg-gradient-to-br from-primary-container/30 to-surface-container-highest flex items-center justify-center text-on-surface-variant">
+      <app-icon name="storefront" size="xl" class="opacity-40" />
+    </div>
+
+    <!-- Status Badge -->
+    <div class="absolute top-3 right-3">
+      @if (isOpen()) {
+      <app-badge variant="secondary" icon="check_circle">Ouvert</app-badge>
+      } @else {
+      <app-badge variant="danger" icon="schedule">Fermé</app-badge>
+      }
+    </div>
+  </div>
+
+  <!-- Content Body -->
+  <div class="p-4 flex flex-col flex-1 justify-between gap-3 relative pt-7">
+    <!-- Floating Avatar Profile Image -->
+    <div
+      class="absolute -top-7 left-4 w-14 h-14 rounded-2xl bg-surface-container-lowest border-2 border-surface-container-lowest shadow-md overflow-hidden flex items-center justify-center shrink-0"
+    >
+      @if (vendor().profileImageUrl) {
+      <img
+        [src]="vendor().profileImageUrl"
+        [alt]="vendor().businessName"
+        class="w-full h-full object-cover"
+      />
+      } @else {
+      <div class="w-full h-full bg-primary-fixed text-primary font-bold text-lg flex items-center justify-center">
+        {{ vendorInitial() }}
+      </div>
+      }
+    </div>
+
+    <!-- Vendor Header -->
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-1.5">
+        <h3 class="font-headline-sm text-sm font-bold text-on-surface group-hover:text-primary transition-colors truncate">
+          {{ vendor().businessName }}
+        </h3>
+        @if (vendor().subscriptionTier === 'PRO' || vendor().subscriptionTier === 'ENTERPRISE') {
+        <app-icon name="verified" size="sm" class="text-primary shrink-0" />
+        }
+      </div>
+
+      <!-- Cuisines -->
+      @if (cuisineList().length > 0) {
+      <div class="flex flex-wrap gap-1 mt-1">
+        @for (cuisine of cuisineList(); track cuisine) {
+        <span class="px-2 py-0.5 rounded-md bg-surface-container-high/60 text-[11px] font-medium text-on-surface-variant">
+              {{ cuisine }}
+            </span>
+        }
+      </div>
+      }
+
+      <!-- Description -->
+      @if (vendor().description) {
+      <p class="text-xs text-on-surface-variant line-clamp-2 mt-1 font-body-sm">
+        {{ vendor().description }}
+      </p>
+      }
+    </div>
+
+    <!-- Rating & Address Footer -->
+    <div class="pt-3 flex flex-col gap-2 border-t border-surface-container-high/60 mt-auto">
+      @if (vendor().totalRatings > 0) {
+      <div class="flex items-center gap-1.5 text-xs text-on-surface-variant font-label-md">
+        <app-rating-stars [rating]="vendor().ratingAvg" [showValue]="false" size="sm" />
+        <span class="font-semibold text-on-surface">{{ vendor().ratingAvg | number:'1.1-1' }}</span>
+        <span>({{ vendor().totalRatings }})</span>
+      </div>
+      }
+
+      <div class="flex items-center gap-1 text-xs text-on-surface-variant">
+        <app-icon name="location_on" size="sm" class="text-primary shrink-0" />
+        <span class="truncate">{{ vendor().address }}</span>
+      </div>
+    </div>
+  </div>
+</article>

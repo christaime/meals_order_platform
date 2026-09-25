@@ -1,0 +1,153 @@
+<div
+  [formGroup]="form()"
+  class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
+         flex flex-col gap-space-md">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Section header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-center justify-between pb-space-sm">
+    <div class="flex items-center gap-space-sm">
+      <span
+        class="w-9 h-9 rounded-lg bg-surface-container-highest text-on-surface
+               flex items-center justify-center shrink-0">
+        <app-icon name="badge" size="md" />
+      </span>
+      <div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">
+          Modération Réglementaire &amp; Documents KYC
+        </h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Vérification d'identité requise par la réglementation des paiements
+          UEMOA / CEMAC
+        </p>
+      </div>
+    </div>
+
+    <span
+      class="px-space-sm py-0.5 rounded-full font-label-sm text-label-sm
+             whitespace-nowrap flex items-center gap-1"
+      [class.bg-secondary-fixed]="bothUploaded()"
+      [class.text-on-secondary-fixed]="bothUploaded()"
+      [class.bg-surface-container-highest]="!bothUploaded()"
+      [class.text-on-surface-variant]="!bothUploaded()">
+      <app-icon name="shield" size="sm" />
+      @if (bothUploaded()) {
+        Conforme
+      } @else {
+        En attente
+      }
+    </span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Informational banner — PENDING status explanation
+       ═══════════════════════════════════════════════════════ -->
+  <div class="p-space-md rounded-xl bg-primary-fixed/30 flex items-start gap-space-sm">
+    <app-icon name="info" size="lg" class="text-primary mt-0.5 shrink-0" />
+    <div>
+      <p class="font-label-md text-label-md text-on-surface">
+        Processus de vérification et statut initial :
+      </p>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+        À la soumission du formulaire, le statut de votre compte sera configuré
+        sur <strong class="text-primary uppercase font-bold">En attente
+        d'approbation</strong>. Notre équipe d'audit culinaire et légale
+        vérifiera vos pièces d'identité et contact sous
+        <strong>24 heures ouvrées</strong> pour activer la réception de
+        commandes en direct.
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Two CNI uploaders
+       ═══════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+
+    <!-- ─── CNI front ─────────────────────────────────────── -->
+    <div class="flex flex-col gap-space-xs">
+      <div class="flex items-center justify-between">
+        <span class="font-label-md text-label-md text-on-surface">
+          CNI / Passeport (Recto) <span class="text-primary">*</span>
+        </span>
+      </div>
+
+      <app-image-uploader
+        purpose="ID_CARD_FRONT"
+        shape="wide"
+        label=""
+        hint="Photo nette, bords visibles, sans reflets."
+        [mediaRef]="frontMediaRef()"
+        (uploaded)="frontUploaded.emit($event)"
+        (cleared)="frontCleared.emit()" />
+
+      @if (frontRef(); as ref) {
+      <div
+        class="inline-flex items-center gap-1 px-2 py-0.5 rounded
+                 bg-surface-container-highest font-mono text-[10px]
+                 text-on-surface-variant w-fit">
+        <app-icon name="check_circle" size="sm" class="text-secondary" />
+        <span>{{ ref }} (Uploadé)</span>
+      </div>
+      }
+    </div>
+
+    <!-- ─── CNI back ──────────────────────────────────────── -->
+    <div class="flex flex-col gap-space-xs">
+      <div class="flex items-center justify-between">
+        <span class="font-label-md text-label-md text-on-surface">
+          CNI / Passeport (Verso) <span class="text-primary">*</span>
+        </span>
+      </div>
+
+      <app-image-uploader
+        purpose="ID_CARD_BACK"
+        shape="wide"
+        label=""
+        hint="Signature et date de validité lisibles."
+        [mediaRef]="backMediaRef()"
+        (uploaded)="backUploaded.emit($event)"
+        (cleared)="backCleared.emit()" />
+
+      @if (backRef(); as ref) {
+      <div
+        class="inline-flex items-center gap-1 px-2 py-0.5 rounded
+                 bg-surface-container-highest font-mono text-[10px]
+                 text-on-surface-variant w-fit">
+        <app-icon name="check_circle" size="sm" class="text-secondary" />
+        <span>{{ ref }} (Uploadé)</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Terms certification checkbox
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-start gap-space-sm mt-space-xs">
+    <mat-checkbox
+      formControlName="termsCertify"
+      required
+      class="shrink-0">
+    </mat-checkbox>
+
+    <label
+      class="font-body-sm text-body-sm text-on-surface-variant leading-snug
+             cursor-pointer select-none"
+      for="termsCertify">
+      Je certifie sur l'honneur l'exactitude des informations fournies, être
+      habilité(e) à représenter cet établissement de restauration et accepter
+      la <a class="text-primary hover:underline font-semibold" href="#">
+      Charte d'Hygiène &amp; Fraîcheur ChopÇa!</a>.
+    </label>
+  </div>
+
+  @if (form().get('termsCertify')?.hasError('required')
+  && form().get('termsCertify')?.touched) {
+  <p class="font-body-sm text-body-sm text-error flex items-center gap-1">
+    <app-icon name="error" size="sm" />
+    Vous devez accepter les conditions pour continuer.
+  </p>
+  }
+</div>

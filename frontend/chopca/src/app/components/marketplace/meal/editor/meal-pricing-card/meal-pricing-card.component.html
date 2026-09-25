@@ -1,0 +1,142 @@
+<div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm
+            flex flex-col gap-6">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-heading text-lg md:text-xl font-bold text-on-surface m-0">
+        Tarification
+      </h2>
+      <p class="font-body text-xs text-on-surface-variant m-0">
+        Fixez votre prix et visualisez immédiatement votre gain net
+        après commission plateforme.
+      </p>
+    </div>
+
+    <div class="w-10 h-10 rounded-full shrink-0
+                bg-surface-container
+                flex items-center justify-center">
+      <app-icon name="payments" size="md" class="text-primary" />
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Price inputs
+       ═══════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    <!-- Base price -->
+    <app-form-field
+      label="Prix normal"
+      iconLeading="sell"
+      [required]="true"
+      trailingHint="FCFA"
+      [error]="priceError">
+      <input
+        appProjectedInput
+        type="number"
+        min="100"
+        step="100"
+        [class]="INPUT_CLASSES"
+        [formControl]="price"
+        placeholder="3500" />
+    </app-form-field>
+
+    <!-- Promo price -->
+    <app-form-field
+      label="Prix promo"
+      iconLeading="local_offer"
+      trailingHint="Optionnel • FCFA"
+      [error]="promoPriceError">
+      <input
+        appProjectedInput
+        type="number"
+        min="100"
+        step="100"
+        [class]="INPUT_CLASSES"
+        [formControl]="promoPrice"
+        placeholder="Ex: 3000" />
+    </app-form-field>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Promo badge
+       ═══════════════════════════════════════════════════════ -->
+  @if (hasPromo()) {
+  <div class="inline-flex items-center gap-2 self-start
+                px-3 py-1.5 rounded-full
+                bg-secondary text-on-secondary
+                font-label text-xs font-bold">
+    <app-icon name="local_offer" size="sm" />
+    <span>−{{ discountPercent() }}% pendant la promo</span>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       Commission preview
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col gap-3 p-4 rounded-xl
+              bg-surface-container-low">
+
+    <div class="flex items-center gap-2">
+      <app-icon name="receipt_long" size="md" class="text-secondary" />
+      <span class="font-heading text-sm font-bold text-on-surface">
+        Aperçu de la rémunération
+      </span>
+    </div>
+
+    <div class="flex flex-col gap-2">
+
+      <!-- Client pays -->
+      <div class="flex items-center justify-between gap-3">
+        <span class="font-body text-xs text-on-surface-variant">
+          Client paie
+        </span>
+        <span class="font-currency text-sm font-bold text-on-surface">
+          {{ formatPrice(effectivePrice()) }}
+        </span>
+      </div>
+
+      <!-- Commission -->
+      <div class="flex items-center justify-between gap-3">
+        <span class="font-body text-xs text-on-surface-variant">
+          Commission plateforme ({{ commissionRate() }}%)
+        </span>
+        <span class="font-currency text-sm font-bold text-error">
+          − {{ formatPrice(commissionAmount()) }}
+        </span>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-outline-variant/60 my-1"></div>
+
+      <!-- Net payout -->
+      <div class="flex items-center justify-between gap-3">
+        <span class="font-label text-xs font-bold text-on-surface">
+          Vous recevez
+        </span>
+        <span class="font-currency text-base font-bold text-secondary">
+          {{ formatPrice(netPayout()) }}
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Info banner
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-start gap-2 p-3 rounded-lg
+              bg-tertiary-fixed/40 text-on-tertiary-fixed">
+    <app-icon name="info" size="md" class="shrink-0 mt-0.5" />
+    <span class="font-body text-xs leading-relaxed">
+      Le règlement est effectué à <strong>J+0</strong> via MoMo ou Orange Money
+      après confirmation de la commande. Aucun frais caché.
+    </span>
+  </div>
+
+</div>

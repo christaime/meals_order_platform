@@ -1,0 +1,219 @@
+<section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="flex flex-col gap-2 mb-6">
+    <h1 class="font-headline-lg text-2xl sm:text-3xl font-bold text-on-surface">
+      Finaliser votre commande
+    </h1>
+    <p class="text-sm text-on-surface-variant">
+      Vérifiez votre adresse de livraison, sélectionnez votre mode de paiement et validez.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <!-- ═══════════════════════════════════════════════════════
+         LEFT COLUMN: Delivery & Payment
+         ═══════════════════════════════════════════════════════ -->
+    <div class="lg:col-span-7 flex flex-col gap-8">
+
+      <!-- ─── Section 1: Address Selection ─────────────────── -->
+      <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-base text-on-surface flex items-center gap-2">
+            <app-icon name="location_on" size="sm" class="text-primary" />
+            <span>Adresse de livraison</span>
+          </h2>
+          <button type="button" class="text-xs font-bold text-primary hover:underline">
+            + Ajouter une adresse
+          </button>
+        </div>
+
+        @if (addresses().length > 0) {
+        <div class="grid grid-cols-1 gap-3">
+          @for (addr of addresses(); track addr.id) {
+          <div
+            (click)="onSelectAddress(addr.id)"
+            [class]="effectiveAddressId() === addr.id
+                  ? 'p-4 rounded-2xl border border-primary bg-primary-container/10 transition-all cursor-pointer flex items-start gap-3'
+                  : 'p-4 rounded-2xl border border-outline-variant/50 hover:bg-surface-container-low transition-all cursor-pointer flex items-start gap-3'">
+
+            <input
+              type="radio"
+              name="delivery_address"
+              [checked]="effectiveAddressId() === addr.id"
+              class="mt-1 text-primary focus:ring-primary" />
+
+            <div class="flex flex-col flex-1">
+              <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-on-surface">
+                      {{ addr.label }}
+                    </span>
+                @if (addr.isDefault) {
+                <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-[10px] font-semibold text-on-surface-variant">
+                        Par défaut
+                      </span>
+                }
+              </div>
+              <span class="text-xs text-on-surface-variant">
+                    {{ addr.fullAddress }}, {{ addr.city }}
+                  </span>
+              <span class="text-xs text-on-surface-variant/80 mt-1">
+                    {{ addr.phone }}
+                  </span>
+            </div>
+
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="p-4 rounded-2xl bg-surface-container-low text-center text-xs text-on-surface-variant">
+          Aucune adresse enregistrée. Veuillez en ajouter une.
+        </div>
+        }
+
+        <!-- Delivery Instructions -->
+        <div class="flex flex-col gap-1.5 mt-2">
+          <label for="instructions" class="text-xs font-bold text-on-surface">
+            Instructions pour le livreur (Optionnel)
+          </label>
+          <input
+            id="instructions"
+            type="text"
+            placeholder="Ex: Sonner au portail noir, 2ème étage..."
+            [value]="deliveryInstructions()"
+            (input)="onInstructionsInput($event)"
+            class="w-full px-4 py-2.5 rounded-xl border border-outline-variant/50 bg-surface-container-low text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+        </div>
+
+      </div>
+
+      <!-- ─── Section 2: Payment Options ───────────────────── -->
+      <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+
+        <h2 class="font-bold text-base text-on-surface flex items-center gap-2">
+          <app-icon name="account_balance_wallet" size="sm" class="text-primary" />
+          <span>Mode de paiement</span>
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          @for (option of paymentOptions; track option.id) {
+          <div
+            (click)="onSelectPayment(option.id)"
+            [class]="selectedPaymentMethod() === option.id
+                ? 'p-4 rounded-2xl border border-primary bg-primary-container/10 transition-all cursor-pointer flex items-start gap-3'
+                : 'p-4 rounded-2xl border border-outline-variant/50 hover:bg-surface-container-low transition-all cursor-pointer flex items-start gap-3'">
+
+            <app-icon [name]="option.iconName" size="md" class="text-primary shrink-0 mt-0.5" />
+            <div class="flex flex-col">
+              <span class="text-xs font-bold text-on-surface">{{ option.name }}</span>
+              <span class="text-[11px] text-on-surface-variant leading-tight mt-0.5">
+                  {{ option.description }}
+                </span>
+            </div>
+
+          </div>
+          }
+        </div>
+
+        <!-- Mobile Money phone input -->
+        @if (selectedPaymentMethod() === 'MTN_MOMO' || selectedPaymentMethod() === 'ORANGE_MONEY') {
+        <div class="p-4 rounded-2xl bg-surface-container-low flex flex-col gap-2 mt-2">
+          <label for="phone" class="text-xs font-bold text-on-surface">
+            Numéro {{ selectedPaymentMethod() === 'MTN_MOMO' ? 'MTN Mobile Money' : 'Orange Money' }}
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            placeholder="6XX XXX XXX"
+            [value]="mobileMoneyNumber()"
+            (input)="onPhoneInput($event)"
+            class="w-full px-4 py-2.5 rounded-xl border border-outline-variant/50 bg-surface-container-lowest text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+          <span class="text-[11px] text-on-surface-variant">
+              Une demande d'autorisation de paiement sera envoyée sur ce numéro.
+            </span>
+        </div>
+        }
+
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         RIGHT COLUMN: Order Summary
+         ═══════════════════════════════════════════════════════ -->
+    <div class="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-6">
+
+      <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+
+        <h2 class="font-bold text-base text-on-surface border-b border-surface-container-high pb-3">
+          Récapitulatif de commande
+        </h2>
+
+        <!-- Items grouped by vendor -->
+        <div class="flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-1">
+          @for (group of cartGroups(); track group.vendorId) {
+          <div class="flex flex-col gap-2">
+
+              <span class="text-xs font-bold text-primary flex items-center gap-1">
+                <app-icon name="storefront" size="sm" />
+                {{ group.vendorName }}
+              </span>
+
+            <div class="flex flex-col gap-2 pl-2 border-l-2 border-primary/20">
+              @for (item of group.items; track item.id) {
+              <div class="flex items-center justify-between text-xs">
+                    <span class="text-on-surface font-medium truncate max-w-[180px]">
+                      {{ item.quantity }}x {{ item.name }}
+                    </span>
+                <app-price-tag [amount]="item.price * item.quantity" variant="compact" />
+              </div>
+              }
+            </div>
+
+          </div>
+          }
+        </div>
+
+        <!-- Costs breakdown -->
+        <div class="flex flex-col gap-2 border-t border-surface-container-high pt-4 text-xs">
+
+          <div class="flex justify-between text-on-surface-variant">
+            <span>Sous-total plats</span>
+            <app-price-tag [amount]="subtotal()" variant="compact" />
+          </div>
+
+          <div class="flex justify-between text-on-surface-variant">
+            <span>Frais de livraison</span>
+            <app-price-tag [amount]="deliveryFee()" variant="compact" />
+          </div>
+
+          <div class="flex justify-between text-on-surface font-bold text-sm border-t border-outline-variant/30 pt-3 mt-1">
+            <span>Total à payer</span>
+            <app-price-tag [amount]="totalAmount()" variant="default" />
+          </div>
+
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="button"
+          [disabled]="!effectiveAddressId() || isSubmitting()"
+          (click)="onSubmitOrder()"
+          class="w-full py-3.5 rounded-full bg-primary text-on-primary font-bold text-sm hover:bg-primary-container disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2 mt-2">
+
+          @if (isSubmitting()) {
+          <span class="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin"></span>
+          <span>Traitement en cours...</span>
+          } @else {
+          <app-icon name="check_circle" size="sm" />
+          <span>Confirmer et Payer</span>
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>

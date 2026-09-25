@@ -1,0 +1,13 @@
+<div class="min-h-screen flex flex-col bg-background text-on-background font-sans">
+  <app-header
+    [cartCount]="cartItemCount()"
+    (toggleCart)="onToggleCart()"
+  />
+
+  <!-- Add pt-20 (80px) to clear the fixed fixed header -->
+  <main class="flex-1 w-full pt-20">
+    <router-outlet />
+  </main>
+
+  <app-footer />
+</div>

@@ -16,7 +16,7 @@ public record MealSummaryResponse(
         String name,
         String description,
         BigDecimal price,
-        String imageUrl,
+        String imageUrl,          // computed, for the card
         Boolean isAvailable,
         Double averageRating,
         Integer totalRatings,

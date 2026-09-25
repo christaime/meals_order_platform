@@ -66,6 +66,9 @@ public class MealController {
             **Relationships:** categories, ingredients, and distribution locations
             must be APPROVED. Locations must also belong to the authenticated vendor.
 
+            **Image:** pass `imageStorageRef` (the MinIO object key returned by
+            `POST /api/v1/media`). The display URL is computed server-side on read.
+
             The vendor is derived from the JWT token — not from the request body.
             """
     )
@@ -188,6 +191,11 @@ public class MealController {
             description = """
             Updates the core fields of a meal that belongs to the authenticated vendor.
 
+            **Image:** `imageStorageRef` follows the null/empty-string convention:
+            - `null`  → keep the existing image
+            - `""`    → clear the image
+            - value   → replace with the new ref (old one becomes an orphan candidate)
+
             **Not allowed here:** categories, ingredients, distribution locations.
             Those are managed via dedicated endpoints (planned for Phase 2).
 
@@ -260,8 +268,14 @@ public class MealController {
     @Operation(
             summary = "Update meal image (vendor only)",
             description = """
-            Updates the meal image URL.
-            The actual file upload to MinIO is handled separately.
+            Replaces the meal image with a new storage ref.
+
+            The ref must come from a prior call to `POST /api/v1/media`
+            (the frontend uploads first, then attaches). The previous ref
+            is marked PENDING in MinIO and cleaned up automatically if not
+            re-used within 24 hours.
+
+            Ownership is enforced.
             """
     )
     @ApiResponses(value = {
@@ -273,16 +287,16 @@ public class MealController {
             @ApiResponse(responseCode = "404", description = "Meal not found"),
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
-    public ResponseEntity<MealResponse> uploadMealImage(
+    public ResponseEntity<MealResponse> updateMealImage(
             @Parameter(description = "Meal ID", required = true)
             @PathVariable UUID id,
 
-            @Parameter(description = "Image URL (from file storage)", required = true)
-            @RequestParam String imageUrl
+            @Parameter(description = "MinIO storage ref (object key) from POST /api/v1/media", required = true)
+            @RequestParam String imageStorageRef
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
         return ResponseEntity.ok(
-                mealService.uploadMealImage(id, imageUrl, vendor.getId())
+                mealService.updateMealImage(id, imageStorageRef, vendor.getId())
         );
     }
 
@@ -297,8 +311,8 @@ public class MealController {
             summary = "Delete one of your meals (vendor only)",
             description = """
             Deletes a meal following the moderation-aware rule:
-            - PENDING / REJECTED → hard delete from DB
-            - APPROVED → transition to DISABLED + record moderation
+            - PENDING / REJECTED → hard delete from DB (image released)
+            - APPROVED → transition to DISABLED + record moderation (image kept)
             - DISABLED → rejected (already retired)
 
             Ownership is enforced.

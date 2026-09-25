@@ -1,0 +1,146 @@
+<div
+  [formGroup]="form()"
+  class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
+         flex flex-col gap-space-md">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Section header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-center justify-between pb-space-sm">
+    <div class="flex items-center gap-space-sm">
+      <span
+        class="w-9 h-9 rounded-lg bg-primary-fixed text-primary
+               flex items-center justify-center shrink-0">
+        <app-icon name="distance" size="md" />
+      </span>
+      <div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">
+          Géolocalisation &amp; Logistique Flotte
+        </h2>
+      </div>
+    </div>
+
+    <span
+      class="px-space-sm py-0.5 rounded-full bg-primary-fixed text-primary
+             font-label-sm text-label-sm whitespace-nowrap">
+      Obligatoire
+    </span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Main address
+       ═══════════════════════════════════════════════════════ -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Adresse physique principale de l'établissement</mat-label>
+    <app-icon matPrefix name="pin_drop" size="md" class="text-primary pr-2" />
+    <input
+      matInput
+      formControlName="address"
+      maxlength="255"
+      placeholder="ex: Rue des Palmiers, Akwa, Douala"
+      (input)="onAddressInput($any($event.target).value)" />
+    <mat-hint>
+      Adresse officielle d'implantation utilisée pour le géocodage GPS précis.
+    </mat-hint>
+    @if (form().get('address')?.hasError('required')
+    && form().get('address')?.touched) {
+    <mat-error>L'adresse physique est obligatoire.</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Pickup address + same-as checkbox
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col gap-1">
+    <div class="flex items-center justify-between gap-space-sm flex-wrap">
+      <label class="font-label-md text-label-md text-on-surface" for="pickupAddress">
+        Adresse de retrait des commandes (Pick-up Coursiers)
+      </label>
+
+      <mat-checkbox
+        [checked]="sameAddress()"
+        (change)="onSameAddressToggle($event.checked)"
+        class="font-label-sm text-label-sm">
+        Identique à l'adresse principale
+      </mat-checkbox>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <app-icon matPrefix name="meeting_room" size="md" class="text-on-surface-variant pr-2" />
+      <input
+        matInput
+        id="pickupAddress"
+        formControlName="pickupAddress"
+        maxlength="255"
+        placeholder="ex: Entrée coursière au fond de l'impasse..." />
+      <mat-hint>
+        Précision utile pour les livreurs partenaires lors des heures de pointe.
+      </mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Delivery radius
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col gap-2 p-space-md rounded-xl bg-surface-container-low mt-2">
+
+    <div class="flex items-center justify-between gap-space-md">
+      <div>
+        <span class="font-label-md text-label-md text-on-surface">
+          Rayon de livraison garanti
+          (<code class="font-mono text-label-sm text-primary">deliveryRadius</code>)
+        </span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Périmètre maximal d'expédition des repas chauds pour préserver la fraîcheur.
+        </p>
+      </div>
+
+      <div
+        class="px-space-md py-1 rounded-full bg-primary text-on-primary
+               font-headline-sm text-headline-sm flex items-center gap-1
+               shadow-sm shrink-0">
+        <span>{{ radius() }}</span>
+        <span class="font-label-md text-label-md">km</span>
+      </div>
+    </div>
+
+    <mat-slider
+      min="1"
+      max="25"
+      step="1"
+      discrete
+      class="w-full">
+      <input matSliderThumb formControlName="deliveryRadius" />
+    </mat-slider>
+
+    <div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+      <span>1 km (Ultra local)</span>
+      <span>8 km (Recommandé)</span>
+      <span>15 km (Grand bassin)</span>
+      <span>25 km (Zone max métropole)</span>
+    </div>
+
+    <!-- Radar simulation -->
+    <div
+      class="w-full h-32 rounded-lg relative overflow-hidden
+             flex items-center justify-center bg-surface-container-high">
+      <div class="absolute inset-0 bg-primary/5 flex items-center justify-center">
+        <div
+          class="rounded-full border-2 border-primary/40 bg-primary/10
+                 flex items-center justify-center transition-all duration-300"
+          [style.width.px]="radarSize()"
+          [style.height.px]="radarSize()">
+          <app-icon name="two_wheeler" size="xl" class="text-primary" />
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-2 left-2 px-2 py-1 rounded bg-surface/90
+               backdrop-blur font-label-sm text-label-sm text-on-surface
+               flex items-center gap-1 shadow-sm">
+        <app-icon name="radar" size="sm" class="text-secondary" />
+        Simulation de couverture : Bonapriso, Akwa, Bonanjo, Deido
+      </div>
+    </div>
+  </div>
+</div>

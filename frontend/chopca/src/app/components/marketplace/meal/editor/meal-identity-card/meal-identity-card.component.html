@@ -1,0 +1,98 @@
+<div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm
+            flex flex-col gap-6">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-heading text-lg md:text-xl font-bold text-on-surface m-0">
+        Identité Culinaire
+      </h2>
+      <p class="font-body text-xs text-on-surface-variant m-0">
+        Donnez envie dès la première lecture sur l'application mobile Chop ça!.
+      </p>
+    </div>
+
+    <app-badge
+      variant="secondary"
+      icon="verified">
+      Recommandé Gold
+    </app-badge>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Name
+       ═══════════════════════════════════════════════════════ -->
+  <app-form-field
+    label="Nom du plat gourmand"
+    iconLeading="restaurant_menu"
+    [required]="true"
+    [error]="nameError">
+    <input
+      appProjectedInput
+      type="text"
+      [class]="INPUT_CLASSES"
+      [formControl]="name"
+      placeholder="Ex: Mbongo Tchobi de Capitaine, Poulet DG…" />
+  </app-form-field>
+
+  <p class="font-body text-[11px] text-on-surface-variant m-0 -mt-3">
+    Conseil : mentionnez l'accompagnement signature ou la coupe de viande
+    pour booster de +24% les commandes.
+  </p>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Categories — cuisine + dish type
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col gap-5 pt-2">
+
+    <!-- Cuisine -->
+    <app-category-pills-selector
+      categoryType="CUISINE"
+      label="Origine culinaire &amp; Spécialité"
+      hint="Choisissez jusqu'à 3 cuisines pour le référencement local"
+      [control]="cuisineIds"
+      [maxSelection]="3"
+      [minSelection]="1"
+      [error]="cuisineIdsError" />
+
+    <!-- Dish type -->
+    <app-category-pills-selector
+      categoryType="DISH_TYPE"
+      label="Type de plat"
+      hint="Détermine la position du plat dans le menu (Plat principal, Dessert, Boisson…)"
+      [control]="dishTypeIds"
+      [maxSelection]="2"
+      [minSelection]="1"
+      [error]="dishTypeIdsError" />
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Description
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col gap-1 pt-2">
+
+    <div class="flex items-center justify-between gap-3">
+      <label class="font-label text-xs font-semibold text-on-surface">
+        Description alléchante &amp; secrets du chef
+      </label>
+      <span class="font-label text-[11px] text-on-surface-variant">
+        {{ descriptionCounter() }}
+      </span>
+    </div>
+
+    <textarea
+      [class]="INPUT_CLASSES + ' min-h-[6rem] resize-y'"
+      [formControl]="description"
+      [attr.maxlength]="maxDescriptionLength()"
+      rows="4"
+      placeholder="Décrivez le plat, ses saveurs, ses origines, ses secrets de préparation…">
+    </textarea>
+
+    <app-form-error [message]="descriptionError" />
+
+  </div>
+
+</div>

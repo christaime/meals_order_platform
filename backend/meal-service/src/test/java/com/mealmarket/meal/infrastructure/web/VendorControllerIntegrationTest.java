@@ -110,6 +110,7 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
                         .requestAttr("keycloakUserId", VENDOR_USER_ID.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.businessName").value("Delicious Bites"))

@@ -1,0 +1,109 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md
+            flex flex-col gap-space-md">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <div class="flex items-center justify-between pb-space-xs">
+    <div class="flex items-center gap-space-xs">
+      <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+      <span class="font-label-md text-label-md text-on-surface uppercase tracking-wide">
+        Aperçu Vitrine en Direct
+      </span>
+    </div>
+    <span class="font-label-sm text-label-sm text-primary">Simulation App Client</span>
+  </div>
+
+  <!-- ── Phone mockup ──────────────────────────────────── -->
+  <div class="w-full rounded-2xl bg-surface-container-low overflow-hidden
+              shadow-sm flex flex-col">
+
+    <!-- Cover banner -->
+    <div class="h-28 w-full relative bg-surface-container-high overflow-hidden">
+      @if (state().coverUrl; as url) {
+      <img [src]="url" alt="Bannière de couverture" class="w-full h-full object-cover" />
+      } @else {
+      <div class="w-full h-full flex items-center justify-center">
+        <app-icon name="panorama" size="xl" class="text-on-surface-variant" />
+      </div>
+      }
+      <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80
+                  via-transparent to-transparent"></div>
+      <div class="absolute top-2 right-2 px-2 py-0.5 rounded-full
+                  bg-surface/90 backdrop-blur font-label-sm text-label-sm
+                  text-on-surface flex items-center gap-1 shadow-sm">
+        <app-icon name="star" size="sm" class="text-primary" [filled]="true" />
+        <span>4.9 • Nouveau</span>
+      </div>
+    </div>
+
+    <!-- Logo overlap -->
+    <div class="px-space-md -mt-8 flex items-end justify-between relative z-10">
+      <div class="w-16 h-16 rounded-full bg-surface-container-lowest p-1 shadow-md">
+        @if (state().logoUrl; as url) {
+        <img [src]="url" alt="Logo de l'enseigne"
+             class="w-full h-full object-cover rounded-full" />
+        } @else {
+        <div class="w-full h-full rounded-full bg-surface-container-high
+                      flex items-center justify-center">
+          <app-icon name="storefront" size="md" class="text-on-surface-variant" />
+        </div>
+        }
+      </div>
+      <span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed
+                   font-label-sm text-label-sm shadow-sm flex items-center gap-1">
+        <app-icon name="verified" size="sm" />
+        Vérifié ChopÇa!
+      </span>
+    </div>
+
+    <!-- Body -->
+    <div class="p-space-md flex flex-col gap-2">
+
+      <div>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+          {{ state().businessName || 'Nom de votre établissement' }}
+        </h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant
+                  line-clamp-2 mt-0.5">
+          {{ state().description || 'Racontez l\'histoire de votre carte culinaire...' }}
+        </p>
+      </div>
+
+      <!-- Logistics strip -->
+      <div class="flex items-center gap-space-sm font-label-sm text-label-sm
+                  text-on-surface-variant py-1 bg-surface-container-lowest
+                  px-space-sm rounded-lg">
+        <div class="flex items-center gap-1">
+          <app-icon name="schedule" size="sm" class="text-primary" />
+          <span>25-40 min</span>
+        </div>
+        <span class="text-on-surface-variant/40">•</span>
+        <div class="flex items-center gap-1">
+          <app-icon name="moped" size="sm" class="text-secondary" />
+          <span>Rayon : {{ state().deliveryRadius ?? '—' }} km</span>
+        </div>
+      </div>
+
+      <!-- Cuisine tags -->
+      <div class="flex flex-wrap gap-1 pt-1">
+        @if (state().cuisineLabels.length === 0) {
+        <span class="font-body-sm text-body-sm text-on-surface-variant">
+            Aucune catégorie sélectionnée
+          </span>
+        } @else {
+        @for (label of state().cuisineLabels; track label) {
+        <span class="px-2 py-0.5 rounded-full bg-primary-fixed
+                         text-on-primary-fixed font-label-sm text-label-sm
+                         truncate max-w-[150px]">
+              {{ label }}
+            </span>
+        }
+        }
+      </div>
+    </div>
+  </div>
+
+  <p class="font-body-sm text-body-sm text-on-surface-variant text-center">
+    Cette vue représente l'agencement exact de votre enseigne sur l'application
+    mobile ChopÇa! pour les clients finaux.
+  </p>
+</div>

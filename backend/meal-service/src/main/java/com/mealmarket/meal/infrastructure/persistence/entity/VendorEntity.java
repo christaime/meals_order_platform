@@ -106,11 +106,17 @@ public class VendorEntity {
 
     // ─── Profile ──────────────────────────────────────────────
 
-    @Column(name = "profile_image_url", length = 500)
-    private String profileImageUrl;
+    @Column(name = "profile_image_storage_ref", length = 512)
+    private String profileImageStorageRef;
 
-    @Column(name = "cover_image_url", length = 500)
-    private String coverImageUrl;
+    @Column(name = "cover_image_storage_ref", length = 512)
+    private String coverImageStorageRef;
+
+    @Column(name = "id_card_front_storage_ref", length = 512)
+    private String idCardFrontStorageRef;
+
+    @Column(name = "id_card_back_storage_ref", length = 512)
+    private String idCardBackStorageRef;
 
     // ─── Category IDs (CUISINE only) ──────────────────────────
 

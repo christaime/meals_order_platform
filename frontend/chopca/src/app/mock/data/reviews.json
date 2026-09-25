@@ -1,0 +1,29 @@
+[
+  {
+    "id": "review-1",
+    "customerName": "Diane E.",
+    "customerInitials": "DE",
+    "rating": 5,
+    "comment": "Le meilleur ndolé de Douala livré à domicile ! Les crevettes étaient croustillantes et fraîches, pas trop d'huile, parfait.",
+    "deliveryArea": "Douala, Akwa",
+    "createdAt": "2025-09-13T10:30:00Z"
+  },
+  {
+    "id": "review-2",
+    "customerName": "Marc K.",
+    "customerInitials": "MK",
+    "rating": 5,
+    "comment": "Portion très généreuse, livré encore bien chaud avec du miondo tout frais. Le bœuf fumé a ce goût authentique du village.",
+    "deliveryArea": "Bonapriso",
+    "createdAt": "2025-09-11T18:20:00Z"
+  },
+  {
+    "id": "review-3",
+    "customerName": "Sylvie M.",
+    "customerInitials": "SM",
+    "rating": 5,
+    "comment": "Assaisonnement parfait, le piment moyen est idéalement dosé. Bravo Chop ça! pour la ponctualité de la livraison.",
+    "deliveryArea": "Deido",
+    "createdAt": "2025-09-09T20:15:00Z"
+  }
+]

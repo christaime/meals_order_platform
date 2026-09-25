@@ -1,0 +1,48 @@
+@if (totalPages() > 1) {
+<nav class="flex items-center justify-between py-4" aria-label="Pagination">
+  <!-- Previous Button -->
+  <button
+    type="button"
+    (click)="previousPage()"
+    [disabled]="currentPage() === 1"
+    class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-on-surface bg-surface-container-low border border-outline-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+  >
+    <app-icon name="chevron_left" size="sm" />
+    <span>Précédent</span>
+  </button>
+
+  <!-- Page Numbers -->
+  <div class="flex items-center gap-1">
+    @for (page of pages(); track $index) {
+    @if (page === '...') {
+    <span class="px-2 text-xs text-on-surface-variant select-none">...</span>
+    } @else {
+    <button
+      type="button"
+      (click)="goToPage(page)"
+      class="w-8 h-8 rounded-xl text-xs font-semibold flex items-center justify-center transition-all cursor-pointer"
+      [class.bg-primary]="currentPage() === page"
+      [class.text-on-primary]="currentPage() === page"
+      [class.shadow-xs]="currentPage() === page"
+      [class.bg-surface-container-lowest]="currentPage() !== page"
+      [class.text-on-surface-variant]="currentPage() !== page"
+      [class.hover:bg-surface-container]="currentPage() !== page"
+    >
+      {{ page }}
+    </button>
+    }
+    }
+  </div>
+
+  <!-- Next Button -->
+  <button
+    type="button"
+    (click)="nextPage()"
+    [disabled]="currentPage() === totalPages()"
+    class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-on-surface bg-surface-container-low border border-outline-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+  >
+    <span>Suivant</span>
+    <app-icon name="chevron_right" size="sm" />
+  </button>
+</nav>
+}

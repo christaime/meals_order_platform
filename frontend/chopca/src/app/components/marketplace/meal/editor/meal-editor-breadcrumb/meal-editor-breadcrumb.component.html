@@ -1,0 +1,57 @@
+<div class="w-full bg-surface-container-low border-b border-outline-variant/40">
+  <div class="max-w-[1440px] mx-auto px-6 lg:px-12 py-4
+              flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+    <!-- ─── Breadcrumb ──────────────────────────────────── -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <a
+        [routerLink]="backRoute()"
+        class="inline-flex items-center gap-1
+               font-label text-xs
+               text-on-surface-variant no-underline
+               hover:text-primary transition-colors">
+        <app-icon name="arrow_back" size="sm" />
+        <span>{{ backLabel() }}</span>
+      </a>
+
+      <span class="text-outline-variant" aria-hidden="true">/</span>
+
+      <span class="font-label text-xs font-semibold text-primary">
+        {{ currentLabel() }}
+      </span>
+
+      @if (draftId()) {
+      <span class="bg-primary-fixed text-on-primary-fixed
+                     font-label text-[11px] font-bold uppercase tracking-wider
+                     px-2.5 py-0.5 rounded-full ml-1">
+          Brouillon n° {{ draftId() }}
+        </span>
+      }
+    </div>
+
+    <!-- ─── Autosave + Vue Client ────────────────────────── -->
+    <div class="flex items-center gap-4">
+      @if (autosaveLabel()) {
+      <span class="hidden sm:flex items-center gap-1.5
+                     text-on-surface-variant font-label text-[11px]">
+          <app-icon name="cloud_done" size="sm" class="text-secondary" />
+          <span>{{ autosaveLabel() }}</span>
+        </span>
+      }
+
+      <button
+        type="button"
+        (click)="onViewClient()"
+        class="inline-flex items-center gap-1.5
+               px-4 py-1.5 rounded
+               bg-surface-container hover:bg-surface-container-highest
+               text-on-surface
+               font-label text-xs
+               border-0 cursor-pointer transition-colors">
+        <app-icon name="visibility" size="sm" />
+        <span>Vue Client</span>
+      </button>
+    </div>
+
+  </div>
+</div>

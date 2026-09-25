@@ -127,10 +127,34 @@ services:
       retries: 3
       start_period: 140s    # pgAdmin takes time to start
 
+  garage:
+    image: dxflrs/garage:v2.3.0
+    container_name: garage
+    command: /garage server --single-node --default-bucket
+    ports:
+      - "3900:3900"   # S3 API
+      - "3902:3902"   # Static web hosting
+      - "3903:3903"   # Admin API
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+    environment:
+      GARAGE_RPC_SECRET: "df3ab0acfc09f7d6fd3f727f7d3bd8e5ed9e07e6bfcfd6a12a046e1b8ce06117"           # openssl rand -hex 32
+      GARAGE_ADMIN_TOKEN: "3a5afb87008d14a11c652c3e5ae20a9b9c17d786692570ae1218e6d42a4283cc"                  # openssl rand -hex 32
+      GARAGE_DEFAULT_ACCESS_KEY: "GK0514f8c0f3dbb3f683d53d65"          # Must start with GK + 24 hex chars
+      GARAGE_DEFAULT_SECRET_KEY: "d4e2f9e1aa30b932d6bb80de7639b5ab1640d48533f6822a8c99428e6335de77"    # 64 hex chars
+      GARAGE_DEFAULT_BUCKET: "mealmarket-media"
+    networks:
+      - meal-network
+    restart: unless-stopped
+
 volumes:
   meal-db-data:
   keycloak-db-data:
   pgadmin-data:
+  garage_meta:
+  garage_data:
 
 networks:
   meal-network:

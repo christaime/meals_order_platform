@@ -1,0 +1,9 @@
+<span [class]="classes()">
+  @if (icon()) {
+    <app-icon
+      [name]="icon()!"
+      [filled]="filledIcon()"
+      size="sm" />
+  }
+  <ng-content />
+</span>

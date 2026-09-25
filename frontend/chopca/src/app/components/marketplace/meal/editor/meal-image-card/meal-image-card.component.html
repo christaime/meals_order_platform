@@ -1,0 +1,125 @@
+<div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm
+            flex flex-col gap-5">
+
+  <!-- ═══════════════════════════════════════════════════════
+       Card header
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex flex-col sm:flex-row sm:items-center
+              justify-between gap-3">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-heading text-lg md:text-xl font-bold text-on-surface m-0">
+        Photographie Haute Qualité
+      </h2>
+      <p class="font-body text-xs text-on-surface-variant m-0">
+        L'image principale affichée sur le feed mobile et le panier.
+      </p>
+    </div>
+
+    <span class="inline-flex items-center gap-1.5
+                 font-label text-[11px] font-bold
+                 text-primary bg-primary-fixed
+                 px-3 py-1 rounded-full self-start sm:self-auto">
+      <app-icon name="aspect_ratio" size="sm" />
+      Format 4:3 recommandé
+    </span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Image uploader (shared component, wide shape)
+       ═══════════════════════════════════════════════════════ -->
+  <app-image-uploader
+    purpose="MEAL_IMAGE"
+    shape="wide"
+    label=""
+    hint="JPG, PNG ou WebP jusqu'à 8 Mo. Mise en valeur avec fumée ou braise conseillée."
+    [maxSizeMb]="8"
+    [mediaRef]="mediaRef()"
+    [error]="error()"
+    [disabled]="disabled()"
+    (uploaded)="uploaded.emit($event)"
+    (cleared)="cleared.emit()" />
+
+  <!-- ═══════════════════════════════════════════════════════
+       Actions
+       ═══════════════════════════════════════════════════════ -->
+  <div class="flex items-center gap-2 flex-wrap pt-1">
+
+    <button
+      type="button"
+      (click)="onCrop()"
+      [disabled]="disabled()"
+      class="inline-flex items-center gap-1.5
+             px-3 py-1.5 rounded
+             bg-surface-container hover:bg-surface-container-highest
+             text-on-surface
+             font-label text-xs
+             border-0 cursor-pointer transition-colors
+             disabled:opacity-50 disabled:cursor-not-allowed">
+      <app-icon name="crop" size="sm" />
+      <span>Recadrer</span>
+    </button>
+
+    <button
+      type="button"
+      (click)="onRotate()"
+      [disabled]="disabled()"
+      class="inline-flex items-center gap-1.5
+             px-3 py-1.5 rounded
+             bg-surface-container hover:bg-surface-container-highest
+             text-on-surface
+             font-label text-xs
+             border-0 cursor-pointer transition-colors
+             disabled:opacity-50 disabled:cursor-not-allowed">
+      <app-icon name="rotate_right" size="sm" />
+      <span>Pivoter</span>
+    </button>
+
+    @if (initialPreviewUrl()) {
+    <button
+      type="button"
+      (click)="onRemove()"
+      [disabled]="disabled()"
+      class="inline-flex items-center gap-1.5
+               px-3 py-1.5 rounded
+               text-error hover:bg-error-container/40
+               font-label text-xs
+               border-0 cursor-pointer transition-colors
+               ml-auto
+               disabled:opacity-50 disabled:cursor-not-allowed">
+      <app-icon name="delete" size="sm" />
+      <span>Retirer</span>
+    </button>
+    }
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       Quality tips (bento)
+       ═══════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+    <div class="flex items-center gap-2 p-3 rounded-lg
+                bg-surface-container-low">
+      <app-icon name="light_mode" size="md" class="text-secondary shrink-0" />
+      <span class="font-body text-[11px] text-on-surface">
+        Lumière naturelle chaude
+      </span>
+    </div>
+
+    <div class="flex items-center gap-2 p-3 rounded-lg
+                bg-surface-container-low">
+      <app-icon name="soup_kitchen" size="md" class="text-secondary shrink-0" />
+      <span class="font-body text-[11px] text-on-surface">
+        Fumée &amp; fraîcheur visibles
+      </span>
+    </div>
+
+    <div class="flex items-center gap-2 p-3 rounded-lg
+                bg-surface-container-low">
+      <app-icon name="restaurant_menu" size="md" class="text-secondary shrink-0" />
+      <span class="font-body text-[11px] text-on-surface">
+        Mise en plat épurée locale
+      </span>
+    </div>
+  </div>
+
+</div>

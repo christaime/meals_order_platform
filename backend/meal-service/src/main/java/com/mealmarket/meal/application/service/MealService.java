@@ -25,12 +25,12 @@ import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.MealSearchRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,6 +47,7 @@ public class MealService {
     private final DistributionLocationRepository locationRepository;
     private final ModerationDataRepository moderationDataRepository;
     private final MealDtoMapper dtoMapper;
+    private final MediaService mediaService;
 
     // ═══════════════════════════════════════════════════════════
     //  Creation
@@ -80,7 +81,7 @@ public class MealService {
                 request.name(),
                 request.description(),
                 request.price(),
-                request.imageUrl(),
+                request.imageStorageRef(),
                 request.prepTimeMinutes(),
                 categories,
                 ingredients,
@@ -89,7 +90,12 @@ public class MealService {
 
         Meal saved = mealRepository.save(meal);
 
-        // 4. Record initial moderation entry
+        // 4. Mark the image as used (MinIO metadata: PENDING → USED)
+        if (saved.getImageStorageRef() != null) {
+            mediaService.markUsed(saved.getImageStorageRef());
+        }
+
+        // 5. Record initial moderation entry
         moderationDataRepository.save(
                 ModerationData.created(
                         ModerationTargetType.MEAL,
@@ -114,18 +120,6 @@ public class MealService {
         return dtoMapper.toResponse(meal);
     }
 
-    /**
-     * Fetch a meal only if it is publicly visible.
-     *
-     * A meal is visible to customers when:
-     * - meal.moderationStatus = APPROVED
-     * - meal.isAvailable = TRUE (vendor's decision, NOT stock-related)
-     * - vendor.status = ACTIVE
-     *
-     * Note: {@code isAvailable} represents the vendor's intent to offer
-     * the meal — it is NOT a stock/quantity indicator. Stock management
-     * is out of scope for the MVP.
-     */
     @Transactional(readOnly = true)
     public MealResponse getApprovedMealById(UUID mealId) {
         log.debug("Fetching approved meal: {}", mealId);
@@ -139,9 +133,6 @@ public class MealService {
         return dtoMapper.toResponse(meal);
     }
 
-    /**
-     * Fetch a meal only if it belongs to the given vendor (any status).
-     */
     @Transactional(readOnly = true)
     public MealResponse getVendorMealById(UUID mealId, UUID vendorId) {
         log.debug("Fetching meal: {} for vendor: {}", mealId, vendorId);
@@ -165,10 +156,6 @@ public class MealService {
         return mealRepository.search(request).map(dtoMapper::toResponse);
     }
 
-    /**
-     * Vendor's own meals — any moderation status.
-     * Forces the vendorId on the criteria.
-     */
     @Transactional(readOnly = true)
     public DataPage<MealResponse> searchMyMeals(
             MealSearchRequest request,
@@ -178,7 +165,7 @@ public class MealService {
 
         MealSearchRequest scopedRequest = MealSearchRequest.builder()
                 .keyword(request.getKeyword())
-                .vendorId(vendorId)                              // ← forced
+                .vendorId(vendorId)
                 .categoryIds(request.getCategoryIds())
                 .cuisineIds(request.getCuisineIds())
                 .dishTypeIds(request.getDishTypeIds())
@@ -198,10 +185,6 @@ public class MealService {
         return mealRepository.search(scopedRequest).map(dtoMapper::toResponse);
     }
 
-    /**
-     * Approved meals only — used for public-facing endpoints.
-     * Forces moderationStatus = APPROVED and returns summaries.
-     */
     @Transactional(readOnly = true)
     public DataPage<MealSummaryResponse> searchApprovedMeals(MealSearchRequest request) {
         log.debug("Searching approved meals");
@@ -220,19 +203,15 @@ public class MealService {
                 .maxPrice(request.getMaxPrice())
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
-                .isAvailable(true)                              // ← forced
+                .isAvailable(true)
                 .distributionLocationId(request.getDistributionLocationId())
-                .moderationStatus(APPROVED)   // ← forced
+                .moderationStatus(APPROVED)
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
         return mealRepository.search(approvedRequest).map(dtoMapper::toSummary);
     }
 
-    /**
-     * Featured meals for the landing page.
-     * Returns top-rated approved + available meals.
-     */
     @Transactional(readOnly = true)
     public List<MealSummaryResponse> getFeaturedMeals(int limit) {
         log.debug("Fetching featured meals (limit={})", limit);
@@ -265,12 +244,10 @@ public class MealService {
 
         Meal existing = findMealWithDetailsOrThrow(mealId);
 
-        // Ownership check
         if (!existing.belongsTo(vendorId)) {
             throw new ForbiddenException("This meal does not belong to you");
         }
 
-        // Uniqueness re-check if name is being changed
         if (request.name() != null
                 && !request.name().equalsIgnoreCase(existing.getName())
                 && mealRepository.existsByVendorIdAndName(vendorId, request.name())) {
@@ -280,7 +257,13 @@ public class MealService {
             );
         }
 
-        // Update core fields only — NOT relationships (categories, ingredients, locations)
+        // Compute the new image ref with the null/empty-string convention:
+        //   null  → keep existing
+        //   ""    → clear
+        //   value → replace
+        String previousRef = existing.getImageStorageRef();
+        String newRef = resolveImageRef(request.imageStorageRef(), previousRef);
+
         Meal updated = Meal.builder()
                 .id(existing.getId())
                 .vendor(existing.getVendor())
@@ -288,8 +271,7 @@ public class MealService {
                 .description(request.description() != null
                         ? request.description() : existing.getDescription())
                 .price(request.price() != null ? request.price() : existing.getPrice())
-                .imageUrl(request.imageUrl() != null
-                        ? request.imageUrl() : existing.getImageUrl())
+                .imageStorageRef(newRef)
                 .isAvailable(request.isAvailable() != null
                         ? request.isAvailable() : existing.getIsAvailable())
                 .averageRating(existing.getAverageRating())
@@ -305,6 +287,10 @@ public class MealService {
                 .build();
 
         Meal saved = mealRepository.save(updated);
+
+        // Sync MinIO metadata if the ref changed
+        syncImageRef(previousRef, newRef);
+
         log.info("Meal updated: {}", saved.getId());
         return dtoMapper.toResponse(saved);
     }
@@ -327,10 +313,14 @@ public class MealService {
         return dtoMapper.toResponse(mealRepository.save(updated));
     }
 
+    /**
+     * Replace the meal image with a new storage ref.
+     * The old ref is marked PENDING so the cleanup job can reap it.
+     */
     @Transactional
-    public MealResponse uploadMealImage(
+    public MealResponse updateMealImage(
             UUID mealId,
-            String imageUrl,
+            String imageStorageRef,
             UUID vendorId
     ) {
         log.info("Updating image for meal: {}", mealId);
@@ -341,8 +331,13 @@ public class MealService {
             throw new ForbiddenException("This meal does not belong to you");
         }
 
-        Meal updated = existing.withImage(imageUrl);
-        return dtoMapper.toResponse(mealRepository.save(updated));
+        String previousRef = existing.getImageStorageRef();
+        Meal updated = existing.withImageRef(imageStorageRef);
+        Meal saved = mealRepository.save(updated);
+
+        syncImageRef(previousRef, imageStorageRef);
+
+        return dtoMapper.toResponse(saved);
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -359,12 +354,19 @@ public class MealService {
             throw new ForbiddenException("This meal does not belong to you");
         }
 
+        String imageRef = existing.getImageStorageRef();
+
         switch (existing.getModerationStatus()) {
 
             case PENDING, REJECTED -> {
                 log.info("Meal {} is {} — performing hard delete",
                         mealId, existing.getModerationStatus());
                 mealRepository.deleteById(mealId);
+
+                // Release the image so the cleanup job can reap it
+                if (imageRef != null) {
+                    mediaService.markPending(imageRef);
+                }
             }
 
             case APPROVED -> {
@@ -381,6 +383,7 @@ public class MealService {
                                 vendorId
                         )
                 );
+                // Image is KEPT — the meal still exists, just disabled.
             }
 
             case DISABLED -> throw new ConflictException(
@@ -411,6 +414,30 @@ public class MealService {
         return mealRepository.findByIdWithDetails(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Meal not found: " + mealId));
+    }
+
+    /**
+     * Resolve the desired image ref from an update request.
+     * Convention:
+     *   requested == null  → keep current
+     *   requested == ""    → clear
+     *   otherwise          → replace with requested
+     */
+    private String resolveImageRef(String requested, String current) {
+        if (requested == null) return current;
+        return requested.isBlank() ? null : requested;
+    }
+
+    /**
+     * Sync MinIO metadata after a ref change:
+     *   - old ref (if any) → PENDING (orphan candidate)
+     *   - new ref (if any) → USED
+     * No-op if the refs are equal.
+     */
+    private void syncImageRef(String previous, String next) {
+        if (Objects.equals(previous, next)) return;
+        if (previous != null && !previous.isBlank()) mediaService.markPending(previous);
+        if (next != null && !next.isBlank()) mediaService.markUsed(next);
     }
 
     private List<Category> resolveCategories(List<UUID> categoryIds) {

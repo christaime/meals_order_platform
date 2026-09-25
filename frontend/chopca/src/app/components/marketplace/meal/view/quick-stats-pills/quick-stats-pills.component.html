@@ -1,0 +1,21 @@
+<div class="flex flex-wrap items-center gap-2.5 md:gap-3">
+  @for (stat of stats(); track stat.id) {
+  <div
+    class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/30 text-on-surface shadow-xs transition-all hover:bg-surface-container-lowest hover:border-outline-variant/60"
+  >
+    <app-icon
+      [name]="stat.icon"
+      class="text-primary text-base flex-shrink-0"
+    />
+
+    <span class="font-label-md text-xs font-medium text-on-surface-variant flex items-center gap-1">
+        <span>{{ stat.label }}</span>
+        @if (stat.highlight) {
+          <strong class="font-semibold text-on-surface text-xs">
+            {{ stat.highlight }}
+          </strong>
+        }
+      </span>
+  </div>
+  }
+</div>

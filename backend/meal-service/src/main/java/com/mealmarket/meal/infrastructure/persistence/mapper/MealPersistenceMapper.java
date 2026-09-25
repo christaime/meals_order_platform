@@ -17,11 +17,16 @@ import java.util.UUID;
 /**
  * Maps between {@link Meal} (domain) and {@link MealEntity} (JPA).
  *
+ * Image handling:
+ * - {@code imageStorageRef} is a plain String on both sides; MapStruct maps
+ *   it 1:1 with no configuration. No URL logic here — URL derivation is a
+ *   presentation concern handled in {@code MealDtoMapper}.
+ *
  * Relationship handling:
- * - {@code vendor}              (domain object)  → {@code vendorId}                 (entity string)
- * - {@code categories}          (domain list)    → {@code categoryIds}              (entity list)
- * - {@code ingredients}         (domain list)    → {@code ingredientIds}            (entity list)
- * - {@code distributionLocations}(domain list)   → {@code distributionLocationIds}  (entity list)
+ * - {@code vendor}               (domain object) → {@code vendorId}                (entity UUID)
+ * - {@code categories}           (domain list)   → {@code categoryIds}             (entity list)
+ * - {@code ingredients}          (domain list)   → {@code ingredientIds}           (entity list)
+ * - {@code distributionLocations}(domain list)   → {@code distributionLocationIds} (entity list)
  *
  * On the entity → domain direction, ALL relationships are IGNORED.
  * The adapter loads them separately via their repositories and reassembles
@@ -36,9 +41,9 @@ public interface MealPersistenceMapper {
     //  Domain → Entity
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "vendorId", source = "vendor", qualifiedByName = "extractVendorId")
-    @Mapping(target = "categoryIds", source = "categories", qualifiedByName = "extractCategoryIds")
-    @Mapping(target = "ingredientIds", source = "ingredients", qualifiedByName = "extractIngredientIds")
+    @Mapping(target = "vendorId",              source = "vendor",                 qualifiedByName = "extractVendorId")
+    @Mapping(target = "categoryIds",           source = "categories",             qualifiedByName = "extractCategoryIds")
+    @Mapping(target = "ingredientIds",         source = "ingredients",            qualifiedByName = "extractIngredientIds")
     @Mapping(target = "distributionLocationIds", source = "distributionLocations", qualifiedByName = "extractLocationIds")
     MealEntity toEntity(Meal meal);
 
@@ -46,12 +51,13 @@ public interface MealPersistenceMapper {
 
     // ═══════════════════════════════════════════════════════════
     //  Entity → Domain (lightweight)
-    //  All relationships are loaded separately by the adapter
+    //  All relationships are loaded separately by the adapter.
+    //  imageStorageRef maps 1:1 (same name, same type).
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "vendor", ignore = true)
-    @Mapping(target = "categories", ignore = true)
-    @Mapping(target = "ingredients", ignore = true)
+    @Mapping(target = "vendor",                ignore = true)
+    @Mapping(target = "categories",            ignore = true)
+    @Mapping(target = "ingredients",           ignore = true)
     @Mapping(target = "distributionLocations", ignore = true)
     Meal toDomain(MealEntity entity);
 

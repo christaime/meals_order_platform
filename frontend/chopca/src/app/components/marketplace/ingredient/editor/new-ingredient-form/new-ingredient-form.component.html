@@ -1,0 +1,44 @@
+<!-- Collapsed: trigger button -->
+@if (!isOpen()) {
+<button
+  type="button"
+  (click)="open()"
+  class="inline-flex items-center gap-1.5
+           px-3 py-2 rounded-lg
+           bg-surface-container-low hover:bg-surface-container
+           text-on-surface
+           font-label text-xs font-semibold
+           transition-colors border-0 cursor-pointer">
+  <app-icon name="add_circle" size="sm" class="text-primary" />
+  <span>Créer un nouvel ingrédient</span>
+</button>
+}
+
+<!-- Expanded: the shared form -->
+@if (isOpen()) {
+<div class="p-4 rounded-xl
+              bg-surface-container-low
+              border border-outline-variant/40">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <app-icon name="add_circle" size="md" class="text-primary" />
+      <span class="font-heading text-sm font-bold text-on-surface">
+          Nouvel ingrédient
+        </span>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      aria-label="Fermer"
+      class="p-1 rounded-full border-0 bg-transparent
+               text-on-surface-variant cursor-pointer
+               hover:text-on-surface hover:bg-surface-container transition-colors">
+      <app-icon name="close" size="sm" />
+    </button>
+  </div>
+
+  <app-ingredient-form
+    (saved)="onSaved($event)"
+    (cancelled)="close()" />
+</div>
+}

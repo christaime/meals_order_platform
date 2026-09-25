@@ -1,0 +1,42 @@
+@if (itemCount() > 0) {
+<div class="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-96 z-40 animate-slide-up">
+  <button
+    type="button"
+    (click)="openCart.emit()"
+    class="w-full flex items-center justify-between p-3.5 bg-primary text-on-primary rounded-2xl shadow-lg hover:bg-primary/95 transition-all duration-200 cursor-pointer border border-white/20 active:scale-[0.99]"
+  >
+    <!-- Left: Cart Icon & Item Badge -->
+    <div class="flex items-center gap-3">
+      <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 shrink-0">
+        <app-icon name="shopping_bag" size="md" />
+        <span
+          class="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 rounded-full bg-error text-on-error text-[10px] font-bold flex items-center justify-center border-2 border-primary"
+        >
+            {{ itemCount() }}
+          </span>
+      </div>
+
+      <div class="flex flex-col text-left">
+          <span class="text-xs font-medium text-on-primary/80 truncate max-w-[150px]">
+            {{ vendorName() ? vendorName() : itemCount() + ' article(s)' }}
+          </span>
+        <span class="text-sm font-bold text-on-primary">
+            Voir le panier
+          </span>
+      </div>
+    </div>
+
+    <!-- Right: Price & Chevron -->
+    <div class="flex items-center gap-2">
+      <div class="text-right">
+        <app-price-tag
+          [amount]="totalAmount()"
+          size="md"
+          class="[&_*]:text-on-primary"
+        />
+      </div>
+      <app-icon name="arrow_forward" size="sm" class="text-on-primary/80" />
+    </div>
+  </button>
+</div>
+}

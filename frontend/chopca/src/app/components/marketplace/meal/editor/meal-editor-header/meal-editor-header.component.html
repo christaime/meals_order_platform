@@ -1,0 +1,40 @@
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+
+  <!-- ─── Text block ───────────────────────────────────── -->
+  <div class="flex flex-col gap-1">
+    <span class="font-label text-[11px] uppercase tracking-widest
+                 text-primary font-bold">
+      {{ eyebrow() }}
+    </span>
+
+    <h1 class="font-heading text-2xl lg:text-3xl font-bold
+               text-on-surface tracking-tight m-0">
+      {{ title() }}
+    </h1>
+
+    <p class="font-body text-sm text-on-surface-variant max-w-2xl m-0 mt-1">
+      {{ intro() }}
+    </p>
+  </div>
+
+  <!-- ─── Metric pills ─────────────────────────────────── -->
+  @if (metrics().length > 0) {
+  <div class="flex items-center gap-2 p-2 rounded-xl
+                bg-surface-container-low shrink-0">
+    @for (metric of metrics(); track metric.label) {
+    <div class="px-3 py-1.5 rounded-lg shadow-sm
+                    bg-surface-container-lowest text-center">
+          <span class="block font-label text-[10px] text-on-surface-variant">
+            {{ metric.label }}
+          </span>
+      <span class="font-currency text-sm font-bold"
+            [class.text-secondary]="metric.tone === 'secondary'"
+            [class.text-primary]="metric.tone === 'primary'">
+            {{ metric.value }}
+          </span>
+    </div>
+    }
+  </div>
+  }
+
+</div>

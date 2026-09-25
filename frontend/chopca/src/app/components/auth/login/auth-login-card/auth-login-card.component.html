@@ -1,0 +1,76 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg md:p-space-xl
+            shadow-md flex flex-col gap-space-lg relative
+            border border-primary-fixed/40 shadow-xl">
+
+  <!-- Top accent bar -->
+  <div class="absolute top-0 left-6 right-6 h-1.5 bg-primary rounded-b-full"></div>
+
+  <!-- Header -->
+  <div class="flex flex-col gap-space-xs pt-space-xs">
+    <div class="inline-flex items-center gap-space-xs text-primary font-label-md text-label-md
+                bg-primary-fixed/20 px-space-sm py-1 rounded-full w-fit mb-space-xs">
+      <app-icon name="verified_user" size="md" />
+      <span class="font-bold tracking-wide">Portail Officiel d'Authentification</span>
+    </div>
+
+    <h2 class="font-display text-headline-lg lg:text-display text-on-surface
+               font-extrabold tracking-tight leading-tight">
+      Connexion sécurisée
+    </h2>
+
+    <p class="font-body-lg text-body-lg text-on-surface-variant">
+      Bienvenue sur Chop ça! Accédez instantanément à votre espace gourmet,
+      cuisine ou partenaire en un clic via nos tiers de confiance.
+    </p>
+  </div>
+
+  <!-- Divider -->
+  <div class="flex items-center gap-space-md my-space-xs">
+    <div class="flex-1 h-px bg-surface-container-highest"></div>
+    <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">
+      Connexion Rapide &amp; Sécurisée
+    </span>
+    <div class="flex-1 h-px bg-surface-container-highest"></div>
+  </div>
+
+  <!-- Social logins (delegated to existing component) -->
+  <app-social-login-buttons
+    [disabled]="loading()"
+    ctaLabel="Continuer avec"
+    (providerClick)="onProviderClick($event)" />
+
+  <!-- Trust block -->
+  <div class="p-space-md rounded-xl bg-surface-container-low flex items-start gap-space-sm
+              border border-surface-container-high">
+    <app-icon name="lock" size="lg" class="text-secondary mt-0.5 shrink-0" />
+    <div class="flex flex-col gap-space-xs">
+      <span class="font-label-sm text-label-sm font-bold text-on-surface">
+        Chiffrement AES 256-bit &amp; Confidentialité Totale
+      </span>
+      <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Connexion instantanée sécurisée. Vos données personnelles sont chiffrées
+        selon les standards bancaires et ne sont jamais cédées ni revendues.
+      </p>
+    </div>
+  </div>
+
+  <!-- Terms + help -->
+  <div class="flex flex-col items-center justify-center text-center gap-space-xs pt-space-xs">
+    <p class="font-body-sm text-body-sm text-on-surface-variant">
+      En vous connectant, vous acceptez nos
+      <a class="text-primary hover:underline font-semibold" href="#">
+        Conditions Générales d'Utilisation
+      </a>
+      et notre
+      <a class="text-primary hover:underline font-semibold" href="#">
+        Politique de Confidentialité
+      </a>.
+    </p>
+    <p class="font-label-sm text-label-sm text-on-surface-variant">
+      Besoin d'aide ?
+      <a class="text-secondary font-bold hover:underline" href="#">
+        Consultez l'assistance 24/7
+      </a>
+    </p>
+  </div>
+</div>

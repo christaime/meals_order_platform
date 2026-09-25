@@ -221,7 +221,7 @@ public class MealRepositoryAdapter implements MealRepository {
                 .name(partial.getName())
                 .description(partial.getDescription())
                 .price(partial.getPrice())
-                .imageUrl(partial.getImageUrl())
+                .imageStorageRef(partial.getImageStorageRef())   // ← fixed
                 .isAvailable(partial.getIsAvailable())
                 .averageRating(partial.getAverageRating())
                 .totalRatings(partial.getTotalRatings())
@@ -229,6 +229,7 @@ public class MealRepositoryAdapter implements MealRepository {
                 .categories(categories)
                 .ingredients(ingredients)
                 .distributionLocations(locations)
+                .moderationStatus(partial.getModerationStatus()) // ← added
                 .createdAt(partial.getCreatedAt())
                 .updatedAt(partial.getUpdatedAt())
                 .build();

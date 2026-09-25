@@ -1,0 +1,79 @@
+<div class="relative location-dropdown-container w-full sm:w-auto">
+  <!-- Selector Trigger Button -->
+  <button
+    type="button"
+    (click)="toggleDropdown($event)"
+    class="w-full sm:w-auto flex items-center justify-between gap-2.5 px-4 py-3.5 rounded-full bg-surface-container-lowest border border-outline-variant/50 text-on-surface hover:border-primary/60 transition-all shadow-xs"
+  >
+    <div class="flex items-center gap-2 overflow-hidden">
+      <app-icon name="location_on" class="text-primary flex-shrink-0" />
+      <div class="flex flex-col text-left truncate">
+        <span class="font-label-sm text-[10px] text-on-surface-variant font-medium leading-none uppercase tracking-wider">
+          Zone de livraison
+        </span>
+        <span class="font-body-md text-sm font-semibold text-on-surface truncate mt-0.5">
+          @if (selectedLocation(); as loc) {
+            {{ loc.city }} — {{ loc.neighborhood }}
+          } @else {
+            Toutes les zones
+          }
+        </span>
+      </div>
+    </div>
+
+    <app-icon
+      name="keyboard_arrow_down"
+      class="text-on-surface-variant transition-transform duration-200"
+      [class.rotate-180]="isOpen()"
+    />
+  </button>
+
+  <!-- Dropdown Menu -->
+  @if (isOpen()) {
+  <div
+    class="absolute top-full left-0 mt-2 w-full sm:w-64 bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-xl z-50 overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-150"
+  >
+    <!-- Douala Locations -->
+    <div class="px-3 py-1 font-label-sm text-[11px] font-bold text-primary uppercase tracking-wider bg-surface-container-low/50">
+      Douala
+    </div>
+    @for (loc of locations(); track loc.id) {
+    @if (loc.city === 'Douala') {
+    <button
+      type="button"
+      (click)="selectLocation(loc)"
+      class="w-full text-left px-4 py-2.5 text-sm font-body-md text-on-surface hover:bg-primary-container/20 flex items-center justify-between transition-colors"
+      [class.font-bold]="selectedLocation()?.id === loc.id"
+      [class.text-primary]="selectedLocation()?.id === loc.id"
+    >
+      <span>{{ loc.neighborhood }}</span>
+      @if (selectedLocation()?.id === loc.id) {
+      <app-icon name="check" size="sm" class="text-primary" />
+      }
+    </button>
+    }
+    }
+
+    <!-- Yaoundé Locations -->
+    <div class="px-3 py-1 mt-1 font-label-sm text-[11px] font-bold text-primary uppercase tracking-wider bg-surface-container-low/50">
+      Yaoundé
+    </div>
+    @for (loc of locations(); track loc.id) {
+    @if (loc.city === 'Yaoundé') {
+    <button
+      type="button"
+      (click)="selectLocation(loc)"
+      class="w-full text-left px-4 py-2.5 text-sm font-body-md text-on-surface hover:bg-primary-container/20 flex items-center justify-between transition-colors"
+      [class.font-bold]="selectedLocation()?.id === loc.id"
+      [class.text-primary]="selectedLocation()?.id === loc.id"
+    >
+      <span>{{ loc.neighborhood }}</span>
+      @if (selectedLocation()?.id === loc.id) {
+      <app-icon name="check" size="sm" class="text-primary" />
+      }
+    </button>
+    }
+    }
+  </div>
+  }
+</div>

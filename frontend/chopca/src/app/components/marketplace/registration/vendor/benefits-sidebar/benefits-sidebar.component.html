@@ -1,0 +1,90 @@
+<div class="flex flex-col gap-space-lg">
+
+  <!-- ── Benefits ───────────────────────────────────────── -->
+  <div class="bg-surface-container-low rounded-xl p-space-lg flex flex-col gap-space-md">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface
+               flex items-center gap-space-xs">
+      <app-icon name="workspace_premium" size="md" class="text-primary" />
+      Pourquoi rejoindre Chop ça!
+    </h3>
+
+    <ul class="flex flex-col gap-space-sm font-body-md text-body-md text-on-surface">
+      <li class="flex items-start gap-space-sm">
+        <span class="w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed
+                     flex items-center justify-center shrink-0 mt-0.5">
+          <app-icon name="money_off" size="sm" />
+        </span>
+        <div>
+          <span class="font-label-md text-label-md">0 FCFA de frais d'activation</span>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">
+            Aucun abonnement mensuel caché. Commission prélevée uniquement sur
+            les ventes livrées.
+          </p>
+        </div>
+      </li>
+
+      <li class="flex items-start gap-space-sm">
+        <span class="w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed
+                     flex items-center justify-center shrink-0 mt-0.5">
+          <app-icon name="account_balance_wallet" size="sm" />
+        </span>
+        <div>
+          <span class="font-label-md text-label-md">Paiements Hebdomadaires MoMo / OM</span>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">
+            Reversements automatiques sur votre compte Orange Money, MTN MoMo
+            ou virement bancaire UBA/Ecobank.
+          </p>
+        </div>
+      </li>
+
+      <li class="flex items-start gap-space-sm">
+        <span class="w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed
+                     flex items-center justify-center shrink-0 mt-0.5">
+          <app-icon name="groups" size="sm" />
+        </span>
+        <div>
+          <span class="font-label-md text-label-md">+50 000 gourmets actifs</span>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">
+            Accédez instantanément à un vivier qualifié de passionnés de bonne
+            cuisine et de cuisine de terroir.
+          </p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ── Testimonial ────────────────────────────────────── -->
+  <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm
+              flex flex-col gap-space-sm">
+    <div class="flex items-center gap-space-sm">
+      <img class="w-12 h-12 rounded-full object-cover"
+           alt="Portrait cheffe partenaire"
+           src="assets/testimonials/cheffe-christiane.jpg" />
+      <div>
+        <h4 class="font-label-lg text-label-lg text-on-surface">
+          Cheffe Christiane Ebodé
+        </h4>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Fondatrice • Le Comptoir de Yaoundé
+        </p>
+      </div>
+    </div>
+
+    <p class="font-body-sm text-body-sm text-on-surface italic">
+      « En 3 mois sur ChopÇa!, nous avons doublé notre débit sur les commandes
+      du midi sans embaucher de livreurs supplémentaires. La flotte de coursiers
+      est ultra ponctuelle ! »
+    </p>
+
+    <div class="flex items-center justify-between pt-1">
+      <div class="flex text-primary">
+        @for (s of [1,2,3,4,5]; track s) {
+        <app-icon name="star" size="sm" [filled]="true" />
+        }
+      </div>
+      <span class="font-label-sm text-label-sm text-secondary">
+        Partenaire depuis 2024
+      </span>
+    </div>
+  </div>
+</div>

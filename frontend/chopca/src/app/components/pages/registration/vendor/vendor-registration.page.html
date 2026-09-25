@@ -1,0 +1,159 @@
+<div class="w-full max-w-[1440px] mx-auto px-margin md:px-margin-md lg:px-margin-lg py-space-lg">
+  <div class="flex flex-col w-full">
+
+    <!-- ═══════════════════════════════════════════════════════
+         Stepper header
+         ═══════════════════════════════════════════════════════ -->
+    <app-stepper-header [currentStep]="currentStep()" />
+
+    <!-- ═══════════════════════════════════════════════════════
+         Main grid: form (8 cols) + sidebar (4 cols)
+         ═══════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start pb-space-xl">
+
+      <!-- ─── Left: form sections ─────────────────────────── -->
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        novalidate
+        class="lg:col-span-8 flex flex-col gap-space-lg">
+
+        <!-- ═══ Step 1 — Identité ══════════════════════════ -->
+        @if (currentStep() === 1) {
+        <app-identity
+          [form]="form"
+          (appendInspiration)="onAppendInspiration($event)" />
+        }
+
+        <!-- ═══ Step 2 — Spécialités & Vitrine ═════════════ -->
+        @if (currentStep() === 2) {
+        <app-cuisine
+          [form]="form"
+          [error]="cuisineError()"
+          [maxSelection]="3"
+          (categoriesSelected)="onCategoriesSelected($event)" />
+
+        <app-visuals
+          [form]="form"
+          [profileMediaRef]="profileMediaRef()"
+          [coverMediaRef]="coverMediaRef()"
+          (logoUploaded)="onLogoUploaded($event)"
+          (logoCleared)="onLogoCleared()"
+          (coverUploaded)="onCoverUploaded($event)"
+          (coverCleared)="onCoverCleared()" />
+        }
+
+        <!-- ═══ Step 3 — Logistique ════════════════════════ -->
+        @if (currentStep() === 3) {
+        <app-logistics [form]="form" />
+        }
+
+        <!-- ═══ Step 4 — KYC ═══════════════════════════════ -->
+        @if (currentStep() === 4) {
+        <app-kyc
+          [form]="form"
+          [frontMediaRef]="frontMediaRef()"
+          [backMediaRef]="backMediaRef()"
+          (frontUploaded)="onFrontUploaded($event)"
+          (frontCleared)="onFrontCleared()"
+          (backUploaded)="onBackUploaded($event)"
+          (backCleared)="onBackCleared()" />
+        }
+
+        <!-- ── Submit error ─────────────────────────────────── -->
+        @if (submitError(); as err) {
+        <div class="p-space-md rounded-lg bg-error-container
+                      text-on-error-container flex items-start gap-space-sm">
+          <app-icon name="error" size="md" class="shrink-0" />
+          <span class="font-body-sm text-body-sm">{{ err }}</span>
+        </div>
+        }
+
+        <!-- ── Navigation + action bar ──────────────────────── -->
+        <div class="sticky bottom-4 z-40 w-full mt-space-lg">
+          <div class="bg-surface/95 backdrop-blur-md rounded-2xl p-space-md
+                      shadow-xl flex flex-col sm:flex-row items-center
+                      justify-between gap-space-md">
+
+            <!-- Left: contextual hint -->
+            <div class="flex items-center gap-space-sm">
+              <span class="w-8 h-8 rounded-full bg-primary-fixed text-primary
+                           flex items-center justify-center shrink-0">
+                <app-icon name="how_to_reg" size="md" />
+              </span>
+              <div class="text-left">
+                @if (currentStep() < 4) {
+                <p class="font-label-md text-label-md text-on-surface">
+                  Étape {{ currentStep() }} sur 4
+                </p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Continuez pour compléter votre inscription.
+                </p>
+                } @else {
+                <p class="font-label-md text-label-md text-on-surface">
+                  Prêt(e) à lancer votre cuisine en ligne ?
+                </p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Statut d'inscription automatique :
+                  <span class="text-primary font-bold">PENDING</span>
+                  (Audit &amp; validation sous 24h).
+                </p>
+                }
+              </div>
+            </div>
+
+            <!-- Right: actions -->
+            <div class="flex items-center gap-space-sm w-full sm:w-auto flex-wrap">
+              @if (currentStep() > 1) {
+              <button
+                type="button"
+                (click)="back()"
+                class="h-11 px-space-md rounded-lg
+                         bg-surface-container-high text-on-surface
+                         font-label-lg text-label-lg
+                         hover:bg-surface-container-highest transition-colors
+                         flex items-center justify-center gap-1.5">
+                <app-icon name="arrow_back" size="md" />
+                <span>Retour</span>
+              </button>
+              }
+
+              @if (currentStep() < 4) {
+              <button
+                type="button"
+                (click)="next()"
+                class="h-11 px-space-xl rounded-lg
+                         bg-primary text-on-primary font-label-lg text-label-lg
+                         hover:bg-primary-container shadow-md transition-all
+                         flex items-center justify-center gap-2">
+                <span>Continuer</span>
+                <app-icon name="arrow_forward" size="md" />
+              </button>
+              } @else {
+              <button
+                type="submit"
+                [disabled]="submitting()"
+                class="h-11 px-space-xl rounded-lg
+                         bg-primary text-on-primary font-label-lg text-label-lg
+                         hover:bg-primary-container shadow-md transition-all
+                         flex items-center justify-center gap-2
+                         disabled:opacity-60 disabled:cursor-not-allowed">
+                <app-icon name="send" size="md" />
+                <span>
+                    {{ submitting() ? 'Envoi en cours…' : "Soumettre ma demande" }}
+                  </span>
+              </button>
+              }
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- ─── Right: sticky sidebar ───────────────────────── -->
+      <aside class="lg:col-span-4 flex flex-col gap-space-lg lg:sticky lg:top-24">
+        <app-preview-card [state]="previewState()" />
+        <app-benefits-sidebar />
+      </aside>
+    </div>
+  </div>
+</div>

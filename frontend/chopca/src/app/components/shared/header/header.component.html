@@ -1,0 +1,255 @@
+<header
+  class="fixed top-0 left-0 right-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/40 shadow-header"
+>
+  <div class="h-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-4">
+
+    <!-- ─── Brand / Logo ──────────────────────────────────── -->
+    <a
+      routerLink="/meals"
+      (click)="closeAllDropdowns()"
+      aria-label="Chop ça! — Accueil"
+      class="flex items-center transition-transform hover:scale-[1.02]"
+    >
+      <app-logo variant="full" size="md" label="Chop ça!" />
+    </a>
+
+    <!-- ─── Primary Navigation (Desktop) ─────────────────── -->
+    <nav class="hidden xl:flex items-center gap-2" aria-label="Navigation principale">
+      @for (item of navItems; track item.route) {
+      <a
+        class="font-label text-sm px-4 py-2 rounded-full no-underline whitespace-nowrap transition-colors text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container-low [&.nav-active]:bg-primary [&.nav-active]:text-on-primary [&.nav-active]:font-semibold [&.nav-active]:shadow-sm [&.nav-active:hover]:bg-primary-container [&.nav-active:hover]:text-on-primary"
+        [routerLink]="item.route"
+        routerLinkActive="nav-active"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
+        (click)="closeAllDropdowns()"
+      >
+        {{ item.label }}
+      </a>
+      }
+    </nav>
+
+    <!-- ─── Right Side Actions ───────────────────────────── -->
+    <div class="flex items-center gap-2 sm:gap-3">
+
+      <!-- Language Selector -->
+      <div class="header-dropdown relative">
+        <button
+          type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest border border-outline-variant/60 text-on-surface font-label text-xs font-semibold hover:bg-surface-container-low transition-colors"
+          (click)="toggleLanguageDropdown($event)"
+          [attr.aria-expanded]="languageOpen()"
+          aria-haspopup="listbox"
+          aria-label="Changer de langue"
+        >
+          <app-icon name="language" size="md" class="text-primary" />
+          <span>{{ currentLanguage() }}</span>
+          <app-icon
+            name="expand_more"
+            size="sm"
+            [class.rotate-180]="languageOpen()"
+            class="transition-transform"
+          />
+        </button>
+
+        @if (languageOpen()) {
+        <ul
+          class="absolute top-[calc(100%+0.5rem)] right-0 min-w-[7rem] bg-surface-container-lowest border border-outline-variant/60 rounded-xl shadow-modal py-2 z-[60] list-none m-0"
+          role="listbox"
+        >
+          @for (lang of languages; track lang) {
+          <li>
+            <button
+              type="button"
+              class="w-full text-left px-4 py-2 font-label text-xs font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+              [class.!text-primary]="lang === currentLanguage()"
+              [class.!bg-surface-container-low]="lang === currentLanguage()"
+              [class.!font-semibold]="lang === currentLanguage()"
+              (click)="selectLanguage(lang)"
+              role="option"
+              [attr.aria-selected]="lang === currentLanguage()"
+            >
+              {{ lang === 'FR' ? 'Français' : 'English' }}
+            </button>
+          </li>
+          }
+        </ul>
+        }
+      </div>
+
+      <!-- Authenticated Cart Trigger (Only for Connected Customer or Vendor) -->
+      @if (isAuthenticated()) {
+      <button
+        type="button"
+        (click)="onToggleCart()"
+        class="relative p-2.5 rounded-full bg-surface-container-lowest border border-outline-variant/60 text-on-surface hover:bg-surface-container-low transition-colors focus:outline-none"
+        aria-label="Voir le panier"
+      >
+        <app-icon name="shopping_cart" size="md" class="text-primary" />
+        @if (cartCount() > 0) {
+        <span class="absolute -top-1.5 -right-1.5">
+              <app-badge variant="danger" size="sm">{{ cartCount() }}</app-badge>
+            </span>
+        }
+      </button>
+      }
+
+      <!-- Anonymous CTAs -->
+      @if (!isAuthenticated()) {
+      <!-- Desktop: login link + two primary CTAs -->
+      <div class="hidden md:flex items-center gap-2">
+        <a
+          routerLink="/auth/login"
+          class="px-3 py-2 rounded-full text-on-surface-variant font-label text-xs font-semibold no-underline whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
+          (click)="closeAllDropdowns()"
+        >
+          {{ labels.login }}
+        </a>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-full border border-secondary text-secondary font-label text-xs font-bold whitespace-nowrap hover:bg-secondary/10 transition-colors"
+          (click)="startRegistration('vendor-registration')"
+        >
+          {{ labels.vendor }}
+        </button>
+        <button
+          type="button"
+          class="px-5 py-2 rounded-full bg-primary text-on-primary font-label text-xs font-bold whitespace-nowrap shadow-sm hover:bg-primary-container transition-colors"
+          (click)="startRegistration('customer-registration')"
+        >
+          {{ labels.customer }}
+        </button>
+      </div>
+
+      <!-- Mobile: compact login icon only (the CTAs live in the mobile menu) -->
+      <a
+        routerLink="/auth/login"
+        class="md:hidden p-2.5 rounded-full bg-surface-container-lowest border border-outline-variant/60 text-on-surface hover:bg-surface-container-low transition-colors"
+        aria-label="Se connecter"
+        (click)="closeAllDropdowns()"
+      >
+        <app-icon name="login" size="md" class="text-primary" />
+      </a>
+      }
+
+      <!-- Authenticated Profile Dropdown -->
+      @if (isAuthenticated()) {
+      <div class="header-dropdown relative">
+        <button
+          type="button"
+          class="flex items-center justify-center p-0.5 rounded-full bg-transparent border-0 cursor-pointer transition-shadow hover:ring-2 hover:ring-primary/40"
+          (click)="toggleProfileDropdown($event)"
+          [attr.aria-expanded]="profileOpen()"
+          aria-haspopup="menu"
+          aria-label="Menu profil"
+        >
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-on-primary font-label text-xs font-bold">
+              {{ currentUser().initials }}
+            </span>
+        </button>
+
+        @if (profileOpen()) {
+        <div
+          class="absolute top-[calc(100%+0.5rem)] right-0 min-w-[13rem] bg-surface-container-lowest border border-outline-variant/60 rounded-2xl shadow-modal py-2 z-[60]"
+          role="menu"
+        >
+          <div class="px-4 py-2.5 border-b border-surface-container-high">
+            <p class="m-0 font-label text-xs font-bold text-on-surface truncate">
+              {{ currentUser().name }}
+            </p>
+            <p class="mt-0.5 mb-0 font-body text-[11px] text-on-surface-variant truncate">
+              {{ currentUser().location }}
+            </p>
+          </div>
+
+          <a
+            routerLink="/mon-compte"
+            (click)="closeAllDropdowns()"
+            class="flex items-center gap-2.5 px-4 py-2 font-label text-xs text-on-surface no-underline hover:bg-surface-container-low transition-colors"
+            role="menuitem"
+          >
+            <app-icon name="person" size="sm" class="text-primary" />
+            <span>Mon compte</span>
+          </a>
+
+          <a
+            routerLink="/mes-commandes"
+            (click)="closeAllDropdowns()"
+            class="flex items-center gap-2.5 px-4 py-2 font-label text-xs text-on-surface no-underline hover:bg-surface-container-low transition-colors"
+            role="menuitem"
+          >
+            <app-icon name="receipt_long" size="sm" class="text-primary" />
+            <span>Mes commandes</span>
+          </a>
+
+          <div class="h-px bg-surface-container-high my-1"></div>
+
+          <button
+            type="button"
+            class="w-full flex items-center gap-2.5 px-4 py-2 text-left font-label text-xs text-error bg-transparent border-0 cursor-pointer hover:bg-error-container/50 transition-colors"
+            (click)="logout()"
+            role="menuitem"
+          >
+            <app-icon name="logout" size="sm" />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Mobile Menu Toggle Button -->
+      <button
+        type="button"
+        (click)="toggleMobileMenu()"
+        class="xl:hidden p-2 rounded-full text-on-surface hover:bg-surface-container-low transition-colors"
+        aria-label="Menu principal mobile"
+      >
+        <app-icon [name]="mobileMenuOpen() ? 'close' : 'menu'" size="md" />
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ─── Mobile Navigation Menu ─────────────────── -->
+  @if (mobileMenuOpen()) {
+  <div class="xl:hidden border-t border-outline-variant/30 bg-surface px-6 py-4 flex flex-col gap-3 font-label text-sm text-on-surface-variant">
+    @for (item of navItems; track item.route) {
+    <a
+      [routerLink]="item.route"
+      routerLinkActive="text-primary font-bold"
+      [routerLinkActiveOptions]="{ exact: item.exact }"
+      (click)="closeAllDropdowns()"
+      class="py-2 hover:text-primary transition-colors no-underline"
+    >
+      {{ item.label }}
+    </a>
+    }
+
+    @if (!isAuthenticated()) {
+    <div class="flex flex-col gap-2 pt-2 border-t border-outline-variant/30">
+      <a
+        routerLink="/auth/login"
+        (click)="closeAllDropdowns()"
+        class="text-center py-2.5 rounded-full border border-outline-variant text-on-surface font-bold text-xs no-underline"
+      >
+        {{ labels.login }}
+      </a>
+      <button
+        type="button"
+        class="text-center py-2.5 rounded-full border border-secondary text-secondary font-bold text-xs"
+        (click)="startRegistration('vendor-registration')"
+      >
+        {{ labels.vendor }}
+      </button>
+      <button
+        type="button"
+        class="text-center py-2.5 rounded-full bg-primary text-on-primary font-bold text-xs"
+        (click)="startRegistration('customer-registration')"
+      >
+        {{ labels.customer }}
+      </button>
+    </div>
+    }
+  </div>
+  }
+</header>

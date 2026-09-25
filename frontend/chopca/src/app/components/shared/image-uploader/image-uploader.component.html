@@ -1,0 +1,115 @@
+<div class="flex flex-col gap-3">
+
+  <!-- Label -->
+  @if (label()) {
+  <label class="text-xs font-semibold text-gray-700">
+    {{ label() }}
+  </label>
+  }
+
+  <!-- Preview or empty picker -->
+  <div
+    [class]="wrapperClasses()"
+    (click)="picker.click()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)">
+
+    @if (hasPreview()) {
+    <!-- Preview image -->
+    <img
+      [src]="previewUrl()!"
+      alt="Aperçu"
+      class="absolute inset-0 w-full h-full object-cover"
+      [class.rounded-full]="shape() === 'circle'" />
+
+    <!-- Remove button -->
+    @if (!disabled() && !isUploading()) {
+    <button
+      type="button"
+      aria-label="Retirer l'image"
+      class="absolute top-2 right-2 z-10
+                 w-8 h-8 rounded-full
+                 bg-black/60 text-white
+                 flex items-center justify-center
+                 border-0 cursor-pointer
+                 hover:bg-black/80 transition-colors"
+      (click)="clear($event)">
+      <app-icon name="close" size="sm" />
+    </button>
+    }
+
+    <!-- Upload progress overlay -->
+    @if (isUploading()) {
+    <div class="absolute inset-x-0 bottom-0 z-10
+                    bg-black/50 px-3 py-2
+                    flex flex-col items-center gap-1">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="uploadProgress()"
+        class="!w-full">
+      </mat-progress-bar>
+      <span class="text-[10px] text-white font-medium">
+            Envoi en cours… {{ uploadProgress() }}%
+          </span>
+    </div>
+    }
+    } @else {
+    <!-- Empty state -->
+    <div class="flex flex-col items-center justify-center gap-2 p-4 text-center">
+      <app-icon
+        [name]="isImageOnly() ? 'add_photo_alternate' : 'upload_file'"
+        size="lg"
+        class="text-outline" />
+
+      @if (shape() !== 'circle') {
+      <span class="text-xs text-on-surface-variant">
+            Cliquez ou déposez une image
+          </span>
+      }
+    </div>
+    }
+
+    <!-- Hidden file input -->
+    <input
+      #picker
+      type="file"
+      class="hidden"
+      [accept]="allowedTypes().join(',')"
+      [disabled]="disabled() || isUploading()"
+      (change)="onFileInputChange($event)" />
+  </div>
+
+  <!-- Hint -->
+  @if (hint()) {
+  <p class="text-[11px] text-on-surface-variant m-0">{{ hint() }}</p>
+  }
+
+  <!-- File name -->
+  @if (fileName()) {
+  <span class="text-[11px] text-on-surface-variant truncate">
+      {{ fileName() }}
+    </span>
+  }
+
+  <!-- Error + optional retry -->
+  @if (displayedError()) {
+  <div class="flex items-center gap-2 p-2 rounded-lg
+                bg-error-container text-on-error-container text-xs">
+    <app-icon name="error" size="sm" class="shrink-0" />
+    <span class="flex-1">{{ displayedError() }}</span>
+
+    @if (canRetry()) {
+    <button
+      type="button"
+      (click)="retry()"
+      class="text-xs font-semibold underline
+                 bg-transparent border-0 cursor-pointer
+                 text-on-error-container">
+      Réessayer
+    </button>
+    }
+  </div>
+  }
+
+</div>
