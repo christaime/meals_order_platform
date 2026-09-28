@@ -7,6 +7,11 @@ import com.mealmarket.meal.domain.model.VendorState;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import com.mealmarket.meal.infrastructure.security.CurrentUser;
+import com.mealmarket.meal.testing.WithMockJwt;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +21,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,28 +57,29 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private VendorJpaRepository vendorJpaRepository;
 
-    @MockBean
-    private CurrentUser currentUser;
-
     @BeforeEach
     void setUp() {
         vendorJpaRepository.deleteAll();
-        when(currentUser.getUserType()).thenReturn(UserType.ADMIN);
-        when(currentUser.getUserId()).thenReturn(ADMIN_ID);
     }
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
 
     private Map<String, Object> validRegisterRequest(String businessName, String email) {
-        return Map.of(
-                "businessName", businessName,
-                "description", "Description for " + businessName,
-                "address", "123 Main Street, Yaoundé",
-                "email", email,
-                "phone", "+237612345678",
-                "password", "securePass123"
-        );
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("businessName", businessName);
+        body.put("ownerName", "owner");
+        body.put("description", "Description for " + businessName);
+        body.put("address", "123 Main Street, Yaoundé");
+        body.put("phone", "+237612345678");
+        body.put("deliveryRadius", 10);
+        body.put("pickupAddress", "Pickup street, Yaoundé");
+        body.put("profileImageStorageRef", null);
+        body.put("coverImageStorageRef", null);
+        body.put("idCardFrontStorageRef", null);
+        body.put("idCardBackStorageRef", null);
+        body.put("cuisineCategoryIds", List.of());
+        return body;
     }
 
     private UUID persistVendor(String businessName, String email, VendorState state) {
@@ -79,6 +87,7 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
                 VendorEntity.builder()
                         .userId(UUID.randomUUID())
                         .businessName(businessName)
+                        .ownerName("owner")
                         .description("Description for " + businessName)
                         .address("123 Main Street, Yaoundé")
                         .email(email)
@@ -98,7 +107,12 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     // ══════════════════════════════════════════════════════════════════
 
     @Test
-    @DisplayName("public can register a vendor → 201")
+    @WithMockJwt(
+            subject = "11111111-1111-1111-1111-111111111111",
+            email = "vendor@deliciousbites.com",
+            roles = {}
+    )
+    @DisplayName("Authenticated user can register a vendor → 201")
     void vendor_canRegister() throws Exception {
         // NOTE: your controller reads 'keycloakUserId' from a request attribute
         // set by an upstream filter. In tests we simulate it via the MockMvc request.
@@ -106,11 +120,11 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
                 validRegisterRequest("Delicious Bites", "vendor@deliciousbites.com")
         );
 
-        mockMvc.perform(post("/api/v1/public/vendors/register")
+        mockMvc.perform(post("/api/v1/vendor/register")
                         .requestAttr("keycloakUserId", VENDOR_USER_ID.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.businessName").value("Delicious Bites"))
@@ -122,6 +136,11 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     // ══════════════════════════════════════════════════════════════════
 
     @Test
+    @WithMockJwt(
+            subject = "11111111-1111-1111-1111-111111111111",
+            email = "existing@test.com",
+            roles = {}
+    )
     @DisplayName("duplicate email → 409")
     void duplicateEmail_returns409() throws Exception {
         // Given
@@ -132,10 +151,11 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
         );
 
         // When / Then
-        mockMvc.perform(post("/api/v1/public/vendors/register")
+        mockMvc.perform(post("/api/v1/vendor/register")
                         .requestAttr("keycloakUserId", VENDOR_USER_ID.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isConflict());
     }
 
@@ -144,12 +164,15 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     // ══════════════════════════════════════════════════════════════════
 
     @Test
-    @WithMockUser(username = "vendor@test.com", roles = {"VENDOR"})
+    @WithMockJwt(
+            subject = "33333333-3333-3333-3333-333333333333",
+            email = "vendor@test.com",
+            roles = {"VENDOR"}
+    )
     @DisplayName("VENDOR can view their own profile")
     void vendor_canViewOwnProfile() throws Exception {
         // Given
         final UUID vendorId = persistVendor("Delicious Bites", "vendor@test.com", VendorState.active(ADMIN_ID));
-        when(currentUser.getUserId()).thenReturn(VENDOR_USER_ID);
 
         // When / Then — the endpoint resolves the vendor from the auth context
         mockMvc.perform(get("/api/v1/vendor/profile"))
@@ -162,7 +185,11 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     // ══════════════════════════════════════════════════════════════════
 
     @Test
-    @WithMockUser(username = "admin@test.com", roles = {"ADMIN"})
+    @WithMockJwt(
+            subject = "22222222-2222-2222-2222-222222222222",
+            email = "admin@test.com",
+            roles = {"ADMIN"}
+    )
     @DisplayName("ADMIN can list all vendors regardless of status")
     void admin_canListAllVendors() throws Exception {
         // Given
@@ -181,7 +208,11 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     // ══════════════════════════════════════════════════════════════════
 
     @Test
-    @WithMockUser(username = "admin@test.com", roles = {"ADMIN"})
+    @WithMockJwt(
+            subject = "22222222-2222-2222-2222-222222222222",
+            email = "admin@test.com",
+            roles = {"ADMIN"}
+    )
     @DisplayName("ADMIN can fetch a vendor by id")
     void admin_canGetVendorById() throws Exception {
         // Given
@@ -200,7 +231,11 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     // ══════════════════════════════════════════════════════════════════
 
     @Test
-    @WithMockUser(username = "vendor@test.com", roles = {"VENDOR"})
+    @WithMockJwt(
+            subject = "33333333-3333-3333-3333-333333333333",
+            email = "vendor@test.com",
+            roles = {"VENDOR"}
+    )
     @DisplayName("VENDOR cannot access admin vendor endpoints → 403")
     void vendor_cannotAccessAdminEndpoints() throws Exception {
         // Given

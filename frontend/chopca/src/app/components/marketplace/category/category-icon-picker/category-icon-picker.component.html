@@ -1,0 +1,14 @@
+<div class="icon-scroller">
+  @for (preset of presets; track preset.glyph) {
+  <button
+    type="button"
+    [title]="preset.label"
+    [attr.aria-label]="preset.label"
+    [attr.aria-pressed]="selected() === preset.glyph"
+    (click)="pick(preset.glyph)"
+    class="icon-scroller__item"
+    [class.icon-scroller__item--selected]="selected() === preset.glyph">
+    <app-icon [name]="preset.glyph" size="lg" />
+  </button>
+  }
+</div>

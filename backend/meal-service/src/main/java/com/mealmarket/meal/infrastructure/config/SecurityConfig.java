@@ -56,33 +56,34 @@ public class SecurityConfig {
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
-                        // ─── Public endpoints (no auth) ────────────────────
+                        // Public
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/reference/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+
+                        // Media
                         .requestMatchers(HttpMethod.POST,   "/api/v1/media").authenticated()
                         .requestMatchers(HttpMethod.GET,    "/api/v1/media/url").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/media").authenticated()
-                        // ─── Swagger / OpenAPI ─────────────────────────────
+
+                        // Swagger
                         .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**"
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/swagger-resources/**", "/webjars/**"
                         ).permitAll()
 
-                        // ─── Actuator ──────────────────────────────────────
+                        // Actuator
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
 
-                        // ─── Admin endpoints ───────────────────────────────
+                        // Admin
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
-                        // ─── Vendor endpoints ──────────────────────────────
+                        // ─── Vendor — carve out registration BEFORE the catch-all ───
+                        .requestMatchers(HttpMethod.POST, "/api/v1/vendor/register").authenticated()
                         .requestMatchers("/api/v1/vendor/**").hasRole("VENDOR")
 
-                        // ─── Everything else requires authentication ──────
+                        // Everything else
                         .anyRequest().authenticated()
                 )
 

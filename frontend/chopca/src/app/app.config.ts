@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationConfig,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
@@ -11,42 +15,69 @@ import {
   INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
   createInterceptorCondition,
 } from 'keycloak-angular';
+import { initializeApp } from './core/initializers/app.initializer';
+import { authInterceptor } from './core/interceptor/auth.interceptor';
 
 const apiBearerTokenCondition = createInterceptorCondition({
-  // Escape the URL (dots, slashes) and append .*
-  urlPattern: new RegExp(`^${environment.apiUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/.*$`, 'i'),
+  urlPattern: new RegExp(
+    `^${environment.apiUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/.*$`,
+    'i',
+  ),
   bearerPrefix: 'Bearer',
 });
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+
+    // Public routes only. Route-level guards (e.g. vendorRegistrationGuard)
+    // handle the few flows that need auth. The catalog, home, vendor detail,
+    // meal detail, etc. are all reachable anonymously.
     provideRouter(routes),
 
-    // HTTP client with bearer token interceptor
+    // The bearer interceptor only injects a token when the request matches
+    // `apiBearerTokenCondition` (our API base URL) AND a token exists.
+    // Anonymous requests to public endpoints (catalog, vendors, meals) pass
+    // through untouched.
     provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
 
-    // Keycloak — replaces the deprecated KeycloakAngularModule
-   provideKeycloak({
+    provideKeycloak({
       config: {
         url: environment.keycloak.url,
         realm: environment.keycloak.realm,
         clientId: environment.keycloak.clientId,
       },
       initOptions: {
-        onLoad: 'check-sso', // silently check if user is already logged in
-        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-        checkLoginIframe: false, // disable iframe check (Keycloak 26+)
-        pkceMethod: 'S256',// PKCE for public clients
-       // silentCheckSsoFallback: false,
+        // `check-sso` = silent SSO check, no redirect. Anonymous users
+        // continue straight into the catalog without touching Keycloak's
+        // login page.
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri:
+          window.location.origin + '/silent-check-sso.html',
+        checkLoginIframe: false,
+        pkceMethod: 'S256',
       },
     }),
 
-    // ─── This is what was missing ───────────────────────────
     {
       provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
       useValue: [apiBearerTokenCondition],
     },
+
+    // ─── Boot sequence ───────────────────────────────────────
+    //
+    // Runs AFTER keycloak-angular's own APP_INITIALIZER (registration order).
+    //  - Refreshes RoleContext from the JWT if authenticated, else empty set.
+    //  - Loads UserContext ONLY if authenticated. Anonymous users skip the
+    //    network call entirely, so the catalog renders instantly.
+    //  - Failures are swallowed — the app boots into a public state, and
+    //    guards/pages retry on demand. Never blank the screen on a 5xx.
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      multi: true,
+    },
+
     ...SERVICE_PROVIDERS,
   ],
 };

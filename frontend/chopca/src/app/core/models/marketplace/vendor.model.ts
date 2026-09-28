@@ -6,6 +6,7 @@ import {
 } from './enum-type.model';
 import { CategorySummary } from './category.model';
 import { LocationSummary } from './location.model';
+import { SearchRequest } from '@core/models/shared';
 
 /**
  * Full vendor — returned by detail endpoints.
@@ -62,7 +63,8 @@ export interface VendorSummary {
   readonly id: string;
   readonly businessName: string;
   readonly description: string | null;
-  readonly address: string;
+  readonly address?: string;
+  readonly email?: string;
   readonly ratingAvg: number;
   readonly totalRatings: number;
   readonly subscriptionTier: SubscriptionTier;
@@ -209,4 +211,14 @@ export interface CreateVendorRequest {
   idCardFrontStorageRef: string | null;
   idCardBackStorageRef: string | null;
   cuisineCategoryIds: string[];
+}
+
+export interface VendorSearchRequest extends SearchRequest {
+  readonly keyword?: string;
+  readonly businessName?: string;
+  readonly email?: string;
+  readonly status?: VendorStatus;
+  readonly minRating?: number;
+  readonly maxRating?: number;
+  readonly categoryIds?: string[];
 }

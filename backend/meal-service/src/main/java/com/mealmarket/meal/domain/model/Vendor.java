@@ -35,6 +35,11 @@ public class Vendor {
     @Size(min = 2, max = 100, message = "Business name must be between 2 and 100 characters")
     private final String businessName;
 
+    // ─── Business Info ────────────────────────────────────────
+    @NotBlank(message = "Business owner name is required")
+    @Size(min = 2, max = 100, message = "Business owner name must be between 2 and 100 characters")
+    private final String ownerName;
+
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     private final String description;
 
@@ -118,6 +123,7 @@ public class Vendor {
         this.categories = builder.categories != null ? new ArrayList<>(builder.categories) : new ArrayList<>();
         this.distributionLocations = builder.distributionLocations != null ? new ArrayList<>(builder.distributionLocations) : new ArrayList<>();
         this.subscriptionTier = builder.subscriptionTier;
+        this.ownerName = builder.ownerName;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
     }
@@ -135,6 +141,7 @@ public class Vendor {
                 .id(this.id)
                 .userId(this.userId)
                 .businessName(this.businessName)
+                .ownerName(this.ownerName)
                 .description(this.description)
                 .address(this.address)
                 .email(this.email)
@@ -254,6 +261,8 @@ public class Vendor {
 
         private String businessName;
 
+        private String ownerName;
+
         private String description;
 
         private String address;
@@ -287,6 +296,7 @@ public class Vendor {
         public Builder id(UUID id) { this.id = id; return this; }
         public Builder userId(UUID userId) { this.userId = userId; return this; }
         public Builder businessName(String businessName) { this.businessName = businessName; return this; }
+        public Builder ownerName(String ownerName) { this.ownerName = ownerName; return this; }
         public Builder description(String description) { this.description = description; return this; }
         public Builder address(String address) { this.address = address; return this; }
         public Builder email(String email) { this.email = email; return this; }

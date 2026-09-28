@@ -48,6 +48,9 @@ public class VendorEntity {
     @Column(name = "business_name", nullable = false, length = 100)
     private String businessName;
 
+    @Column(name = "owner_name", nullable = false, length = 100)
+    private String ownerName;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

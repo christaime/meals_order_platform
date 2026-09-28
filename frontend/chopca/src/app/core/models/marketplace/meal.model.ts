@@ -48,13 +48,19 @@ export interface MealSummary {
   readonly description: string | null;
   readonly price: number;
   readonly imageUrl: string | null;
-  readonly isAvailable: boolean;
+  readonly isAvailable?: boolean;
   readonly averageRating: number;
   readonly totalRatings: number;
   readonly prepTimeMinutes: number | null;
+  readonly moderationStatus: ModerationStatus;
   readonly cuisines: CategorySummary[];
   readonly dishTypes: CategorySummary[];
-  readonly moderationStatus: ModerationStatus;
+  readonly ingredients?: IngredientSummary[];
+  readonly distributionLocations?: LocationSummary[];
+  // ─── Composition & distribution counts (for the management table) ──
+  readonly ingredientCount?: number;
+  readonly allergenIngredientCount?: number;
+  readonly distributionLocationCount?: number;
 }
 
 /**
@@ -79,13 +85,25 @@ export interface MealRequest {
 }
 
 export interface MealSearchRequest extends SearchRequest {
+
   readonly vendorId?: string;
+
   readonly businessName?: string;
+  readonly availableOnly?: string;
   readonly cuisineIds?: string[];
   readonly dishTypeIds?: string[];
   readonly excludeIngredientIds?: string[];
   readonly minPrice?: number;
   readonly maxPrice?: number;
   readonly minRating?: number;
+
+  readonly minPrepTime?: number;
+  readonly maxPrepTime?: number;
+
   readonly distributionLocationId?: string;
+  readonly cityId?: string;
+
+  readonly moderationStatus?: ModerationStatus;
+  readonly loadFull?: boolean;
+  readonly withCount?: boolean;
 }

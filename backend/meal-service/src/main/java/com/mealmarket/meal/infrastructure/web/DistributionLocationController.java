@@ -326,6 +326,56 @@ public class DistributionLocationController {
         return ResponseEntity.ok(locationService.getLocationById(id));
     }
 
+    @GetMapping("/admin/locations")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearer-jwt")
+    @Operation(
+            summary = "Search your locations (vendor only)",
+            description = """
+            Returns the authenticated vendor's locations — any moderation status.
+            The vendor scope is enforced automatically.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of locations"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    public ResponseEntity<DataPage<LocationResponse>> searchLocationsAsAdmin(
+            @Parameter(description = "Keyword search in name or address")
+            @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "Exact name match")
+            @RequestParam(required = false) String name,
+
+            @Parameter(description = "Moderation status filter")
+            @RequestParam(required = false) ModerationStatus moderationStatus,
+
+            @Parameter(description = "Page number (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "Page size")
+            @RequestParam(defaultValue = "20") int size,
+
+            @Parameter(description = "Sort field")
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+
+            @Parameter(description = "Sort direction (ASC or DESC)")
+            @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection
+    ) {
+        var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
+
+        var request = com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest.builder()
+                .vendorId(vendor.getId())
+                .keyword(keyword)
+                .name(name)
+                .moderationStatus(moderationStatus)
+                .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
+                .page(page, size)
+                .build();
+
+        return ResponseEntity.ok(locationService.searchMyLocations(request, vendor.getId()));
+    }
+
     // ═══════════════════════════════════════════════════════════
     //  PUBLIC — Read (approved only)
     // ═══════════════════════════════════════════════════════════

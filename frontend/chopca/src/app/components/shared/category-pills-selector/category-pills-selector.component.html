@@ -71,11 +71,7 @@
       [class.text-on-surface-variant]="!isSelected(category)"
       [class.hover:bg-surface-container-high]="!isSelected(category)">
 
-      @if (isSelected(category)) {
-      <app-icon name="check" size="sm" />
-      } @else {
-      <app-icon name="add" size="sm" />
-      }
+      <app-icon [name]="category.iconUrl ?? 'restaurant'" size="sm" />
 
       <span>{{ category.name }}</span>
     </button>

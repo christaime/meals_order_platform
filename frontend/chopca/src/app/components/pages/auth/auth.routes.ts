@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { vendorRegistrationGuard } from "@core/guards/vendor-registration.guard";
 
 export const AUTH_ROUTES: Routes = [
   {

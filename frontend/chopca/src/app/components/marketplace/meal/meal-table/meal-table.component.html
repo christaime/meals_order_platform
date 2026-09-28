@@ -1,0 +1,182 @@
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-clip">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+      <tr class="bg-surface-container-low text-on-surface-variant
+                   font-label-sm text-label-sm uppercase tracking-wider">
+        <th class="py-3 px-space-md font-bold">Plat</th>
+        <th class="py-3 px-space-md font-bold">Catégories</th>
+        <th class="py-3 px-space-md font-bold">Prix</th>
+        <th class="py-3 px-space-md font-bold">Composition &amp; distribution</th>
+        <th class="py-3 px-space-md font-bold">Statut</th>
+        <th class="py-3 px-space-md font-bold text-right">Actions</th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/30">
+
+      @if (loading()) {
+      <tr>
+        <td colspan="6" class="py-12 px-space-md text-center text-on-surface-variant">
+          <app-icon name="progress_activity" size="xl" class="animate-spin" />
+          <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
+        </td>
+      </tr>
+      } @else if (meals().length === 0) {
+      <tr>
+        <td colspan="6" class="py-12 px-space-md text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-surface-container-low
+                          flex items-center justify-center text-outline">
+            <app-icon name="restaurant_menu" size="xl" />
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+            Aucun plat
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+            Aucun plat ne correspond aux filtres actifs.
+          </p>
+        </td>
+      </tr>
+      } @else {
+      @for (meal of meals(); track meal.id) {
+      <tr
+        class="group transition-colors"
+        [ngClass]="isEditing(meal)
+                ? 'bg-primary-fixed/20 ring-1 ring-inset ring-primary'
+                : 'hover:bg-surface-container-low/60'">
+
+        <!-- ─── Plat ───────────────────────────────────── -->
+        <td class="py-3.5 px-space-md">
+          <div class="flex items-center gap-3">
+            @if (meal.imageUrl) {
+            <img
+              [src]="meal.imageUrl"
+              [alt]="meal.name"
+              class="w-12 h-12 rounded-xl object-cover shrink-0
+                            border border-outline-variant/40
+                            group-hover:scale-105 transition-transform" />
+            } @else {
+            <div class="w-12 h-12 rounded-xl bg-primary-fixed/40 text-primary
+                              flex items-center justify-center shrink-0
+                              group-hover:scale-105 transition-transform
+                              border border-primary-fixed">
+              <app-icon name="restaurant" size="lg" />
+            </div>
+            }
+            <div class="min-w-0">
+              <div class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">
+                {{ meal.name }}
+              </div>
+              @if (meal.description) {
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">
+                {{ meal.description }}
+              </p>
+              }
+            </div>
+          </div>
+        </td>
+
+        <!-- ─── Catégories ─────────────────────────────── -->
+        <td class="py-3.5 px-space-md">
+          <div class="flex flex-wrap items-center gap-1 max-w-[220px]">
+            @for (cat of meal.cuisines; track cat.id; let i = $index) {
+            @if (i < 2) {
+            <app-badge variant="primary" size="sm" [icon]="cat.iconUrl || 'restaurant'">
+              {{ cat.name }}
+            </app-badge>
+            }
+            }
+            @for (cat of meal.dishTypes; track cat.id; let i = $index) {
+            @if (i < 2 - meal.cuisines.length) {
+            <app-badge variant="neutral" size="sm" [icon]="cat.iconUrl || 'restaurant'">
+              {{ cat.name }}
+            </app-badge>
+            }
+            }
+            @if (categoryOverflow(meal.cuisines, meal.dishTypes, 2) > 0) {
+            <app-badge variant="neutral" size="sm">
+              +{{ categoryOverflow(meal.cuisines, meal.dishTypes, 2) }}
+            </app-badge>
+            }
+          </div>
+        </td>
+
+        <!-- ─── Prix ───────────────────────────────────── -->
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <span class="font-currency-tabular text-on-surface font-bold">
+            {{ meal.price | number:'1.0-0' }} FCFA
+          </span>
+        </td>
+
+        <!-- ─── Composition & distribution ─────────────── -->
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <div class="flex flex-col gap-0.5 text-[11px]">
+            <span class="flex items-center gap-1">
+              <app-icon name="restaurant" size="sm" />
+              {{ meal.ingredientCount ?? 0 }} ingrédient{{ (meal.ingredientCount ?? 0) > 1 ? 's' : '' }}
+              @if ((meal.allergenIngredientCount ?? 0) > 0) {
+              · <span class="text-error font-semibold">
+                {{ meal.allergenIngredientCount }} allergène{{ (meal.allergenIngredientCount ?? 0) > 1 ? 's' : '' }}
+              </span>
+              }
+            </span>
+            <span class="flex items-center gap-1">
+              <app-icon name="storefront" size="sm" />
+              {{ meal.distributionLocationCount ?? 0 }} point{{ (meal.distributionLocationCount ?? 0) > 1 ? 's' : '' }}
+            </span>
+          </div>
+        </td>
+
+        <!-- ─── Statut ─────────────────────────────────── -->
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <app-badge
+            [variant]="statusVariant(meal.moderationStatus)"
+            [icon]="statusIcon(meal.moderationStatus)"
+            size="sm">
+            {{ statusLabel(meal.moderationStatus) }}
+          </app-badge>
+        </td>
+
+        <!-- ─── Actions ────────────────────────────────── -->
+        <td class="py-3.5 px-space-md text-right whitespace-nowrap">
+          <div class="flex items-center justify-end gap-1">
+            @if (scope() === 'vendor') {
+            <button
+              type="button"
+              (click)="edit.emit(meal)"
+              title="Modifier"
+              class="p-1.5 rounded-lg text-on-surface-variant
+                             hover:text-primary hover:bg-surface-container transition-colors
+                             bg-transparent border-0 cursor-pointer">
+              <app-icon name="edit" size="sm" />
+            </button>
+            <button
+              type="button"
+              (click)="delete.emit(meal)"
+              title="Supprimer"
+              class="p-1.5 rounded-lg text-on-surface-variant
+                             hover:text-error hover:bg-error-container/40 transition-colors
+                             bg-transparent border-0 cursor-pointer">
+              <app-icon name="delete" size="sm" />
+            </button>
+            } @else {
+            <button
+              type="button"
+              (click)="select.emit(meal)"
+              [title]="isEditing(meal) ? 'Sélectionné pour modération' : 'Sélectionner pour modération'"
+              class="p-1.5 rounded-lg transition-colors
+                             bg-transparent border-0 cursor-pointer"
+              [ngClass]="isEditing(meal)
+                        ? 'text-primary bg-primary-fixed/40'
+                        : 'text-on-surface-variant hover:text-primary hover:bg-surface-container'">
+              <app-icon name="shield_person" size="sm" />
+            </button>
+            }
+          </div>
+        </td>
+      </tr>
+      }
+      }
+      </tbody>
+    </table>
+  </div>
+</div>

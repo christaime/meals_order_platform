@@ -466,13 +466,13 @@ public class MealService {
                 .map(id -> ingredientRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Ingredient not found: " + id)))
-                .peek(i -> {
+               /* .peek(i -> {
                     if (i.getModerationStatus() != APPROVED) {
                         throw new ConflictException(
                                 "Ingredient '" + i.getName() + "' is not approved"
                         );
                     }
-                })
+                })*/
                 .collect(Collectors.toList());
     }
 
@@ -493,11 +493,11 @@ public class MealService {
                                 "Location '" + l.getName() + "' does not belong to you"
                         );
                     }
-                    if (l.getModerationStatus() != APPROVED) {
+                   /* if (l.getModerationStatus() != APPROVED) {
                         throw new ConflictException(
                                 "Location '" + l.getName() + "' is not approved"
                         );
-                    }
+                    }*/
                 })
                 .collect(Collectors.toList());
     }

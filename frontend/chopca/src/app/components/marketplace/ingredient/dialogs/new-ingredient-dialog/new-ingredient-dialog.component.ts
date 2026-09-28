@@ -9,7 +9,7 @@ import {
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
-import { IngredientFormComponent } from '../../editor/ingredient-form/ingredient-form.component';
+import { IngredientFormComponent } from '../../ingredient-form/ingredient-form.component';
 import { Ingredient } from '@app/core/models/marketplace';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 

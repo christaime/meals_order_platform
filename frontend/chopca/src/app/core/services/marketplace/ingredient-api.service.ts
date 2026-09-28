@@ -9,7 +9,7 @@ import {
 } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
 import { IngredientService } from './ingredient.service';
-import { RoleContext } from '@app/core/services/role-context.service';
+import { RoleContext } from '@app/core/services/auth/role-context.service';
 import { environment } from '@environments/environment';
 
 /**
@@ -27,7 +27,7 @@ export class IngredientApiService implements IngredientService {
 
   private readonly publicUrl = `${environment.apiUrl}/public/ingredients`;
   private readonly adminUrl  = `${environment.apiUrl}/admin/ingredients`;
-
+  private readonly vendorUrl  = `${environment.apiUrl}/vendor/ingredients`;
   // ─── Reads ────────────────────────────────────────────────
 
   getIngredients(): Observable<Ingredient[]> {
@@ -47,7 +47,7 @@ export class IngredientApiService implements IngredientService {
     request: IngredientSearchRequest
   ): Observable<DataPage<IngredientSummary>> {
     const params = this.buildSearchParams(request);
-    return this.http.get<DataPage<IngredientSummary>>(this.getReadBaseUrl(), { params });
+    return this.http.get<DataPage<IngredientSummary>>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}`, { params });
   }
 
   searchIngredientsFlat(request: {
@@ -62,7 +62,7 @@ export class IngredientApiService implements IngredientService {
     });
 
     return this.http
-      .get<DataPage<IngredientSummary>>(this.getReadBaseUrl(), { params })
+      .get<DataPage<IngredientSummary>>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}`, { params })
       .pipe(map(page => page.content));
   }
 
@@ -78,20 +78,20 @@ export class IngredientApiService implements IngredientService {
   }
 
   getIngredientById(id: string): Observable<Ingredient> {
-    return this.http.get<Ingredient>(`${this.getReadBaseUrl()}/${id}`);
+    return this.http.get<Ingredient>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}/${id}`);
   }
 
   // ─── Writes ───────────────────────────────────────────────
 
   createIngredient(request: IngredientRequest): Observable<Ingredient> {
-    return this.http.post<Ingredient>(`${environment.apiUrl}/vendor/ingredients`, request);
+    return this.http.post<Ingredient>(`${this.roleContext.isAdmin() ? this.adminUrl : this.vendorUrl }`, request);
   }
 
   updateIngredient(
     id: string,
     request: Partial<IngredientRequest>
   ): Observable<Ingredient> {
-    return this.http.patch<Ingredient>(`${environment.apiUrl}/vendor/ingredients/${id}`, request);
+    return this.http.put<Ingredient>(`${this.roleContext.isAdmin() ? this.adminUrl : this.vendorUrl }/${id}`, request);
   }
 
   deleteIngredient(id: string): Observable<void> {

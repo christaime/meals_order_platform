@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
 import {
   Vendor,
   VendorSummary,
@@ -8,9 +8,11 @@ import {
   CreateVendorRequest,
   VendorDashboard,
   VendorStateChange,
+  VendorSearchRequest
 } from '@app/core/models/marketplace';
 import { VendorService } from '@app/core/services/marketplace/vendor.service';
 import vendorsData from '@app/mock/data/vendors.json';
+import { SearchRequest, DataPage } from '@core/models/shared';
 
 @Injectable()
 export class VendorMockService implements VendorService {
@@ -161,5 +163,39 @@ export class VendorMockService implements VendorService {
       cuisines: vendor.cuisines,
       profileImageUrl: vendor.profileImageUrl,
     };
+  }
+
+  searchVendors(request: VendorSearchRequest): Observable<DataPage<VendorSummary>> {
+    return this.getVendors().pipe(
+      map(vendors => {
+        const keyword = request.keyword?.toLowerCase().trim();
+        const businessName = request.businessName?.toLowerCase().trim();
+
+        const filtered = vendors.filter(v => {
+          if (keyword && !v.businessName.toLowerCase().includes(keyword)) return false;
+          if (businessName && !v.businessName.toLowerCase().includes(businessName)) return false;
+          if (request.status && v.status !== request.status) return false;
+          if (request.minRating != null && v.ratingAvg < request.minRating) return false;
+          if (request.maxRating != null && v.ratingAvg > request.maxRating) return false;
+          return true;
+        });
+
+        const page = request.page ?? 0;
+        const size = request.size ?? 20;
+        const start = page * size;
+        const content = filtered.slice(start, start + size);
+
+        return {
+          content,
+          page,
+          size,
+          totalElements: filtered.length,
+          totalPages: Math.ceil(filtered.length / size),
+          first: page === 0,
+          last: start + size >= filtered.length,
+          empty: content.length === 0,
+        } satisfies DataPage<VendorSummary>;
+      }),
+    );
   }
 }

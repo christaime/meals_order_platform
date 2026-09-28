@@ -111,6 +111,7 @@ CREATE TABLE vendors (
     user_id UUID NOT NULL UNIQUE,
 
     business_name VARCHAR(100) NOT NULL,
+    owner_name VARCHAR(100) NOT NULL,
     description TEXT,
     address VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,

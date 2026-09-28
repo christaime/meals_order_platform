@@ -16,6 +16,7 @@ public interface CategoryDtoMapper {
     CategoryDtoMapper INSTANCE = Mappers.getMapper(CategoryDtoMapper.class);
 
     @Mapping(target = "isActive", source = ".", qualifiedByName = "deriveIsActive")
+    @Mapping(target = "status", source = "moderationStatus")
     CategoryResponse toResponse(Category category);
 
     List<CategoryResponse> toResponseList(List<Category> categories);

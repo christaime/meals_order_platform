@@ -1,0 +1,113 @@
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+      <tr class="bg-surface-container-low text-on-surface-variant
+                   font-label-sm text-label-sm uppercase tracking-wider">
+        <th class="py-3 px-space-md font-bold">Icône &amp; Catégorie</th>
+        <th class="py-3 px-space-md font-bold">Type</th>
+        <th class="py-3 px-space-md font-bold">Statut</th>
+        <th class="py-3 px-space-md font-bold text-right">Actions</th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/30">
+
+      @if (loading()) {
+      <tr>
+        <td colspan="4" class="py-12 px-space-md text-center text-on-surface-variant">
+          <app-icon name="progress_activity" size="xl" class="animate-spin" />
+          <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
+        </td>
+      </tr>
+      } @else if (categories().length === 0) {
+      <tr>
+        <td colspan="4" class="py-12 px-space-md text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-surface-container-low
+                          flex items-center justify-center text-outline">
+            <app-icon name="manage_search" size="xl" />
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+            Aucune catégorie trouvée
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+            Aucun élément ne correspond aux filtres actifs.
+          </p>
+        </td>
+      </tr>
+      } @else {
+      @for (c of categories(); track c.id) {
+      <tr class="group transition-colors"  [ngClass]="isEditing(c)
+          ? 'bg-primary-fixed/20 ring-1 ring-inset ring-primary'
+          : 'hover:bg-surface-container-low/60'">
+        <td class="py-3.5 px-space-md">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary-fixed/40 text-primary
+                              flex items-center justify-center shrink-0
+                              group-hover:scale-105 transition-transform
+                              border border-primary-fixed">
+              <app-icon [name]="c.iconUrl ?? 'restaurant'" size="lg" />
+            </div>
+            <div class="min-w-0">
+              <div class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">
+                {{ c.name }}
+              </div>
+              @if (c.description) {
+              <p class="font-body-sm text-body-sm text-on-surface-variant
+                                line-clamp-1 max-w-md mt-0.5">
+                {{ c.description }}
+              </p>
+              }
+            </div>
+          </div>
+        </td>
+
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <app-badge [variant]="typeVariant(c.type)" size="sm">
+            {{ typeLabel(c.type) }}
+          </app-badge>
+        </td>
+
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <app-badge
+            [variant]="statusVariant(c.status)"
+            [icon]="statusIcon(c.status)"
+            size="sm">
+            {{ statusLabel(c.status) }}
+          </app-badge>
+        </td>
+
+        <td class="py-3.5 px-space-md text-right whitespace-nowrap">
+          <div class="flex items-center justify-end gap-1">
+            <button
+              type="button"
+              (click)="edit.emit(c)"
+              [disabled]="isEditing(c)"
+              [title]="isEditing(c) ? 'En cours d\'édition' : 'Modifier'"
+              class="p-1.5 rounded-lg
+                     bg-transparent border-0 cursor-pointer
+                     transition-colors
+                     disabled:cursor-default"
+                          [class]="isEditing(c)
+                ? 'text-primary bg-primary-fixed/40'
+                : 'text-on-surface-variant hover:text-primary hover:bg-surface-container'">
+              <app-icon [name]="isEditing(c) ? 'edit' : 'edit'" size="sm" />
+            </button>
+
+            <button
+              type="button"
+              (click)="delete.emit(c)"
+              title="Supprimer"
+              class="p-1.5 rounded-lg text-on-surface-variant
+                           hover:text-error hover:bg-error-container/40 transition-colors
+                           bg-transparent border-0 cursor-pointer">
+              <app-icon name="delete" size="sm" />
+            </button>
+          </div>
+        </td>
+      </tr>
+      }
+      }
+      </tbody>
+    </table>
+  </div>
+</div>

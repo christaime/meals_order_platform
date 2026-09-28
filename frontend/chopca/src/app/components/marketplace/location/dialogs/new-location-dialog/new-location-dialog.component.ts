@@ -9,7 +9,7 @@ import {
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
-import { LocationFormComponent } from '../../editor/location-form/location-form.component';
+import { LocationFormComponent } from '../../location-form/location-form.component';
 import { Location } from '@app/core/models/marketplace';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 

@@ -19,3 +19,8 @@ export * from './submission-feedback/submission-feedback.component';
 export * from './category-pills-selector/category-pills-selector.component';
 export * from './stepper/stepper.component';
 export * from './payout-account-card/payout-account-card.component';
+export * from './paginator/paginator.component';
+export * from './toast';
+export * from './delete-entity-dialog/delete-entity-dialog.component';
+export * from './vendor-picker/vendor-picker.component';
+export * from './moderation-status/moderation-status.util';

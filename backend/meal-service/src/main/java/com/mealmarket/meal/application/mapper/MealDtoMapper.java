@@ -113,7 +113,8 @@ public interface MealDtoMapper {
                 .map(i -> new IngredientSummaryResponse(
                         i.getId(),
                         i.getName(),
-                        i.getIsAllergen()
+                        i.getIsAllergen(),
+                        i.getModerationStatus()
                 ))
                 .collect(Collectors.toList());
     }

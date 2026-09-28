@@ -5,6 +5,7 @@ import {
   Category,
   CategoryRequest,
   CategorySearchRequest,
+  ModerationStatus,
 } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
 import { CategoryService } from '@app/core/services/marketplace/category.service';
@@ -94,6 +95,7 @@ export class CategoryMockService implements CategoryService {
       iconUrl: request.iconUrl ?? null,
       type: request.type,
       isActive: false,
+      status: 'PENDING',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

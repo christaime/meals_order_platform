@@ -194,7 +194,6 @@ public class MealRepositoryAdapter implements MealRepository {
     // ═══════════════════════════════════════════════════════════
 
     private Meal toFullDomain(MealEntity entity) {
-        Meal partial = mapper.toDomain(entity);
 
         Vendor vendor = vendorRepository.findById(entity.getVendorId())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -216,22 +215,22 @@ public class MealRepositoryAdapter implements MealRepository {
                 : List.of();
 
         return Meal.builder()
-                .id(partial.getId())
+                .id(entity.getId())
                 .vendor(vendor)
-                .name(partial.getName())
-                .description(partial.getDescription())
-                .price(partial.getPrice())
-                .imageStorageRef(partial.getImageStorageRef())   // ← fixed
-                .isAvailable(partial.getIsAvailable())
-                .averageRating(partial.getAverageRating())
-                .totalRatings(partial.getTotalRatings())
-                .prepTimeMinutes(partial.getPrepTimeMinutes())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .price(entity.getPrice())
+                .imageStorageRef(entity.getImageStorageRef())   // ← fixed
+                .isAvailable(entity.getIsAvailable())
+                .averageRating(entity.getAverageRating() != null ? entity.getAverageRating().doubleValue() : null)
+                .totalRatings(entity.getTotalRatings())
+                .prepTimeMinutes(entity.getPrepTimeMinutes())
                 .categories(categories)
                 .ingredients(ingredients)
                 .distributionLocations(locations)
-                .moderationStatus(partial.getModerationStatus()) // ← added
-                .createdAt(partial.getCreatedAt())
-                .updatedAt(partial.getUpdatedAt())
+                .moderationStatus(entity.getModerationStatus()) // ← added
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

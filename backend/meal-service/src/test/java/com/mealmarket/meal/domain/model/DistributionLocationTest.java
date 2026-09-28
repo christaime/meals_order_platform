@@ -34,6 +34,7 @@ class DistributionLocationTest {
                 .id(VENDOR_ID)
                 .userId(UUID.randomUUID())
                 .businessName("Delicious Bites")
+                .ownerName("owner")
                 .address("123 Main Street, Yaoundé")
                 .email("vendor@deliciousbites.com")
                 .phone("+237612345678")

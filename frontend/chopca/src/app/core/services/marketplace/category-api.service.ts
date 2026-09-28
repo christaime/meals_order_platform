@@ -9,7 +9,7 @@ import {
 import { DataPage } from '@app/core/models/shared';
 import { CategoryService } from './category.service';
 import { environment } from '@environments/environment';
-import { RoleContext } from '@app/core/services/role-context.service';
+import { RoleContext } from '@app/core/services/auth/role-context.service';
 
 /**
  * Real implementation of CategoryService.
@@ -64,7 +64,7 @@ export class CategoryApiService implements CategoryService {
   }
 
   updateCategory(id: string, request: Partial<CategoryRequest>): Observable<Category> {
-    return this.http.patch<Category>(`${this.adminUrl}/${id}`, request);
+    return this.http.put<Category>(`${this.adminUrl}/${id}`, request);
   }
 
   deleteCategory(id: string): Observable<void> {

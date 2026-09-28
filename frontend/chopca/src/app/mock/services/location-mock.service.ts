@@ -135,6 +135,8 @@ export class LocationMockService implements LocationService {
       id: crypto.randomUUID(),
       vendorId: 'mock-vendor',
       vendorBusinessName: 'Mock Vendor',
+      cityId: "ebolowa",
+      city: { "id": "ebolowa", "name": "Ebolowa","region": "Sud" },
       name: request.name,
       address: request.address,
       phone: request.phone ?? null,
@@ -183,6 +185,7 @@ export class LocationMockService implements LocationService {
   private toSummary = (location: Location): LocationSummary => ({
     id: location.id,
     name: location.name,
+     city: { "id": "ebolowa", "name": "Ebolowa","region": "Sud" },
     address: location.address,
     moderationStatus: location.moderationStatus,
   });

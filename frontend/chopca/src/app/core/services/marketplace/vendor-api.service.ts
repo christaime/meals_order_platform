@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Vendor,
@@ -8,9 +8,11 @@ import {
   CreateVendorRequest,
   VendorDashboard,
   VendorStateChange,
+  VendorSearchRequest
 } from '@app/core/models/marketplace';
 import { VendorService } from './vendor.service';
 import { environment } from '@environments/environment';
+import { SearchRequest, DataPage } from '@core/models/shared';
 
 @Injectable()
 export class VendorApiService implements VendorService {
@@ -35,7 +37,7 @@ export class VendorApiService implements VendorService {
   }
 
   updateVendor(id: string, request: Partial<VendorRequest>): Observable<Vendor> {
-    return this.http.patch<Vendor>(`${this.baseUrl}/${id}`, request);
+    return this.http.put<Vendor>(`${this.baseUrl}/${id}`, request);
   }
 
   deleteVendor(id: string): Observable<void> {
@@ -48,5 +50,18 @@ export class VendorApiService implements VendorService {
 
   getVendorStateHistory(vendorId: string): Observable<VendorStateChange[]> {
     return this.http.get<VendorStateChange[]>(`${this.baseUrl}/${vendorId}/state-history`);
+  }
+
+  searchVendors(req: VendorSearchRequest): Observable<DataPage<VendorSummary>> {
+    let params = new HttpParams();
+    if (req.keyword)     params = params.set('keyword', req.keyword);
+    if (req.status)      params = params.set('status', req.status);
+    if (req.page != null) params = params.set('page', req.page.toString());
+    if (req.size != null) params = params.set('size', req.size.toString());
+    if (req.sortBy)       params = params.set('sortBy', req.sortBy);
+    if (req.sortDirection) params = params.set('sortDirection', req.sortDirection);
+    return this.http.get<DataPage<VendorSummary>>(
+      `${environment.apiUrl}/admin/vendors`, { params }
+    );
   }
 }

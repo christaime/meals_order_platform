@@ -63,6 +63,7 @@ export class MealCatalogViewComponent {
   readonly currentPage = signal<number>(1);
   readonly advancedFilters = signal<FilterState>({
     maxPrice: 10000,
+    minPrice: 2000,
     maxPrepTime: 60,
     minRating: 0,
     availableOnly: false,
@@ -148,6 +149,7 @@ export class MealCatalogViewComponent {
     this.selectedSubCategory.set('all');
     this.advancedFilters.set({
       maxPrice: 10000,
+      minPrice: 2000,
       maxPrepTime: 60,
       minRating: 0,
       availableOnly: false,

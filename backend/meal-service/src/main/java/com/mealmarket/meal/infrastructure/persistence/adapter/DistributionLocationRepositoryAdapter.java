@@ -167,34 +167,11 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
     // ═══════════════════════════════════════════════════════════
 
     private DistributionLocation toFullDomain(DistributionLocationEntity entity) {
-        DistributionLocation partial = mapper.toDomain(entity);
-
-        // ✅ Direct JPA query — no adapter dependency
         VendorEntity vendorEntity = vendorJpaRepository.findById(entity.getVendorId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Vendor not found: " + entity.getVendorId()));
+        return mapper.toDomain(entity,vendorEntity);
 
-        Vendor vendor = vendorMapper.toDomain(vendorEntity);
-
-        // ⚠️ Note: `vendorMapper.toDomain(...)` returns a partial vendor
-        // (no categories, no locations). Since the domain DistributionLocation
-        // only needs the vendor's identity and business info, this is enough.
-        // If callers need the full vendor with categories/locations, they
-        // should fetch the vendor via VendorRepository separately.
-
-        return DistributionLocation.builder()
-                .id(partial.getId())
-                .vendor(vendor)
-                .name(partial.getName())
-                .address(partial.getAddress())
-                .phone(partial.getPhone())
-                .latitude(partial.getLatitude())
-                .longitude(partial.getLongitude())
-                .deliveryRadius(partial.getDeliveryRadius())
-                .moderationStatus(partial.getModerationStatus())
-                .createdAt(partial.getCreatedAt())
-                .updatedAt(partial.getUpdatedAt())
-                .build();
     }
 
     private DataPage<DistributionLocation> toDataPage(Page<DistributionLocationEntity> page) {

@@ -9,19 +9,18 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Extracts the currently authenticated user from the security context.
- * Assumes a Keycloak JWT is present.
- */
 @Component
 public class CurrentUser {
 
-    /**
-     * Returns the Keycloak user ID (JWT subject).
-     */
+    /** Returns the Keycloak user ID (JWT subject). */
     public UUID getUserId() {
         String userId = getJwt().getSubject();
         return UUID.fromString(userId);
+    }
+
+    /** Returns the user's email from the JWT. */
+    public String getEmail() {
+        return getJwt().getClaimAsString("email");
     }
 
     /**
@@ -38,9 +37,7 @@ public class CurrentUser {
         return UserType.CUSTOMER;
     }
 
-    /**
-     * Returns the JWT token itself for advanced use.
-     */
+    /** Returns the JWT token itself for advanced use. */
     public Jwt getJwt() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof Jwt jwt)) {

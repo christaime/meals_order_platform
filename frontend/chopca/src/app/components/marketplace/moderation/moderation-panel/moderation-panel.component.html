@@ -1,0 +1,112 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+  <div class="flex items-start justify-between pb-space-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <app-icon name="shield_person" size="md" class="text-primary" />
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+          Modération
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Statut actuel et actions disponibles selon votre rôle.
+      </p>
+    </div>
+    <app-badge [variant]="statusVariant()" size="sm">
+      {{ statusLabel() }}
+    </app-badge>
+  </div>
+
+  <!-- Allowed decisions -->
+  @if (hasDecisions()) {
+  <div class="mt-space-md space-y-space-md">
+
+    @if (reasonRequired()) {
+    <div class="space-y-1">
+      <label class="block font-label-md text-label-md text-on-surface font-semibold">
+        Motif
+      </label>
+      <textarea
+        rows="3"
+        [value]="reason()"
+        (input)="reason.set($any($event.target).value)"
+        [disabled]="busy()"
+        placeholder="Expliquez la raison de la décision…"
+        class="w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
+                   font-body-md text-body-md placeholder:text-outline
+                   focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
+                   transition-colors resize-none disabled:opacity-60">
+          </textarea>
+    </div>
+    }
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+      @for (d of decisions(); track d.value) {
+      <button
+        type="button"
+        [disabled]="busy() || disabled()"
+        (click)="submit(d)"
+        [title]="d.confirmText"
+        class="h-10 rounded-lg font-label-md text-label-md font-semibold
+                   flex items-center justify-center gap-2 transition-all active:scale-95
+                   disabled:opacity-60 disabled:cursor-not-allowed"
+        [class]="
+              d.variant === 'secondary' ? 'bg-secondary text-on-secondary hover:bg-secondary/90 shadow-sm' :
+              d.variant === 'danger'    ? 'bg-error text-on-error hover:bg-error/90 shadow-sm' :
+              d.variant === 'primary'   ? 'bg-primary text-on-primary hover:bg-primary-container shadow-sm' :
+                                          'bg-surface-container text-on-surface hover:bg-surface-container-high'
+            ">
+        <app-icon [name]="d.icon" size="sm" />
+        {{ d.label }}
+      </button>
+      }
+    </div>
+
+    @if (error(); as e) {
+    <p class="font-body-sm text-body-sm text-error flex items-center gap-1.5">
+      <app-icon name="error" size="sm" />
+      {{ e }}
+    </p>
+    }
+  </div>
+  } @else {
+  <div class="mt-space-md p-space-sm rounded-lg bg-surface-container-low
+                flex items-start gap-2">
+    <app-icon name="info" size="md" class="text-on-surface-variant shrink-0" />
+    <p class="font-body-sm text-body-sm text-on-surface-variant">
+      @switch (currentStatus()) {
+      @case ('REJECTED') {
+      Cette catégorie a été rejetée. Corrigez le contenu puis contactez un administrateur
+      pour la remettre en revue.
+      }
+      @default {
+      Aucune action de modération n'est disponible pour ce statut.
+      }
+      }
+    </p>
+  </div>
+  }
+
+  <!-- Latest action recap -->
+  @if (latest(); as last) {
+  <div class="mt-space-md pt-space-md border-t border-outline-variant/40
+                flex flex-wrap items-center gap-x-space-md gap-y-1
+                font-body-sm text-body-sm text-on-surface-variant">
+      <span class="flex items-center gap-1.5">
+        <app-icon name="history" size="sm" />
+        Dernière action&nbsp;:
+        <strong class="text-on-surface">
+          {{ last.fromStatus ?? '—' }} → {{ last.toStatus }}
+        </strong>
+      </span>
+    <span>
+        par <strong class="text-on-surface">{{ actorLabel(last.performedByType) }}</strong>
+        <span class="text-outline">({{ shortId(last.performedById) }})</span>
+      <!-- TODO: resolve display name via user lookup when backend exposes it -->
+      </span>
+    <span>{{ formatDate(last.performedAt) }}</span>
+    @if (last.reason) {
+    <span class="w-full">Motif&nbsp;: <em>{{ last.reason }}</em></span>
+    }
+  </div>
+  }
+</div>

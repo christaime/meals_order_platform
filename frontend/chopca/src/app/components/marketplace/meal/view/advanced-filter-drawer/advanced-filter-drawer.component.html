@@ -37,29 +37,59 @@
   <!-- Drawer Body / Filter Options -->
   <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
 
-    <!-- Max Price Slider -->
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-          Prix Maximum
-        </label>
-        <span class="font-body-md text-sm font-bold text-primary">
-            {{ draftFilters().maxPrice }} FCFA
-          </span>
+    <!-- Price range — min and max sliders, mutually constrained -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Min price -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+            Prix minimum
+          </label>
+          <span class="font-body-md text-sm font-bold text-primary">
+        {{ draftFilters().minPrice }} FCFA
+      </span>
+        </div>
+        <input
+          type="range"
+          [min]="priceMin"
+          [max]="priceMax"
+          [step]="priceStep"
+          [value]="draftFilters().minPrice"
+          (input)="updateMinPrice($event)"
+          class="w-full accent-primary cursor-pointer"
+        />
+        <div class="flex justify-between text-[10px] text-on-surface-variant font-medium">
+          <span>1 000 FCFA</span>
+          <span>20 000 FCFA</span>
+        </div>
       </div>
-      <input
-        type="range"
-        min="1000"
-        max="20000"
-        step="500"
-        [value]="draftFilters().maxPrice"
-        (input)="updateMaxPrice($event)"
-        class="w-full accent-primary cursor-pointer"
-      />
-      <div class="flex justify-between text-[10px] text-on-surface-variant font-medium">
-        <span>1 000 FCFA</span>
-        <span>20 000 FCFA</span>
+
+      <!-- Max price -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+            Prix maximum
+          </label>
+          <span class="font-body-md text-sm font-bold text-primary">
+        {{ draftFilters().maxPrice }} FCFA
+      </span>
+        </div>
+        <input
+          type="range"
+          [min]="priceMin"
+          [max]="priceMax"
+          [step]="priceStep"
+          [value]="draftFilters().maxPrice"
+          (input)="updateMaxPrice($event)"
+          class="w-full accent-primary cursor-pointer"
+        />
+        <div class="flex justify-between text-[10px] text-on-surface-variant font-medium">
+          <span>1 000 FCFA</span>
+          <span>20 000 FCFA</span>
+        </div>
       </div>
+
     </div>
 
     <!-- Max Prep Time Slider -->
@@ -69,8 +99,8 @@
           Temps de préparation max
         </label>
         <span class="font-body-md text-sm font-bold text-primary">
-            {{ draftFilters().maxPrepTime }} min
-          </span>
+          {{ draftFilters().maxPrepTime }} min
+        </span>
       </div>
       <input
         type="range"
@@ -120,6 +150,75 @@
         class="w-5 h-5 accent-primary rounded cursor-pointer"
       />
     </div>
+
+    <!-- ─── Meal-management section ───────────────────────────── -->
+
+    <div class="flex flex-col gap-4 pt-2 border-t border-outline-variant">
+      <app-category-pills-selector
+        categoryType="CUISINE"
+        [control]="cuisineControl"
+        label="Cuisines"
+        [maxSelection]="3"
+        [minSelection]="0"
+        (selectionChange)="onCuisinesChange($event)" />
+
+      <app-category-pills-selector
+        categoryType="DISH_TYPE"
+        [control]="dishTypeControl"
+        label="Types de plat"
+        [maxSelection]="3"
+        [minSelection]="0"
+        (selectionChange)="onDishTypesChange($event)" />
+    </div>
+
+    @if (ingredientOptions().length > 0) {
+    <div class="flex flex-col gap-2">
+      <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+        Exclure des ingrédients
+      </label>
+      <p class="text-[11px] text-on-surface-variant -mt-1">
+        Les plats contenant ces ingrédients seront masqués.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        @for (ing of ingredientOptions(); track ing.id) {
+        <button
+          type="button"
+          (click)="toggleExcludeIngredient(ing.id)"
+          class="px-3 py-1.5 rounded-full border text-xs font-semibold transition-all"
+          [class.bg-error]="isSelected(draftFilters().excludeIngredientIds, ing.id)"
+          [class.text-on-error]="isSelected(draftFilters().excludeIngredientIds, ing.id)"
+          [class.border-error]="isSelected(draftFilters().excludeIngredientIds, ing.id)"
+          [class.bg-surface-container-low]="!isSelected(draftFilters().excludeIngredientIds, ing.id)"
+          [class.text-on-surface-variant]="!isSelected(draftFilters().excludeIngredientIds, ing.id)"
+          [class.border-outline-variant]="!isSelected(draftFilters().excludeIngredientIds, ing.id)"
+        >
+          {{ ing.name }}
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    @if (locationOptions().length > 0) {
+    <div class="flex flex-col gap-2">
+      <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+        Point de distribution
+      </label>
+      <select
+        [value]="draftFilters().distributionLocationId ?? ''"
+        (change)="setDistributionLocation($event)"
+        class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface
+               font-body-md text-sm border border-outline-variant
+               focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <option value="">Tous les points</option>
+        @for (loc of locationOptions(); track loc.id) {
+        <option [value]="loc.id">{{ loc.name }}</option>
+        }
+      </select>
+    </div>
+    }
+
   </div>
 
   <!-- Drawer Footer Actions -->

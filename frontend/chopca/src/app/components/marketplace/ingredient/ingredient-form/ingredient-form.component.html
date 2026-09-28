@@ -1,0 +1,113 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+  <div class="flex items-start justify-between pb-space-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+          {{ isEditMode() ? 'Modifier l\'ingrédient' : 'Ajouter un ingrédient' }}
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Définissez les ingrédients utilisés dans les plats Chop ça!.
+      </p>
+    </div>
+    <span class="px-2 py-1 rounded bg-surface-container-low text-on-surface-variant
+                 font-label-sm text-label-sm uppercase font-semibold">
+      {{ isEditMode() ? 'Édition' : 'Brouillon' }}
+    </span>
+  </div>
+
+  <form class="space-y-space-md mt-space-md" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <!-- Nom -->
+    <div class="space-y-1">
+      <label class="block font-label-md text-label-md text-on-surface font-semibold" for="ing-name">
+        Nom de l'ingrédient <span class="text-error">*</span>
+      </label>
+      <input
+        id="ing-name"
+        type="text"
+        formControlName="name"
+        placeholder="Ex: Feuilles de Ndolé, Djansang, Arachide..."
+        class="w-full h-11 px-space-md rounded-lg bg-surface-container-low text-on-surface
+               font-body-md text-body-md placeholder:text-outline
+               focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
+               transition-colors" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+      <p class="font-body-sm text-body-sm text-error text-[11px] leading-tight">
+        Nom requis (2 à 100 caractères).
+      </p>
+      } @else {
+      <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
+        Nom clair affiché aux clients et utilisé dans les fiches de plat.
+      </p>
+      }
+    </div>
+
+    <!-- Allergène -->
+    <div class="space-y-1.5">
+      <label class="block font-label-md text-label-md text-on-surface font-semibold">
+        Classification
+      </label>
+
+      <label
+        for="ing-allergen"
+        class="flex items-start gap-3 p-space-md rounded-lg bg-surface-container-low
+               cursor-pointer hover:bg-surface-container transition-colors
+               border border-transparent"
+        [class.border-error-container]="form.controls.isAllergen.value"
+        [class.bg-error-container]="false">
+        <input
+          id="ing-allergen"
+          type="checkbox"
+          formControlName="isAllergen"
+          class="mt-0.5 w-5 h-5 rounded accent-primary cursor-pointer shrink-0" />
+        <div class="flex-1">
+          <span class="block font-label-md text-label-md text-on-surface font-semibold">
+            Allergène
+          </span>
+          <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight mt-0.5">
+            Cochez si l'ingrédient est un allergène courant
+            (arachide, crustacés, gluten, lactose, œufs, poisson, soja…).
+          </p>
+        </div>
+      </label>
+    </div>
+
+    <!-- Server error -->
+    @if (serverError()) {
+    <div class="flex items-start gap-2 p-3 rounded-lg
+                  bg-error-container text-on-error-container text-xs">
+      <app-icon name="error" size="sm" class="mt-0.5 shrink-0" />
+      <span>{{ serverError() }}</span>
+    </div>
+    }
+
+    <!-- Actions -->
+    <div class="pt-space-sm flex items-center gap-space-sm">
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="flex-1 h-12 bg-primary hover:bg-primary-container text-on-primary rounded-lg
+               font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all
+               flex items-center justify-center gap-2 active:scale-95
+               disabled:opacity-60 disabled:cursor-not-allowed">
+        <app-icon name="save" size="md" />
+        <span>
+          {{ submitting()
+            ? 'Enregistrement…'
+            : (isEditMode() ? 'Mettre à jour' : 'Enregistrer l\'ingrédient') }}
+        </span>
+      </button>
+      <button
+        type="button"
+        (click)="onReset()"
+        [disabled]="submitting()"
+        class="px-space-md h-12 bg-surface-container hover:bg-surface-container-high
+               text-on-surface rounded-lg font-label-md text-label-md font-semibold
+               transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+        {{ isEditMode() ? 'Annuler' : 'Réinitialiser' }}
+      </button>
+    </div>
+  </form>
+</div>

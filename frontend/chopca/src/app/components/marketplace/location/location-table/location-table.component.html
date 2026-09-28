@@ -1,0 +1,133 @@
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-clip">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+      <tr class="bg-surface-container-low text-on-surface-variant
+                   font-label-sm text-label-sm uppercase tracking-wider">
+        <th class="py-3 px-space-md font-bold">Emplacement</th>
+        <th class="py-3 px-space-md font-bold">Coordonnées</th>
+        <th class="py-3 px-space-md font-bold">Statut</th>
+        <th class="py-3 px-space-md font-bold text-right">Actions</th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/30">
+
+      @if (loading()) {
+      <tr>
+        <td colspan="4" class="py-12 px-space-md text-center text-on-surface-variant">
+          <app-icon name="progress_activity" size="xl" class="animate-spin" />
+          <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
+        </td>
+      </tr>
+      } @else if (locations().length === 0) {
+      <tr>
+        <td colspan="4" class="py-12 px-space-md text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-surface-container-low
+                          flex items-center justify-center text-outline">
+            <app-icon name="location_off" size="xl" />
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+            Aucun emplacement
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+            Aucun emplacement ne correspond aux filtres actifs.
+          </p>
+        </td>
+      </tr>
+      } @else {
+      @for (loc of locations(); track loc.id) {
+      <tr
+        class="group transition-colors"
+        [ngClass]="isEditing(loc)
+                ? 'bg-primary-fixed/20 ring-1 ring-inset ring-primary'
+                : 'hover:bg-surface-container-low/60'">
+
+        <td class="py-3.5 px-space-md">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary-fixed/40 text-primary
+                              flex items-center justify-center shrink-0
+                              group-hover:scale-105 transition-transform
+                              border border-primary-fixed">
+              <app-icon name="storefront" size="lg" />
+            </div>
+            <div class="min-w-0">
+              <div class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">
+                {{ loc.name }}
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">
+                {{ loc.address }}
+              </p>
+              @if (loc.city) {
+              <p class="font-body-sm text-body-sm text-outline text-[11px] mt-0.5">
+                {{ loc.city.name }}@if (loc.city.region) { — {{ loc.city.region }} }
+              </p>
+              }
+            </div>
+          </div>
+        </td>
+
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <div class="flex flex-col gap-0.5 text-[11px]">
+                  <span class="font-currency-tabular text-on-surface">
+                    {{ loc.latitude | number:'1.4-4' }}, {{ loc.longitude | number:'1.4-4' }}
+                  </span>
+            @if (loc.deliveryRadius != null) {
+            <span class="text-on-surface-variant">
+                      Rayon {{ loc.deliveryRadius }} km
+                    </span>
+            }
+          </div>
+        </td>
+
+        <td class="py-3.5 px-space-md whitespace-nowrap">
+          <app-badge
+            [variant]="statusVariant(loc.moderationStatus)"
+            [icon]="statusIcon(loc.moderationStatus)"
+            size="sm">
+            {{ statusLabel(loc.moderationStatus) }}
+          </app-badge>
+        </td>
+
+        <td class="py-3.5 px-space-md text-right whitespace-nowrap">
+          <div class="flex items-center justify-end gap-1">
+            @if (scope() === 'vendor') {
+            <button
+              type="button"
+              (click)="edit.emit(loc)"
+              title="Modifier"
+              class="p-1.5 rounded-lg text-on-surface-variant
+                             hover:text-primary hover:bg-surface-container transition-colors
+                             bg-transparent border-0 cursor-pointer">
+              <app-icon name="edit" size="sm" />
+            </button>
+            <button
+              type="button"
+              (click)="delete.emit(loc)"
+              title="Supprimer"
+              class="p-1.5 rounded-lg text-on-surface-variant
+                             hover:text-error hover:bg-error-container/40 transition-colors
+                             bg-transparent border-0 cursor-pointer">
+              <app-icon name="delete" size="sm" />
+            </button>
+            } @else {
+            <button
+              type="button"
+              (click)="select.emit(loc)"
+              [title]="isEditing(loc) ? 'Sélectionné pour modération' : 'Sélectionner pour modération'"
+              class="p-1.5 rounded-lg transition-colors
+                             bg-transparent border-0 cursor-pointer"
+              [ngClass]="isEditing(loc)
+                        ? 'text-primary bg-primary-fixed/40'
+                        : 'text-on-surface-variant hover:text-primary hover:bg-surface-container'">
+              <app-icon name="shield_person" size="sm" />
+            </button>
+            }
+          </div>
+        </td>
+      </tr>
+      }
+      }
+      </tbody>
+    </table>
+  </div>
+</div>

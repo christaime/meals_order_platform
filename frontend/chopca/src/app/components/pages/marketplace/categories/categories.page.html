@@ -1,0 +1,111 @@
+<!-- Top bar -->
+<section class="w-full px-space-md lg:px-margin-lg py-space-lg">
+  <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg">
+    <div class="space-y-space-xs max-w-2xl">
+      <div class="flex items-center gap-space-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full
+                     bg-primary-fixed text-on-primary-fixed
+                     font-label-sm text-label-sm uppercase tracking-wide">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          Taxonomie E-Commerce &amp; Menus
+        </span>
+        <span class="text-outline-variant">•</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+          Répertoire National Cameroun
+        </span>
+      </div>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
+        Gestion du Catalogue &amp; Taxonomie
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Structurez les univers culinaires, terroirs et moments gourmands pour optimiser
+        la découverte, la recommandation et les filtres des clients Chop ça!.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-space-sm">
+      <button
+        type="button"
+        (click)="onImportCsv()"
+        class="h-11 px-space-md rounded-lg bg-surface-container hover:bg-surface-container-high
+               text-on-surface transition-all duration-200 flex items-center gap-2
+               font-label-lg text-label-lg active:scale-95 shadow-sm">
+        <app-icon name="upload_file" size="md" class="text-primary" />
+        <span>Importer CSV</span>
+      </button>
+      <button
+        type="button"
+        (click)="onExportCsv()"
+        class="h-11 px-space-md rounded-lg bg-surface-container hover:bg-surface-container-high
+               text-on-surface transition-all duration-200 flex items-center gap-2
+               font-label-lg text-label-lg active:scale-95 shadow-sm">
+        <app-icon name="download" size="md" class="text-on-surface-variant" />
+        <span>Exporter CSV</span>
+      </button>
+      <button
+        type="button"
+        (click)="onQuickNew()"
+        class="h-11 px-space-lg rounded-lg bg-primary hover:bg-primary-container
+               text-on-primary font-label-lg text-label-lg shadow-md transition-all
+               duration-200 flex items-center gap-2 active:scale-95">
+        <app-icon name="add_circle" size="md" />
+        <span>+ Nouvelle Catégorie</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Two-column layout -->
+<section class="w-full max-w-full px-space-md lg:px-margin-lg pb-space-xl overflow-x-clip">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+
+    <div class="lg:col-span-5 xl:col-span-4 sticky top-24 z-10 min-w-0
+            flex flex-col gap-space-md"
+         id="category-form-container">
+
+      <app-category-form
+        [editing]="editing()"
+        [submitting]="submitting()"
+        (submitted)="onSubmit($event)"
+        (cancelEdit)="onCancelEdit()" />
+
+      @if (moderableCategory(); as c) {
+      <app-moderation-panel
+        targetType="CATEGORY"
+        [targetId]="c.id"
+        [currentStatus]="c.status"
+        (moderated)="onModerated($event)" />
+      }
+    </div>
+
+    <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-space-md">
+      <app-category-filters
+        [name]="name()"
+        [type]="type()"
+        [status]="status()"
+        [sort]="sort()"
+        (nameChange)="onNameChange($event)"
+        (typeChange)="onTypeChange($event)"
+        (statusChange)="onStatusChange($event)"
+        (sortChange)="onSortChange($event)" />
+
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+        <app-category-table
+          [categories]="result()?.content ?? []"
+          [loading]="loading()"
+          [editingId]="editing()?.id ?? null"
+          (edit)="onEdit($event)"
+          (toggleStatus)="onToggleStatus($event)"
+          (delete)="onDelete($event)" />
+
+        @if (result(); as page) {
+        <app-paginator
+          [page]="page"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onSizeChange($event)" />
+        }
+      </div>
+    </div>
+
+  </div>
+</section>

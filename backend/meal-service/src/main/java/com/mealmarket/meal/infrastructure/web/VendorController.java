@@ -80,25 +80,16 @@ public class VendorController {
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "409", description = "Email or business name already exists")
     })
-    public ResponseEntity<VendorResponse> registerVendor( @AuthenticationPrincipal Jwt jwt,
+    public ResponseEntity<VendorResponse> registerVendor(
             @Valid @RequestBody CreateVendorRequest request
     ) {
-        String keycloakUserId = jwt.getSubject();
-        String email = jwt.getClaimAsString("email");
-        if (keycloakUserId == null) {
-            throw new IllegalStateException(
-                    "keycloakUserId missing — upstream Keycloak registration filter not configured"
-            );
-        }
-
+        UUID keycloakUserId = currentUser.getUserId();
+        String email = currentUser.getEmail();
         if (email == null || email.isBlank()) {
-            throw new IllegalStateException(
-                    "Email missing"
-            );
+            throw new IllegalStateException("Email missing from token — check Keycloak client scopes");
         }
 
-        VendorResponse response = vendorService.registerVendor(request,email, UUID.fromString(keycloakUserId));
-        // Owner just created it — safe to include CNI in the response.
+        VendorResponse response = vendorService.registerVendor(request, email, keycloakUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

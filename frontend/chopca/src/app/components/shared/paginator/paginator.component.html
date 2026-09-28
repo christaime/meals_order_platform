@@ -1,0 +1,66 @@
+@if (page(); as p) {
+<div class="bg-surface-container-low px-space-md py-space-sm
+              flex flex-col sm:flex-row items-center justify-between gap-space-sm
+              font-label-md text-label-md">
+
+  <div class="text-on-surface-variant font-body-sm text-body-sm">
+    Affichage de
+    <span class="font-bold text-on-surface">{{ p.content.length }}</span>
+    sur
+    <span class="font-bold text-on-surface">{{ p.totalElements }}</span>
+    éléments
+  </div>
+
+  <div class="flex items-center gap-3">
+    <label class="flex items-center gap-2 text-on-surface-variant text-body-sm">
+      <span>Par page</span>
+      <select
+        class="h-8 px-2 bg-surface-container-lowest rounded text-on-surface
+                 border border-outline-variant/40
+                 focus:outline-none focus:ring-2 focus:ring-primary"
+        [disabled]="disabled()"
+        [value]="p.size"
+        (change)="onSizeChange($event)">
+        @for (size of pageSizeOptions(); track size) {
+        <option [value]="size">{{ size }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="flex items-center gap-1">
+      <button
+        type="button"
+        class="px-2.5 py-1 rounded bg-surface-container-lowest text-on-surface
+                 hover:bg-surface-container transition-colors
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="disabled() || p.first"
+        (click)="go(p.page - 1)">
+        Précédent
+      </button>
+
+      @for (n of pages(); track n) {
+      <button
+        type="button"
+        class="px-3 py-1 rounded transition-colors disabled:cursor-not-allowed"
+        [class]="n === p.page
+              ? 'bg-primary text-on-primary font-bold shadow-sm'
+              : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container'"
+        [disabled]="disabled()"
+        (click)="go(n)">
+        {{ n + 1 }}
+      </button>
+      }
+
+      <button
+        type="button"
+        class="px-2.5 py-1 rounded bg-surface-container-lowest text-on-surface
+                 hover:bg-surface-container transition-colors
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="disabled() || p.last"
+        (click)="go(p.page + 1)">
+        Suivant
+      </button>
+    </div>
+  </div>
+</div>
+}

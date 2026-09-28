@@ -1,7 +1,9 @@
 package com.mealmarket.meal.infrastructure.persistence.mapper;
 
 import com.mealmarket.meal.domain.model.DistributionLocation;
+import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
+import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -21,7 +23,10 @@ import java.util.UUID;
  * - On Entity → Domain: {@code vendor} is IGNORED — the adapter loads it
  *   separately via the vendor repository and reassembles the domain object.
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = { VendorPersistenceMapper.class }
+)
 public interface DistributionLocationPersistenceMapper {
 
     DistributionLocationPersistenceMapper INSTANCE =
@@ -41,10 +46,18 @@ public interface DistributionLocationPersistenceMapper {
     //  Vendor is loaded separately by the adapter
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "vendor", ignore = true)
-    DistributionLocation toDomain(DistributionLocationEntity entity);
-
-    List<DistributionLocation> toDomainList(List<DistributionLocationEntity> entities);
+    @Mapping(target = "id",             source = "entity.id")
+    @Mapping(target = "name",           source = "entity.name")
+    @Mapping(target = "address",        source = "entity.address")
+    @Mapping(target = "phone",          source = "entity.phone")
+    @Mapping(target = "latitude",       source = "entity.latitude")
+    @Mapping(target = "longitude",      source = "entity.longitude")
+    @Mapping(target = "deliveryRadius", source = "entity.deliveryRadius")
+    @Mapping(target = "moderationStatus", source = "entity.moderationStatus")
+    @Mapping(target = "createdAt",      source = "entity.createdAt")
+    @Mapping(target = "updatedAt",      source = "entity.updatedAt")
+    @Mapping(target = "vendor", source = "vendor", qualifiedByName = "toMinimalDomain")
+    DistributionLocation toDomain(DistributionLocationEntity entity, VendorEntity vendor);
 
     // ═══════════════════════════════════════════════════════════
     //  Helpers

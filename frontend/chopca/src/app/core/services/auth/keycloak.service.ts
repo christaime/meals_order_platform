@@ -1,22 +1,22 @@
 import { Injectable, inject } from '@angular/core';
 import Keycloak from 'keycloak-js';
-import { AuthIntentStore } from '../../storage/auth-intent';
+import { AppSessionStore, RETURN_URL_KEY } from '../../storage/app.store';
+import { SessionManager } from '../session/session-manager.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
 
   private readonly keycloak = inject(Keycloak);
-
-  async loginWithIntent(intent: 'vendor-registration' | 'customer-registration',
-                        idpHint?: string): Promise<void> {
-    AuthIntentStore.set(intent);
-    await this.keycloak!.login({
-      idpHint,
-      redirectUri: window.location.origin + '/auth/callback',
-    });
-  }
+  private readonly route = inject(ActivatedRoute);
 
   async login(idpHint?: string): Promise<void> {
+    // Remember where the user was headed before the guard bounced them
+    // to /auth/login. The callback will read this after Keycloak redirects back.
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      AppSessionStore.set(RETURN_URL_KEY,returnUrl);
+    }
     await this.keycloak!.login({
       idpHint,// 'google' | 'outlook' | 'yahoo'
       redirectUri: window.location.origin + '/auth/callback',
@@ -41,7 +41,8 @@ export class KeycloakService {
   }
 
   async logout(): Promise<void> {
-    await this.keycloak!.logout({ redirectUri: window.location.origin });
+    inject(SessionManager).shutdown();   // broadcast LOGOUT to other tabs first
+    await this.keycloak.logout({ redirectUri: window.location.origin });
   }
 
   getUserEmail(): string | undefined {

@@ -1,0 +1,117 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+  <div class="flex items-start justify-between pb-space-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+          Références du plat
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Ingrédients et points de distribution liés à ce plat.
+      </p>
+    </div>
+    @if (unapprovedCount() > 0) {
+    <span class="px-2 py-1 rounded-full bg-error-container text-on-error-container
+                 font-label-sm text-label-sm font-semibold">
+      {{ unapprovedCount() }} à valider
+    </span>
+    }
+  </div>
+
+  <div class="mt-space-md">
+    @if (loading()) {
+    <div class="flex items-center justify-center py-8 text-on-surface-variant">
+      <app-icon name="progress_activity" size="lg" class="animate-spin" />
+    </div>
+    } @else if (error()) {
+    <div class="flex items-start gap-2 text-error">
+      <app-icon name="error" size="md" class="shrink-0 mt-0.5" />
+      <p class="font-body-sm text-body-sm">
+        Impossible de charger les références de ce plat.
+      </p>
+    </div>
+    } @else if (!mealId()) {
+    <div class="flex items-start gap-2 text-on-surface-variant py-4">
+      <app-icon name="info" size="md" class="shrink-0 mt-0.5" />
+      <p class="font-body-sm text-body-sm">
+        Sélectionnez un plat dans la liste pour voir ses références.
+      </p>
+    </div>
+    } @else {
+
+    <!-- Ingredients -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <span class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+          Ingrédients
+        </span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">
+          {{ ingredients().length }}
+        </span>
+      </div>
+      @if (ingredients().length === 0) {
+      <p class="font-body-sm text-body-sm text-on-surface-variant">
+        Aucun ingrédient.
+      </p>
+      } @else {
+      <div class="flex flex-wrap gap-2">
+        @for (ing of ingredients(); track ing.id) {
+        <button
+          type="button"
+          (click)="openIngredient(ing)"
+          [title]="isUnapproved(ing.moderationStatus)
+                    ? statusLabel(ing.moderationStatus) + ' — ouvrir dans un nouvel onglet'
+                    : 'Ouvrir dans un nouvel onglet'"
+          class="border-0 bg-transparent p-0 cursor-pointer">
+          <app-badge
+            [variant]="statusVariant(ing.moderationStatus)"
+            [icon]="statusIconOrNull(ing.moderationStatus)"
+            size="sm">
+            {{ ing.name }}
+          </app-badge>
+        </button>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Distribution locations -->
+    <div class="flex flex-col gap-2 mt-space-md">
+      <div class="flex items-center justify-between">
+        <span class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
+          Points de distribution
+        </span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">
+          {{ locations().length }}
+        </span>
+      </div>
+      @if (locations().length === 0) {
+      <p class="font-body-sm text-body-sm text-on-surface-variant">
+        Aucun point de distribution.
+      </p>
+      } @else {
+      <div class="flex flex-wrap gap-2">
+        @for (loc of locations(); track loc.id) {
+        <button
+          type="button"
+          (click)="openLocation(loc)"
+          [title]="isUnapproved(loc.moderationStatus)
+                    ? statusLabel(loc.moderationStatus) + ' — ouvrir dans un nouvel onglet'
+                    : 'Ouvrir dans un nouvel onglet'"
+          class="border-0 bg-transparent p-0 cursor-pointer">
+          <app-badge
+            [variant]="statusVariant(loc.moderationStatus)"
+            [icon]="statusIconOrNull(loc.moderationStatus)"
+            size="sm">
+            {{ loc.name }}
+          </app-badge>
+        </button>
+        }
+      </div>
+      }
+    </div>
+
+    }
+  </div>
+</div>

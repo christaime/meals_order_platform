@@ -1,0 +1,77 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+  <div class="flex items-start justify-between pb-space-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+          Sélectionner un vendeur
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Choisissez un vendeur pour gérer ses plats.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-space-md space-y-space-sm">
+    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+      <mat-label>Rechercher un vendeur</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        [formControl]="search"
+        placeholder="Nom, email, ville…"
+        autocomplete="off" />
+      @if (loading()) {
+      <mat-hint>Recherche…</mat-hint>
+      }
+    </mat-form-field>
+
+    @if (vendors().length > 0) {
+    <div class="flex flex-col gap-1.5 max-h-72 overflow-y-auto">
+      @for (v of vendors(); track v.id) {
+      <button
+        type="button"
+        (click)="onSelect(v.id)"
+        class="flex items-center gap-3 p-space-sm rounded-lg text-left
+                   transition-colors border"
+        [class]="selectedVendorId() === v.id
+              ? 'bg-primary-fixed/40 border-primary'
+              : 'bg-surface-container-low border-transparent hover:bg-surface-container'">
+
+        <img
+          [src]="v.profileImageUrl ?? 'assets/default-vendor.png'"
+          [alt]="v.businessName"
+          class="w-10 h-10 rounded-full object-cover shrink-0 border border-outline-variant/40" />
+
+        <div class="flex-1 min-w-0">
+          <div class="font-label-lg text-label-lg font-bold text-on-surface truncate">
+            {{ v.businessName }}
+          </div>
+          <div class="font-body-sm text-body-sm text-on-surface-variant truncate">
+            {{ v.email ?? '—' }}
+          </div>
+          @if (v.address) {
+          <div class="font-body-sm text-body-sm text-outline text-[11px] truncate">
+            {{ v.address }}
+          </div>
+          }
+        </div>
+
+        @if (selectedVendorId() === v.id) {
+        <app-icon name="check_circle" size="md" class="text-primary shrink-0" />
+        }
+      </button>
+      }
+    </div>
+    } @else if (search.value && search.value.length >= 2 && !loading()) {
+    <p class="font-body-sm text-body-sm text-on-surface-variant text-center py-4">
+      Aucun vendeur trouvé.
+    </p>
+    } @else {
+    <p class="font-body-sm text-body-sm text-on-surface-variant text-center py-4">
+      Saisissez au moins 2 caractères pour rechercher.
+    </p>
+    }
+  </div>
+</div>

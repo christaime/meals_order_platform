@@ -1,0 +1,74 @@
+<div class="flex flex-col gap-space-sm">
+  <!-- Row 1: name + status + city + sort + advanced trigger -->
+  <div class="flex flex-wrap items-center gap-2">
+
+    <!-- Name search — flex-1 + min-w-0 so it can shrink; floor via min-w -->
+    <div class="flex-1 min-w-[140px] relative">
+      <app-icon
+        name="search"
+        size="sm"
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+      <input
+        type="text"
+        [value]="draftName()"
+        (input)="onNameInput($event)"
+        (keydown.enter)="onNameSubmit()"
+        (blur)="onNameSubmit()"
+        placeholder="Rechercher un plat…"
+        class="w-full min-w-0 h-11 pl-9 pr-3 rounded-full bg-surface-container-lowest
+               border border-outline-variant text-on-surface
+               font-body-md text-sm placeholder:text-outline
+               focus:outline-none focus:ring-2 focus:ring-primary" />
+    </div>
+
+    <!-- Status — shrink-0 so it never gets squeezed -->
+    <select
+      [value]="moderationStatus()"
+      (change)="onStatusChange($event)"
+      class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+             border border-outline-variant text-on-surface
+             font-label-md text-xs font-semibold
+             focus:outline-none focus:ring-2 focus:ring-primary">
+      @for (opt of statusOptions; track opt.value) {
+      <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+
+    <!-- City — shrink-0 -->
+    <select
+      [value]="cityId() ?? ''"
+      (change)="onCityChange($event)"
+      [disabled]="citiesLoading()"
+      class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+             border border-outline-variant text-on-surface
+             font-label-md text-xs font-semibold
+             focus:outline-none focus:ring-2 focus:ring-primary
+             disabled:opacity-60">
+      <option value="">Toutes les villes</option>
+      @for (city of cities(); track city.id) {
+      <option [value]="city.id">{{ city.name }}</option>
+      }
+    </select>
+
+    <!-- Sort — shrink-0 -->
+    <select
+      [value]="sort()"
+      (change)="onSortChange($event)"
+      class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+             border border-outline-variant text-on-surface
+             font-label-md text-xs font-semibold
+             focus:outline-none focus:ring-2 focus:ring-primary">
+      @for (opt of sortOptions; track opt.value) {
+      <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+
+    <!-- Advanced drawer trigger — shrink-0 -->
+    <app-advanced-filter-drawer
+      class="shrink-0"
+      [filters]="advanced()"
+      (applyFilters)="onAdvancedChange($event)"
+      [ingredientOptions]="ingredientOptions()"
+      [locationOptions]="locationOptions()" />
+  </div>
+</div>

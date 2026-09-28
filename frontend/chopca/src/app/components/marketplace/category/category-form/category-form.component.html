@@ -1,0 +1,133 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+  <div class="flex items-start justify-between pb-space-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+          {{ editing() ? 'Modifier la catégorie' : 'Ajouter une catégorie' }}
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Définir une taxonomie pour les plats et les cuisines partenaires Chop ça!.
+      </p>
+    </div>
+    <span class="px-2 py-1 rounded bg-surface-container-low text-on-surface-variant
+                 font-label-sm text-label-sm uppercase font-semibold">
+      {{ editing() ? 'Édition' : 'Brouillon' }}
+    </span>
+  </div>
+
+  <form class="space-y-space-md mt-space-md" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <!-- Nom -->
+    <div class="space-y-1">
+      <label class="block font-label-md text-label-md text-on-surface font-semibold" for="cat-name">
+        Nom de la catégorie <span class="text-error">*</span>
+      </label>
+      <input
+        id="cat-name"
+        type="text"
+        formControlName="name"
+        placeholder="Ex: Cuisine Sawa (Littoral), Street Food..."
+        class="w-full h-11 px-space-md rounded-lg bg-surface-container-low text-on-surface
+               font-body-md text-body-md placeholder:text-outline
+               focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
+               transition-colors" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+      <p class="font-body-sm text-body-sm text-error text-[11px] leading-tight">
+        Nom requis (2 à 100 caractères).
+      </p>
+      } @else {
+      <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
+        Nom clair affiché aux utilisateurs et dans les cartes de livraison.
+      </p>
+      }
+    </div>
+
+    <!-- Type tabs -->
+    <div class="space-y-1.5">
+      <label class="block font-label-md text-label-md text-on-surface font-semibold">
+        Type de catégorie <span class="text-error">*</span>
+      </label>
+      <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-surface-container-low">
+        @for (tab of types; track tab.value) {
+        <button
+          type="button"
+          (click)="selectType(tab.value)"
+          class="py-2 px-2 rounded-lg font-label-sm text-label-sm font-semibold
+                   transition-all flex items-center justify-center gap-1.5"
+          [class]="form.controls.type.value === tab.value
+              ? 'bg-surface-container-lowest text-primary shadow-sm'
+              : 'text-on-surface-variant hover:text-on-surface'">
+          <app-icon [name]="tab.icon" size="sm" />
+          {{ tab.label }}
+        </button>
+        }
+      </div>
+      <div class="px-2 py-1 bg-surface-container-low rounded font-body-sm text-body-sm
+                  text-on-surface-variant text-[11px]">
+        💡 <strong>{{ currentType().label }} :</strong> {{ currentType().caption }}
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="space-y-1">
+      <div class="flex justify-between items-center">
+        <label class="block font-label-md text-label-md text-on-surface font-semibold" for="cat-desc">
+          Description d'accroche &amp; Mots-clés
+        </label>
+        <span class="font-label-sm text-label-sm text-outline">{{ charCount() }} / 250</span>
+      </div>
+      <textarea
+        id="cat-desc"
+        rows="3"
+        formControlName="description"
+        maxlength="250"
+        placeholder="Décrivez les ingrédients phares, saveurs et particularités pour le moteur de recherche..."
+        class="w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
+               font-body-md text-body-md placeholder:text-outline
+               focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
+               transition-colors resize-none">
+      </textarea>
+    </div>
+
+    <!-- Icon picker -->
+    <div class="space-y-2">
+      <label class="block font-label-md text-label-md text-on-surface font-semibold">
+        Icône de la catégorie
+      </label>
+      <app-category-icon-picker
+        [value]="form.controls.iconUrl.value"
+        (valueChange)="onIconChange($event)" />
+      <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
+        Choisissez une icône parmi les suggestions. Recliquez pour désélectionner.
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="pt-space-sm flex items-center gap-space-sm">
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="flex-1 h-12 bg-primary hover:bg-primary-container text-on-primary rounded-lg
+               font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all
+               flex items-center justify-center gap-2 active:scale-95
+               disabled:opacity-60 disabled:cursor-not-allowed">
+        <app-icon name="save" size="md" />
+        <span>
+          {{ submitting()
+            ? 'Enregistrement…'
+            : (editing() ? 'Mettre à jour' : 'Enregistrer la catégorie') }}
+        </span>
+      </button>
+      <button
+        type="button"
+        (click)="onReset()"
+        class="px-space-md h-12 bg-surface-container hover:bg-surface-container-high
+               text-on-surface rounded-lg font-label-md text-label-md font-semibold
+               transition-colors">
+        {{ editing() ? 'Annuler' : 'Réinitialiser' }}
+      </button>
+    </div>
+  </form>
+</div>

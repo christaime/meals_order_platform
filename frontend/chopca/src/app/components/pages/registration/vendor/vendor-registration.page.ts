@@ -39,7 +39,7 @@ import {
 } from '@app/core/models/marketplace';
 import { KeycloakService } from '@core/services/auth/keycloak.service';
 import { UserContextService } from '@core/services/auth/user-context.service';
-import { AuthIntentStore } from '@core/storage/auth-intent';
+import { AppSessionStore, RETURN_URL_KEY } from '@core/storage/app.store';
 
 /**
  * Vendor registration page.
@@ -334,16 +334,15 @@ export class VendorRegistrationPage {
       await firstValueFrom(this.vendorService.registerVendor(payload));
 
       // Success path:
-      //   1. clear intent (goal achieved)
-      //   2. refresh the token so it picks up the VENDOR role
-      //   3. reload context (now includes the vendor)
-      //   4. navigate to the dashboard
-      AuthIntentStore.clear();
+      //   1. refresh the token so it picks up the VENDOR role
+      //   2. reload context (now includes the vendor)
+      //   3. navigate to the returnUrl
       await this.keycloak.refreshToken();
       this.ctx.clear();
       await this.ctx.ensureLoaded();
-      localStorage.removeItem('vendor-registration.draft');
-      await this.router.navigate(['/vendor/dashboard']);
+      // Consume the returnUrl (reads and clears it).
+      const returnUrl = AppSessionStore.consume(RETURN_URL_KEY) ?? '/vendor/dashboard';
+      await this.router.navigateByUrl(returnUrl);
     } catch (e: any) {
       this.submitError.set(
         e?.error?.message ?? "Échec de l'inscription. Veuillez réessayer.",
@@ -354,8 +353,9 @@ export class VendorRegistrationPage {
   }
 
   protected cancel(): void {
-    AuthIntentStore.clear();
-    void this.router.navigate(['/']);
+    // Consume the returnUrl (reads and clears it).
+    const returnUrl = AppSessionStore.consume(RETURN_URL_KEY) ?? '/vendor/dashboard';
+    void this.router.navigateByUrl(returnUrl);
   }
 
   // ══════════════════════════════════════════════════════════

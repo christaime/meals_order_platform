@@ -11,7 +11,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LogoComponent } from '@components/shared/logo/logo.component';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
-import { RoleContext } from '@app/core/services/role-context.service';
+import { RoleContext } from '@app/core/services/auth/role-context.service';
 import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.models';
 
 /**
@@ -70,10 +70,10 @@ export class AuthHeaderComponent {
     return [];
   });
 
-  protected readonly labels = {
-    login: 'Se connecter',
-    vendor: 'Je Cook!',
-    customer: 'Je Chop!',
+  protected readonly links = {
+    login: {label : 'Se connecter', route:'/auth/login'},
+    vendor: {label : 'Je Cook!', route:'/vendor/dashboard'},
+    customer: {label : 'Je Chop!', route:'/customer/dashboard'},
   } as const;
   /**
    * The label of the current user's portal — used in the badge next to the logo.

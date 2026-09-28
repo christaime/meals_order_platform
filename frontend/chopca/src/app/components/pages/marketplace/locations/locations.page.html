@@ -1,0 +1,159 @@
+<!-- Top bar -->
+<section class="w-full px-space-md lg:px-margin-lg py-space-lg">
+  <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg">
+    <div class="space-y-space-xs max-w-2xl">
+      <div class="flex items-center gap-space-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full
+                     bg-primary-fixed text-on-primary-fixed
+                     font-label-sm text-label-sm uppercase tracking-wide">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          Emplacements de distribution
+        </span>
+        <span class="text-outline-variant">•</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+          {{ scope() === 'admin' ? 'Modération' : 'Mes points de retrait' }}
+        </span>
+      </div>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
+        {{ scope() === 'admin' ? 'Modération des Emplacements' : 'Mes Emplacements' }}
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        {{ scope() === 'admin'
+        ? 'Examinez et modérez les emplacements de distribution soumis par les vendeurs.'
+        : 'Gérez vos points de retrait et de livraison pour vos clients Chop ça!.' }}
+      </p>
+    </div>
+
+    @if (scope() === 'vendor') {
+    <div class="flex flex-wrap items-center gap-space-sm">
+      <button
+        type="button"
+        (click)="onQuickNew()"
+        class="h-11 px-space-lg rounded-lg bg-primary hover:bg-primary-container
+                 text-on-primary font-label-lg text-label-lg shadow-md transition-all
+                 duration-200 flex items-center gap-2 active:scale-95">
+        <app-icon name="add_circle" size="md" />
+        <span>+ Nouvel Emplacement</span>
+      </button>
+    </div>
+    }
+  </div>
+</section>
+
+<!-- Two-column layout -->
+<section class="w-full max-w-full px-space-md lg:px-margin-lg pb-space-xl overflow-x-clip">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+
+    <!-- ══════════════════════════════════════════════════════
+         LEFT COLUMN — differs by scope
+         ══════════════════════════════════════════════════════ -->
+    <div class="lg:col-span-5 xl:col-span-4 sticky top-24 z-10 min-w-0
+                flex flex-col gap-space-md"
+         id="location-left-column">
+
+      @if (scope() === 'vendor') {
+      <!-- VENDOR: form -->
+      <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+        <div class="flex items-start justify-between pb-space-sm">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+              <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+                {{ editing() ? 'Modifier l\'emplacement' : 'Ajouter un emplacement' }}
+              </h2>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              Définissez vos points de retrait et de livraison.
+            </p>
+          </div>
+          <span class="px-2 py-1 rounded bg-surface-container-low text-on-surface-variant
+                         font-label-sm text-label-sm uppercase font-semibold">
+              {{ editing() ? 'Édition' : 'Brouillon' }}
+            </span>
+        </div>
+
+        <div class="mt-space-md">
+          <app-location-form
+            [location]="editing()"
+            (saved)="onSaved($event)"
+            (cancelled)="onCancelEdit()" />
+        </div>
+      </div>
+
+      } @else {
+      <!-- ADMIN: vendor picker (always) + moderation panel (when a row is selected) -->
+      <app-vendor-picker
+        [selectedVendorId]="adminVendorId()"
+        (vendorSelected)="onVendorSelected($event)" />
+
+      @if (moderableLocation(); as loc) {
+      <app-moderation-panel
+        targetType="DISTRIBUTION_LOCATION"
+        [targetId]="loc.id"
+        [currentStatus]="loc.moderationStatus"
+        (moderated)="onModerated($event)" />
+      } @else if (adminVendorId()) {
+      <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md
+                      flex items-start gap-3">
+        <app-icon name="info" size="lg" class="text-outline shrink-0 mt-0.5" />
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Sélectionnez un emplacement dans la liste pour le modérer.
+        </p>
+      </div>
+      }
+      }
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         RIGHT COLUMN — filters + table + paginator (both scopes)
+         ══════════════════════════════════════════════════════ -->
+    <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-space-md min-w-0">
+
+      @if (!effectiveVendorId()) {
+      <!-- No vendor → no table. Only relevant in admin scope. -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl text-center">
+        <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-surface-container-low
+                      flex items-center justify-center text-outline">
+          <app-icon name="person_search" size="xl" />
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+          Sélectionnez un vendeur
+        </h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+          Utilisez le panneau de gauche pour choisir un vendeur et afficher ses emplacements.
+        </p>
+      </div>
+
+      } @else {
+      <!-- Filters -->
+      <app-location-filters
+        [name]="name()"
+        [moderationStatus]="moderationStatus()"
+        [sort]="sort()"
+        (nameChange)="onNameChange($event)"
+        (moderationStatusChange)="onStatusChange($event)"
+        (sortChange)="onSortChange($event)" />
+
+      <!-- Table + paginator card -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+        <app-location-table
+          [locations]="result()?.content ?? []"
+          [loading]="loading()"
+          [editingId]="editing()?.id ?? null"
+          [scope]="scope()"
+          (edit)="onEdit($event)"
+          (select)="onSelectForModeration($event)"
+          (delete)="onDelete($event)" />
+
+        @if (result(); as page) {
+        <app-paginator
+          [page]="page"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onSizeChange($event)" />
+        }
+      </div>
+      }
+    </div>
+
+  </div>
+</section>

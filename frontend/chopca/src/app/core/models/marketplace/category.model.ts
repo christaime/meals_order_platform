@@ -12,6 +12,7 @@ export interface Category {
   readonly iconUrl: string | null;
   readonly type: CategoryType;
   readonly isActive: boolean;
+  readonly status: ModerationStatus;
   readonly createdAt: string;      // ISO 8601
   readonly updatedAt: string;      // ISO 8601
 }
@@ -25,6 +26,7 @@ export interface CategorySummary {
   readonly name: string;
   readonly iconUrl: string | null;
   readonly type: CategoryType;
+  readonly status?: ModerationStatus;
 }
 
 /**

@@ -8,31 +8,92 @@ import { MealEditorStore } from '@components/marketplace/meal/editor/state/meal-
  *
  * Currently implemented:
  * - /meals            → marketplace home (to be built)
- * - /meals/:id        → meal detail page (exists)
- *
- * Planned:
- * - /meals/restaurants       → vendor list
- * - /meals/restaurant/:id    → vendor detail
  */
 export const MARKETPLACE_ROUTES: Routes = [
+  {
+    path: 'meals',
+    loadComponent: () =>
+        import('./marketplace-home/marketplace-home.page')
+          .then(m => m.MarketplaceHomePageComponent),
+    title: 'Chop ça! • Les meilleurs plats camerounais livrés chez vous'
+  },
+  {
+    path: 'meals/:id',
+    loadComponent: () =>
+      import('./meal-detail/meal-detail.page')
+        .then(m => m.MealDetailPageComponent),
+    title: 'Détail du plat • Chop ça!',
+  },
+];
+
+/**
+ * Administrator routes
+ */
+export const ADMIN_ROUTES: Routes = [
+  {
+      path: 'categories',
+      loadComponent: () =>
+        import('./categories/categories.page')
+          .then(m => m.CategoriesPageComponent),
+      title: 'Admin • Les categories de repas',
+  },
+  {
+      path: 'ingredients',
+      loadComponent: () =>
+        import('./ingredients/ingredients.page')
+          .then(m => m.IngredientsPageComponent),
+      title: 'Admin • Les ingredients de repas',
+  },
+  {
+    path: 'locations',
+    loadComponent: () =>
+      import('./locations/locations.page')
+        .then(m => m.LocationsPageComponent),
+    title: 'Admin • Les emplacements de distribution de repas',
+     data: { scope: 'admin' as const },
+  },
+  {
+    path: 'meals',
+    loadComponent: () =>
+      import('@components/pages/marketplace/meals/meals.page')
+        .then(m => m.MealsPageComponent),
+    data: { scope: 'admin' as const },
+  }
+];
+
+/**
+* Vendor workspace route
+* Planned:
+* - /meals/list       → vendor meals list
+* - /meals/edit/:id    → vendor meal edit detail
+*/
+export const VENDOR_ROUTES: Routes = [
+  {
+      path: 'locations',
+      loadComponent: () =>
+        import('./locations/locations.page')
+          .then(m => m.LocationsPageComponent),
+      title: 'Vendor • Vos emplacements de distribution de repas',
+      data: { scope: 'vendor' as const },
+  },
   {
     path: 'meals',
     children: [
       {
         path: '',
         loadComponent: () =>
-          import('./marketplace-home/marketplace-home.page')
-            .then(m => m.MarketplaceHomePageComponent),
-        title: 'Chop ça! • Les meilleurs plats camerounais livrés chez vous',
+        import('@components/pages/marketplace/meals/meals.page')
+          .then(m => m.MealsPageComponent),
+        data: { scope: 'vendor' as const },
+        title: 'Gérer les plats — Chop ça!',
       },
-
       {
-        path: 'edit',
+        path: 'new',
         loadComponent: () => import('./meal-editor/meal-editor.page')
-            .then(m => m.MealEditorPageComponent),
-        providers: [MealEditorStore],   // ← fresh instance per visit
-        title: 'Nouveau plat — Chop ça!',
-      },
+              .then(m => m.MealEditorPageComponent),
+          providers: [MealEditorStore],   // ← fresh instance per visit
+          title: 'Nouveau plat — Chop ça!',
+        },
       {
         path: 'edit/:id',
         loadComponent: () => import('./meal-editor/meal-editor.page')
@@ -47,6 +108,6 @@ export const MARKETPLACE_ROUTES: Routes = [
             .then(m => m.MealDetailPageComponent),
         title: 'Détail du plat • Chop ça!',
       },
-    ],
-  },
+    ]
+  }
 ];

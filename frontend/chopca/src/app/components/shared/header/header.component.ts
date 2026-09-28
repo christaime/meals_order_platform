@@ -12,7 +12,6 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 import { LogoComponent } from '@components/shared/logo/logo.component';
 import { BadgeComponent } from '@components/shared/badge/badge.component';
 import { Router } from '@angular/router';
-import { AuthIntentStore, AuthIntent } from '@core/storage/auth-intent';
 import { UserContextService } from '@core/services/auth';
 
 interface NavItem {
@@ -76,10 +75,10 @@ export class HeaderComponent {
     { label: 'Comment ça marche', route: '/comment-ca-marche', exact: false },
   ];
 
-  protected readonly labels = {
-    login: 'Se connecter',
-    vendor: 'Je Cook!',
-    customer: 'Je Chop!',
+  protected readonly links = {
+    login: {label : 'Se connecter', route:'/auth/login'},
+    vendor: {label : 'Je Cook!', route:'/vendor/dashboard'},
+    customer: {label : 'Je Chop!', route:'/customer/dashboard'},
   } as const;
 
   readonly languages: readonly ('FR' | 'EN')[] = ['FR', 'EN'];
@@ -91,10 +90,9 @@ export class HeaderComponent {
    * The login page (or the Keycloak redirect it triggers) reads the intent
    * on the way back and routes the user to the correct wizard.
    */
-  protected startRegistration(intent: AuthIntent): void {
-    AuthIntentStore.set(intent);
+  protected startRegistration(route: string): void {
     this.closeAllDropdowns();
-    void this.router.navigate(['/auth/login']);
+    void this.router.navigate([route]);
   }
   // ─── Actions ────────────────────────────────────────────
 

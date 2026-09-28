@@ -7,7 +7,9 @@ import {
   CreateVendorRequest,
   VendorDashboard,
   VendorStateChange,
+  VendorSearchRequest
 } from '@app/core/models/marketplace';
+import { SearchRequest, DataPage } from '@core/models/shared';
 
 export abstract class VendorService {
   abstract getVendors(): Observable<VendorSummary[]>;
@@ -18,6 +20,7 @@ export abstract class VendorService {
   abstract deleteVendor(id: string): Observable<void>;
   abstract getVendorDashboard(vendorId: string): Observable<VendorDashboard>;
   abstract getVendorStateHistory(vendorId: string): Observable<VendorStateChange[]>;
+  abstract searchVendors(request: VendorSearchRequest): Observable<DataPage<VendorSummary>>;
 }
 
 export const VENDOR_SERVICE = new InjectionToken<VendorService>('VendorService');

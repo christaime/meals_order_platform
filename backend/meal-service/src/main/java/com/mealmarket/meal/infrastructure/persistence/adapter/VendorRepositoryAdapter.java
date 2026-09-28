@@ -174,7 +174,6 @@ public class VendorRepositoryAdapter implements VendorRepository {
     // ═══════════════════════════════════════════════════════════
 
     private Vendor toFullDomain(VendorEntity entity) {
-        Vendor partial = mapper.toDomain(entity);
 
         // ✅ Query JPA repositories directly — no adapter dependency
         List<Category> categories = (entity.getCategoryIds() != null && !entity.getCategoryIds().isEmpty())
@@ -183,79 +182,38 @@ public class VendorRepositoryAdapter implements VendorRepository {
                 .collect(Collectors.toList())
                 : List.of();
 
-        List<DistributionLocation> locations = (entity.getDistributionLocationIds() != null
-                && !entity.getDistributionLocationIds().isEmpty())
-                ? locationJpaRepository.findByIdIn(entity.getDistributionLocationIds()).stream()
-                .map(locationMapper::toDomain)
-                .collect(Collectors.toList())
-                : List.of();
+        List<DistributionLocation> locations =
+                (entity.getDistributionLocationIds() != null
+                        && !entity.getDistributionLocationIds().isEmpty())
+                        ? locationJpaRepository.findByIdIn(entity.getDistributionLocationIds())
+                        .stream()
+                        .map(loc -> locationMapper.toDomain(loc, entity))
+                        .collect(Collectors.toList())
+                        : List.of();
 
-        // ⚠️ Note: the location entities loaded here only carry a vendorId (String),
-        // not a full Vendor object. Since the domain DistributionLocation requires
-        // a full Vendor and we're ALREADY building that vendor, we inject the
-        // current vendor into each location to complete the object.
-        Vendor vendor = Vendor.builder()
-                .id(partial.getId())
-                .userId(partial.getUserId())
-                .businessName(partial.getBusinessName())
-                .description(partial.getDescription())
-                .address(partial.getAddress())
-                .email(partial.getEmail())
-                .phone(partial.getPhone())
-                .ratingAvg(partial.getRatingAvg())
-                .totalRatings(partial.getTotalRatings())
-                .state(partial.getState())
-                .deliveryRadius(partial.getDeliveryRadius())
-                .pickupAddress(partial.getPickupAddress())
-                .profileImageStorageRef(partial.getProfileImageStorageRef())
-                .coverImageStorageRef(partial.getCoverImageStorageRef())
-                .idCardFrontStorageRef(partial.getIdCardFrontStorageRef())
-                .idCardBackStorageRef(partial.getIdCardBackStorageRef())
-                .categories(categories)
-                .distributionLocations(List.of()) // avoid deep recursion — set below
-                .createdAt(partial.getCreatedAt())
-                .updatedAt(partial.getUpdatedAt())
-                .build();
-
-        // Now rebuild the locations with the vendor reference
-        List<DistributionLocation> locationsWithVendor = locations.stream()
-                .map(loc -> DistributionLocation.builder()
-                        .id(loc.getId())
-                        .vendor(vendor)
-                        .name(loc.getName())
-                        .address(loc.getAddress())
-                        .phone(loc.getPhone())
-                        .latitude(loc.getLatitude())
-                        .longitude(loc.getLongitude())
-                        .deliveryRadius(loc.getDeliveryRadius())
-                        .moderationStatus(loc.getModerationStatus())
-                        .createdAt(loc.getCreatedAt())
-                        .updatedAt(loc.getUpdatedAt())
-                        .build())
-                .collect(Collectors.toList());
-
-        // Rebuild vendor with the fully-linked locations
+        // Build vendor with the fully-linked locations
         return Vendor.builder()
-                .id(vendor.getId())
-                .userId(vendor.getUserId())
-                .businessName(vendor.getBusinessName())
-                .description(vendor.getDescription())
-                .address(vendor.getAddress())
-                .email(vendor.getEmail())
-                .phone(vendor.getPhone())
-                .ratingAvg(vendor.getRatingAvg())
-                .totalRatings(vendor.getTotalRatings())
-                .state(vendor.getState())
-                .deliveryRadius(vendor.getDeliveryRadius())
-                .pickupAddress(vendor.getPickupAddress())
-                .profileImageStorageRef(vendor.getProfileImageStorageRef())
-                .coverImageStorageRef(vendor.getCoverImageStorageRef())
-                .idCardFrontStorageRef(vendor.getIdCardFrontStorageRef())
-                .idCardBackStorageRef(vendor.getIdCardBackStorageRef())
+                .id(entity.getId())
+                .userId(entity.getUserId())
+                .businessName(entity.getBusinessName())
+                .ownerName(entity.getOwnerName())
+                .description(entity.getDescription())
+                .address(entity.getAddress())
+                .email(entity.getEmail())
+                .phone(entity.getPhone())
+                .ratingAvg(entity.getRatingAvg())
+                .totalRatings(entity.getTotalRatings())
+                .state(mapper.buildState(entity))
+                .deliveryRadius(entity.getDeliveryRadius())
+                .pickupAddress(entity.getPickupAddress())
+                .profileImageStorageRef(entity.getProfileImageStorageRef())
+                .coverImageStorageRef(entity.getCoverImageStorageRef())
+                .idCardFrontStorageRef(entity.getIdCardFrontStorageRef())
+                .idCardBackStorageRef(entity.getIdCardBackStorageRef())
                 .categories(categories)
-                .distributionLocations(locationsWithVendor)
-                .createdAt(vendor.getCreatedAt())
-                .updatedAt(vendor.getUpdatedAt())
+                .distributionLocations(locations)
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

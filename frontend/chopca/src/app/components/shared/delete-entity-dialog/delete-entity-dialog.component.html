@@ -1,0 +1,51 @@
+<div class="p-space-lg max-w-md">
+  <div class="flex items-start gap-3">
+    <div class="w-10 h-10 rounded-full bg-error-container text-on-error-container
+                flex items-center justify-center shrink-0">
+      <app-icon name="warning" size="lg" />
+    </div>
+    <div class="flex-1">
+      <h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">
+        {{ copy.title }}
+      </h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+        {{ copy.body }} <strong>{{ data.name }}</strong>.
+        Si cet élément est utilisé, préférez le <strong>désactiver</strong>
+        plutôt que de le supprimer.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-space-md">
+    <label class="block font-label-md text-label-md text-on-surface font-semibold">
+      Motif (optionnel)
+    </label>
+    <textarea
+      [(ngModel)]="reason"
+      rows="2"
+      [placeholder]="placeholder()"
+      class="mt-1 w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
+             font-body-md text-body-md placeholder:text-outline
+             focus:outline-none focus:ring-2 focus:ring-primary resize-none">
+    </textarea>
+  </div>
+
+  <div class="mt-space-lg flex items-center justify-end gap-space-sm">
+    <button
+      type="button"
+      (click)="ref.close()"
+      class="px-space-md h-10 bg-surface-container hover:bg-surface-container-high
+             text-on-surface rounded-lg font-label-md text-label-md font-semibold">
+      Annuler
+    </button>
+    <button
+      type="button"
+      [disabled]="!reason.trim()"
+      (click)="ref.close({ reason: reason.trim() })"
+      class="px-space-md h-10 bg-error hover:bg-error/80 text-on-error rounded-lg
+             font-label-md text-label-md font-bold shadow-sm
+             disabled:opacity-60 disabled:cursor-not-allowed">
+      Supprimer
+    </button>
+  </div>
+</div>

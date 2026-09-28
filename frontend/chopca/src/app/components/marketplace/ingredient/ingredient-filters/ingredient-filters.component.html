@@ -1,0 +1,98 @@
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-space-sm items-center">
+
+    <!-- Search -->
+    <form
+      class="lg:col-span-5 flex items-stretch h-11 rounded-lg overflow-clip
+             bg-surface-container-low
+             focus-within:bg-surface-container-lowest
+             focus-within:ring-2 focus-within:ring-primary
+             transition-colors"
+      (submit)="onFormSubmit($event)">
+
+      <input
+        type="text"
+        name="ingredientSearch"
+        [value]="draft()"
+        (input)="onDraftInput($any($event.target).value)"
+        placeholder="Rechercher un ingrédient..."
+        autocomplete="off"
+        class="flex-1 min-w-0 h-full pl-space-md pr-space-sm bg-transparent border-0
+               text-on-surface font-body-md text-body-md placeholder:text-outline
+               focus:outline-none focus:ring-0" />
+
+      @if (draft()) {
+      <button
+        type="button"
+        (click)="clearSearch()"
+        title="Effacer"
+        aria-label="Effacer la recherche"
+        class="h-full px-2 text-outline hover:text-on-surface
+                 bg-transparent border-0 cursor-pointer
+                 flex items-center justify-center">
+        <app-icon name="cancel" size="sm" />
+      </button>
+      }
+
+      <button
+        type="submit"
+        title="Rechercher"
+        aria-label="Rechercher"
+        class="h-full w-11 shrink-0 bg-primary text-on-primary
+               hover:bg-primary-container transition-colors
+               flex items-center justify-center
+               border-0 cursor-pointer active:scale-95">
+        <app-icon name="search" size="md" />
+      </button>
+    </form>
+
+    <!-- Allergen -->
+    <div class="relative lg:col-span-2">
+      <select
+        [value]="isAllergen()"
+        (change)="onAllergenChange($event)"
+        class="w-full h-11 px-3 pr-8 bg-surface-container-low rounded-lg
+               font-label-md text-label-md text-on-surface appearance-none
+               focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+        @for (opt of allergenOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+      <app-icon name="expand_more" size="sm"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline" />
+    </div>
+
+    <!-- Status -->
+    <div class="relative lg:col-span-3">
+      <select
+        [value]="moderationStatus()"
+        (change)="onStatusChange($event)"
+        class="w-full h-11 px-3 pr-8 bg-surface-container-low rounded-lg
+               font-label-md text-label-md text-on-surface appearance-none
+               focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+        @for (opt of statusOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+      <app-icon name="expand_more" size="sm"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline" />
+    </div>
+
+    <!-- Sort -->
+    <div class="relative lg:col-span-2">
+      <select
+        [value]="sort()"
+        (change)="onSortChange($event)"
+        class="w-full h-11 px-3 pr-8 bg-surface-container-low rounded-lg
+               font-label-md text-label-md text-on-surface appearance-none
+               focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+        @for (opt of sortOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+      <app-icon name="unfold_more" size="sm"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline" />
+    </div>
+
+  </div>
+</div>

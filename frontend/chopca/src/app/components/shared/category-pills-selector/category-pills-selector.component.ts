@@ -7,7 +7,9 @@ import {
   computed,
   inject,
   OnInit,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { FormErrorComponent } from '@components/shared/form-error/form-error.component';
@@ -60,6 +62,7 @@ import { Category, CategoryType } from '@app/core/models/marketplace';
 export class CategoryPillsSelectorComponent implements OnInit {
 
   private readonly categoryService = inject(CATEGORY_SERVICE);
+  private readonly destroyRef = inject(DestroyRef);
 
   // ─── Required configuration ───────────────────────────────
   /** The type of categories to load and display. */
@@ -91,11 +94,11 @@ export class CategoryPillsSelectorComponent implements OnInit {
   /** Emits when the selection changes. */
   readonly selectionChange = output<string[]>();
   /**
-     * Emits the full selected `Category` objects whenever the
-     * selection changes. Convenient for consumers that need labels
-     * (e.g. a live preview panel) without a second lookup.
-     */
-    readonly categoriesSelected = output<Category[]>();
+   * Emits the full selected `Category` objects whenever the
+   * selection changes. Convenient for consumers that need labels
+   * (e.g. a live preview panel) without a second lookup.
+   */
+  readonly categoriesSelected = output<Category[]>();
 
   // ─── Internal state ───────────────────────────────────────
   protected readonly loading = signal<boolean>(true);
@@ -119,32 +122,35 @@ export class CategoryPillsSelectorComponent implements OnInit {
 
   // ─── Lifecycle ────────────────────────────────────────────
 
-    ngOnInit(): void {
-      this.selectedIds.set(this.control().value ?? []);
+  ngOnInit(): void {
+    this.selectedIds.set(this.control().value ?? []);
 
-      this.control().valueChanges.subscribe((value: string[] | null) => {
+    this.control().valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value: string[] | null) => {
         this.selectedIds.set(value ?? []);
       });
 
-      this.categoryService.searchCategories({
-        type: this.categoryType(),
-        size: 100,
-        sortBy: 'name',
-        sortDirection: 'ASC',
-      }).subscribe({
-        next: (page) => {
-          // Unwrap the DataPage
-          this.categories.set(page.content);
-          this.loading.set(false);
-          this.categoriesSelected.emit(this.resolveSelected(this.selectedIds()));
-        },
-        error: (err) => {
-          this.fetchError.set('Impossible de charger les catégories.');
-          this.loading.set(false);
-          console.error('[CategoryPillsSelector] fetch error', err);
-        },
-      });
-    }
+    this.categoryService.searchCategories({
+      type: this.categoryType(),
+      size: 100,
+      moderationStatus: 'APPROVED',
+      sortBy: 'name',
+      sortDirection: 'ASC',
+    }).subscribe({
+      next: (page) => {
+        // Unwrap the DataPage
+        this.categories.set(page.content);
+        this.loading.set(false);
+        this.categoriesSelected.emit(this.resolveSelected(this.selectedIds()));
+      },
+      error: (err) => {
+        this.fetchError.set('Impossible de charger les catégories.');
+        this.loading.set(false);
+        console.error('[CategoryPillsSelector] fetch error', err);
+      },
+    });
+  }
 
   // ─── Actions ──────────────────────────────────────────────
 

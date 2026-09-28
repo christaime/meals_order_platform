@@ -50,6 +50,7 @@ class VendorRepositoryAdapterIntegrationTest extends AbstractIntegrationTest {
         return Vendor.builder()
                 .userId(UUID.randomUUID())
                 .businessName(businessName)
+                .ownerName("owner")
                 .description("Description for " + businessName)
                 .address("123 Main Street, Yaoundé")
                 .email(email)

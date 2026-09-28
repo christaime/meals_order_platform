@@ -1,8 +1,14 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from '@components/layout';
+import { UserAccessDeniedPage } from '@components/pages/user-access-denied/user-access-denied.page';
+import { appGuard } from '@core/guards/app.guard';
 
 export const routes: Routes = [
-
+  // Access denied to a route or page
+  {
+    path: 'user-access-denied',
+    component: UserAccessDeniedPage
+  },
   // Auth routes (Wrapped in AuthLayoutComponent)
   {
     path: 'auth',
@@ -14,7 +20,7 @@ export const routes: Routes = [
       import('./components/pages/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
 
-  // Marketplace routes (Wrapped in MainLayoutComponent)
+  // Marketplace public routes (Wrapped in MainLayoutComponent)
   {
     path: '',
     component: MainLayoutComponent,
@@ -24,9 +30,21 @@ export const routes: Routes = [
       ),
   },
 
-  // Registration routes (Wrapped in AuthLayoutComponent)
+  // Marketplace admin routes (Wrapped in MainLayoutComponent)
     {
-      path: '',
+      path: 'admin',
+      canActivate: [appGuard],
+      component: MainLayoutComponent,
+      loadChildren: () =>
+        import('./components/pages/marketplace/marketplace.routes').then(
+          (m) => m.ADMIN_ROUTES
+        ),
+    },
+
+   // Registration routes (Wrapped in AuthLayoutComponent)
+    {
+      path: 'registration',
+      canActivate: [appGuard],
       loadComponent: () =>
             import('./components/layout/auth-layout/auth-layout.component').then(
               (m) => m.AuthLayoutComponent
@@ -36,6 +54,17 @@ export const routes: Routes = [
           (m) => m.REGISTRATION_ROUTES
         ),
     },
+
+    // Vendor routes (Wrapped in AuthLayoutComponent)
+    {
+       path: 'vendor',
+       canActivate: [appGuard],
+       component: MainLayoutComponent,
+       loadChildren: () =>
+         import('./components/pages/marketplace/marketplace.routes').then(
+           (m) => m.VENDOR_ROUTES
+         ),
+     },
 
   // Fallback
   { path: '**', redirectTo: 'meals' },

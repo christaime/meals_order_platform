@@ -4,13 +4,15 @@ import {
   signal,
   inject,
   OnInit,
+  DestroyRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-
+import { ToastService } from '@components/shared/toast/toast.service';
 import { MealCatalogViewComponent , QuickStatsPillsComponent,
-  DeliveryCoverageSectionComponent, FloatingCartSummaryComponent } from '@components/marketplace/meal/view';
+  DeliveryCoverageSectionComponent, FloatingCartSummaryComponent , FilterState} from '@components/marketplace/meal/view';
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
-import { MealSummary } from '@app/core/models/marketplace';
+import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
 
 /**
  * Marketplace home page — the public meal catalog.
@@ -41,6 +43,8 @@ export class MarketplaceHomePageComponent implements OnInit {
 
   private readonly mealService = inject(MEAL_SERVICE);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // ─── Meal catalog state ───────────────────────────────────
   readonly meals = signal<MealSummary[] | null>(null);
@@ -62,20 +66,13 @@ export class MarketplaceHomePageComponent implements OnInit {
   // ─── Data loading ─────────────────────────────────────────
 
   private loadMeals(): void {
-    this.isLoading.set(true);
-    this.mealService.getMeals().subscribe({
-      next: (meals) => {
-        this.meals.set(meals);
-        this.totalMeals.set(meals.length);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('[MarketplaceHomePage] meals fetch error', err);
-        this.meals.set([]);
-        this.totalMeals.set(0);
-        this.isLoading.set(false);
-      },
-    });
+    this.load({
+              moderationStatus: 'APPROVED',
+              page: 0,
+              size: this.pageSize(),
+              sortBy: "name",
+              sortDirection: 'ASC'
+              });
   }
 
   // ─── Event handlers ───────────────────────────────────────
@@ -85,10 +82,43 @@ export class MarketplaceHomePageComponent implements OnInit {
     subCategory: string;
     sort: string;
     page: number;
-    filters: unknown;
+    filters: FilterState;
   }): void {
     // TODO: pass filters to the backend search endpoint
     console.log('[MarketplaceHomePage] filter change', state);
+    this.load({
+      moderationStatus: 'APPROVED',
+      page: state.page,
+      size: this.pageSize(),
+      sortBy: state.sort,
+      sortDirection: 'ASC',
+      ...(state.query ? { keyword:state.query } : {}),
+      ...(state.subCategory ? { cuisineIds:[state.subCategory] , dishTypeIds:[state.subCategory] } : {}),
+      ...(state.filters && state.filters.maxPrice ? { maxPrice:state.filters.maxPrice } : {}),
+     // ...(state.filters && state.filters.maxPrepTime ? { maxPrepTime:state.filters.maxPrepTime } : {}),
+     // ...(state.filters && state.filters.availableOnly ? { availableOnly:state.filters.availableOnly } : {}),
+      ...(state.filters && state.filters.minRating ? { minRating:state.filters.minRating } : {}),
+      ...(state.filters && state.filters.maxPrice ? { maxPrice:state.filters.maxPrice } : {}),
+      });
+
+  }
+
+  private load(q: MealSearchRequest): void {
+    this.isLoading.set(true);
+    this.mealService.search(q)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: page => {
+          this.meals.set(page.content);
+          this.totalMeals.set(page.totalElements);
+          this.isLoading.set(false);
+        },
+        error: err => {
+          this.isLoading.set(false);
+          this.toast.show('Échec du chargement des catégories', 'error');
+          console.error(err);
+        },
+      });
   }
 
   onAddToCart(meal: MealSummary): void {

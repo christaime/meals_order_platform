@@ -10,7 +10,7 @@ import {
 import { DataPage } from '@app/core/models/shared';
 import { MealService } from './meal.service';
 import { environment } from '@environments/environment';
-
+import { RoleContext } from '@app/core/services/auth/role-context.service';
 /**
  * Real implementation of MealService.
  * Talks to the backend's meal API through the Gateway.
@@ -19,9 +19,13 @@ import { environment } from '@environments/environment';
 export class MealApiService implements MealService {
 
   private http = inject(HttpClient);
+  private readonly roleContext = inject(RoleContext);
 
   /** Public meal browsing endpoints. */
   private readonly publicUrl = `${environment.apiUrl}/public/meals`;
+
+  /** Vendor meal browsing endpoints. */
+  private readonly vendorUrl = `${environment.apiUrl}/vendor/meals`;
 
   /** Admin / vendor management endpoints. */
   private readonly adminUrl = `${environment.apiUrl}/admin/meals`;
@@ -49,7 +53,7 @@ export class MealApiService implements MealService {
 
   search(request: MealSearchRequest): Observable<DataPage<MealSummary>> {
     const params = this.buildSearchParams(request);
-    return this.http.get<DataPage<MealSummary>>(this.publicUrl, { params });
+    return this.http.get<DataPage<MealSummary>>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}`, { params });
   }
 
   getMealById(id: string): Observable<Meal> {
@@ -59,15 +63,15 @@ export class MealApiService implements MealService {
   // ─── Writes ───────────────────────────────────────────────
 
   createMeal(request: MealRequest): Observable<Meal> {
-    return this.http.post<Meal>(this.adminUrl, request);
+    return this.http.post<Meal>(this.vendorUrl, request);
   }
 
   updateMeal(id: string, request: Partial<MealRequest>): Observable<Meal> {
-    return this.http.patch<Meal>(`${this.adminUrl}/${id}`, request);
+    return this.http.put<Meal>(`${this.vendorUrl}/${id}`, request);
   }
 
   deleteMeal(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.adminUrl}/${id}`);
+    return this.http.delete<void>(`${this.vendorUrl}/${id}`);
   }
 
   // ─── Helpers ──────────────────────────────────────────────

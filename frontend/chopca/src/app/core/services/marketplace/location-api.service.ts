@@ -9,7 +9,7 @@ import {
 } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
 import { LocationService } from './location.service';
-import { RoleContext } from '@app/core/services/role-context.service';
+import { RoleContext } from '@app/core/services/auth/role-context.service';
 import { environment } from '@environments/environment';
 
 /**

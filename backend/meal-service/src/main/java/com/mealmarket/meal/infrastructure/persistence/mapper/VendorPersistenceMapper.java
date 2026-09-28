@@ -56,6 +56,33 @@ public interface VendorPersistenceMapper {
     @Mapping(target = "distributionLocations", ignore = true)
     Vendor toDomain(VendorEntity entity);
 
+    /**
+     * Minimal vendor mapper — used for relationship assembly when a domain
+     * object references a Vendor but does not need its full aggregate
+     * (categories, locations, ...).
+     *
+     * Populates only the fields required by {@link Vendor}'s own validation.
+     * Everything else is explicitly ignored so MapStruct doesn't try to
+     * recursively map associations.
+     */
+    @Named("toMinimalDomain")
+    @Mapping(target = "description",              ignore = true)
+    @Mapping(target = "ratingAvg",                ignore = true)
+    @Mapping(target = "totalRatings",             ignore = true)
+    @Mapping(target = "deliveryRadius",           ignore = true)
+    @Mapping(target = "pickupAddress",            ignore = true)
+    @Mapping(target = "profileImageStorageRef",   ignore = true)
+    @Mapping(target = "coverImageStorageRef",     ignore = true)
+    @Mapping(target = "idCardFrontStorageRef",    ignore = true)
+    @Mapping(target = "idCardBackStorageRef",     ignore = true)
+    @Mapping(target = "categories",               ignore = true)
+    @Mapping(target = "distributionLocations",    ignore = true)
+    @Mapping(target = "createdAt",                ignore = true)
+    @Mapping(target = "updatedAt",                ignore = true)
+    @Mapping(target = "state", source = ".", qualifiedByName = "buildState")
+    @Mapping(target = "subscriptionTier",         defaultValue = "FREE")
+    Vendor toMinimalDomain(VendorEntity entity);
+
     // ═══════════════════════════════════════════════════════════
     //  Helpers
     // ═══════════════════════════════════════════════════════════

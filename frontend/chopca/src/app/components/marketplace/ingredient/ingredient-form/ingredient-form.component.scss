@@ -1,0 +1,15 @@
+:host {
+  display: block;
+
+  input,
+  textarea,
+  select {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .grid > * {
+    min-width: 0;
+  }
+}

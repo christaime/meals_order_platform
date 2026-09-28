@@ -107,6 +107,48 @@ public class IngredientController {
         return createIngredient(request, UserType.VENDOR);
     }
 
+    @GetMapping("/vendor/ingredients")
+    @PreAuthorize("hasRole('VENDOR')")
+    @Operation(
+            summary = "Search approved ingredients (public)",
+            description = """
+            Returns only APPROVED ingredients.
+            Used by vendors when creating/editing meals, and by customers
+            browsing meal details. Returns summaries for lightweight payloads.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of approved ingredients")
+    })
+    public ResponseEntity<DataPage<IngredientSummaryResponse>> searchVendorIngredients(
+            @Parameter(description = "Keyword search in name")
+            @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "Filter by allergen flag")
+            @RequestParam(required = false) Boolean isAllergen,
+
+            @Parameter(description = "Page number (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "Page size")
+            @RequestParam(defaultValue = "20") int size,
+
+            @Parameter(description = "Sort field")
+            @RequestParam(defaultValue = "name") String sortBy,
+
+            @Parameter(description = "Sort direction (ASC or DESC)")
+            @RequestParam(defaultValue = "ASC") Sort.Direction sortDirection
+    ) {
+        var request = com.mealmarket.meal.domain.repository.criteria.IngredientSearchRequest.builder()
+                .keyword(keyword)
+                .isAllergen(isAllergen)
+                .createdById(this.currentUser.getUserId()) //
+                .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
+                .page(page, size)
+                .build();
+
+        return ResponseEntity.ok(ingredientService.searchApprovedIngredients(request));
+    }
     // ═══════════════════════════════════════════════════════════
     //  ADMIN — Read (any status)
     // ═══════════════════════════════════════════════════════════
