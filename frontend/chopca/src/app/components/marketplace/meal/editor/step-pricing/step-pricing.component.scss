@@ -1,3 +1,25 @@
 :host {
   display: block;
+  width: 100%;
+  min-width: 0;
+
+  input, textarea, select {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Kill any focus outline on the chip input — the container owns the ring */
+:host input.chip-input {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+
+  &:focus,
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
 }

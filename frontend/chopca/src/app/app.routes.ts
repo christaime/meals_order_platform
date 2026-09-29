@@ -12,10 +12,7 @@ export const routes: Routes = [
   // Auth routes (Wrapped in AuthLayoutComponent)
   {
     path: 'auth',
-    loadComponent: () =>
-      import('./components/layout/auth-layout/auth-layout.component').then(
-        (m) => m.AuthLayoutComponent
-      ),
+    component: MainLayoutComponent,
     loadChildren: () =>
       import('./components/pages/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
@@ -34,7 +31,10 @@ export const routes: Routes = [
     {
       path: 'admin',
       canActivate: [appGuard],
-      component: MainLayoutComponent,
+      loadComponent: () =>
+            import('./components/layout/auth-layout/auth-layout.component').then(
+              (m) => m.AuthLayoutComponent
+            ),
       loadChildren: () =>
         import('./components/pages/marketplace/marketplace.routes').then(
           (m) => m.ADMIN_ROUTES
@@ -59,7 +59,10 @@ export const routes: Routes = [
     {
        path: 'vendor',
        canActivate: [appGuard],
-       component: MainLayoutComponent,
+       loadComponent: () =>
+             import('./components/layout/auth-layout/auth-layout.component').then(
+               (m) => m.AuthLayoutComponent
+             ),
        loadChildren: () =>
          import('./components/pages/marketplace/marketplace.routes').then(
            (m) => m.VENDOR_ROUTES

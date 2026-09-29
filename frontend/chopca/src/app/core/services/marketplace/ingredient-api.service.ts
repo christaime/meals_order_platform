@@ -11,7 +11,7 @@ import { DataPage } from '@app/core/models/shared';
 import { IngredientService } from './ingredient.service';
 import { RoleContext } from '@app/core/services/auth/role-context.service';
 import { environment } from '@environments/environment';
-
+import { WorkspaceService } from './workspace.service';
 /**
  * Real implementation of IngredientService.
  * Talks to the backend's ingredient API through the Gateway.
@@ -24,6 +24,7 @@ export class IngredientApiService implements IngredientService {
 
   private http = inject(HttpClient);
   private readonly roleContext = inject(RoleContext);
+  private readonly workspace = inject(WorkspaceService);
 
   private readonly publicUrl = `${environment.apiUrl}/public/ingredients`;
   private readonly adminUrl  = `${environment.apiUrl}/admin/ingredients`;
@@ -47,7 +48,7 @@ export class IngredientApiService implements IngredientService {
     request: IngredientSearchRequest
   ): Observable<DataPage<IngredientSummary>> {
     const params = this.buildSearchParams(request);
-    return this.http.get<DataPage<IngredientSummary>>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}`, { params });
+    return this.http.get<DataPage<IngredientSummary>>(`${this.getReadBaseUrl()}`, { params });
   }
 
   searchIngredientsFlat(request: {
@@ -62,7 +63,7 @@ export class IngredientApiService implements IngredientService {
     });
 
     return this.http
-      .get<DataPage<IngredientSummary>>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}`, { params })
+      .get<DataPage<IngredientSummary>>(`${this.getReadBaseUrl()}`, { params })
       .pipe(map(page => page.content));
   }
 
@@ -78,30 +79,34 @@ export class IngredientApiService implements IngredientService {
   }
 
   getIngredientById(id: string): Observable<Ingredient> {
-    return this.http.get<Ingredient>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}/${id}`);
+    return this.http.get<Ingredient>(`${this.getReadBaseUrl()}/${id}`);
   }
 
   // ─── Writes ───────────────────────────────────────────────
 
   createIngredient(request: IngredientRequest): Observable<Ingredient> {
-    return this.http.post<Ingredient>(`${this.roleContext.isAdmin() ? this.adminUrl : this.vendorUrl }`, request);
+    return this.http.post<Ingredient>(`${this.getWriteBaseUrl()}`, request);
   }
 
   updateIngredient(
     id: string,
     request: Partial<IngredientRequest>
   ): Observable<Ingredient> {
-    return this.http.put<Ingredient>(`${this.roleContext.isAdmin() ? this.adminUrl : this.vendorUrl }/${id}`, request);
+    return this.http.put<Ingredient>(`${this.getWriteBaseUrl() }/${id}`, request);
   }
 
   deleteIngredient(id: string): Observable<void> {
-    return this.http.delete<void>(`${environment.apiUrl}/admin/ingredients/${id}`);
+    return this.http.delete<void>(`${this.getWriteBaseUrl()}/ingredients/${id}`);
   }
 
   // ─── Helpers ──────────────────────────────────────────────
 
   private getReadBaseUrl(): string {
-    return this.roleContext.isAdmin() ? this.adminUrl : this.publicUrl;
+    return this.workspace.isAdminWorkspace() && this.roleContext.isAdmin() ? this.adminUrl : (this.workspace.isVendorWorkspace() && this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl);
+  }
+
+  private getWriteBaseUrl(): string {
+      return this.workspace.isAdminWorkspace() && this.roleContext.isAdmin() ? this.adminUrl : this.vendorUrl ;
   }
 
   private buildSearchParams(request: IngredientSearchRequest): HttpParams {

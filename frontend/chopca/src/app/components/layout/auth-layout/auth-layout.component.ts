@@ -14,17 +14,6 @@ import { AuthFooterComponent } from './auth-footer/auth-footer.component';
  * The header is fixed (64px tall), so `<main>` gets `pt-16` to match.
  * This is the single place that padding lives.
  *
- * Used via the router with a layout route:
- *
- *   {
- *     path: '',
- *     component: AuthLayoutComponent,
- *     children: [
- *       { path: 'connexion-vendeur', component: VendorLoginPageComponent },
- *       { path: 'inscription-vendeur', component: VendorRegisterPageComponent },
- *     ],
- *   }
- *
  * Note: This is the only component in the project using inline
  * template + styles. Kept as a single file because the template is
  * tiny and has no meaningful styling.

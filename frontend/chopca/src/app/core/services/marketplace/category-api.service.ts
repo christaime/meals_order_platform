@@ -10,7 +10,7 @@ import { DataPage } from '@app/core/models/shared';
 import { CategoryService } from './category.service';
 import { environment } from '@environments/environment';
 import { RoleContext } from '@app/core/services/auth/role-context.service';
-
+import { WorkspaceService } from './workspace.service';
 /**
  * Real implementation of CategoryService.
  * Talks to the backend's category API through the Gateway.
@@ -21,6 +21,7 @@ export class CategoryApiService implements CategoryService {
   private http = inject(HttpClient);
 
   private readonly roleContext = inject(RoleContext);
+  private readonly workspace = inject(WorkspaceService);
 
   /** Public read endpoints (no auth). */
   private readonly publicUrl = `${environment.apiUrl}/public/categories`;
@@ -34,7 +35,7 @@ export class CategoryApiService implements CategoryService {
     // Public endpoint returns a DataPage — we unwrap to a flat array
     return new Observable<Category[]>(subscriber => {
       const params = new HttpParams().set('size', '200');
-      this.http.get<DataPage<Category>>(`${this.roleContext.isAdmin() ? this.adminUrl : this.publicUrl}`, { params }).subscribe({
+      this.http.get<DataPage<Category>>(`${this.workspace.isAdminWorkspace() && this.roleContext.isAdmin() ? this.adminUrl : this.publicUrl}`, { params }).subscribe({
         next: (page) => {
           subscriber.next(page.content);
           subscriber.complete();
@@ -50,7 +51,7 @@ export class CategoryApiService implements CategoryService {
     const params = this.buildSearchParams(request);
 
     console.log("searchCategories",{params});
-    return this.http.get<DataPage<Category>>(`${this.roleContext.isAdmin() ? this.adminUrl : this.publicUrl}`, { params });
+    return this.http.get<DataPage<Category>>(`${this.workspace.isAdminWorkspace() && this.roleContext.isAdmin() ? this.adminUrl : this.publicUrl}`, { params });
   }
 
   getCategoryById(id: string): Observable<Category> {

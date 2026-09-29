@@ -11,6 +11,7 @@ import { DataPage } from '@app/core/models/shared';
 import { MealService } from './meal.service';
 import { environment } from '@environments/environment';
 import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { WorkspaceService } from './workspace.service';
 /**
  * Real implementation of MealService.
  * Talks to the backend's meal API through the Gateway.
@@ -20,6 +21,7 @@ export class MealApiService implements MealService {
 
   private http = inject(HttpClient);
   private readonly roleContext = inject(RoleContext);
+  private readonly workspace = inject(WorkspaceService);
 
   /** Public meal browsing endpoints. */
   private readonly publicUrl = `${environment.apiUrl}/public/meals`;
@@ -36,7 +38,7 @@ export class MealApiService implements MealService {
     // Fallback: fetch a large page and return just the content
     const params = new HttpParams().set('size', '200');
     return new Observable<MealSummary[]>(subscriber => {
-      this.http.get<DataPage<MealSummary>>(this.publicUrl, { params }).subscribe({
+      this.http.get<DataPage<MealSummary>>(this.getReadBaseUrl(), { params }).subscribe({
         next: (page) => {
           subscriber.next(page.content);
           subscriber.complete();
@@ -48,16 +50,16 @@ export class MealApiService implements MealService {
 
   getMealsByIds(ids: string[]): Observable<MealSummary[]> {
     const params = new HttpParams().set('ids', ids.join(','));
-    return this.http.get<MealSummary[]>(this.publicUrl, { params });
+    return this.http.get<MealSummary[]>(this.getReadBaseUrl(), { params });
   }
 
   search(request: MealSearchRequest): Observable<DataPage<MealSummary>> {
     const params = this.buildSearchParams(request);
-    return this.http.get<DataPage<MealSummary>>(`${this.roleContext.isAdmin() ? this.adminUrl : (this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl)}`, { params });
+    return this.http.get<DataPage<MealSummary>>(this.getReadBaseUrl(), { params });
   }
 
   getMealById(id: string): Observable<Meal> {
-    return this.http.get<Meal>(`${this.publicUrl}/${id}`);
+    return this.http.get<Meal>(`${this.getReadBaseUrl()}/${id}`);
   }
 
   // ─── Writes ───────────────────────────────────────────────
@@ -75,6 +77,9 @@ export class MealApiService implements MealService {
   }
 
   // ─── Helpers ──────────────────────────────────────────────
+  private getReadBaseUrl(): string {
+      return this.workspace.isAdminWorkspace() && this.roleContext.isAdmin() ? this.adminUrl : (this.workspace.isVendorWorkspace() && this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl);
+  }
 
   /**
    * Maps a `MealSearchRequest` to HTTP query params, matching

@@ -64,12 +64,12 @@
     <div class="lg:col-span-5 xl:col-span-4 sticky top-24 z-10 min-w-0
                 flex flex-col gap-space-md"
          id="ingredient-form-container">
-
+      <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
       <app-ingredient-form
         [ingredient]="editing()"
         (saved)="onSaved($event)"
         (cancelled)="onCancelEdit()" />
-
+      </div>
       @if (moderableIngredient(); as ing) {
       <app-moderation-panel
         targetType="INGREDIENT"

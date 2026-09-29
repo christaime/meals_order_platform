@@ -49,6 +49,7 @@ public class UserManagementService {
         UserContextDto.VendorContext vendor = vendorRepository.findByUserId(userId)
                 .map(v -> new UserContextDto.VendorContext(
                         v.getId(),
+                        v.getEmail(),
                         v.getBusinessName(),
                         v.getStatus().name(),
                         mediaUrlResolver.toUrl(v.getProfileImageStorageRef()),
@@ -58,6 +59,7 @@ public class UserManagementService {
        /* UserContextDto.CustomerContext customer = customerRepository.findByUserId(userId)
                 .map(c -> new UserContextDto.CustomerContext(
                         c.getId(),
+                        v.getEmail(),
                         c.getDisplayName(),
                         c.getStatus().name()))
                 .orElse(null);
@@ -65,11 +67,12 @@ public class UserManagementService {
         UserContextDto.AdminContext admin = adminRepository.findByUserId(userId)
                 .map(a -> new UserContextDto.AdminContext(
                         a.getId(),
+                        v.getEmail(),
                         a.getDisplayName(),
                         a.getStatus().name()))
                 .orElse(null);*/
-
-        return new UserContextDto(keycloakId, vendor, null, null);
+        String email = vendor != null ? vendor.email() : "";
+        return new UserContextDto(keycloakId, email, vendor, null, null);
     }
 
     // ---------------------------------------------------------------------

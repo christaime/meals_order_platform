@@ -1,15 +1,15 @@
 <div class="flex flex-col gap-6">
 
-  <!-- ═════════ Prep time (slider) ═════════ -->
+  <!-- ═════════ Prep time (Material slider — unchanged) ═════════ -->
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
-      <label class="text-xs font-semibold text-gray-700">
+      <label class="text-xs font-semibold text-on-surface">
         Temps de préparation
-        <span class="text-red-500 ml-0.5">*</span>
+        <span class="text-error ml-0.5">*</span>
       </label>
       <span class="text-sm font-bold text-primary">
-      {{ formatPrepTime(prepTimeMinutes.value) }}
-    </span>
+        {{ formatPrepTime(prepTimeMinutes.value) }}
+      </span>
     </div>
 
     <mat-slider
@@ -22,7 +22,7 @@
       <input matSliderThumb [formControl]="prepTimeMinutes" />
     </mat-slider>
 
-    <div class="flex items-center justify-between text-[11px] text-gray-500">
+    <div class="flex items-center justify-between text-[11px] text-on-surface-variant">
       <span>0h</span>
       <span>2h</span>
       <span>4h</span>
@@ -31,74 +31,118 @@
     </div>
 
     @if (prepTimeError()) {
-    <span class="text-xs text-red-600">{{ prepTimeError() }}</span>
+    <span class="text-xs text-error">{{ prepTimeError() }}</span>
     }
   </div>
 
-  <!-- ═════════ Ingredients (chips + autocomplete + create) ═════════ -->
+  <!-- ═════════ Ingredients (plain chip input + custom dropdown) ═════════ -->
   <div class="flex flex-col gap-1">
-    <label class="text-xs font-semibold text-gray-700">
+    <label class="text-xs font-semibold text-on-surface">
       Ingrédients
     </label>
 
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-chip-grid #ingredientGrid aria-label="Ingrédients sélectionnés">
-        @for (i of selectedIngredients(); track i.id) {
-        <mat-chip-row (removed)="removeIngredient(i)">
-          {{ i.name }}
-          @if (i.isAllergen) {
-          <mat-icon matChipTrailingIcon class="!text-amber-600">warning</mat-icon>
-          }
-          <button matChipRemove aria-label="Retirer">
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip-row>
+    <!-- Chip container: looks like our other inputs; focus ring via :focus-within -->
+    <div
+      class="relative w-full rounded-lg border border-outline-variant bg-surface-container-low
+             px-2 py-1.5 min-h-[44px]
+             flex flex-wrap items-center gap-1.5
+             transition-shadow
+             focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+
+      <!-- Selected chips -->
+      @for (ing of selectedIngredients(); track ing.id) {
+      <span
+        class="inline-flex items-center gap-1.5
+               px-2.5 py-1 rounded-full
+               bg-surface-container text-on-surface
+               font-label text-xs font-semibold">
+        @if (ing.isAllergen) {
+        <app-icon name="warning" size="sm" class="text-tertiary" />
         }
-
-        <input
-          matInput
-          placeholder="Rechercher ou ajouter…"
-          [matChipInputFor]="ingredientGrid"
-          [matAutocomplete]="ingredientAuto"
-          (input)="onIngredientFilterInput($event)" />
-      </mat-chip-grid>
-
-      <mat-autocomplete
-        #ingredientAuto="matAutocomplete"
-        (optionSelected)="addIngredient($event.option.value)">
-        @for (i of filteredResults(); track i.id) {
-        <mat-option [value]="i">
-            <span class="flex items-center gap-2">
-              <span>{{ i.name }}</span>
-              @if (i.isAllergen) {
-                <span class="text-[10px] font-semibold px-1.5 py-0.5
-                             rounded bg-amber-100 text-amber-800">
-                  Allergène
-                </span>
-              }
-            </span>
-        </mat-option>
-        }
-      </mat-autocomplete>
-
-      @if (ingredientError()) {
-      <mat-error>{{ ingredientError() }}</mat-error>
+        <span>{{ ing.name }}</span>
+        <button
+          type="button"
+          (click)="removeIngredient(ing)"
+          aria-label="Retirer"
+          class="border-0 bg-transparent p-0 cursor-pointer
+                 text-on-surface-variant hover:text-error transition-colors">
+          <app-icon name="close" size="sm" />
+        </button>
+      </span>
       }
-      <mat-hint>Tapez au moins 2 caractères pour rechercher.</mat-hint>
-    </mat-form-field>
+
+      <!-- Input -->
+      <input
+        #ingredientInput
+        type="text"
+        [value]="ingredientFilter()"
+        (input)="onIngredientInput($event)"
+        (keydown)="onInputKeydown($event)"
+        (focus)="filteredResults().length > 0 && dropdownOpen.set(true)"
+        placeholder="Rechercher ou ajouter…"
+        autocomplete="off"
+        class="chip-input flex-1 min-w-[120px] h-8 px-1 bg-transparent border-0
+         outline-none focus:outline-none focus-visible:outline-none
+         ring-0 focus:ring-0 focus-visible:ring-0
+         shadow-none focus:shadow-none focus-visible:shadow-none
+         font-body-md text-sm text-on-surface placeholder:text-outline" />
+    </div>
+
+    <!-- Custom dropdown -->
+    @if (showDropdown()) {
+    <div
+      class="relative z-20"
+      role="listbox">
+      <ul
+        class="absolute left-0 right-0 mt-1 max-h-64 overflow-y-auto
+               rounded-lg border border-outline-variant bg-surface-container-lowest
+               shadow-lg py-1">
+        @for (ing of filteredResults(); track ing.id; let i = $index) {
+        <li
+          role="option"
+          [attr.aria-selected]="i === highlightIndex()"
+          (mouseenter)="highlightIndex.set(i)"
+          (click)="addIngredient(ing)"
+          class="flex items-center justify-between gap-2
+                 px-3 py-2 cursor-pointer
+                 font-body-md text-sm text-on-surface
+                 transition-colors"
+          [class.bg-surface-container]="i === highlightIndex()">
+          <span>{{ ing.name }}</span>
+          @if (ing.isAllergen) {
+          <span class="text-[10px] font-semibold px-1.5 py-0.5
+                       rounded bg-tertiary-fixed text-on-tertiary-fixed">
+            Allergène
+          </span>
+          }
+        </li>
+        }
+      </ul>
+    </div>
+    }
 
     <!-- Create new ingredient -->
     @if (showCreateHint()) {
     <button
       type="button"
-      mat-stroked-button
-      color="primary"
-      class="self-start"
-      (click)="openCreateIngredientDialog()">
-      <mat-icon>add</mat-icon>
+      (click)="openCreateIngredientDialog()"
+      class="self-start mt-1 inline-flex items-center gap-1.5
+             px-3 py-2 rounded-lg
+             border border-primary text-primary
+             bg-transparent hover:bg-primary-fixed/40
+             font-label-md text-xs font-semibold
+             transition-colors cursor-pointer">
+      <app-icon name="add" size="sm" />
       Créer « {{ ingredientFilter() }} »
     </button>
     }
+
+    @if (ingredientError()) {
+    <p class="text-xs text-error mt-1">{{ ingredientError() }}</p>
+    }
+    <p class="text-[11px] text-on-surface-variant mt-0.5">
+      Tapez au moins 2 caractères pour rechercher.
+    </p>
   </div>
 
 </div>

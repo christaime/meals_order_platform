@@ -11,7 +11,7 @@ import { DataPage } from '@app/core/models/shared';
 import { LocationService } from './location.service';
 import { RoleContext } from '@app/core/services/auth/role-context.service';
 import { environment } from '@environments/environment';
-
+import { WorkspaceService } from './workspace.service';
 /**
  * Real implementation of LocationService.
  *
@@ -24,6 +24,7 @@ export class LocationApiService implements LocationService {
 
   private http = inject(HttpClient);
   private readonly roleContext = inject(RoleContext);
+  private readonly workspace = inject(WorkspaceService);
 
   private readonly publicUrl = `${environment.apiUrl}/public/locations`;
   private readonly adminUrl  = `${environment.apiUrl}/admin/locations`;
@@ -108,9 +109,7 @@ export class LocationApiService implements LocationService {
   // ─── Helpers ──────────────────────────────────────────────
 
   private getReadBaseUrl(): string {
-    if (this.roleContext.isAdmin()) return this.adminUrl;
-    if (this.roleContext.isVendor()) return this.vendorUrl;
-    return this.publicUrl;
+    return this.workspace.isAdminWorkspace() && this.roleContext.isAdmin() ? this.adminUrl : (this.workspace.isVendorWorkspace() && this.roleContext.isVendor() ? this.vendorUrl : this.publicUrl);
   }
 
   private buildSearchParams(request: LocationSearchRequest): HttpParams {

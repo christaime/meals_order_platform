@@ -4,30 +4,33 @@ import {
   signal,
   computed,
   inject,
-  HostListener
+  HostListener,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { LogoComponent } from '@components/shared/logo/logo.component';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
+import { WorkspaceService } from '@app/core/services/marketplace/workspace.service';
 import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { UserContextService } from '@app/core/services/auth/user-context.service';
 import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.models';
+import { KeycloakService } from '@app/core/services/auth'
 
 /**
- * Application header — used by all authenticated areas (vendor, admin, customer)
- * and by anonymous pages when needed.
+ * Application header — used by authenticated areas.
  *
- * Responsibilities:
- * - Logo + contextual portal badge
- * - Role-based navigation (menu changes with the user's role)
- * - Language selector (FR / EN)
- * - Notifications bell
- * - Profile dropdown (when authenticated)
- * - Anonymous CTAs (when not authenticated)
+ * Menu and workspace badge follow the current route namespace
+ * (WorkspaceService), so a user who is both admin and vendor sees the
+ * vendor menu while browsing `/vendor/*` and the admin menu while browsing
+ * `/admin/*`.
  *
- * The header internally resolves the correct menu from the user's role.
- * No `menu` input needed — parents just render `<app-auth-header />`.
+ * The profile dropdown links are role-scoped (RoleContext), so a
+ * multi-role user always sees all their role-specific shortcuts
+ * regardless of which workspace they are currently browsing.
+ *
+ * Anonymous CTAs are intentionally absent — this header is only mounted
+ * in authenticated layouts.
  */
 @Component({
   selector: 'app-auth-header',
@@ -36,7 +39,7 @@ import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.model
     RouterLink,
     RouterLinkActive,
     LogoComponent,
-    IconComponent
+    IconComponent,
   ],
   templateUrl: './auth-header.component.html',
   styleUrl: './auth-header.component.scss',
@@ -44,7 +47,21 @@ import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.model
 })
 export class AuthHeaderComponent {
 
+  private readonly workspaceService = inject(WorkspaceService);
   private readonly roleContext = inject(RoleContext);
+  private readonly userContext = inject(UserContextService);
+  private readonly keycloakService = inject(KeycloakService);
+
+  // ─── Workspace (menu + badge) ─────────────────────────────
+  readonly workspace = this.workspaceService.workspace;
+  readonly isAdminWorkspace = this.workspaceService.isAdminWorkspace;
+  readonly isVendorWorkspace = this.workspaceService.isVendorWorkspace;
+  readonly isCustomerWorkspace = this.workspaceService.isCustomerWorkspace;
+
+  // ─── Roles (profile dropdown links) ───────────────────────
+  readonly isVendor = this.roleContext.isVendor;
+  readonly isAdmin = this.roleContext.isAdmin;
+  readonly isCustomer = this.roleContext.isCustomer;
 
   // ─── UI state ─────────────────────────────────────────────
   readonly languageOpen = signal<boolean>(false);
@@ -53,48 +70,68 @@ export class AuthHeaderComponent {
 
   readonly currentLanguage = signal<'FR' | 'EN'>('FR');
 
-  // ─── Derived from role ────────────────────────────────────
-  readonly isAuthenticated = this.roleContext.isAuthenticated;
-  readonly isVendor = this.roleContext.isVendor;
-  readonly isAdmin = this.roleContext.isAdmin;
-  readonly isCustomer = this.roleContext.isCustomer;
-
-  /**
-   * The active nav menu, resolved from the current user's role.
-   * Anonymous users get an empty menu.
-   */
+  // ─── Menu by workspace ────────────────────────────────────
   readonly menu = computed<readonly NavItem[]>(() => {
-    if (this.roleContext.isAdmin()) return ADMIN_MENU;
-    if (this.roleContext.isVendor()) return VENDOR_MENU;
-    if (this.roleContext.isCustomer()) return CUSTOMER_MENU;
+    if (this.isAdminWorkspace())    return ADMIN_MENU;
+    if (this.isVendorWorkspace())   return VENDOR_MENU;
+    if (this.isCustomerWorkspace()) return CUSTOMER_MENU;
     return [];
   });
 
-  protected readonly links = {
-    login: {label : 'Se connecter', route:'/auth/login'},
-    vendor: {label : 'Je Cook!', route:'/vendor/dashboard'},
-    customer: {label : 'Je Chop!', route:'/customer/dashboard'},
-  } as const;
-  /**
-   * The label of the current user's portal — used in the badge next to the logo.
-   */
   readonly portalLabel = computed(() => {
-    if (this.roleContext.isAdmin()) return 'Espace Admin';
-    if (this.roleContext.isVendor()) return 'Espace Vendeur';
-    if (this.roleContext.isCustomer()) return 'Espace Client';
+    if (this.isAdminWorkspace())    return 'Espace Admin';
+    if (this.isVendorWorkspace())   return 'Espace Vendeur';
+    if (this.isCustomerWorkspace()) return 'Espace Client';
     return 'Marketplace';
   });
 
+  // ─── Cross-workspace switch links ─────────────────────────
+  protected readonly links = {
+    vendor:   { label: 'Je Cook!', route: '/vendor/dashboard' },
+    customer: { label: 'Je Chop!', route: '/customer/dashboard' },
+  } as const;
+
+  // ─── Current user (from UserContextService) ───────────────
   /**
-   * The mock user for now (until we wire real claims from the JWT).
+   * The signed-in user's display name and derived initials.
    */
-  readonly currentUser = signal({
-    name: 'Maman Pauline',
-    business: 'Le Chaudron Sawa',
-    initials: 'MP',
+  readonly currentUser = computed(() => {
+    const ctx = this.userContext.context?.() ?? null;   // ← adjust accessor
+
+    const name =
+      ctx?.vendor?.businessName ??
+      ctx?.admin?.displayName ??
+      ctx?.customer?.displayName ??
+      ctx?.email ??
+      '';
+
+    return {
+      name,
+      email:ctx?.email,
+      initials: this.initialsFrom(name),
+    };
   });
 
   readonly languages = ['FR', 'EN'] as const;
+
+  // ─── Helpers ──────────────────────────────────────────────
+
+  /**
+   * Derive up-to-two-letter initials from a full name.
+   *   "Maman Pauline"      → "MP"
+   *   "Le Chaudron Sawa"   → "LC"
+   *   "Awa"                → "A"
+   *   ""                   → "?"
+   */
+  private initialsFrom(name: string): string {
+    const parts = name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (parts.length === 0) return '?';
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -103,6 +140,7 @@ export class AuthHeaderComponent {
       this.closeAllDropdowns();
     }
   }
+
   // ─── Dropdown control ─────────────────────────────────────
 
   toggleDropdown(index: number, event: MouseEvent): void {
@@ -118,13 +156,6 @@ export class AuthHeaderComponent {
     this.profileOpen.set(false);
   }
 
-  toggleLanguageDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    this.languageOpen.update(v => !v);
-    this.profileOpen.set(false);
-    this.openDropdownIndex.set(null);
-  }
-
   toggleProfileDropdown(event: MouseEvent): void {
     event.stopPropagation();
     this.profileOpen.update(v => !v);
@@ -137,7 +168,7 @@ export class AuthHeaderComponent {
     this.languageOpen.set(false);
   }
 
-  // ─── Helpers (for the template) ───────────────────────────
+  // ─── Template helpers ─────────────────────────────────────
 
   isGroup(item: NavItem): item is NavGroup {
     return item.kind === 'group';
@@ -147,16 +178,14 @@ export class AuthHeaderComponent {
     return item.kind === 'link';
   }
 
-  // Add to the component class
   logout(): void {
     this.closeAllDropdowns();
-    // TODO: integrate with Keycloak when the auth service lands.
-    // this.keycloak.logout({ redirectUri: window.location.origin + '/meals' });
+    this.keycloakService.logout();
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Menu definitions per role
+//  Menu definitions per workspace
 // ═══════════════════════════════════════════════════════════════
 
 const VENDOR_MENU: readonly NavItem[] = [
@@ -164,31 +193,41 @@ const VENDOR_MENU: readonly NavItem[] = [
     kind: 'group',
     label: 'Gestion des Plats',
     children: [
-      { kind: 'link', label: 'Liste des plats',  route: '/vendor/meals',     icon: 'format_list_bulleted' },
-      { kind: 'link', label: 'Édition de plat',  route: '/vendor/meals/new', icon: 'edit' },
+      { kind: 'link', label: 'Liste des plats', route: '/vendor/meals',     icon: 'format_list_bulleted' },
+      { kind: 'link', label: 'Nouveau plat',     route: '/vendor/meals/new', icon: 'add_circle' },
     ],
   },
   {
     kind: 'group',
     label: 'Gestion des Commandes',
     children: [
-      { kind: 'link', label: 'Commandes en direct',   route: '/vendor/orders', icon: 'receipt_long', badge: { type: 'count', value: 3 } },
+      { kind: 'link', label: 'Commandes en direct',     route: '/vendor/orders', icon: 'receipt_long', badge: { type: 'count', value: 3 } },
       { kind: 'link', label: 'Stocks & Disponibilités', route: '/vendor/stocks', icon: 'inventory_2' },
     ],
   },
-  {
-    kind: 'link',
-    label: 'Statistiques',
-    route: '/vendor/stats',
-  },
+  { kind: 'link', label: 'Statistiques', route: '/vendor/stats' },
 ];
 
 const ADMIN_MENU: readonly NavItem[] = [
-  { kind: 'link', label: 'Vendeurs',     route: '/admin/vendors' },
-  { kind: 'link', label: 'Catégories',   route: '/admin/categories' },
-  { kind: 'link', label: 'Ingrédients',  route: '/admin/ingredients' },
-  { kind: 'link', label: 'Modération',   route: '/admin/moderation' },
-  { kind: 'link', label: 'Paramètres',   route: '/admin/settings' },
+  {
+    kind: 'group',
+    label: 'Catalogue de mets',
+    children: [
+      { kind: 'link', label: 'Catégories',  route: '/admin/categories',  icon: 'category' },
+      { kind: 'link', label: 'Ingrédients', route: '/admin/ingredients', icon: 'grocery' },
+      { kind: 'link', label: 'Plats',       route: '/admin/meals',       icon: 'restaurant_menu' },
+    ],
+  },
+  {
+    kind: 'group',
+    label: 'Vendeurs & lieux',
+    children: [
+      { kind: 'link', label: 'Vendeurs',     route: '/admin/vendors',   icon: 'storefront' },
+      { kind: 'link', label: 'Emplacements', route: '/admin/locations', icon: 'location_on' },
+    ],
+  },
+  { kind: 'link', label: 'Modération', route: '/admin/moderation' },
+  { kind: 'link', label: 'Paramètres', route: '/admin/settings' },
 ];
 
 const CUSTOMER_MENU: readonly NavItem[] = [

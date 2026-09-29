@@ -1,26 +1,26 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  ElementRef,
+  ViewChild,
   input,
   inject,
   signal,
   computed,
   OnInit,
   DestroyRef,
+  HostListener,
 } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { NewLocationDialogComponent } from '../../../location/dialogs/new-location-dialog/new-location-dialog.component';
+import { IconComponent } from '@components/shared/icon/icon.component';
+import {
+  NewLocationDialogComponent,
+} from '../../../location/dialogs/new-location-dialog/new-location-dialog.component';
 
 import { LOCATION_SERVICE } from '@app/core/services/marketplace/location.service';
 import {
@@ -33,21 +33,16 @@ import {
  * Step 3 — Pricing & distribution.
  *
  * Fields:
- * - price (required)
- * - promoPrice (optional, < price)
- * - distributionLocationIds (chips + autocomplete + create dialog)
+ * - price (plain number input, required)
+ * - promoPrice (plain number input, optional, < price)
+ * - distributionLocationIds (plain chip input + custom autocomplete + create dialog)
  */
 @Component({
   selector: 'app-step-pricing',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatChipsModule,
-    MatAutocompleteModule,
-    MatIconModule,
-    MatButtonModule,
+    IconComponent,
   ],
   templateUrl: './step-pricing.component.html',
   styleUrl: './step-pricing.component.scss',
@@ -60,18 +55,28 @@ export class StepPricingComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
 
+  @ViewChild('locationInput')
+  private locationInputRef?: ElementRef<HTMLInputElement>;
+
   readonly form = input.required<FormGroup>();
 
-  // ─── Locations ────────────────────────────────────────────
+  // ─── Location state ───────────────────────────────────────
   readonly locationFilter = signal<string>('');
   private readonly searchResults = signal<LocationSummary[]>([]);
   readonly selectedLocations = signal<LocationSummary[]>([]);
+  readonly highlightIndex = signal<number>(-1);
+  readonly dropdownOpen = signal<boolean>(false);
+
   private readonly locationCache = signal<Map<string, LocationSummary>>(new Map());
 
   protected readonly filteredLocations = computed(() => {
     const selected = new Set(this.selectedLocations().map(l => l.id));
     return this.searchResults().filter(l => !selected.has(l.id));
   });
+
+  protected readonly showDropdown = computed(
+    () => this.dropdownOpen() && this.filteredLocations().length > 0,
+  );
 
   private searchTimer?: ReturnType<typeof setTimeout>;
 
@@ -89,29 +94,26 @@ export class StepPricingComponent implements OnInit {
   // ─── Derived pricing ──────────────────────────────────────
   protected readonly commissionRate = 12;
 
-  protected readonly commissionAmount = computed(() => {
-    const price = this.effectivePrice();
-    return Math.round((price * this.commissionRate) / 100);
-  });
-
-  protected readonly netPayout = computed(
-    () => this.effectivePrice() - this.commissionAmount()
-  );
-
   private readonly _effectivePrice = signal<number>(0);
   protected readonly effectivePrice = this._effectivePrice.asReadonly();
+
+  protected readonly commissionAmount = computed(() =>
+    Math.round((this.effectivePrice() * this.commissionRate) / 100),
+  );
+
+  protected readonly netPayout = computed(
+    () => this.effectivePrice() - this.commissionAmount(),
+  );
 
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
-    // Sync chips with form
     this.locationIds.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(ids => this.syncSelected(ids ?? []));
 
     this.syncSelected(this.locationIds.value ?? []);
 
-    // Sync pricing
     this.price.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.recomputePrice());
@@ -132,7 +134,7 @@ export class StepPricingComponent implements OnInit {
     }
   }
 
-  // ─── Locations ────────────────────────────────────────────
+  // ─── Location selection sync ──────────────────────────────
 
   private syncSelected(ids: string[]): void {
     if (!ids.length) {
@@ -167,12 +169,16 @@ export class StepPricingComponent implements OnInit {
     this.selectedLocations.set(list);
   }
 
-  onLocationFilterInput(event: Event): void {
+  // ─── Location search ──────────────────────────────────────
+
+  protected onLocationInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.locationFilter.set(value);
+    this.highlightIndex.set(-1);
 
     if (value.trim().length < 2) {
       this.searchResults.set([]);
+      this.dropdownOpen.set(false);
       return;
     }
 
@@ -185,13 +191,55 @@ export class StepPricingComponent implements OnInit {
       .searchLocations({ keyword, size: 10 } as LocationSearchRequest)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (page) => this.searchResults.set(page.content),
+        next: (page) => {
+          this.searchResults.set(page.content);
+          this.dropdownOpen.set(true);
+          this.highlightIndex.set(page.content.length > 0 ? 0 : -1);
+        },
         error: (err) => {
           console.error('[StepPricing] search error', err);
           this.searchResults.set([]);
+          this.dropdownOpen.set(false);
         },
       });
   }
+
+  // ─── Keyboard navigation ──────────────────────────────────
+
+  protected onInputKeydown(event: KeyboardEvent): void {
+    const results = this.filteredLocations();
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (!this.dropdownOpen()) {
+        this.dropdownOpen.set(true);
+        return;
+      }
+      this.highlightIndex.update(i => Math.min(i + 1, results.length - 1));
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.highlightIndex.update(i => Math.max(i - 1, 0));
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      if (this.dropdownOpen() && this.highlightIndex() >= 0 && results[this.highlightIndex()]) {
+        event.preventDefault();
+        this.addLocation(results[this.highlightIndex()]);
+      }
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      this.dropdownOpen.set(false);
+      this.highlightIndex.set(-1);
+    }
+  }
+
+  // ─── Add / remove ─────────────────────────────────────────
 
   addLocation(location: LocationSummary): void {
     if (this.selectedLocations().some(l => l.id === location.id)) return;
@@ -202,8 +250,7 @@ export class StepPricingComponent implements OnInit {
 
     this.locationIds.setValue([...this.locationIds.value, location.id]);
     this.locationIds.markAsTouched();
-    this.locationFilter.set('');
-    this.searchResults.set([]);
+    this.clearFilter();
   }
 
   removeLocation(location: LocationSummary): void {
@@ -211,6 +258,16 @@ export class StepPricingComponent implements OnInit {
     this.locationIds.setValue(next);
     this.locationIds.markAsTouched();
   }
+
+  private clearFilter(): void {
+    this.locationFilter.set('');
+    this.searchResults.set([]);
+    this.dropdownOpen.set(false);
+    this.highlightIndex.set(-1);
+    this.locationInputRef?.nativeElement.focus();
+  }
+
+  // ─── Create dialog ────────────────────────────────────────
 
   openCreateLocationDialog(): void {
     const ref = this.dialog.open(NewLocationDialogComponent, {
@@ -230,6 +287,15 @@ export class StepPricingComponent implements OnInit {
         } as LocationSummary);
         this.snackBar.open(`« ${created.name} » ajouté`, 'OK', { duration: 3000 });
       });
+  }
+
+  // ─── Outside-click closes dropdown ────────────────────────
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    if (!this.dropdownOpen()) return;
+    const host = (event.target as HTMLElement).closest('app-step-pricing');
+    if (!host) this.dropdownOpen.set(false);
   }
 
   // ─── Errors ───────────────────────────────────────────────

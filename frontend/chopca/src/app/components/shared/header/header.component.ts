@@ -77,8 +77,8 @@ export class HeaderComponent {
 
   protected readonly links = {
     login: {label : 'Se connecter', route:'/auth/login'},
-    vendor: {label : 'Je Cook!', route:'/vendor/dashboard'},
-    customer: {label : 'Je Chop!', route:'/customer/dashboard'},
+    vendor: {label : 'Je Cook!', route:'/vendor/meals'},
+    customer: {label : 'Je Chop!', route:'/customer/orders'},
   } as const;
 
   readonly languages: readonly ('FR' | 'EN')[] = ['FR', 'EN'];

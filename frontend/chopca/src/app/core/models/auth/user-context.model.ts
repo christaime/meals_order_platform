@@ -8,6 +8,7 @@ export type ContextStatus =
 
 export interface UserContext {
   keycloakId: string;
+  email?: string;
   vendor: VendorContext | null;
   customer: CustomerContext | null;
   admin: AdminContext | null;
