@@ -15,8 +15,11 @@ import com.mealmarket.meal.domain.repository.MealRepository;
 import com.mealmarket.meal.domain.repository.VendorRepository;
 import com.mealmarket.meal.domain.repository.criteria.MealSearchRequest;
 import com.mealmarket.meal.infrastructure.persistence.entity.MealEntity;
+import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import com.mealmarket.meal.infrastructure.persistence.mapper.MealPersistenceMapper;
+import com.mealmarket.meal.infrastructure.persistence.mapper.VendorPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.repository.MealJpaRepository;
+import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.specification.MealSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
@@ -36,7 +39,9 @@ import java.util.stream.Collectors;
 public class MealRepositoryAdapter implements MealRepository {
 
     private final MealJpaRepository jpaRepository;
+    private final VendorJpaRepository jpaVendorRepository;
     private final MealPersistenceMapper mapper;
+    private final VendorPersistenceMapper vendorMapper;
 
     private final @Lazy VendorRepository vendorRepository;
     private final @Lazy CategoryRepository categoryRepository;
@@ -56,7 +61,13 @@ public class MealRepositoryAdapter implements MealRepository {
 
     @Override
     public Optional<Meal> findById(UUID id) {
-        return jpaRepository.findById(id).map(mapper::toDomain);
+        return jpaRepository.findById(id)
+                .map(entity -> {
+                    VendorEntity vendor = jpaVendorRepository.findById(entity.getVendorId())
+                            .orElseThrow(() -> new ResourceNotFoundException(
+                                    "Vendor not found: " + entity.getVendorId()));
+                    return mapper.toDomain(entity, vendor);
+                });
     }
 
     @Override
@@ -195,7 +206,7 @@ public class MealRepositoryAdapter implements MealRepository {
 
     private Meal toFullDomain(MealEntity entity) {
 
-        Vendor vendor = vendorRepository.findById(entity.getVendorId())
+        VendorEntity vendorEntity = jpaVendorRepository.findById(entity.getVendorId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Vendor not found: " + entity.getVendorId()));
 
@@ -216,7 +227,7 @@ public class MealRepositoryAdapter implements MealRepository {
 
         return Meal.builder()
                 .id(entity.getId())
-                .vendor(vendor)
+                .vendor(vendorMapper.toMinimalDomain(vendorEntity))
                 .name(entity.getName())
                 .description(entity.getDescription())
                 .price(entity.getPrice())

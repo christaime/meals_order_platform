@@ -134,6 +134,7 @@ export class MealMockService implements MealService {
       description: request.description ?? null,
       price: request.price,
       imageUrl: request.imageUrl ?? null,
+      imageStorageRef: request.imageStorageRef ?? null,
       isAvailable: request.isAvailable ?? true,
       averageRating: 0,
       totalRatings: 0,

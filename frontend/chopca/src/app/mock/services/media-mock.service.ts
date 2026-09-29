@@ -41,7 +41,6 @@ export class MediaMockService implements MediaService {
     const now = new Date().toISOString();
 
     const response: MediaUploadResponse = {
-      id,
       storageRef,
       purpose,
       url: previewUrl,

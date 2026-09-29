@@ -17,6 +17,7 @@ export interface Meal {
   readonly description: string | null;
   readonly price: number;
   readonly imageUrl: string | null;
+  readonly imageStorageRef: string | null;
 
   readonly isAvailable: boolean;
   readonly averageRating: number;
@@ -80,8 +81,8 @@ export interface MealRequest {
   categoryIds?: string[];             // cuisines + dish types combined
   ingredientIds?: string[];
   distributionLocationIds?: string[];
-  supplementIds?: string[];           // ← new
-  imageMediaId?: string;
+  supplementIds?: string[];
+  imageStorageRef: string | null;
 }
 
 export interface MealSearchRequest extends SearchRequest {

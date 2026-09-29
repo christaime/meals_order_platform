@@ -5,6 +5,7 @@ import {
   inject,
   input,
   OnInit,
+  effect
 } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -49,10 +50,21 @@ export class MealDetailPageComponent implements OnInit {
   readonly meal = signal<MealDetail | null>(null);
   readonly isLoading = signal<boolean>(true);
 
+  constructor() {
+    effect(() => {
+      let mealId: string;
+      try {
+        mealId = this.id();
+      } catch {
+        return;   // input not bound yet — effect will re-run when it is
+      }
+      this.loadMeal(mealId);
+    });
+  }
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.loadMeal(this.id());
+
   }
 
   // ─── Data loading ─────────────────────────────────────────

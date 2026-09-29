@@ -234,8 +234,8 @@ export class ImageUploaderComponent implements OnDestroy {
         next: (result: MediaUploadResponse) => {
           this.isUploading.set(false);
           this.uploadProgress.set(0);
-
-          this._currentMedia.set({ id: result.id, url: result.url });
+          console.log("image-uploader ", result);
+          this._currentMedia.set({ id: result.storageRef, url: result.url });
 
           // Replace local blob with the server URL
           this.revokeLocalPreview();

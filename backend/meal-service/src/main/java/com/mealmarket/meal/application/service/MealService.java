@@ -125,7 +125,7 @@ public class MealService {
         log.debug("Fetching approved meal: {}", mealId);
         Meal meal = findMealWithDetailsOrThrow(mealId);
 
-        if (!meal.isVisibleToCustomers()) {
+        if (!meal.isActive()) {
             throw new ResourceNotFoundException(
                     "Meal not found or not available: " + mealId);
         }
@@ -142,7 +142,6 @@ public class MealService {
         if (!meal.belongsTo(vendorId)) {
             throw new ForbiddenException("This meal does not belong to you");
         }
-
         return dtoMapper.toResponse(meal);
     }
 

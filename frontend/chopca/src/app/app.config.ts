@@ -3,9 +3,8 @@ import {
   ApplicationConfig,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { SERVICE_PROVIDERS } from './core/services/service.providers';
 import { environment } from '@environments/environment';
@@ -28,6 +27,7 @@ const apiBearerTokenCondition = createInterceptorCondition({
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideRouter(routes, withComponentInputBinding()),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
     // Public routes only. Route-level guards (e.g. vendorRegistrationGuard)

@@ -19,7 +19,6 @@ export type MediaPurpose =
  * remain backend concerns.
  */
 export interface MediaUploadResponse {
-  readonly id: string;
   readonly storageRef: string;
   readonly purpose: MediaPurpose;
   readonly url: string;

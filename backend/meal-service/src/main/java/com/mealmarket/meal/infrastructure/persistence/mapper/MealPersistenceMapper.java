@@ -6,6 +6,7 @@ import com.mealmarket.meal.domain.model.Ingredient;
 import com.mealmarket.meal.domain.model.Meal;
 import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.infrastructure.persistence.entity.MealEntity;
+import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -32,7 +33,10 @@ import java.util.UUID;
  * The adapter loads them separately via their repositories and reassembles
  * the full domain object.
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = { VendorPersistenceMapper.class }
+)
 public interface MealPersistenceMapper {
 
     MealPersistenceMapper INSTANCE = Mappers.getMapper(MealPersistenceMapper.class);
@@ -54,14 +58,24 @@ public interface MealPersistenceMapper {
     //  All relationships are loaded separately by the adapter.
     //  imageStorageRef maps 1:1 (same name, same type).
     // ═══════════════════════════════════════════════════════════
-
-    @Mapping(target = "vendor",                ignore = true)
+    @Mapping(target = "id",                    source = "entity.id")
+    @Mapping(target = "name",                  source = "entity.name")
+    @Mapping(target = "description",           source = "entity.description")
+    @Mapping(target = "price",                 source = "entity.price")
+    @Mapping(target = "imageStorageRef",       source = "entity.imageStorageRef")
+    @Mapping(target = "isAvailable",           source = "entity.isAvailable")
+    @Mapping(target = "averageRating",         source = "entity.averageRating")
+    @Mapping(target = "totalRatings",          source = "entity.totalRatings")
+    @Mapping(target = "prepTimeMinutes",       source = "entity.prepTimeMinutes")
+    @Mapping(target = "moderationStatus",      source = "entity.moderationStatus")
+    @Mapping(target = "createdAt",             source = "entity.createdAt")
+    @Mapping(target = "updatedAt",             source = "entity.updatedAt")
+    @Mapping(target = "vendor",                source = "vendor", qualifiedByName = "toMinimalDomain")
     @Mapping(target = "categories",            ignore = true)
     @Mapping(target = "ingredients",           ignore = true)
     @Mapping(target = "distributionLocations", ignore = true)
-    Meal toDomain(MealEntity entity);
+    Meal toDomain(MealEntity entity, VendorEntity vendor);
 
-    List<Meal> toDomainList(List<MealEntity> entities);
 
     // ═══════════════════════════════════════════════════════════
     //  Helpers — extract IDs from domain objects

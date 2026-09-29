@@ -96,7 +96,8 @@ export class MealEditorPageComponent implements OnInit {
   });
 
   protected onImageUploaded(result: MediaUploadResponse): void {
-    this.imageMediaId.set(result.id);
+    console.log("image in page ", result);
+    this.imageMediaId.set(result.storageRef);
     this.imageUrl.set(result.url);
   }
 
@@ -222,6 +223,7 @@ export class MealEditorPageComponent implements OnInit {
         next: (meal) => {
           this.patchForm(meal);
           this.imageUrl.set(meal.imageUrl);
+          this.imageMediaId.set(meal.imageStorageRef);
           this.isLoading.set(false);
         },
         error: (err) => {
@@ -274,7 +276,7 @@ export class MealEditorPageComponent implements OnInit {
     const op = id
       ? this.mealService.updateMeal(id, request)
       : this.mealService.createMeal(request);
-
+    console.log("request ",{request});
     op.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.submitting.set(false);
@@ -311,6 +313,7 @@ export class MealEditorPageComponent implements OnInit {
         ? v.distributionLocationIds
         : undefined,
       imageUrl: this.imageUrl() ?? undefined,
+      imageStorageRef: this.imageMediaId()
     };
 
     // isAvailable only sent on update (per Q3-C decision)
