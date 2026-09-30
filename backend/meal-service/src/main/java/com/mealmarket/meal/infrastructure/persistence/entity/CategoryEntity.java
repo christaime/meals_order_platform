@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -18,10 +19,6 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "categories",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_categories_name_type",
-                columnNames = {"name", "type"}
-        ),
         indexes = {
                 @Index(name = "idx_categories_type", columnList = "type"),
                 @Index(name = "idx_categories_name", columnList = "name"),
@@ -33,6 +30,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLRestriction("moderation_status <> 'DISABLED'")
 public class CategoryEntity {
 
     @Id

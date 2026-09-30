@@ -96,6 +96,9 @@ export class MealApiService implements MealService {
     if (request.vendorId)              params = params.set('vendorId', request.vendorId);
     if (request.businessName)          params = params.set('businessName', request.businessName);
 
+    if (request.loadFull)              params = params.set('loadFull', request.loadFull);
+    if (request.withCount)          params = params.set('withCount', request.withCount);
+
     if (request.cuisineIds?.length)    params = params.set('cuisineIds', request.cuisineIds.join(','));
     if (request.dishTypeIds?.length)   params = params.set('dishTypeIds', request.dishTypeIds.join(','));
     if (request.excludeIngredientIds?.length)

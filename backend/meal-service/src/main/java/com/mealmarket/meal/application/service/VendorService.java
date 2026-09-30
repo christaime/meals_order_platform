@@ -91,7 +91,7 @@ public class VendorService {
                 .phone(request.phone())
                 .ratingAvg(BigDecimal.ZERO)
                 .totalRatings(0)
-                .state(VendorState.pending())
+                .state(VendorState.active(keycloakUserId))
                 .deliveryRadius(request.deliveryRadius() != null ? request.deliveryRadius() : 10)
                 .pickupAddress(request.pickupAddress())
                 .profileImageStorageRef(request.profileImageStorageRef())

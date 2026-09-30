@@ -542,6 +542,7 @@ public class VendorController {
                 v.id(),
                 v.userId(),
                 v.businessName(),
+                v.ownerName(),
                 v.description(),
                 v.address(),
                 v.email(),

@@ -71,7 +71,7 @@ export class HeaderComponent {
   // ─── Static Data ────────────────────────────────────────
   readonly navItems: readonly NavItem[] = [
     { label: 'Explorer les plats', route: '/meals', exact: true },
-    { label: 'Restaurants partenaires', route: '/vendor', exact: false },
+    { label: 'Restaurants partenaires', route: '/meals/vendor/directory', exact: false },
     { label: 'Comment ça marche', route: '/comment-ca-marche', exact: false },
   ];
 

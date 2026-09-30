@@ -28,6 +28,8 @@ public class MealSearchRequest extends SearchRequest {
     private final UUID distributionLocationId;
     private final LocationProximity locationProximity;
     private final ModerationStatus moderationStatus;
+    private final Boolean loadFull;
+    private final Boolean withCount;
 
     private MealSearchRequest(Builder builder) {
         super(builder);
@@ -48,6 +50,8 @@ public class MealSearchRequest extends SearchRequest {
         this.distributionLocationId = builder.distributionLocationId;
         this.locationProximity = builder.locationProximity;
         this.moderationStatus = builder.moderationStatus;
+        this.loadFull = builder.loadFull;
+        this.withCount = builder.withCount;
     }
 
     public static Builder builder() {
@@ -77,6 +81,8 @@ public class MealSearchRequest extends SearchRequest {
         private UUID distributionLocationId;
         private LocationProximity locationProximity;
         private ModerationStatus moderationStatus;
+        private Boolean loadFull;
+        private Boolean withCount;
 
         public Builder keyword(String keyword) {
             this.keyword = keyword;
@@ -120,6 +126,16 @@ public class MealSearchRequest extends SearchRequest {
 
         public Builder hasAllergens(Boolean hasAllergens) {
             this.hasAllergens = hasAllergens;
+            return this;
+        }
+
+        public Builder loadFull(Boolean loadFull) {
+            this.loadFull = loadFull;
+            return this;
+        }
+
+        public Builder withCount(Boolean withCount) {
+            this.withCount = withCount;
             return this;
         }
 

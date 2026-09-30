@@ -35,9 +35,14 @@ import {
  * - prepTimeMinutes (Material slider)
  * - ingredientIds (plain chip input + custom autocomplete + create dialog)
  *
- * The ingredient field is built from plain Tailwind + native input, so
- * its visual style matches the rest of the app and the input's visible
- * text is driven directly by `ingredientFilter()`.
+ * Ingredient resolution:
+ * - When `initialIngredients` is provided (editing an existing meal, whose
+ *   MealResponse already carries the full ingredient summaries), the
+ *   component resolves the form's ingredient ids against that list —
+ *   no backend call.
+ * - When it's null (create mode, or a bare mount), the component falls
+ *   back to fetching. In practice this path is rarely hit because the
+ *   user adds ingredients one at a time via `addIngredient()`.
  */
 @Component({
   selector: 'app-step-composition',
@@ -62,6 +67,14 @@ export class StepCompositionComponent implements OnInit {
   private ingredientInputRef?: ElementRef<HTMLInputElement>;
 
   readonly form = input.required<FormGroup>();
+
+  /**
+   * Optional pre-supplied ingredient list. When provided, the component
+   * resolves `ingredientIds` against this list instead of calling the
+   * backend — used when editing an existing meal, whose `MealResponse`
+   * already carries the full ingredient summaries.
+   */
+  readonly initialIngredients = input<IngredientSummary[] | null>(null);
 
   // ─── Ingredient state ─────────────────────────────────────
   readonly ingredientFilter = signal<string>('');
@@ -99,6 +112,16 @@ export class StepCompositionComponent implements OnInit {
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
+    // Seed the local cache from the caller-provided list, if any.
+    // This must happen before the valueChanges subscription fires so
+    // the first `syncSelected` resolves against a populated cache.
+    const provided = this.initialIngredients();
+    if (provided && provided.length > 0) {
+      const next = new Map(this.ingredientCache());
+      for (const i of provided) next.set(i.id, i);
+      this.ingredientCache.set(next);
+    }
+
     this.ingredientIds.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(ids => this.syncSelected(ids ?? []));
@@ -127,6 +150,20 @@ export class StepCompositionComponent implements OnInit {
     const missing = ids.filter(id => !cache.has(id));
 
     if (missing.length) {
+      // When a caller-provided list is used, any id not present in it is
+      // either deleted or DISABLED (hidden by @SQLRestriction on the
+      // backend). Re-fetching won't find it — resolve what we have and
+      // log the rest.
+      if (this.initialIngredients() !== null) {
+        console.warn(
+          '[StepComposition] ingredient ids not in the supplied list, skipping:',
+          missing,
+        );
+        this.updateSelectedFromCache(ids);
+        return;
+      }
+
+      // Fallback path (no initial list): fetch the missing ones.
       this.ingredientService
         .searchIngredients({} as IngredientSearchRequest)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -146,7 +183,15 @@ export class StepCompositionComponent implements OnInit {
 
   private updateSelectedFromCache(ids: string[]): void {
     const cache = this.ingredientCache();
-    const list = ids.map(id => cache.get(id)).filter((i): i is IngredientSummary => !!i);
+    const list: IngredientSummary[] = [];
+    for (const id of ids) {
+      const ing = cache.get(id);
+      if (ing) {
+        list.push(ing);
+      } else {
+        console.warn('[StepComposition] unresolved ingredient id', id);
+      }
+    }
     this.selectedIngredients.set(list);
   }
 

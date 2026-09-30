@@ -218,7 +218,12 @@ public class DistributionLocationService {
         log.info("Updating location: {} by vendor: {}", locationId, vendorId);
 
         DistributionLocation existing = findLocationOrThrow(locationId);
-
+        // Only pending location can be edit
+        if(!existing.getModerationStatus().equals(ModerationStatus.PENDING)){
+            throw new ConflictException(
+                    "Location can only be edited while PENDING — current status: "
+                            + existing.getModerationStatus());
+        }
         // Ownership check
         if (!existing.belongsTo(vendorId)) {
             throw new ForbiddenException("This location does not belong to you");

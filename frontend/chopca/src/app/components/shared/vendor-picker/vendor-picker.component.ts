@@ -1,16 +1,15 @@
 import {
-  ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, signal,
+  ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, output, signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 
 import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
-import { VendorSummary } from '@app/core/models/marketplace';
+import { Vendor, VendorSummary } from '@app/core/models/marketplace';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
 /**
@@ -19,9 +18,10 @@ import { IconComponent } from '@components/shared/icon/icon.component';
  * Presentational + self-fetching: it owns the search control and calls
  * `VENDOR_SERVICE.searchVendors(...)`. The host page owns the selected ID.
  *
- * Originally lived under the location feature (`LocationVendorPickerComponent`).
- * Promoted to `@components/shared/` so both the locations page and the meals
- * page can use it.
+ * When `selectedVendorId` is provided (e.g. from a deep-link `?vendorId=`),
+ * the picker fetches that single vendor and shows it as the only option,
+ * highlighted as selected. The search box stays empty — it's for the user
+ * to look up a different vendor.
  */
 @Component({
   selector: 'app-vendor-picker',
@@ -43,7 +43,6 @@ export class VendorPickerComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly selectedVendorId = input<string | null>(null);
-
   readonly vendorSelected = output<string>();
 
   protected readonly search = new FormControl<string>('', { nonNullable: true });
@@ -51,29 +50,59 @@ export class VendorPickerComponent {
   protected readonly loading = signal<boolean>(false);
 
   constructor() {
-    this.search.valueChanges.pipe(
-      debounceTime(250),
-      distinctUntilChanged(),
-      switchMap(keyword => {
-        this.loading.set(true);
-        if (!keyword || keyword.trim().length < 2) {
-          return of({ content: [] as VendorSummary[] });
-        }
-        return this.vendorService.searchVendors({
-          keyword: keyword.trim(),
-          size: 20,
-          sortBy: 'businessName',
-          sortDirection: 'ASC',
+    console.log('[Picker] input value at construction:', this.selectedVendorId());
+    // ─── Initial selection (from a deep-link `?vendorId=`) ────
+    effect(() => {
+      const vendorId = this.selectedVendorId();
+      console.log("vendorId ", vendorId);
+      if (!vendorId) return;
+
+      this.loading.set(true);
+
+      this.vendorService.getVendorById(vendorId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (vendor: Vendor) => {
+            // Stale-response guard: if the selection changed mid-flight,
+            // ignore this result.
+            if (this.selectedVendorId() !== vendorId) return;
+
+            this.vendors.set([vendor as unknown as VendorSummary]);
+            this.loading.set(false);
+          },
+          error: () => {
+            if (this.selectedVendorId() !== vendorId) return;
+            this.loading.set(false);
+          },
         });
-      }),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: (page: any) => {
-        this.vendors.set(page.content ?? []);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
     });
+
+    // ─── Manual search ─────────────────────────────────────
+    this.search.valueChanges
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        switchMap(keyword => {
+          this.loading.set(true);
+          if (!keyword || keyword.trim().length < 2) {
+            return of({ content: [] as VendorSummary[] });
+          }
+          return this.vendorService.searchVendors({
+            keyword: keyword.trim(),
+            size: 20,
+            sortBy: 'businessName',
+            sortDirection: 'ASC',
+          });
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (page: any) => {
+          this.vendors.set(page.content ?? []);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
   }
 
   protected onSelect(vendorId: string): void {

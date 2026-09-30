@@ -1,0 +1,81 @@
+<!-- Top bar -->
+<section class="w-full px-space-md lg:px-margin-lg py-space-lg">
+  <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg">
+    <div class="space-y-space-xs max-w-2xl">
+      <div class="flex items-center gap-space-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full
+                     bg-primary-fixed text-on-primary-fixed
+                     font-label-sm text-label-sm uppercase tracking-wide">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          Vendeurs
+        </span>
+        <span class="text-outline-variant">•</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+          Modération
+        </span>
+      </div>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
+        Modération des Vendeurs
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Examinez et modérez le cycle de vie des vendeurs — activation,
+        suspension, bannissement.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Two-column layout -->
+<section class="w-full max-w-full px-space-md lg:px-margin-lg pb-space-xl overflow-x-clip">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start min-w-0">
+
+    <!-- LEFT — sticky moderation panel -->
+    <div class="lg:col-span-5 xl:col-span-4 sticky top-24 z-10 min-w-0
+                flex flex-col gap-space-md">
+
+      @if (editing(); as v) {
+      <app-vendor-moderation-panel
+        [vendorId]="v.id"
+        [businessName]="v.businessName"
+        [currentStatus]="v.status"
+        (moderated)="onModerated($event)" />
+      } @else {
+      <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md
+                  flex items-start gap-3">
+        <app-icon name="info" size="lg" class="text-outline shrink-0 mt-0.5" />
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Sélectionnez un vendeur dans la liste pour le modérer.
+        </p>
+      </div>
+      }
+    </div>
+
+    <!-- RIGHT — filters + table + paginator -->
+    <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-space-md min-w-0">
+
+      <app-vendor-filters
+        [keyword]="keyword()"
+        [status]="status()"
+        [sort]="sort()"
+        (keywordChange)="onKeywordChange($event)"
+        (statusChange)="onStatusChange($event)"
+        (sortChange)="onSortChange($event)" />
+
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+        <app-vendor-table
+          [vendors]="result()?.content ?? []"
+          [loading]="loading()"
+          [editingId]="editing()?.id ?? null"
+          (select)="onSelectForModeration($event)" />
+
+        @if (result(); as page) {
+        <app-paginator
+          [page]="page"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onSizeChange($event)" />
+        }
+      </div>
+    </div>
+
+  </div>
+</section>

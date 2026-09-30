@@ -23,5 +23,8 @@ public record MealSummaryResponse(
         Integer prepTimeMinutes,
         List<CategorySummaryResponse> cuisines,        // only CUISINE categories
         List<CategorySummaryResponse> dishTypes,       // only DISH_TYPE categories
+        Integer ingredientCount,
+        Integer distributionLocationCount,
+        Integer allergenIngredientCount,
         ModerationStatus moderationStatus
 ) {}

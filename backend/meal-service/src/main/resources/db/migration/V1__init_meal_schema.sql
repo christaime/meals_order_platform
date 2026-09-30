@@ -24,6 +24,17 @@
 -- (storage ref), never the URL. URLs are computed at read time
 -- by MediaStoragePort (see MediaUrlResolver in the mapper layer).
 -- Object keys look like "meal_image/<uuid>.jpg", "vendor_logo/<uuid>.png".
+--
+-- SOFT DELETE
+-- -----------
+-- Moderable entities (categories, ingredients, meals,
+-- distribution_locations) treat moderation_status = 'DISABLED'
+-- as DELETED:
+--   1. Hibernate @SQLRestriction("moderation_status <> 'DISABLED'")
+--      hides them from all JPA queries (including associations).
+--   2. Unicity constraints are PARTIAL UNIQUE INDEXES with the
+--      predicate `WHERE moderation_status <> 'DISABLED'`, so a
+--      disabled row does not block the reuse of its natural key.
 -- ============================================================
 
 -- Enable UUID extension
@@ -53,14 +64,22 @@ CREATE TABLE categories (
 
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 
-    -- Case-sensitive uniqueness (matches JPA @UniqueConstraint)
-    CONSTRAINT uk_categories_name_type UNIQUE (name, type)
+    -- NOTE: no inline UNIQUE constraint here.
+    -- Unicity is enforced by partial unique indexes below, which
+    -- exclude rows where moderation_status = 'DISABLED'.
 );
 
-CREATE UNIQUE INDEX uk_categories_name_type_lower
-    ON categories (LOWER(name), type);
+-- Case-sensitive unicity among ACTIVE (non-disabled) rows
+CREATE UNIQUE INDEX uk_categories_name_type_active
+    ON categories (name, type)
+    WHERE moderation_status <> 'DISABLED';
+
+-- Case-insensitive unicity among ACTIVE (non-disabled) rows
+CREATE UNIQUE INDEX uk_categories_name_type_lower_active
+    ON categories (LOWER(name), type)
+    WHERE moderation_status <> 'DISABLED';
 
 CREATE INDEX idx_categories_type ON categories(type);
 CREATE INDEX idx_categories_name ON categories(name);
@@ -87,13 +106,18 @@ CREATE TABLE ingredients (
 
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 
-    -- Case-sensitive uniqueness
-    CONSTRAINT uk_ingredients_name UNIQUE (name)
+    -- NOTE: no inline UNIQUE constraint — see partial indexes below.
 );
 
-CREATE UNIQUE INDEX uk_ingredients_name_lower ON ingredients (LOWER(name));
+CREATE UNIQUE INDEX uk_ingredients_name_active
+    ON ingredients (name)
+    WHERE moderation_status <> 'DISABLED';
+
+CREATE UNIQUE INDEX uk_ingredients_name_lower_active
+    ON ingredients (LOWER(name))
+    WHERE moderation_status <> 'DISABLED';
 
 CREATE INDEX idx_ingredients_name ON ingredients(name);
 CREATE INDEX idx_ingredients_is_allergen ON ingredients(is_allergen);
@@ -103,6 +127,8 @@ CREATE INDEX idx_ingredients_created_by ON ingredients(created_by_type, created_
 -- ============================================================
 -- 3. VENDORS
 -- Business entity with state machine (separate from moderation).
+-- NOT soft-deletable — status uses VendorStatus, not ModerationStatus.
+-- Unicity here stays unconditional.
 -- ============================================================
 CREATE TABLE vendors (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -182,15 +208,20 @@ CREATE TABLE distribution_locations (
 
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 
-    -- Case-sensitive uniqueness (per vendor)
-    CONSTRAINT uk_distribution_locations_vendor_name
-        UNIQUE (vendor_id, name)
+    -- NOTE: no inline UNIQUE constraint — see partial indexes below.
 );
 
-CREATE UNIQUE INDEX uk_distribution_locations_vendor_name_lower
-    ON distribution_locations (vendor_id, LOWER(name));
+-- Case-sensitive unicity per vendor among ACTIVE rows
+CREATE UNIQUE INDEX uk_distribution_locations_vendor_name_active
+    ON distribution_locations (vendor_id, name)
+    WHERE moderation_status <> 'DISABLED';
+
+-- Case-insensitive unicity per vendor among ACTIVE rows
+CREATE UNIQUE INDEX uk_distribution_locations_vendor_name_lower_active
+    ON distribution_locations (vendor_id, LOWER(name))
+    WHERE moderation_status <> 'DISABLED';
 
 CREATE INDEX idx_distribution_locations_vendor_id
     ON distribution_locations(vendor_id);
@@ -271,14 +302,20 @@ CREATE TABLE meals (
 
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 
-    -- Case-sensitive uniqueness (per vendor)
-    CONSTRAINT uk_meals_vendor_name UNIQUE (vendor_id, name)
+    -- NOTE: no inline UNIQUE constraint — see partial indexes below.
 );
 
-CREATE UNIQUE INDEX uk_meals_vendor_name_lower
-    ON meals (vendor_id, LOWER(name));
+-- Case-sensitive unicity per vendor among ACTIVE rows
+CREATE UNIQUE INDEX uk_meals_vendor_name_active
+    ON meals (vendor_id, name)
+    WHERE moderation_status <> 'DISABLED';
+
+-- Case-insensitive unicity per vendor among ACTIVE rows
+CREATE UNIQUE INDEX uk_meals_vendor_name_lower_active
+    ON meals (vendor_id, LOWER(name))
+    WHERE moderation_status <> 'DISABLED';
 
 CREATE INDEX idx_meals_vendor_id ON meals(vendor_id);
 CREATE INDEX idx_meals_name ON meals(name);

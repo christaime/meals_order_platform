@@ -19,6 +19,7 @@ export interface Vendor {
 
   // Business info
   readonly businessName: string;
+  readonly ownerName: string;
   readonly description: string | null;
   readonly address: string;
   readonly email: string;
@@ -62,6 +63,7 @@ export interface Vendor {
 export interface VendorSummary {
   readonly id: string;
   readonly businessName: string;
+  readonly ownerName: string;
   readonly description: string | null;
   readonly address?: string;
   readonly email?: string;

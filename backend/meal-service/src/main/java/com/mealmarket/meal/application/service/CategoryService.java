@@ -153,7 +153,12 @@ public class CategoryService {
         log.info("Updating category: {} by admin: {}", categoryId, adminId);
 
         Category existing = findCategoryOrThrow(categoryId);
-
+        // Approved category cannot be edit
+        if(!existing.getModerationStatus().equals(ModerationStatus.PENDING)){
+            throw new ConflictException(
+                    "Category can only be edited while PENDING — current status: "
+                            + existing.getModerationStatus());
+        }
         // Uniqueness re-check if name is being changed
         if (request.name() != null
                 && !request.name().equalsIgnoreCase(existing.getName())

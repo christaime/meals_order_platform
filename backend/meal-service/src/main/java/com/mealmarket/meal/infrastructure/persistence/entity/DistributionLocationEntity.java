@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -16,10 +17,6 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "distribution_locations",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_distribution_locations_vendor_name",
-                columnNames = {"vendor_id", "name"}
-        ),
         indexes = {
                 @Index(name = "idx_distribution_locations_vendor_id", columnList = "vendor_id"),
                 @Index(name = "idx_distribution_locations_coordinates", columnList = "latitude, longitude"),
@@ -31,6 +28,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLRestriction("moderation_status <> 'DISABLED'")
 public class DistributionLocationEntity {
 
     @Id

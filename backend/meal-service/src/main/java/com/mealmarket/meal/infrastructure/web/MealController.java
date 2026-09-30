@@ -145,6 +145,12 @@ public class MealController {
             @Parameter(description = "Filter by availability")
             @RequestParam(required = false) Boolean isAvailable,
 
+            @Parameter(description = "Get ingredients and distribution locations in the result")
+            @RequestParam(required = false) Boolean loadFull,
+
+            @Parameter(description = "Count ingredients, allergen and locations")
+            @RequestParam(required = false) Boolean withCount,
+
             @Parameter(description = "Minimum price")
             @RequestParam(required = false) BigDecimal minPrice,
 
@@ -170,6 +176,8 @@ public class MealController {
                 .keyword(keyword)
                 .moderationStatus(moderationStatus)
                 .isAvailable(isAvailable)
+                .loadFull(loadFull)
+                .withCount(withCount)
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
@@ -428,6 +436,12 @@ public class MealController {
             @Parameter(description = "Filter by availability")
             @RequestParam(required = false) Boolean isAvailable,
 
+            @Parameter(description = "Get ingredients and distribution locations in the result")
+            @RequestParam(required = false) Boolean loadFull,
+
+            @Parameter(description = "Count ingredients, allergen and locations")
+            @RequestParam(required = false) Boolean withCount,
+
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
 
@@ -452,6 +466,8 @@ public class MealController {
                 .minRating(minRating)
                 .moderationStatus(moderationStatus)
                 .isAvailable(isAvailable)
+                .withCount(withCount)
+                .loadFull(loadFull)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();

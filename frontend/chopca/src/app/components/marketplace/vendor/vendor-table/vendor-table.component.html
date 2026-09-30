@@ -1,0 +1,236 @@
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-clip">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+      <tr class="bg-surface-container-low text-on-surface-variant
+                   font-label-sm text-label-sm uppercase tracking-wider">
+        <th class="py-3 px-space-md font-bold">Vendeur</th>
+        <th class="py-3 px-space-md font-bold">Emplacements</th>
+        <th class="py-3 px-space-md font-bold">Cuisines</th>
+        <th class="py-3 px-space-md font-bold">Note</th>
+        <th class="py-3 px-space-md font-bold">Statut</th>
+        <th class="py-3 px-space-md font-bold text-right">Actions</th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/30">
+
+      @if (loading()) {
+      <tr>
+        <td colspan="6" class="py-12 px-space-md text-center text-on-surface-variant">
+          <app-icon name="progress_activity" size="xl" class="animate-spin" />
+          <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
+        </td>
+      </tr>
+      } @else if (vendors().length === 0) {
+      <tr>
+        <td colspan="6" class="py-12 px-space-md text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-surface-container-low
+                          flex items-center justify-center text-outline">
+            <app-icon name="storefront" size="xl" />
+          </div>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+            Aucun vendeur
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+            Aucun vendeur ne correspond aux filtres actifs.
+          </p>
+        </td>
+      </tr>
+      } @else {
+      @for (v of vendors(); track v.id) {
+      <tr
+        class="group transition-colors"
+        [ngClass]="isEditing(v)
+                ? 'bg-primary-fixed/20 ring-1 ring-inset ring-primary'
+                : 'hover:bg-surface-container-low/60'">
+
+        <!-- ─── Vendeur — avatar + (name / tier / description / address / contact) ─── -->
+        <td class="py-3.5 px-space-md">
+          <div class="flex items-start gap-3">
+            @if (v.profileImageUrl) {
+            <img
+              [src]="v.profileImageUrl"
+              [alt]="v.businessName"
+              class="w-12 h-12 rounded-full object-cover shrink-0
+                            border border-outline-variant/40
+                            group-hover:scale-105 transition-transform" />
+            } @else {
+            <div class="w-12 h-12 rounded-full bg-primary-fixed/40 text-primary
+                              flex items-center justify-center shrink-0
+                              group-hover:scale-105 transition-transform
+                              border border-primary-fixed
+                              font-label-md text-xs font-bold">
+              {{ initials(v.businessName) }}
+            </div>
+            }
+
+            <div class="min-w-0 flex flex-col gap-0.5">
+
+              <!-- Line 1: business name -->
+              <span
+                class="font-headline-sm text-headline-sm text-on-surface font-bold
+                       truncate max-w-[220px]"
+                [title]="v.businessName">
+                {{ v.businessName }}
+              </span>
+
+              <!-- Line 2: subscription tier -->
+              <app-badge variant="neutral" size="sm" [uppercase]="true" class="self-start">
+                {{ v.subscriptionTier }}
+              </app-badge>
+
+              <!-- Line 3: description -->
+              @if (v.description) {
+              <p
+                class="font-body-sm text-body-sm text-on-surface-variant
+                       truncate mt-0.5 max-w-[260px]"
+                [title]="v.description">
+                {{ v.description }}
+              </p>
+              }
+
+              <!-- Line 4: address -->
+              @if (v.address) {
+              <p
+                class="font-body-sm text-[11px] text-outline truncate max-w-[260px]"
+                [title]="v.address">
+                <app-icon name="location_on" size="sm" class="inline align-text-bottom mr-0.5" />
+                {{ v.address }}
+              </p>
+              }
+
+              <!-- Line 5: email + phone -->
+              <div class="flex items-center gap-3 mt-0.5">
+                @if (v.email) {
+                <span
+                  class="font-body-sm text-[11px] text-on-surface-variant
+                         truncate max-w-[150px]"
+                  [title]="v.email">
+                  <app-icon name="mail" size="sm" class="inline align-text-bottom mr-0.5" />
+                  {{ v.email }}
+                </span>
+                }
+                @if (v.phone) {
+                <span
+                  class="font-body-sm text-[11px] text-on-surface-variant
+                         truncate max-w-[120px]"
+                  [title]="v.phone">
+                  <app-icon name="call" size="sm" class="inline align-text-bottom mr-0.5" />
+                  {{ v.phone }}
+                </span>
+                }
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <!-- ─── Emplacements ─── -->
+        <td class="py-3.5 px-space-md align-top">
+          @if (v.distributionLocations.length === 0) {
+          <span class="font-body-sm text-body-sm text-on-surface-variant">—</span>
+          } @else {
+          <div class="flex flex-wrap items-center gap-1 max-w-[190px]">
+            @for (loc of v.distributionLocations; track loc.id; let i = $index) {
+            @if (i < maxBadges) {
+            <app-badge
+              variant="secondary"
+              size="sm"
+              icon="storefront"
+              [truncate]="true"
+              [maxWidth]="badgeMaxWidth"
+              [title]="loc.name">
+              {{ loc.name }}
+            </app-badge>
+            }
+            }
+            @if (locationsOverflow(v.distributionLocations) > 0) {
+            <app-badge
+              variant="neutral"
+              size="sm"
+              [title]="hiddenLocations(v.distributionLocations)">
+              +{{ locationsOverflow(v.distributionLocations) }}
+            </app-badge>
+            }
+          </div>
+          }
+        </td>
+
+        <!-- ─── Cuisines ─── -->
+        <td class="py-3.5 px-space-md align-top">
+          @if (v.cuisines.length === 0) {
+          <span class="font-body-sm text-body-sm text-on-surface-variant">—</span>
+          } @else {
+          <div class="flex flex-wrap items-center gap-1 max-w-[190px]">
+            @for (cat of v.cuisines; track cat.id; let i = $index) {
+            @if (i < maxBadges) {
+            <app-badge
+              variant="primary"
+              size="sm"
+              [icon]="cat.iconUrl || 'restaurant'"
+              [truncate]="true"
+              [maxWidth]="badgeMaxWidth"
+              [title]="cat.name">
+              {{ cat.name }}
+            </app-badge>
+            }
+            }
+            @if (cuisinesOverflow(v.cuisines) > 0) {
+            <app-badge
+              variant="neutral"
+              size="sm"
+              [title]="hiddenCuisines(v.cuisines)">
+              +{{ cuisinesOverflow(v.cuisines) }}
+            </app-badge>
+            }
+          </div>
+          }
+        </td>
+
+        <!-- ─── Note ─── -->
+        <td class="py-3.5 px-space-md whitespace-nowrap align-top">
+          @if (v.totalRatings > 0) {
+          <div class="flex items-center gap-1">
+            <app-icon name="star" size="sm" class="text-tertiary" />
+            <span class="font-currency-tabular font-bold text-on-surface">
+              {{ v.ratingAvg | number:'1.1-1' }}
+            </span>
+            <span class="font-body-sm text-[11px] text-on-surface-variant">
+              ({{ v.totalRatings }})
+            </span>
+          </div>
+          } @else {
+          <span class="font-body-sm text-body-sm text-on-surface-variant">—</span>
+          }
+        </td>
+
+        <!-- ─── Statut ─── -->
+        <td class="py-3.5 px-space-md whitespace-nowrap align-top">
+          <app-badge
+            [variant]="statusVariant(v.status)"
+            [icon]="statusIcon(v.status)"
+            size="sm">
+            {{ statusLabel(v.status) }}
+          </app-badge>
+        </td>
+
+        <!-- ─── Actions ─── -->
+        <td class="py-3.5 px-space-md text-right whitespace-nowrap align-top">
+          <button
+            type="button"
+            (click)="select.emit(v)"
+            [title]="isEditing(v) ? 'Sélectionné pour modération' : 'Sélectionner pour modération'"
+            class="p-1.5 rounded-lg transition-colors
+                   bg-transparent border-0 cursor-pointer"
+            [ngClass]="isEditing(v)
+                      ? 'text-primary bg-primary-fixed/40'
+                      : 'text-on-surface-variant hover:text-primary hover:bg-surface-container'">
+            <app-icon name="shield_person" size="sm" />
+          </button>
+        </td>
+      </tr>
+      }
+      }
+      </tbody>
+    </table>
+  </div>
+</div>

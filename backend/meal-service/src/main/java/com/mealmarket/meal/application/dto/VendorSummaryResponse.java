@@ -16,6 +16,7 @@ import java.util.UUID;
 public record VendorSummaryResponse(
         UUID id,
         String businessName,
+        String ownerName,
         String description,
         String address,
         BigDecimal ratingAvg,

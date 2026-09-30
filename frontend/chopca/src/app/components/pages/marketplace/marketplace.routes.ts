@@ -24,6 +24,20 @@ export const MARKETPLACE_ROUTES: Routes = [
         .then(m => m.MealDetailPageComponent),
     title: 'Détail du plat • Chop ça!',
   },
+  {
+    path: 'meals/vendor/directory',
+    loadComponent: () =>
+      import('@components/pages/marketplace/vendor-directory/vendor-directory.page')
+        .then(m => m.VendorDirectoryPageComponent),
+    title: 'Restaurants partenaires • Chop ça!',
+  },
+  {
+    path: 'meals/vendor/directory/:id',
+    loadComponent: () =>
+      import('@components/pages/marketplace/vendor-detail/vendor-detail.page')
+        .then(m => m.VendorDetailPageComponent),
+    title: 'Restaurant • Chop ça!',
+  },
 ];
 
 /**
@@ -58,6 +72,13 @@ export const ADMIN_ROUTES: Routes = [
       import('@components/pages/marketplace/meals/meals.page')
         .then(m => m.MealsPageComponent),
     data: { scope: 'admin' as const },
+  },
+  {
+    path: 'vendors',
+    loadComponent: () =>
+      import('@components/pages/marketplace/vendors/vendors.page')
+        .then(m => m.VendorsPageComponent),
+    title: 'Modération des vendeurs • Chop ça!',
   }
 ];
 

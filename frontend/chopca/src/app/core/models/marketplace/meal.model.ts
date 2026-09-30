@@ -29,6 +29,9 @@ export interface Meal {
   readonly ingredients: IngredientSummary[];
   readonly distributionLocations: LocationSummary[];
   readonly supplements: MealSummary[];
+  readonly ingredientCount?: number;
+  readonly distributionLocationCount?: number;
+  readonly allergenIngredientCount?: number;
 
   readonly moderationStatus: ModerationStatus;
   readonly isActive: boolean;

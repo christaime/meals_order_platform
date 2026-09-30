@@ -134,7 +134,7 @@ export class MealReferencesPanelComponent {
 
   protected openLocation(loc: LocationSummary): void {
     const vendorId = this.meal()?.vendorId ?? '';
-    const url = `/admin/locations?vendorId=${encodeURIComponent(vendorId)}&focus=${encodeURIComponent(loc.id)}`;
+    const url = `/admin/locations?name=${encodeURIComponent(loc.name)}&vendorId=${encodeURIComponent(vendorId)}&focus=${encodeURIComponent(loc.id)}`;
     window.open(url, '_blank', 'noopener');
   }
 }

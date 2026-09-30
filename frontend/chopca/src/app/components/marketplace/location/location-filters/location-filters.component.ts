@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, computed, input, output, signal,
+  ChangeDetectionStrategy, Component, computed, input, output, signal,effect
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
@@ -51,5 +51,15 @@ export class LocationFiltersComponent {
   }
   protected onSortChange(e: Event): void {
     this.sortChange.emit((e.target as HTMLSelectElement).value as LocationSort);
+  }
+
+  constructor() {
+    // Seed the name filter from the URL-bound input, once.
+    effect(() => {
+      const initial = this.name();
+      if (initial && !this.draft()) {
+        this.draft.set(initial);
+      }
+    }, { allowSignalWrites: true });
   }
 }

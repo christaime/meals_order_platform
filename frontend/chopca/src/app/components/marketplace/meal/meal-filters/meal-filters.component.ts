@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  effect
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -120,8 +121,13 @@ export class MealFiltersComponent implements OnInit {
   ];
 
   constructor() {
-    // Keep the draft in sync when the host resets the name.
-    // (computed would be cleaner, but we need a mutable field.)
+    // Seed the name filter from the URL-bound input, once.
+    effect(() => {
+      const initial = this.name();
+      if (initial && !this.draftName()) {
+        this.draftName.set(initial);
+      }
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {

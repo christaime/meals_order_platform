@@ -32,7 +32,6 @@ import com.mealmarket.meal.domain.repository.IngredientRepository;
 import com.mealmarket.meal.domain.repository.MealRepository;
 import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.CategorySearchRequest;
-import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
 import com.mealmarket.meal.domain.repository.criteria.IngredientSearchRequest;
 import com.mealmarket.meal.domain.repository.criteria.MealSearchRequest;
 import com.mealmarket.meal.domain.repository.criteria.ModerationDataSearchRequest;
@@ -40,8 +39,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -259,11 +258,20 @@ public class ModerationService {
             UserType performedByType,
             UUID performedById
     ) {
-        Meal meal = mealRepository.findById(mealId)
+        // Must load with details — the shallow load returns empty
+        // ingredient/location collections, and the cascade would no-op.
+        Meal meal = mealRepository.findByIdWithDetails(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found: " + mealId));
 
         ModerationStatus from = meal.getModerationStatus();
         ModerationStatus to = mapDecision(request.decision(), from);
+
+        // On APPROVE, cascade the meal's pending references to APPROVED.
+        // Throws if any reference is in an incompatible state — the whole
+        // transaction rolls back.
+        if (to == ModerationStatus.APPROVED) {
+            cascadeApprovalForMeal(meal, performedByType, performedById);
+        }
 
         Meal updated = meal.withModerationStatus(to);
         mealRepository.save(updated);
@@ -534,5 +542,109 @@ public class ModerationService {
         return new DataPage<>(
                 items, categories.getPage(), categories.getSize(), categories.getTotalElements()
         );
+    }
+
+    /**
+     * Cascades approval to a meal's ingredients and distribution locations.
+     *
+     * Pre-flight rule: every child must be in a cascade-eligible state —
+     * PENDING (will be approved) or APPROVED (no-op). Any child in
+     * REJECTED or DISABLED throws ConflictException, which rolls back the
+     * whole transaction because the caller is @Transactional.
+     *
+     * Categories are intentionally excluded — they are reference data and
+     * are never un-approved.
+     *
+     * For every child that transitions, a ModerationData entry is written
+     * with the same performer and the same timestamp as the parent's
+     * approval.
+     */
+    private void cascadeApprovalForMeal(
+            Meal meal,
+            UserType performedByType,
+            UUID performedById
+    ) {
+        Instant now = Instant.now();
+
+        // ─── Validate — fail fast, before any state changes ───
+        List<String> blocking = new ArrayList<String>();
+
+        for (Ingredient ing : meal.getIngredients()) {
+            if (!isCascadeEligible(ing.getModerationStatus())) {
+                blocking.add("ingredient '" + ing.getName()
+                        + "' is " + ing.getModerationStatus());
+            }
+        }
+        for (DistributionLocation loc : meal.getDistributionLocations()) {
+            if (!isCascadeEligible(loc.getModerationStatus())) {
+                blocking.add("location '" + loc.getName()
+                        + "' is " + loc.getModerationStatus());
+            }
+        }
+
+        if (!blocking.isEmpty()) {
+            throw new ConflictException(
+                    "Cannot approve meal '" + meal.getName()
+                            + "' — referenced entities are not in a cascade-eligible state: "
+                            + String.join("; ", blocking)
+            );
+        }
+
+        // ─── Cascade ingredients ───
+        for (Ingredient ing : meal.getIngredients()) {
+            if (ing.getModerationStatus() == ModerationStatus.PENDING) {
+                ingredientRepository.save(ing.withModerationStatus(ModerationStatus.APPROVED));
+                recordCascade(
+                        ModerationTargetType.INGREDIENT, ing.getId(),
+                        ModerationStatus.PENDING, ModerationStatus.APPROVED,
+                        performedByType, performedById, now
+                );
+            }
+        }
+
+        // ─── Cascade locations ───
+        for (DistributionLocation loc : meal.getDistributionLocations()) {
+            if (loc.getModerationStatus() == ModerationStatus.PENDING) {
+                locationRepository.save(loc.withModerationStatus(ModerationStatus.APPROVED));
+                recordCascade(
+                        ModerationTargetType.DISTRIBUTION_LOCATION, loc.getId(),
+                        ModerationStatus.PENDING, ModerationStatus.APPROVED,
+                        performedByType, performedById, now
+                );
+            }
+        }
+    }
+
+    /** PENDING is eligible (will be approved); APPROVED is eligible (no-op). */
+    private boolean isCascadeEligible(ModerationStatus status) {
+        return status == ModerationStatus.PENDING
+                || status == ModerationStatus.APPROVED;
+    }
+
+    /**
+     * Records a system-generated ModerationData entry for a cascaded
+     * transition. Reason is null — these are not human-authored decisions.
+     */
+    private void recordCascade(
+            ModerationTargetType targetType,
+            UUID targetId,
+            ModerationStatus from,
+            ModerationStatus to,
+            UserType performedByType,
+            UUID performedById,
+            Instant at
+    ) {
+        ModerationData data = ModerationData.builder()
+                .targetType(targetType)
+                .targetId(targetId)
+                .fromStatus(from)
+                .toStatus(to)
+                .reason(null)
+                .performedByType(performedByType)
+                .performedById(performedById)
+                .performedAt(at)
+                .build();
+
+        moderationDataRepository.save(data);
     }
 }

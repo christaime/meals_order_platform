@@ -63,6 +63,11 @@ export class LocationsPageComponent {
   );
 
   // ─── Filters ──────────────────────────────────────────────
+  /**
+   * From `?name=…`. The route's query param name must be `name`.
+   * Nullable — withComponentInputBinding binds after construction.
+   */
+  readonly initialKeyword = input<string | null>(null, { alias: 'name' });
   protected readonly name = signal<string>('');
   protected readonly moderationStatus = signal<ModerationStatus | 'ALL'>('ALL');
   protected readonly sort = signal<LocationSort>('name-asc');
@@ -113,6 +118,17 @@ export class LocationsPageComponent {
   });
 
   constructor() {
+    const params = this.route.snapshot.queryParamMap;
+    const vendorIdParam = params.get('vendorId');
+    if (vendorIdParam) {
+      this.adminVendorId.set(vendorIdParam);
+    }
+    effect(() => {
+      const initial = this.initialKeyword();
+      if (initial ) {
+        this.name.set(initial);
+      }
+    }, { allowSignalWrites: true });
     effect(() => {
       const q = this.query();
       if (!q) {

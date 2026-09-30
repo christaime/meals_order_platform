@@ -2,13 +2,15 @@ import {
   DestroyRef, Injectable, NgZone, effect, inject, signal,
 } from '@angular/core';
 import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { AppSessionStore, RETURN_URL_KEY } from '@app/core/storage/app.store';
 import Keycloak from 'keycloak-js';
 import { SESSION_CHANNEL, SessionMessage } from './session-messages';
 
-const LEADER_HEARTBEAT_MS = 5_000;
-const LEADER_TIMEOUT_MS   = 12_000;   // if no heartbeat in 12s, leader is dead
-const TOKEN_REFRESH_MS    = 20_000;   // check every 20s; updateToken(30) decides
-const REFRESH_THRESHOLD_S = 30;       // refresh if expiring within 30s
+const LEADER_HEARTBEAT_MS     = 5_000;
+const LEADER_TIMEOUT_MS       = 12_000;   // if no heartbeat in 12s, leader is dead
+const TOKEN_REFRESH_MS        = 20_000;   // check every 20s; updateToken(30) decides
+const REFRESH_THRESHOLD_S     = 30;       // refresh if expiring within 30s
+const REVALIDATE_COOLDOWN_MS  = 1_000;    // debounce visibility+focus bursts
 
 @Injectable({ providedIn: 'root' })
 export class SessionManager {
@@ -31,14 +33,17 @@ export class SessionManager {
   private lastLeaderHeartbeat = 0;
 
   /** Timers owned by this tab. */
-  private refreshTimer: ReturnType<typeof setInterval> | null = null;
+  private refreshTimer:   ReturnType<typeof setInterval> | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
-  private electionTimer: ReturnType<typeof setTimeout> | null = null;
+  private electionTimer:  ReturnType<typeof setTimeout>  | null = null;
 
   // ─── Lifecycle ────────────────────────────────────────────
-
   private started = false;
   private onVisibility: (() => void) | null = null;
+  private onFocus: (() => void) | null = null;
+
+  /** Last time `revalidate()` ran — debounces focus/visibility bursts. */
+  private lastRevalidate = 0;
 
   constructor() {
     // Start/stop the session machinery based on auth state.
@@ -65,12 +70,25 @@ export class SessionManager {
 
     this.attemptLeadership();
 
+    // ─── Tab-return recovery ──────────────────────────────
+    // When the tab becomes visible again — or the window regains
+    // focus — the periodic refresh may have been throttled while
+    // backgrounded and the token may now be expired. Refresh eagerly,
+    // and redirect to login if the Keycloak session is gone.
+    //
+    // zone.run() is load-bearing: these events fire outside Angular's
+    // zone, and any signal write inside would otherwise not trigger CD.
     this.onVisibility = () => {
       if (document.visibilityState === 'visible') {
-        this.refreshNow().catch(() => { /* handled inside */ });
+        this.zone.run(() => this.revalidate());
       }
     };
+    this.onFocus = () => {
+      this.zone.run(() => this.revalidate());
+    };
+
     document.addEventListener('visibilitychange', this.onVisibility);
+    window.addEventListener('focus', this.onFocus);
   }
 
   private stop(): void {
@@ -80,6 +98,10 @@ export class SessionManager {
     if (this.onVisibility) {
       document.removeEventListener('visibilitychange', this.onVisibility);
       this.onVisibility = null;
+    }
+    if (this.onFocus) {
+      window.removeEventListener('focus', this.onFocus);
+      this.onFocus = null;
     }
     this.releaseLeadership();
   }
@@ -108,6 +130,24 @@ export class SessionManager {
     return this.keycloak.token ?? '';
   }
 
+  /**
+   * Force a token refresh — used by the interceptor on a 401.
+   *
+   * Unlike `getFreshToken()`, this always calls `updateToken(0)`,
+   * which forces a refresh if the current token is invalid, and
+   * throws if the refresh token is also dead. Throwing is the
+   * signal the interceptor needs to redirect to login.
+   */
+  async forceRefresh(): Promise<string> {
+    if (!this.keycloak.authenticated) {
+      throw new Error('No authenticated session');
+    }
+    await this.keycloak.updateToken(0);
+    const token = this.keycloak.token;
+    if (!token) throw new Error('No token after forced refresh');
+    return token;
+  }
+
   /** Force a token refresh. Safe to call from anywhere. */
   async refreshNow(): Promise<void> {
     if (!this.keycloak.authenticated) return;
@@ -119,7 +159,35 @@ export class SessionManager {
     } catch {
       // Refresh token dead — tell all tabs and re-auth.
       this.broadcast({ type: 'LOGOUT', tabId: this.tabId });
-      await this.keycloak.login();
+      await this.loginAgain();
+    }
+  }
+
+  /**
+   * Called when the tab becomes visible or the window regains focus.
+   *
+   * Refreshes the token if it's close to (or past) expiry. On failure
+   * — token truly expired, refresh token dead, Keycloak session gone —
+   * redirects to login. The current URL is preserved for the return trip.
+   *
+   * Debounced: `visibilitychange` and `focus` often fire together, and
+   * we don't want two concurrent `updateToken` calls.
+   */
+  private async revalidate(): Promise<void> {
+    if (!this.keycloak.authenticated) return;
+
+    const now = Date.now();
+    if (now - this.lastRevalidate < REVALIDATE_COOLDOWN_MS) return;
+    this.lastRevalidate = now;
+
+    try {
+      const refreshed = await this.keycloak.updateToken(REFRESH_THRESHOLD_S);
+      if (refreshed && this._isLeader()) {
+        this.broadcastToken();
+      }
+    } catch {
+      // Session is gone — redirect to login with a return URL.
+      await this.loginAgain();
     }
   }
 
@@ -217,10 +285,7 @@ export class SessionManager {
     switch (msg.type) {
       case 'CLAIM_LEADERSHIP':
         // Another tab is claiming. If I'm leader, I out-rank if my tabId is smaller.
-        if (this._isLeader() && msg.tabId > this.tabId) {
-          // I win — ignore their claim.
-          return;
-        }
+        if (this._isLeader() && msg.tabId > this.tabId) return;
         // Someone else wins — I yield.
         if (this._isLeader()) this.releaseLeadership();
         this.lastLeaderHeartbeat = msg.at;
@@ -264,6 +329,19 @@ export class SessionManager {
   }
 
   // ─── Helpers ──────────────────────────────────────────────
+
+  /**
+   * Redirect to Keycloak login, preserving the current URL so the user
+   * lands back where they were after re-authenticating.
+   */
+  private async loginAgain(): Promise<void> {
+    const returnUrl = window.location.pathname + window.location.search;
+    AppSessionStore.set(RETURN_URL_KEY, returnUrl);
+
+    await this.keycloak.login({
+      redirectUri: window.location.origin + '/auth/callback',
+    });
+  }
 
   private isExpiring(token: string, withinSeconds: number): boolean {
     try {

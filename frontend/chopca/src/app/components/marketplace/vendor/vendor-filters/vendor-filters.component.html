@@ -1,0 +1,48 @@
+<div class="flex flex-wrap items-center gap-2">
+
+  <!-- Keyword -->
+  <div class="flex-1 min-w-[140px] relative">
+    <app-icon
+      name="search"
+      size="sm"
+      class="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+    <input
+      type="text"
+      [value]="keyword()"
+      (input)="onKeywordInput($event)"
+      (keydown.enter)="onKeywordSubmit($event)"
+      (blur)="onKeywordSubmit($event)"
+      placeholder="Rechercher un vendeur…"
+      class="w-full min-w-0 h-11 pl-9 pr-3 rounded-full bg-surface-container-lowest
+             border border-outline-variant text-on-surface
+             font-body-md text-sm placeholder:text-outline
+             focus:outline-none focus:ring-2 focus:ring-primary" />
+  </div>
+
+  <!-- Status -->
+  <select
+    [value]="status()"
+    (change)="onStatusChange($event)"
+    class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+           border border-outline-variant text-on-surface
+           font-label-md text-xs font-semibold
+           focus:outline-none focus:ring-2 focus:ring-primary">
+    @for (opt of statusOptions; track opt.value) {
+    <option [value]="opt.value">{{ opt.label }}</option>
+    }
+  </select>
+
+  <!-- Sort -->
+  <select
+    [value]="sort()"
+    (change)="onSortChange($event)"
+    class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+           border border-outline-variant text-on-surface
+           font-label-md text-xs font-semibold
+           focus:outline-none focus:ring-2 focus:ring-primary">
+    @for (opt of sortOptions; track opt.value) {
+    <option [value]="opt.value">{{ opt.label }}</option>
+    }
+  </select>
+
+</div>

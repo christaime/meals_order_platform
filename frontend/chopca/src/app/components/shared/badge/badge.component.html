@@ -1,9 +1,14 @@
-<span [class]="classes()">
+<span [class]="classes()" [style.max-width]="maxWidth() ?? null">
   @if (icon()) {
     <app-icon
       [name]="icon()!"
       [filled]="filledIcon()"
-      size="sm" />
+      size="sm"
+      [class.shrink-0]="truncate()" />
   }
-  <ng-content />
+  @if (truncate()) {
+    <span class="block truncate"><ng-content /></span>
+  } @else {
+    <ng-content />
+  }
 </span>

@@ -49,6 +49,9 @@ public interface MealDtoMapper {
     @Mapping(target = "ingredients",           source = "ingredients",           qualifiedByName = "mapIngredientSummaries")
     @Mapping(target = "distributionLocations", source = "distributionLocations", qualifiedByName = "mapLocationSummaries")
     @Mapping(target = "isActive",              source = ".",                     qualifiedByName = "deriveIsActive")
+    @Mapping(target = "ingredientCount", ignore = true)
+    @Mapping(target = "distributionLocationCount", ignore = true)
+    @Mapping(target = "allergenIngredientCount", ignore = true)
     MealResponse toResponse(Meal meal);
 
     List<MealResponse> toResponseList(List<Meal> meals);
@@ -64,6 +67,9 @@ public interface MealDtoMapper {
 
     @Mapping(target = "cuisines",  source = "categories", qualifiedByName = "mapCuisines")
     @Mapping(target = "dishTypes", source = "categories", qualifiedByName = "mapDishTypes")
+    @Mapping(target = "ingredientCount", source = "ingredients",           qualifiedByName = "countIngredient")
+    @Mapping(target = "distributionLocationCount", source = "distributionLocations",           qualifiedByName = "countLocation")
+    @Mapping(target = "allergenIngredientCount", source = "ingredients",           qualifiedByName = "countAllergen")
     MealSummaryResponse toSummary(Meal meal);
 
     List<MealSummaryResponse> toSummaryList(List<Meal> meals);
@@ -71,6 +77,32 @@ public interface MealDtoMapper {
     // ═══════════════════════════════════════════════════════════
     //  Helpers
     // ═══════════════════════════════════════════════════════════
+    @Named("countIngredient")
+    default Integer countIngredient(List<Ingredient> ingredients) {
+        if (ingredients == null || ingredients.isEmpty()) {
+            return 0;
+        }
+        return ingredients.size();
+    }
+
+    @Named("countLocation")
+    default Integer countLocation(List<DistributionLocation> distributionLocations) {
+        if (distributionLocations == null || distributionLocations.isEmpty()) {
+            return 0;
+        }
+        return distributionLocations.size();
+    }
+
+    @Named("countAllergen")
+    default Integer countAllergen(List<Ingredient> ingredients) {
+        if (ingredients == null || ingredients.isEmpty()) {
+            return 0;
+        }
+        Long count = ingredients.stream()
+                .filter(c -> Boolean.TRUE.equals(c.getIsAllergen())).count();
+        return count.intValue();
+    }
+
 
     @Named("mapCuisines")
     default List<CategorySummaryResponse> mapCuisines(List<Category> categories) {

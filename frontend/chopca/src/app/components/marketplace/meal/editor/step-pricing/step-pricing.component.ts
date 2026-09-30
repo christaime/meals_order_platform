@@ -36,6 +36,15 @@ import {
  * - price (plain number input, required)
  * - promoPrice (plain number input, optional, < price)
  * - distributionLocationIds (plain chip input + custom autocomplete + create dialog)
+ *
+ * Location resolution:
+ * - When `initialLocations` is provided (editing an existing meal, whose
+ *   MealResponse already carries the full distribution-location summaries),
+ *   the component resolves the form's location ids against that list —
+ *   no backend call.
+ * - When it's null (create mode, or a bare mount), the component falls
+ *   back to fetching. In practice this path is rarely hit because the
+ *   user adds locations one at a time via `addLocation()`.
  */
 @Component({
   selector: 'app-step-pricing',
@@ -59,6 +68,14 @@ export class StepPricingComponent implements OnInit {
   private locationInputRef?: ElementRef<HTMLInputElement>;
 
   readonly form = input.required<FormGroup>();
+
+  /**
+   * Optional pre-supplied distribution-location list. When provided, the
+   * component resolves `distributionLocationIds` against this list
+   * instead of calling the backend — used when editing an existing meal,
+   * whose `MealResponse` already carries the location summaries.
+   */
+  readonly initialLocations = input<LocationSummary[] | null>(null);
 
   // ─── Location state ───────────────────────────────────────
   readonly locationFilter = signal<string>('');
@@ -108,6 +125,16 @@ export class StepPricingComponent implements OnInit {
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
+    // Seed the local cache from the caller-provided list, if any.
+    // This must happen before the valueChanges subscription fires so
+    // the first `syncSelected` resolves against a populated cache.
+    const provided = this.initialLocations();
+    if (provided && provided.length > 0) {
+      const next = new Map(this.locationCache());
+      for (const l of provided) next.set(l.id, l);
+      this.locationCache.set(next);
+    }
+
     this.locationIds.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(ids => this.syncSelected(ids ?? []));
@@ -146,6 +173,21 @@ export class StepPricingComponent implements OnInit {
     const missing = ids.filter(id => !cache.has(id));
 
     if (missing.length) {
+      // When a caller-provided list is used, any id not present in it is
+      // either deleted or DISABLED (hidden by @SQLRestriction on the
+      // backend). Re-fetching won't find it — resolve what we have and
+      // log the rest.
+      if (this.initialLocations() !== null) {
+        console.warn(
+          '[StepPricing] location ids not in the supplied list, skipping:',
+          missing,
+        );
+        this.updateSelectedFromCache(ids);
+        return;
+      }
+
+      // Fallback path (no initial list): fetch a page and hope it covers
+      // the ids. Rarely hit — the create flow adds locations one at a time.
       this.locationService
         .searchLocations({ size: 100 } as LocationSearchRequest)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -165,7 +207,15 @@ export class StepPricingComponent implements OnInit {
 
   private updateSelectedFromCache(ids: string[]): void {
     const cache = this.locationCache();
-    const list = ids.map(id => cache.get(id)).filter((l): l is LocationSummary => !!l);
+    const list: LocationSummary[] = [];
+    for (const id of ids) {
+      const loc = cache.get(id);
+      if (loc) {
+        list.push(loc);
+      } else {
+        console.warn('[StepPricing] unresolved location id', id);
+      }
+    }
     this.selectedLocations.set(list);
   }
 

@@ -15,6 +15,7 @@ public record VendorResponse(
 
         // ─── Business Info ─────────────────────────────────────────
         String businessName,
+        String ownerName,
         String description,
         String address,
         String email,

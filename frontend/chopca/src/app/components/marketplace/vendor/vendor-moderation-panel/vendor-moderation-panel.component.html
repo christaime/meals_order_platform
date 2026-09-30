@@ -1,0 +1,103 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+
+  <!-- Header -->
+  <div class="flex items-start justify-between pb-space-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
+          Modération du vendeur
+        </h2>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 truncate">
+        {{ businessName() }}
+      </p>
+    </div>
+    <app-badge
+      [variant]="statusVariant(currentStatus())"
+      [icon]="statusIcon(currentStatus())"
+      size="sm">
+      {{ statusLabel(currentStatus()) }}
+    </app-badge>
+  </div>
+
+  <!-- Body -->
+  <div class="mt-space-md flex flex-col gap-space-sm">
+
+    @if (validActions().length === 0) {
+    <div class="flex items-start gap-2 text-on-surface-variant py-4">
+      <app-icon name="block" size="md" class="shrink-0 mt-0.5" />
+      <p class="font-body-sm text-body-sm">
+        Ce vendeur est définitivement banni. Aucune action supplémentaire n'est possible.
+      </p>
+    </div>
+    } @else if (!pendingAction()) {
+    <!-- Action list -->
+    <div class="flex flex-wrap gap-2">
+      @for (meta of validActions(); track meta.action) {
+      <button
+        type="button"
+        (click)="beginAction(meta)"
+        class="inline-flex items-center gap-1.5
+               px-3 py-2 rounded-lg
+               font-label-md text-xs font-semibold
+               border transition-colors cursor-pointer"
+        [ngClass]="meta.destructive
+                  ? 'border-error text-error bg-transparent hover:bg-error-container/40'
+                  : 'border-primary text-primary bg-transparent hover:bg-primary-fixed/40'">
+        <app-icon [name]="meta.icon" size="sm" />
+        {{ meta.label }}
+      </button>
+      }
+    </div>
+    } @else {
+    <!-- Confirmation step -->
+    <div class="flex flex-col gap-space-sm pt-space-sm border-t border-outline-variant">
+
+      <div class="flex items-center gap-2">
+        <app-icon [name]="pendingMeta()!.icon" size="md"
+                  [class.text-error]="pendingMeta()!.destructive"
+                  [class.text-primary]="!pendingMeta()!.destructive" />
+        <span class="font-label-md text-sm font-bold text-on-surface">
+          Confirmer : {{ pendingMeta()!.label }}
+        </span>
+      </div>
+
+      @if (pendingMeta()!.requiresReason) {
+      <textarea
+        [value]="reason()"
+        (input)="onReasonInput($event)"
+        rows="3"
+        placeholder="Motif (obligatoire, min. 3 caractères)…"
+        class="w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
+               font-body-md text-sm placeholder:text-outline
+               focus:outline-none focus:ring-2 focus:ring-primary resize-none
+               border border-outline-variant"></textarea>
+      }
+
+      <div class="flex items-center justify-end gap-space-sm">
+        <button
+          type="button"
+          (click)="cancel()"
+          [disabled]="submitting()"
+          class="px-space-md h-10 bg-surface-container hover:bg-surface-container-high
+                 text-on-surface rounded-lg font-label-md text-label-md font-semibold
+                 disabled:opacity-60">
+          Annuler
+        </button>
+        <button
+          type="button"
+          (click)="confirm()"
+          [disabled]="!canConfirm() || submitting()"
+          class="px-space-md h-10 rounded-lg font-label-md text-label-md font-bold shadow-sm
+                 disabled:opacity-60 disabled:cursor-not-allowed"
+          [ngClass]="pendingMeta()!.destructive
+                    ? 'bg-error hover:bg-error/80 text-on-error'
+                    : 'bg-primary hover:bg-primary-container text-on-primary'">
+          {{ submitting() ? 'En cours…' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+</div>

@@ -84,7 +84,9 @@
             <mat-step>
               <ng-template matStepLabel>Composition</ng-template>
               <div class="pt-6 pb-2">
-                <app-step-composition [form]="form" />
+                <app-step-composition
+                  [form]="form"
+                  [initialIngredients]="editingMeal()?.ingredients ?? null" />
               </div>
               <div class="flex items-center justify-between gap-2 pt-4">
                 <button type="button" mat-button matStepperPrevious>
@@ -106,7 +108,9 @@
             <mat-step>
               <ng-template matStepLabel>Tarifs &amp; Zones</ng-template>
               <div class="pt-6 pb-2">
-                <app-step-pricing [form]="form" />
+                <app-step-pricing
+                  [form]="form"
+                  [initialLocations]="editingMeal()?.distributionLocations ?? null" />
               </div>
 
               @if (submitError()) {

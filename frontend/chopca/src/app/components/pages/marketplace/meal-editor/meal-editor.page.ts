@@ -84,6 +84,7 @@ export class MealEditorPageComponent implements OnInit {
   protected readonly submitting = signal<boolean>(false);
   protected readonly submitError = signal<string | null>(null);
   protected readonly isEditMode = signal<boolean>(false);
+  protected readonly editingMeal = signal<Meal | null>(null);
 
 //  Image management
   protected readonly imageMediaId = signal<string | null>(null);
@@ -225,6 +226,7 @@ export class MealEditorPageComponent implements OnInit {
           this.imageUrl.set(meal.imageUrl);
           this.imageMediaId.set(meal.imageStorageRef);
           this.isLoading.set(false);
+          this.editingMeal.set(meal);
         },
         error: (err) => {
           console.error('[MealEditorPage] load error', err);

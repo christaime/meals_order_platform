@@ -24,7 +24,7 @@ public class MediaService {
             Set.of("image/jpeg", "image/png", "image/webp");
     private static final long MAX_SIZE_BYTES = 5L * 1024 * 1024;
 
-    private final MediaStoragePort storage;   // <-- the port, not the adapter
+    private final MediaStoragePort storage;
 
     public MediaResponse upload(MediaUploadRequest request) {
         MultipartFile file = request.file();

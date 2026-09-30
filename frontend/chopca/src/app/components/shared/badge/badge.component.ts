@@ -20,10 +20,19 @@ export type BadgeSize = 'sm' | 'md';
  * - neutral   → informational (nouveau, tags)
  * - danger    → warning (allergènes, épuisé)
  *
+ * Truncation:
+ *   [truncate]="true" caps the label to a single line with an ellipsis.
+ *   Combine with [maxWidth]="'150px'" to bound the width.
+ *   The full text is available via the native [title] tooltip when set
+ *   on the host element by the caller.
+ *
  * Usage:
  *   <app-badge variant="secondary" icon="verified">Vérifié</app-badge>
  *   <app-badge variant="tertiary" icon="workspace_premium" [filledIcon]="true" [uppercase]="true">
  *     Top Vendeur
+ *   </app-badge>
+ *   <app-badge [truncate]="true" [maxWidth]="'150px'" [title]="longName">
+ *     {{ longName }}
  *   </app-badge>
  */
 @Component({
@@ -43,14 +52,22 @@ export class BadgeComponent {
   readonly filledIcon = input<boolean>(false);
   readonly uppercase = input<boolean>(false);
 
+  /** Cap the label to a single line with ellipsis. */
+  readonly truncate = input<boolean>(false);
+
+  /** Optional max width (e.g. '150px', '12rem'). Only applies with truncate=true. */
+  readonly maxWidth = input<string | null>(null);
+
   // ─── Derived classes ──────────────────────────────────────
 
   /** Full class string for the host `<span>`. */
   readonly classes = computed(() => [
     // Base
     'inline-flex items-center gap-1.5',
-    'font-label font-semibold rounded-full whitespace-nowrap leading-none',
+    'font-label font-semibold rounded-full leading-none',
     'transition-colors duration-150',
+    // Width / overflow — overflow-hidden clips past the max-width
+    this.truncate() ? 'overflow-hidden whitespace-nowrap' : 'whitespace-nowrap',
     // Size
     this.size() === 'sm'
       ? 'px-2 py-0.5 text-[10px] tracking-[0.03em]'

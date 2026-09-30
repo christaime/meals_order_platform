@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal,
+  ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal, input
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
@@ -61,6 +61,13 @@ export class IngredientsPageComponent {
   protected readonly moderationStatus = signal<ModerationStatus | 'ALL'>('ALL');
   protected readonly sort = signal<IngredientSort>('name-asc');
 
+  // ─── Route-bound inputs ────────────────────────────────────
+  /**
+   * From `?name=…`. The route's query param name must be `name`.
+   * Nullable — withComponentInputBinding binds after construction.
+   */
+  readonly initialKeyword = input<string | null>(null, { alias: 'name' });
+
   // Pagination
   protected readonly page = signal<number>(0);
   protected readonly size = signal<number>(10);
@@ -93,6 +100,12 @@ export class IngredientsPageComponent {
   );
 
   constructor() {
+    effect(() => {
+      const initial = this.initialKeyword();
+      if (initial ) {
+        this.name.set(initial);
+      }
+    }, { allowSignalWrites: true });
     effect(() => this.load(this.query()));
   }
 

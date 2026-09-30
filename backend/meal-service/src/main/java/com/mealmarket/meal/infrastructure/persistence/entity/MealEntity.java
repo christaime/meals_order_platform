@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -19,10 +20,6 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "meals",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_meals_vendor_name",
-                columnNames = {"vendor_id", "name"}
-        ),
         indexes = {
                 @Index(name = "idx_meals_vendor_id", columnList = "vendor_id"),
                 @Index(name = "idx_meals_name", columnList = "name"),
@@ -37,6 +34,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLRestriction("moderation_status <> 'DISABLED'")
 public class MealEntity {
 
     @Id

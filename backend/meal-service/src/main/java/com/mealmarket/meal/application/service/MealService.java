@@ -151,8 +151,45 @@ public class MealService {
 
     @Transactional(readOnly = true)
     public DataPage<MealResponse> searchMeals(MealSearchRequest request) {
-        log.debug("Searching meals with filters");
-        return mealRepository.search(request).map(dtoMapper::toResponse);
+        log.debug("Searching meals with filters (loadFull={}, withCount={})",
+                request.getLoadFull(), request.getWithCount());
+
+        return mealRepository.search(request)
+                .map(meal -> toSearchResponse(meal, request));
+    }
+
+    /**
+     * Builds the search response for one meal.
+     *
+     * Operation order matters:
+     *   1. Map domain → response (mapper produces the full shape)
+     *   2. Count from the DOMAIN object (never from the response —
+     *      the mapper may omit collections)
+     *   3. Attach counts, if `withCount`
+     *   4. Trim collections, if `!loadFull`
+     *
+     * Steps 2 and 4 both touch ingredients/locations, but the order
+     * guarantees counting happens before trimming.
+     */
+    private MealResponse toSearchResponse(Meal meal, MealSearchRequest request) {
+        MealResponse response = dtoMapper.toResponse(meal);
+
+        // ── 2. Counts from the domain, before any trimming ──
+        if (Boolean.TRUE.equals(request.getWithCount())) {
+            int ingredientCount = meal.getIngredients().size();
+            int allergenCount = (int) meal.getIngredients().stream()
+                    .filter(i -> Boolean.TRUE.equals(i.getIsAllergen()))
+                    .count();
+            int locationCount = meal.getDistributionLocations().size();
+            response = response.withCounts(ingredientCount, allergenCount, locationCount);
+        }
+
+        // ── 4. Trim collections last ──
+        if (request.getLoadFull() == null || Boolean.FALSE.equals(request.getLoadFull())) {
+            response = response.withthoutIngredientsAndLocations();
+        }
+
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -160,7 +197,9 @@ public class MealService {
             MealSearchRequest request,
             UUID vendorId
     ) {
-        log.debug("Searching meals for vendor: {}", vendorId);
+
+        log.debug("Searching meals for vendor: {} with filters (loadFull={}, withCount={})",
+                vendorId, request.getLoadFull(), request.getWithCount());
 
         MealSearchRequest scopedRequest = MealSearchRequest.builder()
                 .keyword(request.getKeyword())
@@ -181,7 +220,8 @@ public class MealService {
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
-        return mealRepository.search(scopedRequest).map(dtoMapper::toResponse);
+        return mealRepository.search(request)
+                .map(meal -> toSearchResponse(meal, request));
     }
 
     @Transactional(readOnly = true)
@@ -263,6 +303,11 @@ public class MealService {
         String previousRef = existing.getImageStorageRef();
         String newRef = resolveImageRef(request.imageStorageRef(), previousRef);
 
+        // 2. Resolve relationships
+        List<Category> categories = resolveCategories(request.categoryIds());
+        List<Ingredient> ingredients = resolveIngredients(request.ingredientIds());
+        List<DistributionLocation> locations = resolveLocations(request.distributionLocationIds(), vendorId);
+
         Meal updated = Meal.builder()
                 .id(existing.getId())
                 .vendor(existing.getVendor())
@@ -277,9 +322,9 @@ public class MealService {
                 .totalRatings(existing.getTotalRatings())
                 .prepTimeMinutes(request.prepTimeMinutes() != null
                         ? request.prepTimeMinutes() : existing.getPrepTimeMinutes())
-                .categories(existing.getCategories())
-                .ingredients(existing.getIngredients())
-                .distributionLocations(existing.getDistributionLocations())
+                .categories(categories)
+                .ingredients(ingredients)
+                .distributionLocations(locations)
                 .moderationStatus(existing.getModerationStatus())
                 .createdAt(existing.getCreatedAt())
                 .updatedAt(java.time.Instant.now())
