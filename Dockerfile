@@ -22,7 +22,7 @@ RUN ./gradlew --no-daemon dependencies || true
 COPY . .
 
 # Build the AI backend
-RUN ./gradlew --no-daemon :backend:meal-service:bootJar
+RUN ./gradlew --no-daemon :meal-service:bootJar
 
 # ---------- Stage 2: Run ----------
 FROM eclipse-temurin:17-jre-alpine
