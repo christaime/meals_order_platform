@@ -10,9 +10,9 @@ COPY gradle ./gradle/
 
 # Copy each subproject's build.gradle so Gradle can resolve dependencies
 COPY common/build.gradle ./common/
-COPY gateway/build.gradle ./gateway/
+#COPY gateway/build.gradle ./gateway/
 COPY meal-service/build.gradle ./meal-service/
-COPY payment-service/build.gradle ./payment-service/
+#COPY payment-service/build.gradle ./payment-service/
 
 # Pre-download dependencies (optional but speeds up subsequent builds)
 RUN ./gradlew --no-daemon dependencies
