@@ -22,7 +22,7 @@ import {
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model';
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
-import { City } from '@app/core/models/marketplace/reference.model';
+import { City } from '@app/core/models/marketplace';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
 
 export type MealSort =

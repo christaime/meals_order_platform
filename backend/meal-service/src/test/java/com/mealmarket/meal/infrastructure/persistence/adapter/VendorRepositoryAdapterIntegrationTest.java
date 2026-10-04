@@ -3,11 +3,15 @@ package com.mealmarket.meal.infrastructure.persistence.adapter;
 import com.mealmarket.AbstractIntegrationTest;
 import com.mealmarket.common.pagination.DataPage;
 import com.mealmarket.common.pagination.PageRequest;
+import com.mealmarket.meal.domain.model.City;
 import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.domain.model.VendorState;
+import com.mealmarket.meal.domain.repository.CityRepository;
 import com.mealmarket.meal.domain.repository.VendorRepository;
 import com.mealmarket.meal.domain.repository.criteria.VendorSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.repository.CityJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
+import com.mealmarket.meal.testing.TestFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,10 +40,16 @@ class VendorRepositoryAdapterIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private VendorJpaRepository vendorJpaRepository;
+    @Autowired private CityRepository cityRepository;              // NEW
+    @Autowired private CityJpaRepository cityJpaRepository;         // NEW
+
+    private City yaounde;
 
     @BeforeEach
     void cleanUp() {
         vendorJpaRepository.deleteAll();
+        cityJpaRepository.deleteAll();
+        yaounde = cityRepository.save(City.create("Yaoundé", "Centre", "CM"));
     }
 
     // ------------------------------------------------------------------
@@ -50,6 +60,7 @@ class VendorRepositoryAdapterIntegrationTest extends AbstractIntegrationTest {
         return Vendor.builder()
                 .userId(UUID.randomUUID())
                 .businessName(businessName)
+                .city(yaounde)
                 .ownerName("owner")
                 .description("Description for " + businessName)
                 .address("123 Main Street, Yaoundé")

@@ -9,11 +9,13 @@ import com.mealmarket.meal.application.dto.LocationResponse;
 import com.mealmarket.meal.application.dto.LocationSummaryResponse;
 import com.mealmarket.meal.application.dto.UpdateLocationRequest;
 import com.mealmarket.meal.application.mapper.LocationDtoMapper;
+import com.mealmarket.meal.domain.model.City;                                    // NEW
 import com.mealmarket.meal.domain.model.DistributionLocation;
 import com.mealmarket.meal.domain.model.ModerationData;
 import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.ModerationTargetType;
 import com.mealmarket.meal.domain.model.Vendor;
+import com.mealmarket.meal.domain.repository.CityRepository;                     // NEW
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
 import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 public class DistributionLocationService {
 
     private final DistributionLocationRepository locationRepository;
+    private final CityRepository cityRepository;                                // NEW
     private final ModerationDataRepository moderationDataRepository;
     private final LocationDtoMapper dtoMapper;
 
@@ -52,10 +55,16 @@ public class DistributionLocationService {
             );
         }
 
-        // 2. Create the domain object (always PENDING)
+        // 2. Resolve city                                                      // NEW
+        City city = cityRepository.findById(request.cityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found: " + request.cityId()));
+
+        // 3. Create the domain object (always PENDING)
         DistributionLocation location = DistributionLocation.create(
                 vendor,
                 request.name(),
+                city,                                                           // NEW
                 request.address(),
                 request.phone(),
                 request.latitude(),
@@ -65,7 +74,7 @@ public class DistributionLocationService {
 
         DistributionLocation saved = locationRepository.save(location);
 
-        // 3. Record initial moderation entry
+        // 4. Record initial moderation entry
         moderationDataRepository.save(
                 ModerationData.created(
                         ModerationTargetType.DISTRIBUTION_LOCATION,
@@ -152,6 +161,7 @@ public class DistributionLocationService {
                         .keyword(request.getKeyword())
                         .name(request.getName())
                         .moderationStatus(request.getModerationStatus())
+                        .sort(request.getSort())
                         .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                         .build();
 
@@ -173,7 +183,10 @@ public class DistributionLocationService {
                         .vendorId(request.getVendorId())
                         .keyword(request.getKeyword())
                         .name(request.getName())
-                        .moderationStatus(ModerationStatus.APPROVED)    // ← forced
+                        .moderationStatus(ModerationStatus.APPROVED)
+                        .cityNameLike(request.getCityNameLike())
+                        .cityIds(request.getCityIds())
+                        .sort(request.getSort())
                         .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                         .build();
 
@@ -219,7 +232,7 @@ public class DistributionLocationService {
 
         DistributionLocation existing = findLocationOrThrow(locationId);
         // Only pending location can be edit
-        if(!existing.getModerationStatus().equals(ModerationStatus.PENDING)){
+        if (!existing.getModerationStatus().equals(ModerationStatus.PENDING)) {
             throw new ConflictException(
                     "Location can only be edited while PENDING — current status: "
                             + existing.getModerationStatus());
@@ -239,8 +252,16 @@ public class DistributionLocationService {
             );
         }
 
+        // Resolve city only when provided (null = unchanged)                  // NEW
+        City city = request.cityId() != null
+                ? cityRepository.findById(request.cityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found: " + request.cityId()))
+                : null;
+
         DistributionLocation updated = existing.withUpdatedDetails(
                 request.name(),
+                city,                                                           // NEW
                 request.address(),
                 request.phone(),
                 request.latitude(),

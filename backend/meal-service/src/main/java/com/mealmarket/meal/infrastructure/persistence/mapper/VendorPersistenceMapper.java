@@ -4,6 +4,7 @@ import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.DistributionLocation;
 import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.domain.model.VendorState;
+import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,72 +17,108 @@ import java.util.UUID;
 /**
  * Maps between {@link Vendor} (domain) and {@link VendorEntity} (JPA).
  *
- * Image handling:
- * - The four {@code *StorageRef} fields (profile, cover, idCardFront, idCardBack)
- *   are plain Strings on both sides; MapStruct maps them 1:1 with no configuration.
- *   URL derivation is a presentation concern handled in {@code VendorDtoMapper}.
+ * Multi-parameter methods (Entity → Domain):
+ *   Every {@code @Mapping} source is prefixed with its parameter name.
+ *   MapStruct cannot disambiguate implicit sources across parameters,
+ *   and three fields — {@code id}, {@code createdAt}, {@code updatedAt} —
+ *   exist on both {@code VendorEntity} and {@code CityEntity}.
  *
- * Relationship handling:
- * - {@code categories} and {@code distributionLocations} are IGNORED on the
- *   entity → domain direction. The adapter loads them separately via their
- *   respective repositories and reassembles the full domain object.
- * - On the domain → entity direction, only IDs are extracted from the objects.
+ * City handling:
+ *   The entity stores only {@code UUID cityId}; the {@code CityEntity}
+ *   is resolved by the adapter and passed in.
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = { CityPersistenceMapper.class }
+)
 public interface VendorPersistenceMapper {
 
     VendorPersistenceMapper INSTANCE = Mappers.getMapper(VendorPersistenceMapper.class);
 
     // ═══════════════════════════════════════════════════════════
-    //  Domain → Entity
+    //  Domain → Entity  (single parameter — no prefix needed)
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "categoryIds",             source = "categories",             qualifiedByName = "mapCategoryIds")
-    @Mapping(target = "distributionLocationIds", source = "distributionLocations",  qualifiedByName = "mapLocationIds")
+    @Mapping(target = "categoryIds",             source = "categories",            qualifiedByName = "mapCategoryIds")
+    @Mapping(target = "distributionLocationIds", source = "distributionLocations", qualifiedByName = "mapLocationIds")
     @Mapping(target = "status",                  source = "state.status")
     @Mapping(target = "statusReason",            source = "state.reason")
     @Mapping(target = "statusChangedAt",         source = "state.changedAt")
     @Mapping(target = "statusChangedBy",         source = "state.changedBy")
     @Mapping(target = "statusChangeType",        source = "state.changeType")
+    @Mapping(target = "cityId",                  source = "city.id")
     VendorEntity toEntity(Vendor vendor);
 
     // ═══════════════════════════════════════════════════════════
-    //  Entity → Domain (lightweight)
-    //  Relationships are loaded separately by the adapter.
-    //  The four imageStorageRef fields map 1:1 (same names, same type).
+    //  Entity → Domain  (full)
+    //
+    //  Two parameters → every source must be prefixed.
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "state",                 source = ".", qualifiedByName = "buildState")
+    @Mapping(target = "id",             source = "entity.id")
+    @Mapping(target = "userId",         source = "entity.userId")
+    @Mapping(target = "businessName",   source = "entity.businessName")
+    @Mapping(target = "ownerName",      source = "entity.ownerName")
+    @Mapping(target = "description",    source = "entity.description")
+    @Mapping(target = "address",        source = "entity.address")
+    @Mapping(target = "email",          source = "entity.email")
+    @Mapping(target = "phone",          source = "entity.phone")
+    @Mapping(target = "city",           source = "city")
+    @Mapping(target = "ratingAvg",      source = "entity.ratingAvg")
+    @Mapping(target = "totalRatings",   source = "entity.totalRatings")
+    @Mapping(target = "state",          source = "entity", qualifiedByName = "buildState")
+    @Mapping(target = "deliveryRadius", source = "entity.deliveryRadius")
+    @Mapping(target = "pickupAddress",  source = "entity.pickupAddress")
+
+    @Mapping(target = "profileImageStorageRef", source = "entity.profileImageStorageRef")
+    @Mapping(target = "coverImageStorageRef",   source = "entity.coverImageStorageRef")
+    @Mapping(target = "idCardFrontStorageRef",  source = "entity.idCardFrontStorageRef")
+    @Mapping(target = "idCardBackStorageRef",   source = "entity.idCardBackStorageRef")
+
+    @Mapping(target = "subscriptionTier",  source = "entity.subscriptionTier")
+    @Mapping(target = "createdAt",         source = "entity.createdAt")
+    @Mapping(target = "updatedAt",         source = "entity.updatedAt")
+
+    // Loaded separately by the adapter — do not attempt to map.
     @Mapping(target = "categories",            ignore = true)
     @Mapping(target = "distributionLocations", ignore = true)
-    Vendor toDomain(VendorEntity entity);
+    Vendor toDomain(VendorEntity entity, CityEntity city);
 
-    /**
-     * Minimal vendor mapper — used for relationship assembly when a domain
-     * object references a Vendor but does not need its full aggregate
-     * (categories, locations, ...).
-     *
-     * Populates only the fields required by {@link Vendor}'s own validation.
-     * Everything else is explicitly ignored so MapStruct doesn't try to
-     * recursively map associations.
-     */
+    // ═══════════════════════════════════════════════════════════
+    //  Entity → Domain  (minimal)
+    //
+    //  Used to build the {@code vendor} field of a location / meal.
+    //  Populates only fields required by {@code Vendor}'s own
+    //  validation. Everything else is ignored.
+    // ═══════════════════════════════════════════════════════════
+
     @Named("toMinimalDomain")
-    @Mapping(target = "description",              ignore = true)
-    @Mapping(target = "ratingAvg",                ignore = true)
-    @Mapping(target = "totalRatings",             ignore = true)
-    @Mapping(target = "deliveryRadius",           ignore = true)
-    @Mapping(target = "pickupAddress",            ignore = true)
-    @Mapping(target = "profileImageStorageRef",   ignore = true)
-    @Mapping(target = "coverImageStorageRef",     ignore = true)
-    @Mapping(target = "idCardFrontStorageRef",    ignore = true)
-    @Mapping(target = "idCardBackStorageRef",     ignore = true)
-    @Mapping(target = "categories",               ignore = true)
-    @Mapping(target = "distributionLocations",    ignore = true)
-    @Mapping(target = "createdAt",                ignore = true)
-    @Mapping(target = "updatedAt",                ignore = true)
-    @Mapping(target = "state", source = ".", qualifiedByName = "buildState")
-    @Mapping(target = "subscriptionTier",         defaultValue = "FREE")
-    Vendor toMinimalDomain(VendorEntity entity);
+    @Mapping(target = "id",             source = "entity.id")
+    @Mapping(target = "userId",         source = "entity.userId")
+    @Mapping(target = "businessName",   source = "entity.businessName")
+    @Mapping(target = "ownerName",      source = "entity.ownerName")
+    @Mapping(target = "address",        source = "entity.address")
+    @Mapping(target = "email",          source = "entity.email")
+    @Mapping(target = "phone",          source = "entity.phone")
+    @Mapping(target = "city",           source = "city")
+    @Mapping(target = "state",          source = "entity", qualifiedByName = "buildState")
+    @Mapping(target = "subscriptionTier", source = "entity.subscriptionTier", defaultValue = "FREE")
+
+    // Not needed by a location / meal referencing a vendor.
+    @Mapping(target = "description",            ignore = true)
+    @Mapping(target = "ratingAvg",              ignore = true)
+    @Mapping(target = "totalRatings",           ignore = true)
+    @Mapping(target = "deliveryRadius",         ignore = true)
+    @Mapping(target = "pickupAddress",          ignore = true)
+    @Mapping(target = "profileImageStorageRef", ignore = true)
+    @Mapping(target = "coverImageStorageRef",   ignore = true)
+    @Mapping(target = "idCardFrontStorageRef",  ignore = true)
+    @Mapping(target = "idCardBackStorageRef",   ignore = true)
+    @Mapping(target = "categories",             ignore = true)
+    @Mapping(target = "distributionLocations",  ignore = true)
+    @Mapping(target = "createdAt",              ignore = true)
+    @Mapping(target = "updatedAt",              ignore = true)
+    Vendor toMinimalDomain(VendorEntity entity, CityEntity city);
 
     // ═══════════════════════════════════════════════════════════
     //  Helpers

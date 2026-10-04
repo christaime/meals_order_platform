@@ -61,9 +61,9 @@ lerna-debug.log*
 # ═══════════════════════════════════════════════════════════════
 #  ENVIRONMENT & SECRETS — NEVER COMMIT
 # ═══════════════════════════════════════════════════════════════
-.env
-.env.*
-!.env.example
+backend/meal-service/.env
+backend/meal-service/.env.example
+!backend/meal-service/.env.example
 *.env
 application-local.yml
 application-local.properties

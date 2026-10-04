@@ -7,10 +7,12 @@ import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import com.mealmarket.meal.infrastructure.persistence.mapper.DistributionLocationPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.mapper.VendorPersistenceMapper;
+import com.mealmarket.meal.infrastructure.persistence.repository.CityJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.DistributionLocationJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.specification.DistributionLocationSpecification;
@@ -32,9 +34,10 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
     private final DistributionLocationJpaRepository jpaRepository;
     private final DistributionLocationPersistenceMapper mapper;
 
-    // ✅ Direct JPA access — no adapter-to-adapter dependency
     private final VendorJpaRepository vendorJpaRepository;
     private final VendorPersistenceMapper vendorMapper;
+
+    private final CityJpaRepository cityJpaRepository;
 
     // ═══════════════════════════════════════════════════════════
     //  CRUD
@@ -67,10 +70,6 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
         jpaRepository.deleteById(location.getId());
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  Uniqueness (per vendor)
-    // ═══════════════════════════════════════════════════════════
-
     @Override
     public boolean existsByVendorIdAndName(UUID vendorId, String name) {
         return jpaRepository.existsByVendorIdAndName(vendorId, name);
@@ -80,10 +79,6 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
     public Optional<DistributionLocation> findByVendorIdAndName(UUID vendorId, String name) {
         return jpaRepository.findByVendorIdAndName(vendorId, name).map(this::toFullDomain);
     }
-
-    // ═══════════════════════════════════════════════════════════
-    //  Vendor-Scoped Queries
-    // ═══════════════════════════════════════════════════════════
 
     @Override
     public List<DistributionLocation> findByVendorId(UUID vendorId) {
@@ -97,10 +92,6 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
         return jpaRepository.countByVendorId(vendorId);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  Bulk Lookup
-    // ═══════════════════════════════════════════════════════════
-
     @Override
     public List<DistributionLocation> findAllById(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -110,10 +101,6 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
                 .map(this::toFullDomain)
                 .collect(Collectors.toList());
     }
-
-    // ═══════════════════════════════════════════════════════════
-    //  Proximity Queries
-    // ═══════════════════════════════════════════════════════════
 
     @Override
     public List<DistributionLocation> findNearbyByVendorId(
@@ -128,21 +115,11 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
                 .collect(Collectors.toList());
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  Search
-    // ═══════════════════════════════════════════════════════════
-
     @Override
     public DataPage<DistributionLocation> search(DistributionLocationSearchRequest request) {
-        if (request.getVendorId() == null) {
-            throw new IllegalArgumentException(
-                    "vendorId is required when searching distribution locations"
-            );
-        }
 
         Specification<DistributionLocationEntity> spec =
                 DistributionLocationSpecification.build(request);
-
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
                 request.getPageRequest().getSize()
@@ -150,10 +127,6 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
         Page<DistributionLocationEntity> page = jpaRepository.findAll(spec, pageable);
         return toDataPage(page);
     }
-
-    // ═══════════════════════════════════════════════════════════
-    //  Moderation Queue (admin-wide)
-    // ═══════════════════════════════════════════════════════════
 
     @Override
     public List<DistributionLocation> findByModerationStatus(ModerationStatus status) {
@@ -167,11 +140,29 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
     // ═══════════════════════════════════════════════════════════
 
     private DistributionLocation toFullDomain(DistributionLocationEntity entity) {
-        VendorEntity vendorEntity = vendorJpaRepository.findById(entity.getVendorId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Vendor not found: " + entity.getVendorId()));
-        return mapper.toDomain(entity,vendorEntity);
+        Vendor vendor = loadMinimalVendor(entity.getVendorId());
 
+        CityEntity cityEntity = cityJpaRepository.findById(entity.getCityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found: " + entity.getCityId()));
+
+        return mapper.toDomain(entity, vendor, cityEntity);
+    }
+
+    /**
+     * Minimal domain Vendor (no locations, no categories) to break the
+     * location → vendor → locations recursion.
+     */
+    private Vendor loadMinimalVendor(UUID vendorId) {
+        VendorEntity vendorEntity = vendorJpaRepository.findById(vendorId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Vendor not found: " + vendorId));
+
+        CityEntity vendorCity = cityJpaRepository.findById(vendorEntity.getCityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found for vendor: " + vendorEntity.getCityId()));
+
+        return vendorMapper.toMinimalDomain(vendorEntity, vendorCity);
     }
 
     private DataPage<DistributionLocation> toDataPage(Page<DistributionLocationEntity> page) {

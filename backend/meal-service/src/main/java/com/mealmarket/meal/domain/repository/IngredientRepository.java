@@ -53,11 +53,11 @@ public interface IngredientRepository {
     long countByModerationStatus(ModerationStatus status);
 
     // ═══════════════════════════════════════════════════════════
-    //  Search (single entry point for all filters)
+    //  Search (entry point for all elaborated filters)
     // ═══════════════════════════════════════════════════════════
 
     DataPage<Ingredient> search(IngredientSearchRequest request);
-
+    List<Ingredient> findByModerationStatusAndIsAllergen(ModerationStatus status, boolean isAllergen);
     // ═══════════════════════════════════════════════════════════
     //  Statistics
     // ═══════════════════════════════════════════════════════════

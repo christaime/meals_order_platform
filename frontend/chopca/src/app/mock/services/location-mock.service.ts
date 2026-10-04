@@ -136,7 +136,7 @@ export class LocationMockService implements LocationService {
       vendorId: 'mock-vendor',
       vendorBusinessName: 'Mock Vendor',
       cityId: "ebolowa",
-      city: { "id": "ebolowa", "name": "Ebolowa","region": "Sud" },
+      city: { id: 'c17a0000-0000-4000-8000-000000000001', "name": "Ebolowa","region": "Sud" , countryCode: 'CM' },
       name: request.name,
       address: request.address,
       phone: request.phone ?? null,
@@ -185,7 +185,7 @@ export class LocationMockService implements LocationService {
   private toSummary = (location: Location): LocationSummary => ({
     id: location.id,
     name: location.name,
-     city: { "id": "ebolowa", "name": "Ebolowa","region": "Sud" },
+     city: { id: 'c17a0000-0000-4000-8000-000000000001', "name": "Ebolowa","region": "Sud" , countryCode: 'CM' },
     address: location.address,
     moderationStatus: location.moderationStatus,
   });

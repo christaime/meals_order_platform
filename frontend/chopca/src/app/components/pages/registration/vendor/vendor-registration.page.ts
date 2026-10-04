@@ -138,6 +138,7 @@ export class VendorRegistrationPage {
     coverImageStorageRef:   [null as string | null, Validators.required],
 
     // ── Section D ────────────────────────────────────────
+    cityId:       ['', [Validators.required]],
     address: ['', [
       Validators.required,
       Validators.maxLength(255),
@@ -377,6 +378,7 @@ export class VendorRegistrationPage {
       businessName: v.businessName.trim(),
       ownerName:    v.ownerName.trim(),
       address,
+      cityId: v.cityId,
       phone:        v.phone.trim(),
       description:  desc.length > 0 ? desc : null,
       deliveryRadius: typeof v.deliveryRadius === 'number' ? v.deliveryRadius : null,

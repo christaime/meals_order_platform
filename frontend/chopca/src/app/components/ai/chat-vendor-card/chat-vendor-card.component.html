@@ -1,0 +1,89 @@
+<article
+  role="button"
+  tabindex="0"
+  (click)="onClick()"
+  (keydown)="onKeydown($event)"
+  class="rounded-lg overflow-hidden
+         bg-surface-container-low
+         border border-outline-variant
+         hover:border-primary hover:shadow-sm
+         transition-all cursor-pointer
+         flex flex-col gap-2 p-2">
+
+  <!-- ─── Top row: avatar + main info ────────────────────── -->
+  <div class="flex gap-2">
+
+    <!-- Avatar -->
+    @if (vendor().profileImageUrl) {
+    <img
+      [src]="vendor().profileImageUrl"
+      [alt]="vendor().businessName"
+      loading="lazy"
+      class="w-14 h-14 rounded-full object-cover shrink-0
+               bg-surface-container" />
+    } @else {
+    <div class="w-14 h-14 rounded-full bg-surface-container shrink-0
+                  flex items-center justify-center">
+      <mat-icon class="text-on-surface-variant">storefront</mat-icon>
+    </div>
+    }
+
+    <!-- Info -->
+    <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+      <div class="font-label-lg text-label-lg text-on-surface truncate">
+        {{ vendor().businessName }}
+      </div>
+
+      @if (vendor().cityName) {
+      <div class="font-label-sm text-label-sm text-on-surface-variant truncate">
+        {{ vendor().cityName }}
+      </div>
+      }
+
+      <div class="flex items-center gap-2 mt-auto flex-wrap">
+        @if (vendor().ratingAvg) {
+        <span class="flex items-center gap-0.5
+                       font-label-sm text-label-sm text-on-surface-variant">
+            <mat-icon class="!text-xs !w-3 !h-3 !leading-none">star</mat-icon>
+            <span>{{ vendor().ratingAvg | number:'1.1-1' }}</span>
+            @if (vendor().totalRatings) {
+              <span class="text-outline">({{ vendor().totalRatings }})</span>
+            }
+          </span>
+        }
+
+        @if (hasCuisines()) {
+        <span class="font-label-sm text-label-sm text-on-surface-variant truncate">
+            {{ vendor().cuisines!.join(', ') }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Chevron -->
+    <mat-icon class="text-on-surface-variant self-center shrink-0">
+      chevron_right
+    </mat-icon>
+  </div>
+
+  <!-- ─── Expanded-only sections ─────────────────────────── -->
+  @if (expanded()) {
+
+  @if (vendor().description) {
+  <p class="font-body-sm text-body-sm text-on-surface-variant px-1">
+    {{ vendor().description }}
+  </p>
+  }
+
+  @if (vendor().address) {
+  <div class="flex items-start gap-1.5 px-1 pt-1
+                  border-t border-outline-variant/40
+                  font-body-sm text-body-sm text-on-surface">
+    <mat-icon class="!text-sm !w-4 !h-4 mt-0.5 text-primary shrink-0">
+      place
+    </mat-icon>
+    <span class="min-w-0 truncate">{{ vendor().address }}</span>
+  </div>
+  }
+  }
+</article>

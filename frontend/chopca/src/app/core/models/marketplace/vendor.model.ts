@@ -5,6 +5,7 @@ import {
   VendorStatus,
 } from './enum-type.model';
 import { CategorySummary } from './category.model';
+import { City } from './city.model';
 import { LocationSummary } from './location.model';
 import { SearchRequest } from '@core/models/shared';
 
@@ -24,6 +25,7 @@ export interface Vendor {
   readonly address: string;
   readonly email: string;
   readonly phone: string;
+  readonly city: City;
 
   // Ratings
   readonly ratingAvg: number;
@@ -96,8 +98,8 @@ export interface VendorRequest {
   description?: string;
   address: string;
   email: string;
+  cityId: string;
   phone: string;
-  password?: string;              // present on create only
   deliveryRadius?: number;
   pickupAddress?: string;
   cuisineCategoryIds?: string[];
@@ -206,6 +208,7 @@ export interface CreateVendorRequest {
   description: string | null;
   address: string;
   phone: string;
+  cityId: string;
   deliveryRadius: number | null;
   pickupAddress: string | null;
   profileImageStorageRef: string | null;

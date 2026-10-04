@@ -1,16 +1,14 @@
 package com.mealmarket.meal.infrastructure.persistence.adapter;
 
 import com.mealmarket.AbstractIntegrationTest;
-import com.mealmarket.common.exception.ResourceNotFoundException;
 import com.mealmarket.common.pagination.DataPage;
 import com.mealmarket.common.pagination.PageRequest;
-import com.mealmarket.meal.domain.model.DistributionLocation;
-import com.mealmarket.meal.domain.model.ModerationStatus;
-import com.mealmarket.meal.domain.model.Vendor;
-import com.mealmarket.meal.domain.model.VendorState;
+import com.mealmarket.meal.domain.model.*;
+import com.mealmarket.meal.domain.repository.CityRepository;
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
 import com.mealmarket.meal.domain.repository.VendorRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.repository.CityJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.DistributionLocationJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +42,7 @@ class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractInteg
     private static final double YAOUNDE_LNG = 11.5021;
     private static final double DOUALA_LAT = 4.0511;
     private static final double DOUALA_LNG = 9.7679;
+    private City yaounde;
 
     @Autowired
     private DistributionLocationRepository locationRepository;
@@ -57,11 +56,19 @@ class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractInteg
     @Autowired
     private VendorJpaRepository vendorJpaRepository;
 
+    @Autowired
+    private CityJpaRepository cityJpaRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
+
     @BeforeEach
     void cleanUp() {
         // FK order: locations first, then vendors.
         locationJpaRepository.deleteAll();
         vendorJpaRepository.deleteAll();
+        cityJpaRepository.deleteAll();
+        yaounde = persistCity("Yaoundé","Centre","CM");
     }
 
     // ------------------------------------------------------------------
@@ -72,6 +79,7 @@ class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractInteg
         return vendorRepository.save(Vendor.builder()
                 .userId(UUID.randomUUID())
                 .businessName(businessName)
+                .city(yaounde)
                 .ownerName("owner")
                 .description("Description for " + businessName)
                 .address("123 Main Street, Yaoundé")
@@ -79,6 +87,10 @@ class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractInteg
                 .phone("+237612345678")
                 .state(VendorState.active(ADMIN_ID))
                 .build());
+    }
+
+    private City persistCity(String name, String region, String countryCode) {
+        return cityRepository.save(City.create(name, region,countryCode));
     }
 
     /** Factory-built location — always starts as PENDING with radius 10. */
@@ -91,6 +103,7 @@ class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractInteg
         return DistributionLocation.create(
                 vendor,
                 name,
+                yaounde,
                 "Address for " + name,
                 "+237699999999",
                 lat,
@@ -333,6 +346,7 @@ class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractInteg
         // When — domain-level update via the copy helper
         final DistributionLocation updated = saved.withUpdatedDetails(
                 "New Name",
+                yaounde,
                 "New Address",
                 "+237611111111",
                 YAOUNDE_LAT + 0.01,

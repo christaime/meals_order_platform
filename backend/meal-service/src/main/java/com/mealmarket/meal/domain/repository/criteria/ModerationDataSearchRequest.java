@@ -7,6 +7,7 @@ import com.mealmarket.meal.domain.model.UserType;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -31,6 +32,16 @@ public class ModerationDataSearchRequest extends SearchRequest {
         this.performedById = builder.performedById;
         this.performedFrom = builder.performedFrom;
         this.performedTo = builder.performedTo;
+    }
+
+    @Override
+    protected Set<String> getSortableProperties() {
+        return Set.of("targetType", "performedAt");
+    }
+
+    @Override
+    protected String getDefaultSortProperty() {
+        return "performedAt";
     }
 
     public static Builder builder() {

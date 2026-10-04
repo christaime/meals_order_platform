@@ -10,8 +10,7 @@ import {
 import { Router } from '@angular/router';
 
 import {
-  MealDetailViewComponent,
-  MealDetail,
+  MealDetailViewComponent
 } from '@components/marketplace/meal/view';
 
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
@@ -23,7 +22,6 @@ import { Meal } from '@app/core/models/marketplace';
  * Responsibilities:
  * - Reads the meal ID from the route
  * - Fetches the full meal from the API
- * - Transforms the backend Meal model into the view's MealDetail shape
  * - Passes data to MealDetailViewComponent
  * - Handles "add to cart" and "view vendor" navigation
  *
@@ -47,7 +45,7 @@ export class MealDetailPageComponent implements OnInit {
   private readonly router = inject(Router);
 
   // ─── State ────────────────────────────────────────────────
-  readonly meal = signal<MealDetail | null>(null);
+  readonly meal = signal<Meal | null>(null);
   readonly isLoading = signal<boolean>(true);
 
   constructor() {
@@ -74,7 +72,7 @@ export class MealDetailPageComponent implements OnInit {
 
     this.mealService.getMealById(id).subscribe({
       next: (meal) => {
-        this.meal.set(this.toDetailViewModel(meal));
+        this.meal.set(meal);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -101,41 +99,4 @@ export class MealDetailPageComponent implements OnInit {
     this.router.navigate(['/meals/restaurant', vendorId]);
   }
 
-  // ─── Transform: backend Meal → view MealDetail ────────────
-
-  /**
-   * Converts the backend Meal model into the MealDetail shape
-   * expected by MealDetailViewComponent.
-   *
-   * Mapping notes:
-   * - `price` → `basePrice`
-   * - `imageUrl` (single) → `images` (array with one entry)
-   * - `averageRating` / `totalRatings` → `rating` / `reviewCount`
-   * - `vendorId` + `vendorBusinessName` → `vendor` object
-   * - `ingredients` (allergens) → `allergens` string array
-   * - `optionGroups` — NOT YET IN THE BACKEND. Empty for now.
-   */
-  private toDetailViewModel(meal: Meal): MealDetail {
-    return {
-      id: meal.id,
-      name: meal.name,
-      description: meal.description ?? '',
-      basePrice: meal.price,
-      images: meal.imageUrl ? [meal.imageUrl] : [],
-      rating: meal.averageRating,
-      reviewCount: meal.totalRatings,
-      preparationTimeMinutes: meal.prepTimeMinutes ?? 0,
-      isAvailable: meal.isAvailable,
-      vendor: {
-        id: meal.vendorId,
-        name: meal.vendorBusinessName,
-        logoUrl: undefined,       // not available on MealSummary/Meal
-        rating: 0,                // not available on Meal
-      },
-      allergens: meal.ingredients
-        ?.filter(i => i.isAllergen)
-        .map(i => i.name) ?? [],
-      optionGroups: [],           // not yet in the backend model
-    };
-  }
 }

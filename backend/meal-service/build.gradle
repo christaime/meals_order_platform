@@ -9,6 +9,9 @@ dependencies {
     // ─── Internal Modules ───────────────────────────────────────
     implementation project(':common')
 
+    // .env support for local development
+    developmentOnly 'me.paulschwarz:springboot3-dotenv:5.0.1'
+
     // ─── Spring Boot Starters ──────────────────────────────────
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

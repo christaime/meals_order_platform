@@ -1,0 +1,97 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
+         flex flex-col gap-space-md"
+  novalidate>
+
+  <!-- Section header -->
+  <div class="flex items-center justify-between pb-space-sm">
+    <div class="flex items-center gap-space-sm">
+      <span
+        class="w-9 h-9 rounded-lg bg-primary-fixed text-primary
+               flex items-center justify-center shrink-0">
+        <app-icon name="location_city" size="md" />
+      </span>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">
+        @if (editing(); as c) {
+        Modifier « {{ c.name }} »
+        } @else {
+        Nouvelle ville
+        }
+      </h2>
+    </div>
+  </div>
+
+  <!-- Name -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Nom de la ville</mat-label>
+    <app-icon matPrefix name="badge" size="md" class="text-primary pr-2" />
+    <input
+      matInput
+      id="city-name"
+      formControlName="name"
+      maxlength="120"
+      placeholder="ex: Douala, Yaoundé, Bafoussam…"
+      autocomplete="off" />
+    @if (nameError()) {
+    <mat-error>{{ nameError() }}</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- Region -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Région (optionnel)</mat-label>
+    <app-icon matPrefix name="map" size="md" class="text-on-surface-variant pr-2" />
+    <input
+      matInput
+      formControlName="region"
+      maxlength="120"
+      placeholder="ex: Littoral, Centre, Ouest…"
+      autocomplete="off" />
+    @if (regionError()) {
+    <mat-error>{{ regionError() }}</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- Country code -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Code pays</mat-label>
+    <app-icon matPrefix name="public" size="md" class="text-on-surface-variant pr-2" />
+    <input
+      matInput
+      formControlName="countryCode"
+      maxlength="2"
+      placeholder="CM" />
+    <mat-hint>
+      ISO 3166-1 alpha-2. Fixé à <code class="font-mono">CM</code> pour le Cameroun.
+    </mat-hint>
+  </mat-form-field>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-end gap-2 pt-2">
+    @if (editing()) {
+    <button
+      type="button"
+      mat-button
+      (click)="onCancel()"
+      [disabled]="submitting()">
+      Annuler
+    </button>
+    }
+
+    <button
+      type="submit"
+      mat-flat-button
+      color="primary"
+      [disabled]="submitting()">
+      @if (submitting()) {
+      <mat-spinner diameter="18" class="inline-block mr-2" />
+      <span>Enregistrement…</span>
+      } @else {
+      <app-icon name="check" size="sm" class="mr-1" />
+      <span>{{ editing() ? 'Enregistrer' : 'Créer' }}</span>
+      }
+    </button>
+  </div>
+</form>

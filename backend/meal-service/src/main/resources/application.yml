@@ -14,9 +14,9 @@ spring:
 
   # ─── Database ─────────────────────────────────────────────────
   datasource:
-    url: jdbc:postgresql://localhost:5432/meal_db
-    username: mealuser
-    password: mealpass123
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/meal_db}
+    username: ${DB_USERNAME:mealuser}
+    password: ${DB_PASSWORD:mealpass123}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -75,18 +75,18 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/mealmarket
-          jwk-set-uri: http://localhost:8080/realms/mealmarket/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/mealmarket}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/mealmarket/protocol/openid-connect/certs}
       client:
         registration:
           keycloak-admin:
-            client-id: meal-marketplace-backend
-            client-secret: bFcfLsXi9Y2wHkodCOcFczmVQPtSQH6D
+            client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:meal-marketplace-backend}
+            client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:bFcfLsXi9Y2wHkodCOcFczmVQPtSQH6D}
             authorization-grant-type: client_credentials
             scope: openid
         provider:
           keycloak-admin:
-            token-uri: http://localhost:8080/realms/mealmarket/protocol/openid-connect/token
+            token-uri: ${KEYCLOAK_ADMIN_TOKEN_PROVIDER_URI:http://localhost:8080/realms/mealmarket/protocol/openid-connect/token}
 
   # ─── File Upload ──────────────────────────────────────────────
   servlet:
@@ -115,11 +115,11 @@ server:
 # ─── MinIO ──────────────────────────────────────────────────────
 minio:
   enabled: true                    # Keep enabled—your adapter just points at Garage now
-  url: http://localhost:3900       # Garage S3 API endpoint
-  access-key: GK0514f8c0f3dbb3f683d53d65  # Set from env or paste generated value
-  secret-key: d4e2f9e1aa30b932d6bb80de7639b5ab1640d48533f6822a8c99428e6335de77
-  bucket: mealmarket-media
-  public-base-url: http://mealmarket-media.web.garage.localhost:3902
+  url: ${MINIO_URL:http://localhost:3900}       # Garage S3 API endpoint
+  access-key: ${MINIO_ACCESS_KEY:GK0514f8c0f3dbb3f683d53d65}  # Set from env or paste generated value
+  secret-key: ${MINIO_SECRET_KEY:d4e2f9e1aa30b932d6bb80de7639b5ab1640d48533f6822a8c99428e6335de77}
+  bucket: ${MINIO_BUCKET:mealmarket-media}
+  public-base-url: ${MINIO_PUBLIC_BASE_URL:http://mealmarket-media.web.garage.localhost:3902}
   presigned-expiry-seconds: 3600
 
 # ─── SpringDoc / OpenAPI ────────────────────────────────────────
@@ -139,7 +139,7 @@ springdoc:
     groups-order: ASC
     doc-expansion: none
   show-actuator: false
-  packages-to-scan: com.mealmarket.meal.infrastructure.web
+  packages-to-scan: com.mealmarket.meal.infrastructure.web,com.mealmarket.ai.infrastructure.web
   default-produces-media-type: application/json
 
 # ─── Actuator / Monitoring ──────────────────────────────────────
@@ -184,6 +184,11 @@ feign:
 
 # ─── Application Specific ───────────────────────────────────────
 mealmarket:
+  ai:
+    openrouter:
+      base-url: ${OPENROUTER_BASE_URL:https://api.groq.com/openai/v1}
+      api-key: ${OPENROUTER_API_KEY:}
+      model: ${OPENROUTER_MODEL:openrouter/free}
   storage:
     max-image-size: 5242880  # 5MB in bytes
     allowed-image-types:
@@ -194,10 +199,10 @@ mealmarket:
 # ─── Keycloak Specific ───────────────────────────────────────
 keycloak:
   admin:
-    url: http://localhost:8080
-    realm: mealmarket
-    username: ${KEYCLOAK_ADMIN_USER}
-    password: ${KEYCLOAK_ADMIN_PASSWORD}
+    url: ${KEYCLOAK_BASE_URL:http://localhost:8080}
+    realm: ${KEYCLOAK_REALM:mealmarket}
+    username: ${KEYCLOAK_ADMIN_USER:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
     client-id: admin-cli
 
 resilience4j:

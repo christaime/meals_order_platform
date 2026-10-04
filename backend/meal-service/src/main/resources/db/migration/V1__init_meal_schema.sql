@@ -35,10 +35,60 @@
 --   2. Unicity constraints are PARTIAL UNIQUE INDEXES with the
 --      predicate `WHERE moderation_status <> 'DISABLED'`, so a
 --      disabled row does not block the reuse of its natural key.
+--
+-- CITY (reference data)
+-- ---------------------
+-- Cities are admin-curated reference data. They are NOT moderable,
+-- NOT soft-deleted, and have no `is_active` flag. Both vendors and
+-- distribution locations reference a city by FK.
+-- Coordinates live on distribution_locations, not here.
+--
+-- STATE MACHINES
+-- --------------
+-- The DB validates that a status column holds a legal ENUM VALUE.
+-- The DB does NOT enforce legal TRANSITIONS (e.g. ACTIVE → BANNED
+-- is allowed by the application's VendorState machine, but the DB
+-- only requires that both values are members of the enum).
+-- Transition rules live in the domain (VendorState.canTransitionTo,
+-- ModerationService.mapDecision).
 -- ============================================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ============================================================
+-- 0. CITY (reference data — admin-managed, never moderated)
+-- ============================================================
+CREATE TABLE city (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(120) NOT NULL,
+    region VARCHAR(120),
+    country_code VARCHAR(2) NOT NULL,
+
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_city_name_country UNIQUE (name, country_code)
+);
+
+CREATE INDEX idx_city_country ON city(country_code);
+CREATE INDEX idx_city_name    ON city(LOWER(name));
+
+-- Initial seed — Cameroon
+INSERT INTO city (name, region, country_code) VALUES
+    ('Douala',     'Littoral',      'CM'),
+    ('Yaoundé',    'Centre',        'CM'),
+    ('Bafoussam',  'Ouest',         'CM'),
+    ('Bamenda',    'Nord-Ouest',    'CM'),
+    ('Buea',       'Sud-Ouest',     'CM'),
+    ('Kribi',      'Sud',           'CM'),
+    ('Limbé',      'Sud-Ouest',     'CM'),
+    ('Ngaoundéré', 'Adamaoua',      'CM'),
+    ('Garoua',     'Nord',          'CM'),
+    ('Maroua',     'Extrême-Nord',  'CM'),
+    ('Bertoua',    'Est',           'CM'),
+    ('Ebolowa',    'Sud',           'CM');
 
 -- ============================================================
 -- 1. CATEGORIES
@@ -129,6 +179,7 @@ CREATE INDEX idx_ingredients_created_by ON ingredients(created_by_type, created_
 -- Business entity with state machine (separate from moderation).
 -- NOT soft-deletable — status uses VendorStatus, not ModerationStatus.
 -- Unicity here stays unconditional.
+-- References city(id) — required.
 -- ============================================================
 CREATE TABLE vendors (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -140,6 +191,10 @@ CREATE TABLE vendors (
     owner_name VARCHAR(100) NOT NULL,
     description TEXT,
     address VARCHAR(255) NOT NULL,
+
+    -- Reference city
+    city_id UUID NOT NULL REFERENCES city(id),
+
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(50) NOT NULL,
 
@@ -152,6 +207,7 @@ CREATE TABLE vendors (
     total_ratings INTEGER NOT NULL DEFAULT 0,
 
     -- Current state (VendorState machine)
+    -- Enum check only. Legal transitions are enforced by the domain layer.
     status VARCHAR(50) NOT NULL DEFAULT 'PENDING'
         CHECK (status IN ('PENDING', 'ACTIVE', 'SUSPENDED', 'BANNED', 'INACTIVE')),
     status_reason TEXT,
@@ -183,6 +239,7 @@ CREATE UNIQUE INDEX uk_vendors_business_name_lower
 
 CREATE INDEX idx_vendors_email ON vendors(email);
 CREATE INDEX idx_vendors_user_id ON vendors(user_id);
+CREATE INDEX idx_vendors_city ON vendors(city_id);
 CREATE INDEX idx_vendors_status ON vendors(status);
 CREATE INDEX idx_vendors_subscription_tier ON vendors(subscription_tier);
 CREATE INDEX idx_vendors_rating_avg ON vendors(rating_avg);
@@ -191,11 +248,16 @@ CREATE INDEX idx_vendors_business_name ON vendors(business_name);
 -- ============================================================
 -- 4. DISTRIBUTION LOCATIONS
 -- Fully owned by vendors. Moderable: starts as PENDING.
+-- References city(id) — required.
 -- ============================================================
 CREATE TABLE distribution_locations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     vendor_id UUID NOT NULL REFERENCES vendors(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
+
+    -- Reference city
+    city_id UUID NOT NULL REFERENCES city(id),
+
     address VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     latitude DOUBLE PRECISION NOT NULL,
@@ -203,6 +265,7 @@ CREATE TABLE distribution_locations (
     delivery_radius INTEGER NOT NULL DEFAULT 10,
 
     -- Moderation
+    -- Enum check only. Legal transitions are enforced by the domain layer.
     moderation_status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
         CHECK (moderation_status IN ('PENDING', 'APPROVED', 'REJECTED', 'DISABLED')),
 
@@ -225,6 +288,8 @@ CREATE UNIQUE INDEX uk_distribution_locations_vendor_name_lower_active
 
 CREATE INDEX idx_distribution_locations_vendor_id
     ON distribution_locations(vendor_id);
+CREATE INDEX idx_distribution_locations_city
+    ON distribution_locations(city_id);
 CREATE INDEX idx_distribution_locations_coordinates
     ON distribution_locations(latitude, longitude);
 CREATE INDEX idx_distribution_locations_moderation_status
@@ -232,6 +297,8 @@ CREATE INDEX idx_distribution_locations_moderation_status
 
 -- ============================================================
 -- 5. VENDOR STATUS HISTORY (Vendor state machine audit trail)
+-- Append-only. Records every state transition on a vendor.
+-- The domain enforces legal transitions; this table records them.
 -- ============================================================
 CREATE TABLE vendor_status_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -297,6 +364,7 @@ CREATE TABLE meals (
     prep_time_minutes INTEGER,
 
     -- Moderation
+    -- Enum check only. Legal transitions are enforced by the domain layer.
     moderation_status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
         CHECK (moderation_status IN ('PENDING', 'APPROVED', 'REJECTED', 'DISABLED')),
 
@@ -366,6 +434,7 @@ CREATE INDEX idx_meals_dist_loc_location_id ON meals_distribution_locations(dist
 -- 12. MODERATION DATA (Unified Audit Trail)
 -- Append-only. Records every moderation action on any
 -- moderable entity (Meal, Ingredient, Location, Category).
+-- The domain enforces legal transitions; this table records them.
 -- ============================================================
 CREATE TABLE moderation_data (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

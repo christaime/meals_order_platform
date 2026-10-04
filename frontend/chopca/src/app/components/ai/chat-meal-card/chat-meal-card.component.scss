@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+article:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+img {
+  // Fallback while loading or if the image URL is broken
+  background-color: var(--color-surface-container);
+}
+
+// Slight tightening of MatIcon inside the compact meta row
+mat-icon {
+  flex-shrink: 0;
+}

@@ -1,5 +1,6 @@
 package com.mealmarket.meal.infrastructure.persistence.specification;
 
+import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.repository.criteria.IngredientSearchRequest;
 import com.mealmarket.meal.infrastructure.persistence.entity.IngredientEntity;
 import jakarta.persistence.criteria.Predicate;
@@ -45,16 +46,33 @@ public class IngredientSpecification {
                 ));
             }
 
-            // ─── Moderation status ────────────────────────────────
-            if (request.getModerationStatus() != null) {
+            // ─── Ownership + moderation visibility ─────────────────────
+            //
+            // Two ways an ingredient is visible to the caller:
+            //   1. It was created by them AND is PENDING (they can see their own
+            //      pending submissions).
+            //   2. It is APPROVED (visible to everyone).
+            //
+            // When createdById is set, the OR applies. When it isn't, only
+            // the moderation filter applies as a standalone predicate.
+            if (request.getCreatedById() != null) {
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.and(
+                                criteriaBuilder.equal(root.get("createdById"),
+                                        request.getCreatedById()),
+                                criteriaBuilder.equal(root.get("moderationStatus"),
+                                        ModerationStatus.PENDING)
+                        ),
+                        criteriaBuilder.equal(root.get("moderationStatus"),
+                                ModerationStatus.APPROVED)
+                ));
+            } else if (request.getModerationStatus() != null) {
+                // No owner scoping — respect whatever moderation filter was requested.
                 predicates.add(criteriaBuilder.equal(
                         root.get("moderationStatus"),
                         request.getModerationStatus()
                 ));
-            }
-
-            // ─── Created by type ──────────────────────────────────
-            if (request.getCreatedByType() != null) {
+            }else if (request.getCreatedByType() != null) {
                 predicates.add(criteriaBuilder.equal(
                         root.get("createdByType"),
                         request.getCreatedByType()

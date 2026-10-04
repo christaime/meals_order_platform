@@ -1,4 +1,4 @@
-package com.mealmarket.meal;
+package com.mealmarket;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableCaching
-@EnableKafka
+//@EnableKafka
 @EnableAsync
 @EnableScheduling
 @EnableFeignClients

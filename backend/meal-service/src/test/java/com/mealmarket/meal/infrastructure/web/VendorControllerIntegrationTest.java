@@ -2,9 +2,12 @@ package com.mealmarket.meal.infrastructure.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mealmarket.AbstractIntegrationTest;
+import com.mealmarket.meal.domain.model.City;
 import com.mealmarket.meal.domain.model.UserType;
 import com.mealmarket.meal.domain.model.VendorState;
+import com.mealmarket.meal.domain.repository.CityRepository;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
+import com.mealmarket.meal.infrastructure.persistence.repository.CityJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import com.mealmarket.meal.infrastructure.security.CurrentUser;
 import com.mealmarket.meal.testing.WithMockJwt;
@@ -57,9 +60,16 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private VendorJpaRepository vendorJpaRepository;
 
+    @Autowired private CityRepository cityRepository;              // NEW
+    @Autowired private CityJpaRepository cityJpaRepository;         // NEW
+
+    private City yaounde;
+
     @BeforeEach
     void setUp() {
         vendorJpaRepository.deleteAll();
+        cityJpaRepository.deleteAll();
+        yaounde = cityRepository.save(City.create("Yaoundé", "Centre", "CM"));
     }
     // ------------------------------------------------------------------
     // Helpers
@@ -69,6 +79,7 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> body = new java.util.HashMap<>();
         body.put("businessName", businessName);
         body.put("ownerName", "owner");
+        body.put("cityId", yaounde.getId().toString());
         body.put("description", "Description for " + businessName);
         body.put("address", "123 Main Street, Yaoundé");
         body.put("phone", "+237612345678");
@@ -87,6 +98,7 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
                 VendorEntity.builder()
                         .userId(UUID.randomUUID())
                         .businessName(businessName)
+                        .cityId(yaounde.getId())
                         .ownerName("owner")
                         .description("Description for " + businessName)
                         .address("123 Main Street, Yaoundé")
@@ -128,7 +140,7 @@ class VendorControllerIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.businessName").value("Delicious Bites"))
-                .andExpect(jsonPath("$.status").value("PENDING"));
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
     }
 
     // ══════════════════════════════════════════════════════════════════

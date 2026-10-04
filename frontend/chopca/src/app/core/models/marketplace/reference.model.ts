@@ -1,19 +1,3 @@
-/**
- * Reference / lookup data used across the app.
- *
- * These are read-only lists served by the backend under
- * /api/v1/reference/*. They rarely change and are cached on
- * the frontend by the services that fetch them.
- */
-
-/**
- * A Cameroonian city where vendors can operate.
- */
-export interface City {
-  readonly id: string;       // e.g. "douala"
-  readonly name: string;     // e.g. "Douala"
-  readonly region: string;   // e.g. "Littoral"
-}
 
 /**
  * A daily-preparation capacity range for a vendor.

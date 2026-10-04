@@ -1,8 +1,12 @@
 package com.mealmarket.meal.infrastructure.persistence.specification;
 
+import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.repository.criteria.VendorSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -71,6 +75,27 @@ public class VendorSpecification {
                 ));
             }
 
+            // ─── City (vendor's registered city OR any approved location's city) ──
+            if (request.getCityId() != null) {
+                UUID cityId = request.getCityId();
+
+                // Subquery: vendors that have at least one APPROVED distribution
+                // location in the requested city.
+                Subquery<UUID> locationVendorIds = query.subquery(UUID.class);
+                Root<DistributionLocationEntity> locRoot =
+                        locationVendorIds.from(DistributionLocationEntity.class);
+                locationVendorIds.select(locRoot.get("vendorId"))
+                        .where(criteriaBuilder.and(
+                                criteriaBuilder.equal(locRoot.get("cityId"), cityId),
+                                criteriaBuilder.equal(locRoot.get("moderationStatus"),
+                                        ModerationStatus.APPROVED)
+                        ));
+
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("cityId"), cityId),
+                        root.get("id").in(locationVendorIds)
+                ));
+            }
             // ─── Categories (CUISINE) ─────────────────────────────
             if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
                 for (UUID categoryId : request.getCategoryIds()) {

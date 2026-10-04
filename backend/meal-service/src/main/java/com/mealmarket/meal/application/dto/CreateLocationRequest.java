@@ -5,18 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-/**
- * Request to create a new distribution location.
- *
- * The vendor is NOT in the request — it is derived from the
- * authenticated user (via security context) by the service layer.
- * moderationStatus is NOT in the request — always set to PENDING on creation.
- */
+import java.util.UUID;
+
 public record CreateLocationRequest(
 
         @NotBlank(message = "Location name is required")
         @Size(min = 2, max = 100, message = "Location name must be between 2 and 100 characters")
         String name,
+
+        @NotNull(message = "City is required")                             // NEW
+        UUID cityId,                                                       // NEW
 
         @NotBlank(message = "Address is required")
         @Size(max = 255, message = "Address cannot exceed 255 characters")

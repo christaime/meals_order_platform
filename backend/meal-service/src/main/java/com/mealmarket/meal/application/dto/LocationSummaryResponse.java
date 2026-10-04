@@ -10,6 +10,9 @@ import java.util.UUID;
 public record LocationSummaryResponse(
         UUID id,
         String name,
+        CityResponse city,
         String address,
+        String vendorBusinessName,
+        UUID vendorId,
         ModerationStatus moderationStatus
 ) {}

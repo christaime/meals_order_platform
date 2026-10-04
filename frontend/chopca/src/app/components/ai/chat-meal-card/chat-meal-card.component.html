@@ -1,0 +1,137 @@
+<article
+  role="button"
+  tabindex="0"
+  (click)="onClick()"
+  (keydown)="onKeydown($event)"
+  class="rounded-lg overflow-hidden
+         bg-surface-container-low
+         border border-outline-variant
+         hover:border-primary hover:shadow-sm
+         transition-all cursor-pointer
+         flex flex-col gap-2 p-2">
+
+  <!-- ─── Top row: image + main info ─────────────────────── -->
+  <div class="flex gap-2">
+
+    <!-- Image -->
+    @if (meal().imageUrl) {
+    <img
+      [src]="meal().imageUrl"
+      [alt]="meal().name"
+      loading="lazy"
+      class="w-16 h-16 rounded-md object-cover shrink-0
+               bg-surface-container" />
+    } @else {
+    <div class="w-16 h-16 rounded-md bg-surface-container shrink-0
+                  flex items-center justify-center">
+      <mat-icon class="text-on-surface-variant">restaurant</mat-icon>
+    </div>
+    }
+
+    <!-- Info -->
+    <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+      <div class="font-label-lg text-label-lg text-on-surface truncate">
+        {{ meal().name }}
+      </div>
+
+      @if (meal().vendorName) {
+      <div class="font-label-sm text-label-sm text-on-surface-variant truncate">
+        {{ meal().vendorName }}
+      </div>
+      }
+
+      <div class="flex items-center gap-2 mt-auto flex-wrap">
+        <span class="font-label-md text-label-md text-primary whitespace-nowrap">
+          {{ meal().price | number:'1.0-0' }} FCFA
+        </span>
+
+        @if (meal().averageRating) {
+        <span class="flex items-center gap-0.5
+                       font-label-sm text-label-sm text-on-surface-variant">
+            <mat-icon class="!text-xs !w-3 !h-3 !leading-none">star</mat-icon>
+            <span>{{ meal().averageRating | number:'1.1-1' }}</span>
+            @if (meal().totalRatings) {
+              <span class="text-outline">({{ meal().totalRatings }})</span>
+            }
+          </span>
+        }
+
+        @if (meal().prepTimeMinutes) {
+        <span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
+            {{ meal().prepTimeMinutes }} min
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Chevron -->
+    <mat-icon class="text-on-surface-variant self-center shrink-0">
+      chevron_right
+    </mat-icon>
+  </div>
+
+  <!-- ─── Expanded-only sections ─────────────────────────── -->
+  @if (expanded()) {
+
+  @if (meal().description) {
+  <p class="font-body-sm text-body-sm text-on-surface-variant px-1">
+    {{ meal().description }}
+  </p>
+  }
+
+  <!-- Locations -->
+  @if (hasLocations()) {
+  <div class="flex flex-col gap-1 px-1 pt-1 border-t border-outline-variant/40">
+        <span class="font-label-sm text-label-sm text-on-surface-variant
+                     uppercase tracking-wide">
+          Points de retrait
+        </span>
+    @for (loc of meal().locations; track loc.id) {
+    <div class="flex items-start gap-1.5
+                      font-body-sm text-body-sm text-on-surface">
+      <mat-icon class="!text-sm !w-4 !h-4 mt-0.5 text-primary shrink-0">
+        place
+      </mat-icon>
+      <div class="min-w-0">
+        <span class="font-label-md text-label-md">{{ loc.name }}</span>
+        @if (loc.cityName) {
+        <span class="text-on-surface-variant"> · {{ loc.cityName }}</span>
+        }
+        @if (loc.address) {
+        <div class="text-on-surface-variant truncate">
+          {{ loc.address }}
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Ingredients -->
+  @if (hasIngredients()) {
+  <div class="flex flex-col gap-1 px-1 pt-1 border-t border-outline-variant/40">
+        <span class="font-label-sm text-label-sm text-on-surface-variant
+                     uppercase tracking-wide">
+          Ingrédients
+        </span>
+    <div class="flex flex-wrap gap-1">
+      @for (ing of meal().ingredients; track ing.id) {
+      <span
+        class="px-1.5 py-0.5 rounded font-label-sm text-label-sm
+                     inline-flex items-center gap-0.5"
+        [class.bg-surface-container]="!ing.isAllergen"
+        [class.text-on-surface-variant]="!ing.isAllergen"
+        [class.bg-error-container]="ing.isAllergen"
+        [class.text-on-error-container]="ing.isAllergen">
+              {{ ing.name }}
+              @if (ing.isAllergen) {
+                <mat-icon class="!text-xs !w-3 !h-3 !leading-none">warning</mat-icon>
+              }
+            </span>
+      }
+    </div>
+  </div>
+  }
+  }
+</article>

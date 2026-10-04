@@ -5,6 +5,7 @@ import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.UserType;
 import lombok.Getter;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +26,16 @@ public class IngredientSearchRequest extends SearchRequest {
         this.moderationStatus = builder.moderationStatus;
         this.createdByType = builder.createdByType;
         this.createdById = builder.createdById;
+    }
+
+    @Override
+    protected Set<String> getSortableProperties() {
+        return Set.of("name", "createdAt","isAllergen");
+    }
+
+    @Override
+    protected String getDefaultSortProperty() {
+        return "name";
     }
 
     public static Builder builder() {

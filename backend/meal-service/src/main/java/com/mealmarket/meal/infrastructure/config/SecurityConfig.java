@@ -60,7 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/reference/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-
+                        .requestMatchers("/api/v1/ai/**").permitAll()
                         // Media
                         .requestMatchers(HttpMethod.POST,   "/api/v1/media").authenticated()
                         .requestMatchers(HttpMethod.GET,    "/api/v1/media/url").permitAll()

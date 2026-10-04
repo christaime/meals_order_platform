@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+article:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+img {
+  background-color: var(--color-surface-container);
+}

@@ -6,6 +6,7 @@ import com.mealmarket.meal.application.dto.IngredientResponse;
 import com.mealmarket.meal.application.dto.IngredientSummaryResponse;
 import com.mealmarket.meal.application.dto.UpdateIngredientRequest;
 import com.mealmarket.meal.application.service.IngredientService;
+import com.mealmarket.meal.application.service.VendorService;
 import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.UserType;
 import com.mealmarket.meal.infrastructure.security.CurrentUser;
@@ -120,7 +121,7 @@ public class IngredientController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paginated list of approved ingredients")
     })
-    public ResponseEntity<DataPage<IngredientSummaryResponse>> searchVendorIngredients(
+    public ResponseEntity<DataPage<IngredientResponse>> searchVendorIngredients(
             @Parameter(description = "Keyword search in name")
             @RequestParam(required = false) String keyword,
 
@@ -142,12 +143,11 @@ public class IngredientController {
         var request = com.mealmarket.meal.domain.repository.criteria.IngredientSearchRequest.builder()
                 .keyword(keyword)
                 .isAllergen(isAllergen)
-                .createdById(this.currentUser.getUserId()) //
+                .createdById(currentUser.getUserId())
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();
-
-        return ResponseEntity.ok(ingredientService.searchApprovedIngredients(request));
+        return ResponseEntity.ok(ingredientService.searchIngredients(request));
     }
     // ═══════════════════════════════════════════════════════════
     //  ADMIN — Read (any status)

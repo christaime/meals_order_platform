@@ -1,6 +1,6 @@
 import { SearchRequest } from '@app/core/models/shared';
 import { ModerationStatus } from './enum-type.model';
-import { City } from './reference.model';
+import { City } from './city.model';
 
 export interface Location {
   readonly id: string;
@@ -40,7 +40,7 @@ export interface LocationRequest {
   latitude: number;
   longitude: number;
   deliveryRadius?: number;
-  cityId?: string;
+  cityId: string;
 }
 
 export interface LocationSearchRequest extends SearchRequest {

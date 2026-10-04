@@ -1,0 +1,39 @@
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm
+            flex flex-wrap items-center gap-space-sm">
+
+  <!-- Keyword -->
+  <mat-form-field appearance="outline" class="flex-1 min-w-[220px]">
+    <mat-label>Recherche</mat-label>
+    <app-icon matPrefix name="search" size="md" class="text-on-surface-variant pr-2" />
+    <input
+      matInput
+      [value]="keyword()"
+      (input)="onKeywordInput($any($event.target).value)"
+      placeholder="Nom ou région…"
+      autocomplete="off" />
+    @if (keyword()) {
+    <button
+      matSuffix
+      mat-icon-button
+      type="button"
+      aria-label="Effacer"
+      (click)="clearKeyword()">
+      <app-icon name="close" size="sm" />
+    </button>
+    }
+  </mat-form-field>
+
+  <!-- Sort -->
+  <mat-form-field appearance="outline" class="min-w-[200px]">
+    <mat-label>Trier par</mat-label>
+    <app-icon matPrefix name="sort" size="md" class="text-on-surface-variant pr-2" />
+    <mat-select
+      [value]="sort()"
+      (selectionChange)="onSortChange($event.value)">
+      <mat-option value="name-asc">Nom (A → Z)</mat-option>
+      <mat-option value="name-desc">Nom (Z → A)</mat-option>
+      <mat-option value="region-asc">Région (A → Z)</mat-option>
+      <mat-option value="region-desc">Région (Z → A)</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>

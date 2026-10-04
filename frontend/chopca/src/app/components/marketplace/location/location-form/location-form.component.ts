@@ -33,7 +33,8 @@ import { Location, LocationRequest, City } from '@app/core/models/marketplace';
  * Location create / edit form with Google Map picker.
  *
  * Behavior:
- * - Select a city → map centers there
+ * - Select a city → map centers there (or on Yaoundé if the city
+ *   isn't in the static coordinate list)
  * - Search for a place → autocomplete fills lat/lng + address
  * - Click / drag on the map → lat/lng update + reverse geocode fills address
  * - Type lat/lng manually → marker moves
@@ -69,16 +70,15 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
 
   readonly location = input<Location | null>(null);
-  //readonly location = input<Location | Partial<Location> | null>(null);
   readonly saved     = output<Location>();
   readonly cancelled = output<void>();
 
   readonly cities = signal<City[]>([]);
   readonly selectedCityId = signal<string | null>(null);
 
-  readonly mapCenter = signal<google.maps.LatLngLiteral>({ lat: 4.0480, lng: 9.7021 });
+  readonly mapCenter = signal<google.maps.LatLngLiteral>({ lat: 3.8480, lng: 11.5021 });
   readonly mapZoom = signal<number>(12);
-  readonly markerPosition = signal<google.maps.LatLngLiteral>({ lat: 4.0480, lng: 9.7021 });
+  readonly markerPosition = signal<google.maps.LatLngLiteral>({ lat: 3.8480, lng: 11.5021 });
 
   readonly mapOptions = signal<google.maps.MapOptions | null>(null);
   readonly markerOptions = signal<google.maps.MarkerOptions | null>(null);
@@ -91,15 +91,16 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-    cityId: [null as string | null],
+    cityId: ['', [Validators.required]],
     address: ['', [Validators.required, Validators.maxLength(255)]],
     phone: ['', [Validators.maxLength(50)]],
-    latitude: [4.0480, [Validators.required, Validators.min(-90), Validators.max(90)]],
-    longitude: [9.7021, [Validators.required, Validators.min(-180), Validators.max(180)]],
+    latitude: [3.8480, [Validators.required, Validators.min(-90), Validators.max(90)]],
+    longitude: [11.5021, [Validators.required, Validators.min(-180), Validators.max(180)]],
     deliveryRadius: [10, [Validators.min(0)]],
   });
 
   protected get name() { return this.form.controls.name; }
+  protected get cityId() { return this.form.controls.cityId; }
   protected get address() { return this.form.controls.address; }
   protected get phone() { return this.form.controls.phone; }
   protected get latitude() { return this.form.controls.latitude; }
@@ -122,18 +123,16 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
         latitude: existing.latitude,
         longitude: existing.longitude,
         deliveryRadius: existing.deliveryRadius ?? 10,
-        cityId: existing.cityId ?? null,
+        cityId: existing.city?.id ?? '',
       });
+      this.selectedCityId.set(existing.city?.id ?? null);
       this.updateMap({ lat: existing.latitude, lng: existing.longitude });
-      this.selectedCityId.set(existing.cityId ?? null);
     } else if (existing) {
-       // Prefill-only mode — the caller passed an `Location` shape
-       // with no id, used to pre-populate the form. Still create mode.
-       this.form.patchValue({
-         name: existing.name ?? '',
-       });
-     }
-
+      this.form.patchValue({
+        name: existing.name ?? '',
+      });
+    }
+    this.form.controls.cityId.valueChanges.subscribe((value) => this.onCityChange(value));
     this.form.controls.latitude.valueChanges.subscribe(() => this.syncMarker());
     this.form.controls.longitude.valueChanges.subscribe(() => this.syncMarker());
   }
@@ -141,7 +140,6 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     await this.mapsLoader.load();
 
-    // Now safe to reference google.maps.*
     this.mapOptions.set({
       mapTypeControl: false,
       streetViewControl: false,
@@ -157,7 +155,6 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     this.geocoder = new google.maps.Geocoder();
     this.attachAutocomplete();
   }
-
 
   onMapClick(event: google.maps.MapMouseEvent): void {
     if (!event.latLng) return;
@@ -177,16 +174,21 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     this.reverseGeocode(lat, lng);
   }
 
-
   onCityChange(cityId: string): void {
+    if (!cityId) return;
     this.selectedCityId.set(cityId);
-    this.form.controls.cityId.setValue(cityId);
-    const coords = this.getCityCoordinates(cityId);
-    if (!coords) return;
+    //this.form.controls.cityId.setValue(cityId);
+
+    const city = this.cities().find(c => c.id === cityId);
+    const coords = this.getCityCoordinates(city?.name);
+    console.log("Location ",coords, city?.name);
+    this.form.patchValue(
+      { latitude: coords.lat, longitude: coords.lng },
+      { emitEvent: false },
+    );
     this.form.patchValue({ latitude: coords.lat, longitude: coords.lng });
     this.updateMap(coords);
   }
-
 
   private syncMarker(): void {
     const lat = this.form.controls.latitude.value;
@@ -241,17 +243,101 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private getCityCoordinates(cityId: string): google.maps.LatLngLiteral | null {
-    const coords: Record<string, google.maps.LatLngLiteral> = {
-      douala:    { lat: 4.0480, lng: 9.7021 },
-      yaounde:   { lat: 3.8480, lng: 11.5021 },
-      bafoussam: { lat: 5.4781, lng: 10.4172 },
-      bamenda:   { lat: 5.9597, lng: 10.1459 },
-      buea:      { lat: 4.1559, lng: 9.2410 },
-      kribi:     { lat: 2.9372, lng: 9.9100 },
-    };
-    return coords[cityId] ?? null;
+  // ═══════════════════════════════════════════════════════════
+  //  Static city coordinates
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Static coordinates for the main Cameroonian cities.
+   *
+   * Keys are *lowercase, accent-stripped* city names, e.g.
+   * "yaoundé" → "yaounde". {@link normalizeCityName} runs the
+   * lookup through the same transformation, so accented spellings
+   * ("Yaoundé", "Limbé", "Ngaoundéré", "Edéa") resolve correctly.
+   *
+   * NOT keyed by city id — the backend sends UUIDs which vary
+   * between environments. Names are stable; ids are not.
+   */
+  private static readonly CITY_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
+    // ─── Major cities ────────────────────────────────────────
+    'douala':      { lat: 4.0511, lng: 9.7679 },
+    'yaounde':     { lat: 3.8480, lng: 11.5021 },
+    'bafoussam':   { lat: 5.4781, lng: 10.4172 },
+    'bamenda':     { lat: 5.9597, lng: 10.1459 },
+    'garoua':      { lat: 9.3017, lng: 13.3921 },
+    'maroua':      { lat: 10.5956, lng: 14.3247 },
+    'ngaoundere':  { lat: 7.3167, lng: 13.5833 },
+    'bertoua':     { lat: 4.5772, lng: 13.6846 },
+    'buea':        { lat: 4.1559, lng: 9.2410 },
+    'limbe':       { lat: 4.0186, lng: 9.2146 },
+    'kribi':       { lat: 2.9372, lng: 9.9100 },
+    'ebolowa':     { lat: 2.9000, lng: 11.1500 },
+    'edea':        { lat: 3.8000, lng: 10.1333 },
+    'kumba':       { lat: 4.6363, lng: 9.4469 },
+    'nkongsamba':  { lat: 4.9547, lng: 9.9404 },
+    'foumban':     { lat: 5.7266, lng: 10.9000 },
+    'sangmelima':  { lat: 2.9333, lng: 11.9833 },
+    'dschang':     { lat: 5.4500, lng: 10.0667 },
+    'mbalmayo':    { lat: 3.5167, lng: 11.5000 },
+    'wum':         { lat: 6.3833, lng: 10.0667 },
+    'bafang':      { lat: 5.1500, lng: 10.1833 },
+    'mbouda':      { lat: 5.6333, lng: 10.2500 },
+    'bangangte':   { lat: 5.1500, lng: 10.5167 },
+    'meiganga':    { lat: 6.5167, lng: 14.3000 },
+    'batouri':     { lat: 4.4333, lng: 14.3667 },
+    'yagoua':      { lat: 10.3428, lng: 15.2406 },
+    'kousseri':    { lat: 12.0769, lng: 15.0306 },
+    'mora':        { lat: 11.0464, lng: 14.1400 },
+    'tiko':        { lat: 4.0750, lng: 9.3600 },
+    'muyuka':      { lat: 4.2900, lng: 9.4100 },
+    'ekondo-titi': { lat: 4.6000, lng: 8.9833 },
+  };
+
+  /**
+   * Default fallback coordinates (Yaoundé — political capital).
+   * Used when a city has no matching entry in {@link CITY_COORDINATES}.
+   */
+  private static readonly DEFAULT_COORDINATES: google.maps.LatLngLiteral =
+    { lat: 3.8480, lng: 11.5021 };
+
+  /**
+   * Normalize a city name for coordinate lookup:
+   * lowercase, strip diacritics, trim, collapse whitespace.
+   *
+   *   "Yaoundé"      → "yaounde"
+   *   "  Douala  "   → "douala"
+   *   "Ngaoundéré"   → "ngaoundere"
+   *   "Edéa"         → "edea"
+   */
+  private static normalizeCityName(name: string | null | undefined): string {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .replace(/\s+/g, ' ');
   }
+
+  /**
+   * Look up coordinates by city name.
+   *
+   * The backend sends UUIDs for city ids; names are the only stable
+   * key across environments. Falls back to Yaoundé when the name is
+   * missing or not present in {@link CITY_COORDINATES}.
+   *
+   * Always returns a coordinate — never null — so the map never
+   * "doesn't move" when a city is selected.
+   */
+  private getCityCoordinates(cityName: string | null | undefined): google.maps.LatLngLiteral {
+    const key = LocationFormComponent.normalizeCityName(cityName);
+    return LocationFormComponent.CITY_COORDINATES[key]
+        ?? LocationFormComponent.DEFAULT_COORDINATES;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  Field error accessors
+  // ═══════════════════════════════════════════════════════════
 
   protected nameError(): string | null {
     const c = this.name;
@@ -261,6 +347,14 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     if (c.errors['maxlength']) return 'Maximum 100 caractères';
     return null;
   }
+
+  protected cityIdError(): string | null {
+    const c = this.cityId;
+    if (!c.touched || !c.errors) return null;
+    if (c.errors['required']) return 'La ville est requise';
+    return null;
+  }
+
   protected addressError(): string | null {
     const c = this.address;
     if (!c.touched || !c.errors) return null;
@@ -268,12 +362,14 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     if (c.errors['maxlength']) return 'Maximum 255 caractères';
     return null;
   }
+
   protected phoneError(): string | null {
     const c = this.phone;
     if (!c.touched || !c.errors) return null;
     if (c.errors['maxlength']) return 'Maximum 50 caractères';
     return null;
   }
+
   protected latitudeError(): string | null {
     const c = this.latitude;
     if (!c.touched || !c.errors) return null;
@@ -281,6 +377,7 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     if (c.errors['min'] || c.errors['max']) return 'Entre -90 et 90';
     return null;
   }
+
   protected longitudeError(): string | null {
     const c = this.longitude;
     if (!c.touched || !c.errors) return null;
@@ -288,12 +385,17 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     if (c.errors['min'] || c.errors['max']) return 'Entre -180 et 180';
     return null;
   }
+
   protected deliveryRadiusError(): string | null {
     const c = this.deliveryRadius;
     if (!c.touched || !c.errors) return null;
     if (c.errors['min']) return 'Doit être positif';
     return null;
   }
+
+  // ═══════════════════════════════════════════════════════════
+  //  Submit
+  // ═══════════════════════════════════════════════════════════
 
   onCancel(): void {
     if (this.submitting()) return;
@@ -311,16 +413,16 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     const v = this.form.getRawValue();
     const request: LocationRequest = {
       name: v.name.trim(),
+      cityId: v.cityId,
       address: v.address.trim(),
       phone: v.phone?.trim() || undefined,
       latitude: v.latitude!,
       longitude: v.longitude!,
       deliveryRadius: v.deliveryRadius ?? undefined,
-      ...(v.cityId ? { cityId: v.cityId } : {})
     };
 
     const existing = this.location();
-    const op =  existing?.id
+    const op = existing?.id
       ? this.locationService.updateLocation(existing.id, request)
       : this.locationService.createLocation(request);
 

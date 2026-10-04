@@ -55,6 +55,9 @@ public class Vendor {
     @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Phone number must be valid")
     private final String phone;
 
+    @NotNull(message = "City is required")
+    private final City city;
+
     // ─── Ratings ──────────────────────────────────────────────
     private final BigDecimal ratingAvg;
     private final Integer totalRatings;
@@ -111,6 +114,7 @@ public class Vendor {
         this.address = builder.address;
         this.email = builder.email;
         this.phone = builder.phone;
+        this.city = builder.city;
         this.ratingAvg = builder.ratingAvg;
         this.totalRatings = builder.totalRatings;
         this.state = builder.state;
@@ -146,6 +150,7 @@ public class Vendor {
                 .address(this.address)
                 .email(this.email)
                 .phone(this.phone)
+                .city(this.city)
                 .ratingAvg(this.ratingAvg)
                 .totalRatings(this.totalRatings)
                 .state(this.state)
@@ -184,6 +189,10 @@ public class Vendor {
 
     public Vendor withCategories(List<Category> cuisines) {
         return baseBuilder().categories(cuisines).build();
+    }
+
+    public Vendor withCity(City city) {              // NEW
+        return baseBuilder().city(city).build();
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -246,6 +255,10 @@ public class Vendor {
         return idCardFrontStorageRef != null && !idCardFrontStorageRef.isBlank()
                 && idCardBackStorageRef != null && !idCardBackStorageRef.isBlank();
     }
+
+    public boolean isBasedIn(UUID cityId) {
+        return city != null && city.getId().equals(cityId);
+    }
     // ═══════════════════════════════════════════════════════════
     //  Manual Builder with Jakarta Validation
     // ═══════════════════════════════════════════════════════════
@@ -270,6 +283,8 @@ public class Vendor {
         private String email;
 
         private String phone;
+
+        private City city;
 
         private BigDecimal ratingAvg = BigDecimal.ZERO;
         private Integer totalRatings = 0;
@@ -301,6 +316,7 @@ public class Vendor {
         public Builder address(String address) { this.address = address; return this; }
         public Builder email(String email) { this.email = email; return this; }
         public Builder phone(String phone) { this.phone = phone; return this; }
+        public Builder city(City v) { this.city = v; return this; }
         public Builder ratingAvg(BigDecimal ratingAvg) { this.ratingAvg = ratingAvg; return this; }
         public Builder totalRatings(Integer totalRatings) { this.totalRatings = totalRatings; return this; }
         public Builder state(VendorState state) { this.state = state; return this; }

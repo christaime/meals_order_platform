@@ -1,5 +1,6 @@
 package com.mealmarket.meal.domain.model;
 
+import com.mealmarket.meal.testing.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,7 @@ class VendorTest {
                 .userId(KEYCLOAK_USER_ID)
                 .businessName("Delicious Bites")
                 .ownerName("owner")
+                .city(TestFixtures.aCity())
                 .description("Authentic Cameroonian cuisine")
                 .address("123 Main Street, Yaoundé")
                 .email("vendor@deliciousbites.com")
@@ -60,6 +62,7 @@ class VendorTest {
         return DistributionLocation.builder()
                 .id(id)
                 .vendor(vendor)
+                .city(TestFixtures.aCity())
                 .name("Branch " + id)
                 .address("Somewhere")
                 .latitude(3.8480)
@@ -109,6 +112,7 @@ class VendorTest {
                 Vendor.builder()
                         .id(VENDOR_ID)
                         .userId(KEYCLOAK_USER_ID)
+                        .city(TestFixtures.aCity())
                         .businessName("Delicious Bites")
                         .ownerName("owner")
                         .address("123 Main Street, Yaoundé")
@@ -123,6 +127,7 @@ class VendorTest {
                 Vendor.builder()
                         .id(VENDOR_ID)
                         .userId(KEYCLOAK_USER_ID)
+                        .city(TestFixtures.aCity())
                         .ownerName("owner")
                         .address("123 Main Street, Yaoundé")
                         .email("vendor@deliciousbites.com")

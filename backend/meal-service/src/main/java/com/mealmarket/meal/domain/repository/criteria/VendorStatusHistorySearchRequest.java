@@ -5,6 +5,7 @@ import com.mealmarket.meal.domain.model.VendorState;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -27,6 +28,16 @@ public class VendorStatusHistorySearchRequest extends SearchRequest {
         this.changeType = builder.changeType;
         this.changedFrom = builder.changedFrom;
         this.changedTo = builder.changedTo;
+    }
+
+    @Override
+    protected Set<String> getSortableProperties() {
+        return Set.of("vendorId", "createdAt");
+    }
+
+    @Override
+    protected String getDefaultSortProperty() {
+        return "vendorId";
     }
 
     public static Builder builder() {

@@ -6,6 +6,8 @@ import com.mealmarket.common.exception.ResourceNotFoundException;
 import com.mealmarket.meal.application.dto.VendorDashboardResponse;
 import com.mealmarket.meal.application.dto.VendorResponse;
 import com.mealmarket.meal.application.dto.VendorStateChangeResponse;
+import com.mealmarket.meal.application.mapper.CategoryDtoMapper;          // NEW
+import com.mealmarket.meal.application.mapper.LocationDtoMapper;          // NEW
 import com.mealmarket.meal.application.mapper.VendorDtoMapper;
 import com.mealmarket.meal.application.mapper.VendorStateChangeDtoMapper;
 import com.mealmarket.meal.domain.model.Vendor;
@@ -33,16 +35,14 @@ public class VendorStateChangeService {
     private final VendorStatusHistoryRepository historyRepository;
     private final MealRepository mealRepository;
     private final VendorDtoMapper vendorDtoMapper;
+    private final CategoryDtoMapper categoryDtoMapper;                    // NEW
+    private final LocationDtoMapper locationDtoMapper;                    // NEW
     private final VendorStateChangeDtoMapper historyDtoMapper;
 
     // ═══════════════════════════════════════════════════════════
     //  State Transitions
     // ═══════════════════════════════════════════════════════════
 
-    /**
-     * Activate a vendor: PENDING / SUSPENDED / INACTIVE → ACTIVE.
-     * Used by admin.
-     */
     @Transactional
     public VendorResponse activateVendor(UUID vendorId, UUID adminId) {
         return transitionState(
@@ -54,10 +54,6 @@ public class VendorStateChangeService {
         );
     }
 
-    /**
-     * Suspend a vendor: ACTIVE → SUSPENDED.
-     * Used by admin.
-     */
     @Transactional
     public VendorResponse suspendVendor(UUID vendorId, String reason, UUID adminId) {
         return transitionState(
@@ -69,10 +65,6 @@ public class VendorStateChangeService {
         );
     }
 
-    /**
-     * Ban a vendor: ANY (except BANNED) → BANNED.
-     * Used by admin.
-     */
     @Transactional
     public VendorResponse banVendor(UUID vendorId, String reason, UUID adminId) {
         return transitionState(
@@ -84,10 +76,6 @@ public class VendorStateChangeService {
         );
     }
 
-    /**
-     * Deactivate a vendor: ACTIVE → INACTIVE.
-     * Used by admin.
-     */
     @Transactional
     public VendorResponse deactivateVendor(UUID vendorId, String reason, UUID adminId) {
         return transitionState(
@@ -99,10 +87,6 @@ public class VendorStateChangeService {
         );
     }
 
-    /**
-     * Vendor voluntarily deactivates their own account: ACTIVE → INACTIVE.
-     * Ownership enforced via `userId`.
-     */
     @Transactional
     public VendorResponse deactivateOwnAccount(UUID vendorId, String reason, UUID userId) {
         Vendor existing = findVendorOrThrow(vendorId);
@@ -157,16 +141,13 @@ public class VendorStateChangeService {
 
         Vendor vendor = findVendorOrThrow(vendorId);
 
-        // Ownership check
         if (!vendor.getUserId().equals(userId)) {
             throw new ForbiddenException("You can only view your own dashboard");
         }
 
-        // Meal stats
         long totalMeals = mealRepository.countByVendorId(vendorId);
         long availableMeals = mealRepository.countAvailableByVendorId(vendorId);
 
-        // Trust metrics from history
         List<VendorStateChange> history = historyRepository.findByVendorId(vendorId);
         long banCount = history.stream()
                 .filter(h -> h.getToStatus() == VendorState.VendorStatus.BANNED)
@@ -175,19 +156,18 @@ public class VendorStateChangeService {
                 .filter(h -> h.getToStatus() == VendorState.VendorStatus.SUSPENDED)
                 .count();
 
-        // TODO: Phase 2 — pending meals, order metrics
         return new VendorDashboardResponse(
-                (int) totalMeals,       // totalMealsCount
-                0,                      // approvedMealsCount (placeholder — Phase 2)
-                0,                      // pendingMealsCount (placeholder — Phase 2)
-                (int) availableMeals,   // availableMealsCount
+                (int) totalMeals,
+                0,
+                0,
+                (int) availableMeals,
                 vendor.getRatingAvg() != null ? vendor.getRatingAvg().doubleValue() : 0.0,
                 vendor.getTotalRatings() != null ? vendor.getTotalRatings() : 0,
-                (int) (banCount + suspensionCount),  // negativeRatingsCount placeholder
-                (int) banCount,         // banCount
-                (int) suspensionCount,  // suspensionCount
-                List.of(),              // topSellingMeals (Phase 2)
-                List.of()               // weeklyTrend (Phase 2)
+                (int) (banCount + suspensionCount),
+                (int) banCount,
+                (int) suspensionCount,
+                List.of(),
+                List.of()
         );
     }
 
@@ -195,10 +175,6 @@ public class VendorStateChangeService {
     //  Helpers
     // ═══════════════════════════════════════════════════════════
 
-    /**
-     * Central method for state transitions.
-     * Validates the transition, updates the vendor, and records history.
-     */
     private VendorResponse transitionState(
             UUID vendorId,
             VendorState.VendorStatus targetStatus,
@@ -212,7 +188,6 @@ public class VendorStateChangeService {
                 ? currentState.status()
                 : null;
 
-        // Validate transition
         if (currentState != null && !currentState.canTransitionTo(targetStatus)) {
             throw new ConflictException(
                     String.format("Cannot transition vendor from %s to %s",
@@ -220,7 +195,6 @@ public class VendorStateChangeService {
             );
         }
 
-        // Build new state
         VendorState newState = new VendorState(
                 targetStatus,
                 reason,
@@ -229,11 +203,9 @@ public class VendorStateChangeService {
                 changeType
         );
 
-        // Update vendor
         Vendor updated = copyWithState(existing, newState);
         Vendor saved = vendorRepository.save(updated);
 
-        // Record history
         VendorStateChange change = VendorStateChange.builder()
                 .vendorId(vendorId)
                 .fromStatus(currentStatus)
@@ -249,7 +221,7 @@ public class VendorStateChangeService {
         log.info("Vendor {} transitioned: {} → {}",
                 vendorId, currentStatus, targetStatus);
 
-        return vendorDtoMapper.toResponse(saved);
+        return vendorDtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     private Vendor copyWithState(Vendor existing, VendorState newState) {
@@ -257,8 +229,10 @@ public class VendorStateChangeService {
                 .id(existing.getId())
                 .userId(existing.getUserId())
                 .businessName(existing.getBusinessName())
+                .ownerName(existing.getOwnerName())                              // ← was missing
                 .description(existing.getDescription())
                 .address(existing.getAddress())
+                .city(existing.getCity())                                        // ← CRITICAL, was missing
                 .email(existing.getEmail())
                 .phone(existing.getPhone())
                 .ratingAvg(existing.getRatingAvg())
@@ -272,6 +246,7 @@ public class VendorStateChangeService {
                 .idCardBackStorageRef(existing.getIdCardBackStorageRef())
                 .categories(existing.getCategories())
                 .distributionLocations(existing.getDistributionLocations())
+                .subscriptionTier(existing.getSubscriptionTier())                // ← was missing
                 .createdAt(existing.getCreatedAt())
                 .updatedAt(Instant.now())
                 .build();

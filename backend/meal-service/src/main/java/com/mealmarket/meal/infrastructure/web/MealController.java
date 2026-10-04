@@ -415,8 +415,11 @@ public class MealController {
             @Parameter(description = "Dish type category IDs filter (comma-separated)")
             @RequestParam(required = false) List<UUID> dishTypeIds,
 
-            @Parameter(description = "Ingredient IDs filter (meals containing these)")
-            @RequestParam(required = false) List<UUID> ingredientIds,
+            @Parameter(description = "Ingredient IDs filter (meals containing ALL of these)")
+            @RequestParam(required = false) List<UUID> allIngredientIds,
+
+            @Parameter(description = "Ingredient IDs filter (meals containing ANY of these)")
+            @RequestParam(required = false) List<UUID> anyIngredientIds,
 
             @Parameter(description = "Ingredient IDs to exclude (allergens)")
             @RequestParam(required = false) List<UUID> excludeIngredientIds,
@@ -435,6 +438,9 @@ public class MealController {
 
             @Parameter(description = "Filter by availability")
             @RequestParam(required = false) Boolean isAvailable,
+
+            @Parameter(description = "Filter looking if has Allergens or not")
+            @RequestParam(required = false) Boolean hasAllergens,
 
             @Parameter(description = "Get ingredients and distribution locations in the result")
             @RequestParam(required = false) Boolean loadFull,
@@ -459,8 +465,10 @@ public class MealController {
                 .vendorId(vendorId)
                 .cuisineIds(cuisineIds)
                 .dishTypeIds(dishTypeIds)
-                .ingredientIds(ingredientIds)
+                .anyIngredientIds(anyIngredientIds)
+                .allIngredientIds(allIngredientIds)
                 .excludeIngredientIds(excludeIngredientIds)
+                .hasAllergens(hasAllergens)
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
                 .minRating(minRating)
@@ -547,8 +555,8 @@ public class MealController {
             @Parameter(description = "Minimum rating")
             @RequestParam(required = false) Double minRating,
 
-            @Parameter(description = "Distribution location ID filter")
-            @RequestParam(required = false) UUID distributionLocationId,
+            @Parameter(description = "Distribution location IDs filter")
+            @RequestParam(required = false) List<UUID> distributionLocationIds,
 
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
@@ -572,7 +580,7 @@ public class MealController {
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
                 .minRating(minRating)
-                .distributionLocationId(distributionLocationId)
+                .distributionLocationIds(distributionLocationIds)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();

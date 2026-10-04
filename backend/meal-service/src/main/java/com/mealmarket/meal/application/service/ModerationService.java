@@ -18,6 +18,8 @@ import com.mealmarket.meal.application.mapper.IngredientDtoMapper;
 import com.mealmarket.meal.application.mapper.LocationDtoMapper;
 import com.mealmarket.meal.application.mapper.MealDtoMapper;
 import com.mealmarket.meal.application.mapper.ModerationDataDtoMapper;
+import com.mealmarket.meal.domain.event.CategoryChangedEvent;
+import com.mealmarket.meal.domain.event.IngredientChangedEvent;
 import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.DistributionLocation;
 import com.mealmarket.meal.domain.model.Ingredient;
@@ -37,6 +39,7 @@ import com.mealmarket.meal.domain.repository.criteria.MealSearchRequest;
 import com.mealmarket.meal.domain.repository.criteria.ModerationDataSearchRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
@@ -63,15 +66,12 @@ public class ModerationService {
     private final CategoryDtoMapper categoryDtoMapper;
     private final ModerationDataDtoMapper moderationDataDtoMapper;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     // ═══════════════════════════════════════════════════════════
     //  Unified Moderation Entry Point
     // ═══════════════════════════════════════════════════════════
 
-    /**
-     * Generic moderation entry point.
-     * Resolves the target, applies the transition, records history,
-     * and returns a lightweight outcome.
-     */
     @Transactional
     public ModerationOutcome moderate(
             ModerationTargetType targetType,
@@ -105,7 +105,7 @@ public class ModerationService {
         moderateMealInternal(mealId, request, performedByType, performedById);
         Meal updated = mealRepository.findByIdWithDetails(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found: " + mealId));
-        return mealDtoMapper.toResponse(updated);
+        return mealDtoMapper.toResponse(updated, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     @Transactional
@@ -131,7 +131,7 @@ public class ModerationService {
         moderateLocationInternal(locationId, request, performedByType, performedById);
         DistributionLocation updated = locationRepository.findById(locationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Location not found: " + locationId));
-        return locationDtoMapper.toResponse(updated);
+        return locationDtoMapper.toResponse(updated);                                     // unchanged
     }
 
     @Transactional
@@ -144,7 +144,7 @@ public class ModerationService {
         moderateCategoryInternal(categoryId, request, performedByType, performedById);
         Category updated = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryId));
-        return categoryDtoMapper.toResponse(updated);
+        return categoryDtoMapper.toResponse(updated);                                     // unchanged
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -258,17 +258,12 @@ public class ModerationService {
             UserType performedByType,
             UUID performedById
     ) {
-        // Must load with details — the shallow load returns empty
-        // ingredient/location collections, and the cascade would no-op.
         Meal meal = mealRepository.findByIdWithDetails(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal not found: " + mealId));
 
         ModerationStatus from = meal.getModerationStatus();
         ModerationStatus to = mapDecision(request.decision(), from);
 
-        // On APPROVE, cascade the meal's pending references to APPROVED.
-        // Throws if any reference is in an incompatible state — the whole
-        // transaction rolls back.
         if (to == ModerationStatus.APPROVED) {
             cascadeApprovalForMeal(meal, performedByType, performedById);
         }
@@ -297,6 +292,9 @@ public class ModerationService {
 
         Ingredient updated = ingredient.withModerationStatus(to);
         ingredientRepository.save(updated);
+
+        eventPublisher.publishEvent(new IngredientChangedEvent(ingredientId,
+                IngredientChangedEvent.ChangeType.STATUS_CHANGED));
 
         return recordAndReturn(
                 ModerationTargetType.INGREDIENT, ingredientId, from, to,
@@ -342,6 +340,9 @@ public class ModerationService {
         Category updated = category.withModerationStatus(to);
         categoryRepository.save(updated);
 
+        eventPublisher.publishEvent(new CategoryChangedEvent(categoryId,
+                CategoryChangedEvent.ChangeType.STATUS_CHANGED));
+
         return recordAndReturn(
                 ModerationTargetType.CATEGORY, categoryId, from, to,
                 request.reason(), performedByType, performedById
@@ -352,10 +353,6 @@ public class ModerationService {
     //  Private — Decision Mapping
     // ═══════════════════════════════════════════════════════════
 
-    /**
-     * Maps a moderation decision + current status to the target status.
-     * Throws ConflictException on invalid transitions.
-     */
     private ModerationStatus mapDecision(
             ModerationRequest.ModerationDecision decision,
             ModerationStatus currentStatus
@@ -493,7 +490,6 @@ public class ModerationService {
         List<DistributionLocation> allPending = locationRepository
                 .findByModerationStatus(ModerationStatus.PENDING);
 
-        // Manual pagination (since the repository method returns a list)
         int totalElements = allPending.size();
         int fromIndex = page.getOffset();
         int toIndex = Math.min(fromIndex + page.getSize(), totalElements);
@@ -544,21 +540,6 @@ public class ModerationService {
         );
     }
 
-    /**
-     * Cascades approval to a meal's ingredients and distribution locations.
-     *
-     * Pre-flight rule: every child must be in a cascade-eligible state —
-     * PENDING (will be approved) or APPROVED (no-op). Any child in
-     * REJECTED or DISABLED throws ConflictException, which rolls back the
-     * whole transaction because the caller is @Transactional.
-     *
-     * Categories are intentionally excluded — they are reference data and
-     * are never un-approved.
-     *
-     * For every child that transitions, a ModerationData entry is written
-     * with the same performer and the same timestamp as the parent's
-     * approval.
-     */
     private void cascadeApprovalForMeal(
             Meal meal,
             UserType performedByType,
@@ -566,7 +547,6 @@ public class ModerationService {
     ) {
         Instant now = Instant.now();
 
-        // ─── Validate — fail fast, before any state changes ───
         List<String> blocking = new ArrayList<String>();
 
         for (Ingredient ing : meal.getIngredients()) {
@@ -590,10 +570,11 @@ public class ModerationService {
             );
         }
 
-        // ─── Cascade ingredients ───
         for (Ingredient ing : meal.getIngredients()) {
             if (ing.getModerationStatus() == ModerationStatus.PENDING) {
                 ingredientRepository.save(ing.withModerationStatus(ModerationStatus.APPROVED));
+                eventPublisher.publishEvent(new IngredientChangedEvent(ing.getId(),
+                        IngredientChangedEvent.ChangeType.STATUS_CHANGED));
                 recordCascade(
                         ModerationTargetType.INGREDIENT, ing.getId(),
                         ModerationStatus.PENDING, ModerationStatus.APPROVED,
@@ -602,7 +583,6 @@ public class ModerationService {
             }
         }
 
-        // ─── Cascade locations ───
         for (DistributionLocation loc : meal.getDistributionLocations()) {
             if (loc.getModerationStatus() == ModerationStatus.PENDING) {
                 locationRepository.save(loc.withModerationStatus(ModerationStatus.APPROVED));
@@ -615,16 +595,11 @@ public class ModerationService {
         }
     }
 
-    /** PENDING is eligible (will be approved); APPROVED is eligible (no-op). */
     private boolean isCascadeEligible(ModerationStatus status) {
         return status == ModerationStatus.PENDING
                 || status == ModerationStatus.APPROVED;
     }
 
-    /**
-     * Records a system-generated ModerationData entry for a cascaded
-     * transition. Reason is null — these are not human-authored decisions.
-     */
     private void recordCascade(
             ModerationTargetType targetType,
             UUID targetId,

@@ -8,6 +8,7 @@ import com.mealmarket.meal.application.dto.CategorySummaryResponse;
 import com.mealmarket.meal.application.dto.CreateCategoryRequest;
 import com.mealmarket.meal.application.dto.UpdateCategoryRequest;
 import com.mealmarket.meal.application.mapper.CategoryDtoMapper;
+import com.mealmarket.meal.domain.event.CategoryChangedEvent;
 import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.CategoryType;
 import com.mealmarket.meal.domain.model.ModerationData;
@@ -19,6 +20,7 @@ import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.CategorySearchRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModerationDataRepository moderationDataRepository;
     private final CategoryDtoMapper dtoMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ═══════════════════════════════════════════════════════════
     //  Creation
@@ -75,6 +78,10 @@ public class CategoryService {
                         createdById
                 )
         );
+
+        // Publish Category created
+        eventPublisher.publishEvent(new CategoryChangedEvent(saved.getId(),
+                CategoryChangedEvent.ChangeType.CREATED));
 
         log.info("Category created with ID: {}", saved.getId());
         return dtoMapper.toResponse(saved);
@@ -133,7 +140,8 @@ public class CategoryService {
                 .keyword(request.getKeyword())
                 .name(request.getName())
                 .type(request.getType())
-                .moderationStatus(ModerationStatus.APPROVED)   // ← forced
+                .moderationStatus(ModerationStatus.APPROVED)   //
+                .sort(request.getSort())
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
@@ -176,6 +184,11 @@ public class CategoryService {
         );
 
         Category saved = categoryRepository.save(updated);
+
+        // Publish category update
+        eventPublisher.publishEvent(new CategoryChangedEvent(saved.getId(),
+                CategoryChangedEvent.ChangeType.UPDATED));
+
         log.info("Category updated: {}", saved.getId());
         return dtoMapper.toResponse(saved);
     }
@@ -202,6 +215,8 @@ public class CategoryService {
                 log.info("Category {} is {} — performing hard delete",
                         categoryId, existing.getModerationStatus());
                 categoryRepository.deleteById(categoryId);
+                eventPublisher.publishEvent(new CategoryChangedEvent(categoryId,
+                        CategoryChangedEvent.ChangeType.DELETED));
             }
 
             case APPROVED -> {
@@ -219,6 +234,8 @@ public class CategoryService {
                                 adminId
                         )
                 );
+                eventPublisher.publishEvent(new CategoryChangedEvent(categoryId,
+                        CategoryChangedEvent.ChangeType.STATUS_CHANGED));
             }
 
             case DISABLED -> throw new ConflictException(

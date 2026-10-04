@@ -18,6 +18,7 @@ public record VendorResponse(
         String ownerName,
         String description,
         String address,
+        CityResponse city,                     // NEW
         String email,
         String phone,
 
@@ -40,14 +41,14 @@ public record VendorResponse(
         String pickupAddress,
 
         // ─── Profile ───────────────────────────────────────────────
-        String profileImageUrl,          // computed from profileImageStorageRef
-        String profileImageStorageRef,   // raw ref, for the editor
-        String coverImageUrl,            // computed from coverImageStorageRef
-        String coverImageStorageRef,     // raw ref, for the editor
-        String idCardFrontUrl,           // computed from idCardFrontStorageRef
-        String idCardFrontStorageRef,    // raw ref, for the editor
-        String idCardBackUrl,            // computed from idCardBackStorageRef
-        String idCardBackStorageRef,     // raw ref, for the editor
+        String profileImageUrl,
+        String profileImageStorageRef,
+        String coverImageUrl,
+        String coverImageStorageRef,
+        String idCardFrontUrl,
+        String idCardFrontStorageRef,
+        String idCardBackUrl,
+        String idCardBackStorageRef,
 
         // ─── Relationships ────────────────────────────────────────
         List<CategorySummaryResponse> cuisines,

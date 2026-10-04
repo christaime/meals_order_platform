@@ -1,0 +1,9 @@
+:host {
+  display: contents;
+
+  // Ensure the messages container can grow its scroll area without
+  // collapsing on very long single-line messages.
+  .messages-container {
+    overscroll-behavior: contain;
+  }
+}

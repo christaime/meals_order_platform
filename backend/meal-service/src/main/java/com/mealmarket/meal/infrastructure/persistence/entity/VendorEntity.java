@@ -54,6 +54,9 @@ public class VendorEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "city_id", nullable = false)
+    private UUID cityId;
+
     @Column(nullable = false, length = 255)
     private String address;
 

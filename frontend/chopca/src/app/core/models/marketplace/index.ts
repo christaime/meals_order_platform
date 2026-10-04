@@ -8,6 +8,9 @@ export * from './enum-type.model';
 // Category
 export * from './category.model';
 
+// City
+export * from './city.model';
+
 // Ingredient
 export * from './ingredient.model';
 

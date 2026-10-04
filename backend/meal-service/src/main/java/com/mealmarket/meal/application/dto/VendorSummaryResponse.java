@@ -19,6 +19,7 @@ public record VendorSummaryResponse(
         String ownerName,
         String description,
         String address,
+        CityResponse city,                     // NEW
         BigDecimal ratingAvg,
         Integer totalRatings,
         SubscriptionTier subscriptionTier,

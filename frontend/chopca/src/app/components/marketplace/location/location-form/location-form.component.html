@@ -8,16 +8,19 @@
   <mat-form-field appearance="outline" class="w-full">
     <mat-label>Ville</mat-label>
     <mat-icon matPrefix>location_city</mat-icon>
-    <mat-select
-      [value]="selectedCityId()"
-      (selectionChange)="onCityChange($event.value)"
-      placeholder="Sélectionner une ville">
+    <mat-select formControlName="cityId" placeholder="Sélectionner une ville">
       @for (city of cities(); track city.id) {
       <mat-option [value]="city.id">
         {{ city.name }}@if (city.region) { — {{ city.region }} }
       </mat-option>
       }
+      @if (cities().length === 0) {
+      <mat-option disabled>Aucune ville disponible</mat-option>
+      }
     </mat-select>
+    @if (cityIdError()) {
+    <mat-error>{{ cityIdError() }}</mat-error>
+    }
   </mat-form-field>
 
   <!-- Places search -->

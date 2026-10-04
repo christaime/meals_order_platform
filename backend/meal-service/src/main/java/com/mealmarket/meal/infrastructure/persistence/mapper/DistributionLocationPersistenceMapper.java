@@ -2,8 +2,8 @@ package com.mealmarket.meal.infrastructure.persistence.mapper;
 
 import com.mealmarket.meal.domain.model.DistributionLocation;
 import com.mealmarket.meal.domain.model.Vendor;
+import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
-import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -16,16 +16,18 @@ import java.util.UUID;
  * Maps between {@link DistributionLocation} (domain) and
  * {@link DistributionLocationEntity} (JPA).
  *
- * Relationship handling:
- * - The domain has a full {@code Vendor} object.
- * - The entity stores only {@code vendorId}.
- * - On Domain → Entity: extract {@code vendor.id} into {@code vendorId}.
- * - On Entity → Domain: {@code vendor} is IGNORED — the adapter loads it
- *   separately via the vendor repository and reassembles the domain object.
+ * City handling:
+ *   The entity stores only {@code UUID cityId}. A {@link CityEntity} is
+ *   passed in on the Entity → Domain direction by the adapter.
+ *
+ * Vendor handling:
+ *   The mapper receives the fully-assembled domain {@link Vendor} — the
+ *   adapter resolves it (minimal — no locations, no categories) to break
+ *   the recursion between locations and vendors.
  */
 @Mapper(
         componentModel = "spring",
-        uses = { VendorPersistenceMapper.class }
+        uses = { CityPersistenceMapper.class }
 )
 public interface DistributionLocationPersistenceMapper {
 
@@ -37,34 +39,39 @@ public interface DistributionLocationPersistenceMapper {
     // ═══════════════════════════════════════════════════════════
 
     @Mapping(target = "vendorId", source = "vendor", qualifiedByName = "extractVendorId")
+    @Mapping(target = "cityId",   source = "city.id")
     DistributionLocationEntity toEntity(DistributionLocation location);
 
     List<DistributionLocationEntity> toEntityList(List<DistributionLocation> locations);
 
     // ═══════════════════════════════════════════════════════════
-    //  Entity → Domain (lightweight)
-    //  Vendor is loaded separately by the adapter
+    //  Entity → Domain
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "id",             source = "entity.id")
-    @Mapping(target = "name",           source = "entity.name")
-    @Mapping(target = "address",        source = "entity.address")
-    @Mapping(target = "phone",          source = "entity.phone")
-    @Mapping(target = "latitude",       source = "entity.latitude")
-    @Mapping(target = "longitude",      source = "entity.longitude")
-    @Mapping(target = "deliveryRadius", source = "entity.deliveryRadius")
+    @Mapping(target = "id",               source = "entity.id")
+    @Mapping(target = "name",             source = "entity.name")
+    @Mapping(target = "city",             source = "city")
+    @Mapping(target = "address",          source = "entity.address")
+    @Mapping(target = "phone",            source = "entity.phone")
+    @Mapping(target = "latitude",         source = "entity.latitude")
+    @Mapping(target = "longitude",        source = "entity.longitude")
+    @Mapping(target = "deliveryRadius",   source = "entity.deliveryRadius")
     @Mapping(target = "moderationStatus", source = "entity.moderationStatus")
-    @Mapping(target = "createdAt",      source = "entity.createdAt")
-    @Mapping(target = "updatedAt",      source = "entity.updatedAt")
-    @Mapping(target = "vendor", source = "vendor", qualifiedByName = "toMinimalDomain")
-    DistributionLocation toDomain(DistributionLocationEntity entity, VendorEntity vendor);
+    @Mapping(target = "createdAt",        source = "entity.createdAt")
+    @Mapping(target = "updatedAt",        source = "entity.updatedAt")
+    @Mapping(target = "vendor",           source = "vendor")
+    DistributionLocation toDomain(
+            DistributionLocationEntity entity,
+            Vendor vendor,
+            CityEntity city
+    );
 
     // ═══════════════════════════════════════════════════════════
     //  Helpers
     // ═══════════════════════════════════════════════════════════
 
     @Named("extractVendorId")
-    default UUID extractVendorId(com.mealmarket.meal.domain.model.Vendor vendor) {
+    default UUID extractVendorId(Vendor vendor) {
         return vendor != null ? vendor.getId() : null;
     }
 }

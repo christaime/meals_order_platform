@@ -45,6 +45,13 @@ export const MARKETPLACE_ROUTES: Routes = [
  */
 export const ADMIN_ROUTES: Routes = [
   {
+    path: 'cities',
+    loadComponent: () =>
+      import('./cities/cities.page')
+        .then(m => m.CitiesPageComponent),
+   title: 'Admin • Les villes',
+  },
+  {
       path: 'categories',
       loadComponent: () =>
         import('./categories/categories.page')

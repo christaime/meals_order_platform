@@ -351,6 +351,9 @@ public class VendorController {
             @Parameter(description = "Phone filter")
             @RequestParam(required = false) String phone,
 
+            @Parameter(description = "City filter")
+            @RequestParam(required = false) UUID cityId,
+
             @Parameter(description = "Vendor status filter")
             @RequestParam(required = false) VendorState.VendorStatus status,
 
@@ -384,6 +387,7 @@ public class VendorController {
                 .minRating(minRating)
                 .maxRating(maxRating)
                 .categoryIds(categoryIds)
+                .cityId(cityId)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();
@@ -499,6 +503,9 @@ public class VendorController {
             @Parameter(description = "Minimum rating")
             @RequestParam(required = false) Double minRating,
 
+            @Parameter(description = "City filter")
+            @RequestParam(required = false) UUID cityId,
+
             @Parameter(description = "Cuisine category IDs filter (comma-separated)")
             @RequestParam(required = false) List<UUID> categoryIds,
 
@@ -519,6 +526,7 @@ public class VendorController {
                 .businessName(businessName)
                 .minRating(minRating)
                 .categoryIds(categoryIds)
+                .cityId(cityId)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();
@@ -545,6 +553,7 @@ public class VendorController {
                 v.ownerName(),
                 v.description(),
                 v.address(),
+                v.city(),
                 v.email(),
                 v.phone(),
                 v.ratingAvg(),

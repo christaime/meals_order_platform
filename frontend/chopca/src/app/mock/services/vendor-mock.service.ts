@@ -151,6 +151,7 @@ export class VendorMockService implements VendorService {
       ownerName: request.ownerName,
       description: request.description,
       address: request.address,
+      city: {id:request.cityId,countryCode:"CM",name:"city",region:""},
       email: '',
       phone: request.phone,
       ratingAvg: 0,

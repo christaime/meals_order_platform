@@ -2,21 +2,28 @@ import {
   Component,
   ChangeDetectionStrategy,
   computed,
+  inject,
   input,
   signal,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSliderModule } from '@angular/material/slider';
 import { IconComponent } from '@components/shared/icon/icon.component';
+import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
+import { City } from '@app/core/models/marketplace';
+import { map } from 'rxjs';
 
 /**
  * Section D — Géolocalisation & Logistique Flotte.
  *
  * Parent-owned FormGroup must contain:
  *   - address        : string, required, max 255
+ *   - cityId         : string (UUID), required
  *   - pickupAddress  : string, max 255
  *   - deliveryRadius : number, required, 1–25 (km)
  *
@@ -28,10 +35,9 @@ import { IconComponent } from '@components/shared/icon/icon.component';
  *   - toggle of the checkbox (onSameAddressToggle)
  *   - every input in the main address field (onAddressInput)
  *
- * The component does NOT subscribe to `address.valueChanges` — the
- * template calls `onAddressInput` explicitly, which keeps the flow
- * easy to trace and avoids the "when is `form()` available?" problem
- * that a constructor-time subscription would hit with signal inputs.
+ * The city list is loaded once at construction from {@link CITY_SERVICE}.
+ * If the load fails, the select shows "no city available" and the
+ * `cityId` control stays required, so the user can't submit.
  */
 @Component({
   selector: 'app-logistics',
@@ -40,6 +46,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatCheckboxModule,
     MatSliderModule,
     IconComponent,
@@ -50,10 +57,17 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 })
 export class LogisticsComponent {
 
+  // ─── Dependencies ─────────────────────────────────────────
+
+  private readonly cityService = inject(CITY_SERVICE);
+
   // ─── Inputs ───────────────────────────────────────────────
 
   /** Parent-owned form. See class doc for required controls. */
   readonly form = input.required<FormGroup>();
+
+  // ─── City list ────────────────────────────────────────────
+  readonly cities = signal<City[]>([]);
 
   // ─── UI state (not part of the form) ──────────────────────
 
@@ -71,6 +85,12 @@ export class LogisticsComponent {
   /** Diameter in px for the radar ring, driven by the radius value. */
   protected readonly radarSize = computed<number>(() => 40 + this.radius() * 4);
 
+  ngOnInit(): void {
+      this.cityService.getCities().subscribe({
+        next: (cities) => this.cities.set(cities),
+        error: (err) => console.error('[Logistics] cities error', err),
+      });
+  }
   // ─── Actions ──────────────────────────────────────────────
 
   /**

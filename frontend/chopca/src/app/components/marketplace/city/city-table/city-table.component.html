@@ -1,0 +1,98 @@
+<div class="relative">
+  @if (loading()) {
+  <div class="absolute inset-0 bg-surface/70 backdrop-blur-sm z-10
+                flex items-center justify-center">
+    <mat-spinner diameter="32" />
+  </div>
+  }
+
+  <table class="w-full text-left border-collapse">
+    <thead class="bg-surface-container-low">
+    <tr>
+      <th class="px-space-md py-space-sm font-label-md text-label-md
+                   text-on-surface-variant uppercase tracking-wide">
+        Nom
+      </th>
+      <th class="px-space-md py-space-sm font-label-md text-label-md
+                   text-on-surface-variant uppercase tracking-wide">
+        Région
+      </th>
+      <th class="px-space-md py-space-sm font-label-md text-label-md
+                   text-on-surface-variant uppercase tracking-wide text-right">
+        Actions
+      </th>
+    </tr>
+    </thead>
+
+    <tbody>
+    @for (city of cities(); track city.id) {
+    <tr
+      class="border-t border-outline-variant/40 transition-colors"
+      [ngClass]="editingId() === city.id
+            ? 'bg-primary-fixed/40'
+            : 'hover:bg-surface-container-low/50'">
+
+      <!-- Name + country code -->
+      <td class="px-space-md py-space-sm">
+        <div class="flex items-center gap-2">
+              <span class="font-label-lg text-label-lg text-on-surface">
+                {{ city.name }}
+              </span>
+          <span
+            class="px-1.5 py-0.5 rounded bg-surface-container
+                       font-label-sm text-label-sm text-on-surface-variant
+                       uppercase tracking-wide">
+                {{ city.countryCode }}
+              </span>
+        </div>
+      </td>
+
+      <!-- Region -->
+      <td class="px-space-md py-space-sm">
+        @if (city.region) {
+        <span class="font-body-md text-body-md text-on-surface-variant">
+                {{ city.region }}
+              </span>
+        } @else {
+        <span class="font-body-sm text-body-sm text-outline italic">
+                Non renseignée
+              </span>
+        }
+      </td>
+
+      <!-- Actions -->
+      <td class="px-space-md py-space-sm text-right">
+        <div class="inline-flex items-center gap-1">
+          <button
+            type="button"
+            mat-icon-button
+            aria-label="Modifier"
+            (click)="onEdit(city)">
+            <app-icon name="edit" size="sm" class="text-primary" />
+          </button>
+
+          <button
+            type="button"
+            mat-icon-button
+            aria-label="Supprimer"
+            (click)="onDelete(city)">
+            <app-icon name="delete" size="sm" class="text-error" />
+          </button>
+        </div>
+      </td>
+    </tr>
+    } @empty {
+    <tr>
+      <td colspan="3" class="px-space-md py-space-xl text-center">
+        <div class="flex flex-col items-center gap-space-sm text-on-surface-variant">
+          <app-icon name="location_off" size="xl" class="opacity-40" />
+          <span class="font-body-md text-body-md">
+                Aucune ville trouvée.
+              </span>
+        </div>
+      </td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>

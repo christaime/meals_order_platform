@@ -28,6 +28,52 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════
+       City select
+       ═══════════════════════════════════════════════════════ -->
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Ville d'implantation</mat-label>
+    <app-icon
+      matPrefix
+      name="location_city"
+      size="md"
+      class="text-primary pr-2" />
+
+    <mat-select
+      formControlName="cityId"
+      placeholder="Sélectionnez une ville">
+      @for (city of cities(); track city.id) {
+      <mat-option [value]="city.id">
+          <span class="flex items-center justify-between gap-space-md w-full">
+            <span class="font-body-md text-body-md text-on-surface">
+              {{ city.name }}
+            </span>
+            @if (city.region) {
+              <span class="font-label-sm text-label-sm text-on-surface-variant">
+                {{ city.region }}
+              </span>
+            }
+          </span>
+      </mat-option>
+      } @empty {
+      <mat-option disabled>
+          <span class="font-body-sm text-body-sm text-on-surface-variant">
+            Aucune ville disponible
+          </span>
+      </mat-option>
+      }
+    </mat-select>
+
+    <mat-hint>
+      La ville détermine la zone de recherche pour vos clients.
+    </mat-hint>
+
+    @if (form().get('cityId')?.hasError('required')
+    && form().get('cityId')?.touched) {
+    <mat-error>La ville d'implantation est obligatoire.</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- ═══════════════════════════════════════════════════════
        Main address
        ═══════════════════════════════════════════════════════ -->
   <mat-form-field appearance="outline" class="w-full">

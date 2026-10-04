@@ -14,6 +14,7 @@ public record LocationResponse(
 
         // Location details
         String name,
+        CityResponse city,
         String address,
         String phone,
         Double latitude,
@@ -22,7 +23,7 @@ public record LocationResponse(
 
         // Moderation
         ModerationStatus moderationStatus,
-        Boolean isActive,               // ← derived: moderationStatus == APPROVED
+        Boolean isActive,
 
         // Timestamps
         Instant createdAt,

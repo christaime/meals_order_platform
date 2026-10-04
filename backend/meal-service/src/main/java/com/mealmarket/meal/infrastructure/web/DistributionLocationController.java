@@ -139,6 +139,12 @@ public class DistributionLocationController {
             @Parameter(description = "Moderation status filter")
             @RequestParam(required = false) ModerationStatus moderationStatus,
 
+            @Parameter(description = "Exact city name or region match")
+            @RequestParam(required = false) String cityNameLike,
+
+            @Parameter(description = "Exact location cityId match in")
+            @RequestParam(required = false) List<UUID> cityIds,
+
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
 
@@ -157,6 +163,8 @@ public class DistributionLocationController {
                 .vendorId(vendor.getId())
                 .keyword(keyword)
                 .name(name)
+                .cityIds(cityIds)
+                .cityNameLike(cityNameLike)
                 .moderationStatus(moderationStatus)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
@@ -330,10 +338,9 @@ public class DistributionLocationController {
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(
-            summary = "Search your locations (vendor only)",
+            summary = "Search your locations by vendorId ",
             description = """
-            Returns the authenticated vendor's locations — any moderation status.
-            The vendor scope is enforced automatically.
+            Returns the vendor's locations — any moderation status.
             """
     )
     @ApiResponses(value = {
@@ -341,6 +348,9 @@ public class DistributionLocationController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     public ResponseEntity<DataPage<LocationResponse>> searchLocationsAsAdmin(
+            @Parameter(description = "VendorId owning the locations")
+            @RequestParam(required = true) UUID vendorId,
+
             @Parameter(description = "Keyword search in name or address")
             @RequestParam(required = false) String keyword,
 
@@ -349,6 +359,12 @@ public class DistributionLocationController {
 
             @Parameter(description = "Moderation status filter")
             @RequestParam(required = false) ModerationStatus moderationStatus,
+
+            @Parameter(description = "Exact city name or region match")
+            @RequestParam(required = false) String cityNameLike,
+
+            @Parameter(description = "Exact location cityId match in")
+            @RequestParam(required = false) List<UUID> cityIds,
 
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
@@ -362,18 +378,19 @@ public class DistributionLocationController {
             @Parameter(description = "Sort direction (ASC or DESC)")
             @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection
     ) {
-        var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
 
         var request = com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest.builder()
-                .vendorId(vendor.getId())
+                .vendorId(vendorId)
                 .keyword(keyword)
                 .name(name)
+                .cityNameLike(cityNameLike)
+                .cityIds(cityIds)
                 .moderationStatus(moderationStatus)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();
 
-        return ResponseEntity.ok(locationService.searchMyLocations(request, vendor.getId()));
+        return ResponseEntity.ok(locationService.searchLocations(request));
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -436,6 +453,60 @@ public class DistributionLocationController {
         var request = com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest.builder()
                 .vendorId(vendorId)
                 .keyword(keyword)
+                .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
+                .page(page, size)
+                .build();
+
+        return ResponseEntity.ok(locationService.searchApprovedLocations(request));
+    }
+
+    @GetMapping("/public/locations")
+    @Operation(
+            summary = "Search approved locations ",
+            description = """
+            Returns the approved locations matching the criteria.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of locations"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    public ResponseEntity<DataPage<LocationSummaryResponse>> searchApprovedLocations(
+            @Parameter(description = "VendorId owning the locations")
+            @RequestParam(required = false) UUID vendorId,
+
+            @Parameter(description = "Keyword search in name or address")
+            @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "Exact name match")
+            @RequestParam(required = false) String name,
+
+            @Parameter(description = "Exact city name or region match")
+            @RequestParam(required = false) String cityNameLike,
+
+            @Parameter(description = "Exact location cityId match in")
+            @RequestParam(required = false) List<UUID> cityIds,
+
+            @Parameter(description = "Page number (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "Page size")
+            @RequestParam(defaultValue = "20") int size,
+
+            @Parameter(description = "Sort field")
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+
+            @Parameter(description = "Sort direction (ASC or DESC)")
+            @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection
+    ) {
+
+        var request = com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest.builder()
+                .vendorId(vendorId)
+                .keyword(keyword)
+                .name(name)
+                .cityIds(cityIds)
+                .cityNameLike(cityNameLike)
+                .moderationStatus(ModerationStatus.APPROVED)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();

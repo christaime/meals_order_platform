@@ -1,5 +1,6 @@
 package com.mealmarket.meal.domain.model;
 
+import com.mealmarket.meal.testing.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,7 @@ class MealTest {
         return Vendor.builder()
                 .id(VENDOR_ID)
                 .userId(UUID.randomUUID())
+                .city(TestFixtures.aCity())
                 .businessName("Delicious Bites")
                 .ownerName("owner")
                 .address("123 Main Street, Yaoundé")
@@ -50,6 +52,7 @@ class MealTest {
         return Vendor.builder()
                 .id(VENDOR_ID)
                 .userId(UUID.randomUUID())
+                .city(TestFixtures.aCity())
                 .businessName("Delicious Bites")
                 .ownerName("owner")
                 .address("123 Main Street, Yaoundé")

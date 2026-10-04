@@ -8,6 +8,8 @@ import com.mealmarket.meal.application.dto.CreateMealRequest;
 import com.mealmarket.meal.application.dto.MealResponse;
 import com.mealmarket.meal.application.dto.MealSummaryResponse;
 import com.mealmarket.meal.application.dto.UpdateMealRequest;
+import com.mealmarket.meal.application.mapper.CategoryDtoMapper;                // NEW
+import com.mealmarket.meal.application.mapper.LocationDtoMapper;                // NEW
 import com.mealmarket.meal.application.mapper.MealDtoMapper;
 import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.DistributionLocation;
@@ -47,6 +49,8 @@ public class MealService {
     private final DistributionLocationRepository locationRepository;
     private final ModerationDataRepository moderationDataRepository;
     private final MealDtoMapper dtoMapper;
+    private final CategoryDtoMapper categoryDtoMapper;                          // NEW
+    private final LocationDtoMapper locationDtoMapper;                          // NEW
     private final MediaService mediaService;
 
     // ═══════════════════════════════════════════════════════════
@@ -106,7 +110,7 @@ public class MealService {
         );
 
         log.info("Meal created with ID: {}", saved.getId());
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -117,7 +121,7 @@ public class MealService {
     public MealResponse getMealById(UUID mealId) {
         log.debug("Fetching meal: {}", mealId);
         Meal meal = findMealWithDetailsOrThrow(mealId);
-        return dtoMapper.toResponse(meal);
+        return dtoMapper.toResponse(meal, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     @Transactional(readOnly = true)
@@ -130,7 +134,7 @@ public class MealService {
                     "Meal not found or not available: " + mealId);
         }
 
-        return dtoMapper.toResponse(meal);
+        return dtoMapper.toResponse(meal, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     @Transactional(readOnly = true)
@@ -142,7 +146,7 @@ public class MealService {
         if (!meal.belongsTo(vendorId)) {
             throw new ForbiddenException("This meal does not belong to you");
         }
-        return dtoMapper.toResponse(meal);
+        return dtoMapper.toResponse(meal, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -172,7 +176,7 @@ public class MealService {
      * guarantees counting happens before trimming.
      */
     private MealResponse toSearchResponse(Meal meal, MealSearchRequest request) {
-        MealResponse response = dtoMapper.toResponse(meal);
+        MealResponse response = dtoMapper.toResponse(meal, categoryDtoMapper, locationDtoMapper);   // FIXED
 
         // ── 2. Counts from the domain, before any trimming ──
         if (Boolean.TRUE.equals(request.getWithCount())) {
@@ -197,17 +201,18 @@ public class MealService {
             MealSearchRequest request,
             UUID vendorId
     ) {
-
         log.debug("Searching meals for vendor: {} with filters (loadFull={}, withCount={})",
                 vendorId, request.getLoadFull(), request.getWithCount());
 
         MealSearchRequest scopedRequest = MealSearchRequest.builder()
                 .keyword(request.getKeyword())
                 .vendorId(vendorId)
+                .loadFull(request.getLoadFull())
                 .categoryIds(request.getCategoryIds())
                 .cuisineIds(request.getCuisineIds())
                 .dishTypeIds(request.getDishTypeIds())
-                .ingredientIds(request.getIngredientIds())
+                .anyIngredientIds(request.getAnyIngredientIds())
+                .allIngredientIds(request.getAllIngredientIds())
                 .excludeIngredientIds(request.getExcludeIngredientIds())
                 .hasAllergens(request.getHasAllergens())
                 .minPrice(request.getMinPrice())
@@ -215,13 +220,14 @@ public class MealService {
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
                 .isAvailable(request.getIsAvailable())
-                .distributionLocationId(request.getDistributionLocationId())
+                .distributionLocationIds(request.getDistributionLocationIds())
                 .moderationStatus(request.getModerationStatus())
+                .sort(request.getSort())
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
-        return mealRepository.search(request)
-                .map(meal -> toSearchResponse(meal, request));
+        return mealRepository.search(scopedRequest)                                 // FIXED
+                .map(meal -> toSearchResponse(meal, scopedRequest));                // FIXED
     }
 
     @Transactional(readOnly = true)
@@ -235,7 +241,8 @@ public class MealService {
                 .categoryIds(request.getCategoryIds())
                 .cuisineIds(request.getCuisineIds())
                 .dishTypeIds(request.getDishTypeIds())
-                .ingredientIds(request.getIngredientIds())
+                .anyIngredientIds(request.getAnyIngredientIds())
+                .allIngredientIds(request.getAllIngredientIds())
                 .excludeIngredientIds(request.getExcludeIngredientIds())
                 .hasAllergens(request.getHasAllergens())
                 .minPrice(request.getMinPrice())
@@ -243,12 +250,14 @@ public class MealService {
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
                 .isAvailable(true)
-                .distributionLocationId(request.getDistributionLocationId())
+                .distributionLocationIds(request.getDistributionLocationIds())
                 .moderationStatus(APPROVED)
+                .sort(request.getSort())
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
-        return mealRepository.search(approvedRequest).map(dtoMapper::toSummary);
+        return mealRepository.search(approvedRequest)
+                .map(m -> dtoMapper.toSummary(m, categoryDtoMapper));
     }
 
     @Transactional(readOnly = true)
@@ -265,7 +274,7 @@ public class MealService {
         return mealRepository.search(featuredRequest)
                 .getContent()
                 .stream()
-                .map(dtoMapper::toSummary)
+                .map(m -> dtoMapper.toSummary(m, categoryDtoMapper))                // FIXED
                 .collect(Collectors.toList());
     }
 
@@ -336,7 +345,7 @@ public class MealService {
         syncImageRef(previousRef, newRef);
 
         log.info("Meal updated: {}", saved.getId());
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     @Transactional
@@ -354,7 +363,11 @@ public class MealService {
         }
 
         Meal updated = existing.withAvailability(isAvailable);
-        return dtoMapper.toResponse(mealRepository.save(updated));
+        return dtoMapper.toResponse(
+                mealRepository.save(updated),
+                categoryDtoMapper,
+                locationDtoMapper
+        );                                                                          // FIXED
     }
 
     /**
@@ -381,7 +394,7 @@ public class MealService {
 
         syncImageRef(previousRef, imageStorageRef);
 
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);   // FIXED
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -510,13 +523,13 @@ public class MealService {
                 .map(id -> ingredientRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Ingredient not found: " + id)))
-               /* .peek(i -> {
-                    if (i.getModerationStatus() != APPROVED) {
-                        throw new ConflictException(
-                                "Ingredient '" + i.getName() + "' is not approved"
-                        );
-                    }
-                })*/
+                /* .peek(i -> {
+                     if (i.getModerationStatus() != APPROVED) {
+                         throw new ConflictException(
+                                 "Ingredient '" + i.getName() + "' is not approved"
+                         );
+                     }
+                 })*/
                 .collect(Collectors.toList());
     }
 

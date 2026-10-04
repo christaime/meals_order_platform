@@ -8,6 +8,8 @@ import com.mealmarket.meal.application.dto.IngredientResponse;
 import com.mealmarket.meal.application.dto.IngredientSummaryResponse;
 import com.mealmarket.meal.application.dto.UpdateIngredientRequest;
 import com.mealmarket.meal.application.mapper.IngredientDtoMapper;
+import com.mealmarket.meal.domain.event.CategoryChangedEvent;
+import com.mealmarket.meal.domain.event.IngredientChangedEvent;
 import com.mealmarket.meal.domain.model.Ingredient;
 import com.mealmarket.meal.domain.model.ModerationData;
 import com.mealmarket.meal.domain.model.ModerationStatus;
@@ -18,6 +20,7 @@ import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.IngredientSearchRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,7 @@ public class IngredientService {
     private final IngredientRepository ingredientRepository;
     private final ModerationDataRepository moderationDataRepository;
     private final IngredientDtoMapper dtoMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ═══════════════════════════════════════════════════════════
     //  Creation
@@ -75,6 +79,8 @@ public class IngredientService {
                 )
         );
 
+        eventPublisher.publishEvent(new IngredientChangedEvent(saved.getId(),
+                IngredientChangedEvent.ChangeType.CREATED));
         log.info("Ingredient created with ID: {}", saved.getId());
         return dtoMapper.toResponse(saved);
     }
@@ -133,7 +139,8 @@ public class IngredientService {
                 .keyword(request.getKeyword())
                 .name(request.getName())
                 .isAllergen(request.getIsAllergen())
-                .moderationStatus(APPROVED)   // ← forced
+                .moderationStatus(APPROVED)
+                .sort(request.getSort())
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
@@ -183,6 +190,8 @@ public class IngredientService {
         );
 
         Ingredient saved = ingredientRepository.save(updated);
+        eventPublisher.publishEvent(new IngredientChangedEvent(saved.getId(),
+                IngredientChangedEvent.ChangeType.UPDATED));
         log.info("Ingredient updated: {}", saved.getId());
         return dtoMapper.toResponse(saved);
     }
@@ -209,6 +218,8 @@ public class IngredientService {
                 log.info("Ingredient {} is {} — performing hard delete",
                         ingredientId, existing.getModerationStatus());
                 ingredientRepository.deleteById(ingredientId);
+                eventPublisher.publishEvent(new IngredientChangedEvent(existing.getId(),
+                        IngredientChangedEvent.ChangeType.DELETED));
             }
 
             case APPROVED -> {
@@ -226,6 +237,8 @@ public class IngredientService {
                                 adminId
                         )
                 );
+                eventPublisher.publishEvent(new IngredientChangedEvent(existing.getId(),
+                        IngredientChangedEvent.ChangeType.DELETED));
             }
 
             case DISABLED -> throw new ConflictException(

@@ -10,14 +10,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-/**
- * Maps between {@link DistributionLocation} (domain) and its DTOs.
- *
- * The {@code vendor} (full object in domain) is flattened to
- * {@code vendorId} + {@code vendorBusinessName} in the response.
- * The {@code isActive} field is derived from moderationStatus.
- */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { CityDtoMapper.class })
 public interface LocationDtoMapper {
 
     LocationDtoMapper INSTANCE = Mappers.getMapper(LocationDtoMapper.class);
@@ -26,9 +19,10 @@ public interface LocationDtoMapper {
     //  Full Response
     // ═══════════════════════════════════════════════════════════
 
-    @Mapping(target = "vendorId", source = "vendor.id")
+    @Mapping(target = "vendorId",           source = "vendor.id")
     @Mapping(target = "vendorBusinessName", source = "vendor.businessName")
-    @Mapping(target = "isActive", source = ".", qualifiedByName = "deriveIsActive")
+    @Mapping(target = "city",               source = "city")               // NEW
+    @Mapping(target = "isActive",           source = ".", qualifiedByName = "deriveIsActive")
     LocationResponse toResponse(DistributionLocation location);
 
     List<LocationResponse> toResponseList(List<DistributionLocation> locations);
@@ -37,6 +31,9 @@ public interface LocationDtoMapper {
     //  Summary Response
     // ═══════════════════════════════════════════════════════════
 
+    @Mapping(target = "vendorId",           source = "vendor.id")
+    @Mapping(target = "vendorBusinessName", source = "vendor.businessName")
+    @Mapping(target = "city",               source = "city")               // NEW
     LocationSummaryResponse toSummary(DistributionLocation location);
 
     List<LocationSummaryResponse> toSummaryList(List<DistributionLocation> locations);

@@ -47,6 +47,9 @@ public class DistributionLocationEntity {
     @Column(length = 50)
     private String phone;
 
+    @Column(name = "city_id", nullable = false)
+    private UUID cityId;
+
     @Column(nullable = false)
     private Double latitude;
 

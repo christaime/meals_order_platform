@@ -55,7 +55,8 @@ public abstract class AbstractIntegrationTest {
             new PostgreSQLContainer<>("postgres:18-alpine")
                     .withDatabaseName("meal_db")
                     .withUsername("mealuser")
-                    .withPassword("mealpass123");
+                    .withPassword("mealpass123")
+                    .withReuse(false);
 
     static {
         POSTGRES.start();

@@ -117,6 +117,12 @@ public class IngredientRepositoryAdapter implements IngredientRepository {
         return toDataPage(page);
     }
 
+    @Override
+    public List<Ingredient> findByModerationStatusAndIsAllergen(ModerationStatus status, boolean isAllergen){
+        return jpaRepository.findByModerationStatusAndIsAllergen(status,isAllergen).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
     // ═══════════════════════════════════════════════════════════
     //  Statistics
     // ═══════════════════════════════════════════════════════════

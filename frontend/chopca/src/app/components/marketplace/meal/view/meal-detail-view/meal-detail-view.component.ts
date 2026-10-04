@@ -12,39 +12,23 @@ import {
   PriceTagComponent,
   RatingStarsComponent,
 } from '@components/shared';
+import { Meal } from '@app/core/models/marketplace';
 
-export interface MealOptionGroup {
-  readonly id: string;
-  readonly title: string;
-  readonly required: boolean;
-  readonly maxSelectable?: number;
-  readonly options: {
-    readonly id: string;
-    readonly name: string;
-    readonly extraPrice: number;
-  }[];
-}
-
-export interface MealDetail {
-  readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  readonly basePrice: number;
-  readonly images: string[];
-  readonly rating: number;
-  readonly reviewCount: number;
-  readonly preparationTimeMinutes: number;
-  readonly isAvailable: boolean;
-  readonly vendor: {
-    readonly id: string;
-    readonly name: string;
-    readonly logoUrl?: string;
-    readonly rating: number;
-  };
-  readonly allergens?: string[];
-  readonly optionGroups?: MealOptionGroup[];
-}
-
+/**
+ * Presentational meal detail view.
+ *
+ * Receives a fully-loaded {@link Meal} from the page and renders it.
+ * No intermediate view-model — the model the API returns is the model
+ * the view consumes.
+ *
+ * The template uses:
+ *   - meal().cuisines              → category chips (primary color)
+ *   - meal().dishTypes             → category chips (secondary color)
+ *   - meal().ingredients           → ingredient chips, allergens flagged
+ *   - meal().distributionLocations → pickup points
+ *   - meal().supplements           → companion meals (currently unused)
+ *   - meal().imageUrl              → single hero image (no gallery yet)
+ */
 @Component({
   selector: 'app-meal-detail-view',
   standalone: true,
@@ -59,8 +43,9 @@ export interface MealDetail {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MealDetailViewComponent {
-  // ─── Inputs & Outputs ──────────────────────────────────────────────
-  readonly meal = input<MealDetail | null>(null);
+
+  // ─── Inputs & Outputs ──────────────────────────────────────
+  readonly meal = input<Meal | null>(null);
   readonly isLoading = input<boolean>(false);
 
   readonly addToCart = output<{
@@ -71,73 +56,46 @@ export class MealDetailViewComponent {
   }>();
   readonly selectVendor = output<string>();
 
-  // ─── Local State Signals ──────────────────────────────────────────
-  readonly selectedImageIndex = signal<number>(0);
+  // ─── Local State ───────────────────────────────────────────
   readonly quantity = signal<number>(1);
+
+  /** Selected option ids. Options are not yet provided by the API,
+   *  so this stays empty — kept for the future customization UI. */
   readonly selectedOptionIds = signal<Set<string>>(new Set());
 
-  // ─── Computed Properties ──────────────────────────────────────────
-  readonly activeImage = computed(() => {
-    const images = this.meal()?.images;
-    if (!images || images.length === 0) return null;
-    return images[this.selectedImageIndex()] || images[0];
+  // ─── Derived ───────────────────────────────────────────────
+  readonly hasCategories = computed<boolean>(() => {
+    const m = this.meal();
+    return !!m
+      && ((m.cuisines?.length ?? 0) > 0 || (m.dishTypes?.length ?? 0) > 0);
   });
 
-  readonly optionsTotalPrice = computed(() => {
-    const meal = this.meal();
-    if (!meal || !meal.optionGroups) return 0;
+  readonly hasIngredients = computed<boolean>(() =>
+    (this.meal()?.ingredients?.length ?? 0) > 0,
+  );
 
-    let extra = 0;
-    const selected = this.selectedOptionIds();
+  readonly hasLocations = computed<boolean>(() =>
+    (this.meal()?.distributionLocations?.length ?? 0) > 0,
+  );
 
-    for (const group of meal.optionGroups) {
-      for (const opt of group.options) {
-        if (selected.has(opt.id)) {
-          extra += opt.extraPrice;
-        }
-      }
-    }
-    return extra;
-  });
+  /** Extra price from selected options. Always 0 today. */
+  readonly optionsTotalPrice = computed<number>(() => 0);
 
-  readonly unitPrice = computed(() => {
-    const base = this.meal()?.basePrice ?? 0;
-    return base + this.optionsTotalPrice();
-  });
+  readonly unitPrice = computed<number>(() =>
+    (this.meal()?.price ?? 0) + this.optionsTotalPrice(),
+  );
 
-  readonly grandTotal = computed(() => this.unitPrice() * this.quantity());
+  readonly grandTotal = computed<number>(() =>
+    this.unitPrice() * this.quantity(),
+  );
 
-  // ─── Event Handlers ───────────────────────────────────────────────
-  onSelectImage(index: number): void {
-    this.selectedImageIndex.set(index);
-  }
-
+  // ─── Handlers ──────────────────────────────────────────────
   onIncrement(): void {
     this.quantity.update((q) => q + 1);
   }
 
   onDecrement(): void {
     this.quantity.update((q) => (q > 1 ? q - 1 : 1));
-  }
-
-  toggleOption(groupId: string, optionId: string, isSingleSelect: boolean): void {
-    const current = new Set(this.selectedOptionIds());
-
-    if (isSingleSelect) {
-      const group = this.meal()?.optionGroups?.find((g) => g.id === groupId);
-      if (group) {
-        group.options.forEach((opt) => current.delete(opt.id));
-      }
-      current.add(optionId);
-    } else {
-      if (current.has(optionId)) {
-        current.delete(optionId);
-      } else {
-        current.add(optionId);
-      }
-    }
-
-    this.selectedOptionIds.set(current);
   }
 
   onAddToCart(): void {

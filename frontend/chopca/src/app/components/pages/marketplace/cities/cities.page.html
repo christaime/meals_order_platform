@@ -1,0 +1,81 @@
+<!-- Top bar -->
+<section class="w-full px-space-md lg:px-margin-lg py-space-lg">
+  <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg">
+    <div class="space-y-space-xs max-w-2xl">
+      <div class="flex items-center gap-space-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full
+                     bg-primary-fixed text-on-primary-fixed
+                     font-label-sm text-label-sm uppercase tracking-wide">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          Référentiel Géographique
+        </span>
+        <span class="text-outline-variant">•</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
+          Villes Cameroun
+        </span>
+      </div>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
+        Gestion des Villes
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Référentiel des villes où les vendeurs peuvent opérer et où les clients
+        peuvent commander ou retirer leurs repas.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-space-sm">
+      <button
+        type="button"
+        (click)="onQuickNew()"
+        class="h-11 px-space-lg rounded-lg bg-primary hover:bg-primary-container
+               text-on-primary font-label-lg text-label-lg shadow-md transition-all
+               duration-200 flex items-center gap-2 active:scale-95">
+        <app-icon name="add_circle" size="md" />
+        <span>+ Nouvelle Ville</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Two-column layout -->
+<section class="w-full max-w-full px-space-md lg:px-margin-lg pb-space-xl overflow-x-clip">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+
+    <!-- Left: editor -->
+    <div class="lg:col-span-5 xl:col-span-4 sticky top-24 z-10 min-w-0
+                flex flex-col gap-space-md"
+         id="city-form-container">
+      <app-city-form
+        [editing]="editing()"
+        [submitting]="submitting()"
+        (submitted)="onSubmit($event)"
+        (cancelEdit)="onCancelEdit()" />
+    </div>
+
+    <!-- Right: filters + table + paginator -->
+    <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-space-md">
+      <app-city-filters
+        [keyword]="keyword()"
+        [sort]="sort()"
+        (keywordChange)="onKeywordChange($event)"
+        (sortChange)="onSortChange($event)" />
+
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+        <app-city-table
+          [cities]="result()?.content ?? []"
+          [loading]="loading()"
+          [editingId]="editing()?.id ?? null"
+          (edit)="onEdit($event)"
+          (delete)="onDelete($event)" />
+
+        @if (result(); as page) {
+        <app-paginator
+          [page]="page"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onSizeChange($event)" />
+        }
+      </div>
+    </div>
+
+  </div>
+</section>

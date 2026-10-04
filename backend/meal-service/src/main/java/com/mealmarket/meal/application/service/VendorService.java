@@ -10,15 +10,19 @@ import com.mealmarket.meal.application.dto.UpdateVendorRequest;
 import com.mealmarket.meal.application.dto.VendorResponse;
 import com.mealmarket.meal.application.dto.VendorSummaryResponse;
 import com.mealmarket.meal.application.exception.VendorAlreadyRegisteredException;
+import com.mealmarket.meal.application.mapper.CategoryDtoMapper;                // NEW
+import com.mealmarket.meal.application.mapper.LocationDtoMapper;                // NEW
 import com.mealmarket.meal.application.mapper.VendorDtoMapper;
 import com.mealmarket.meal.application.port.IamPort;
 import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.CategoryType;
+import com.mealmarket.meal.domain.model.City;                                   // NEW
 import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.domain.model.VendorState;
 import com.mealmarket.meal.domain.model.VendorStateChange;
 import com.mealmarket.meal.domain.repository.CategoryRepository;
+import com.mealmarket.meal.domain.repository.CityRepository;                     // NEW
 import com.mealmarket.meal.domain.repository.VendorRepository;
 import com.mealmarket.meal.domain.repository.VendorStatusHistoryRepository;
 import com.mealmarket.meal.domain.repository.criteria.VendorSearchRequest;
@@ -44,7 +48,10 @@ public class VendorService {
     private final VendorRepository vendorRepository;
     private final VendorStatusHistoryRepository historyRepository;
     private final CategoryRepository categoryRepository;
+    private final CityRepository cityRepository;                                // NEW
     private final VendorDtoMapper dtoMapper;
+    private final CategoryDtoMapper categoryDtoMapper;                          // NEW
+    private final LocationDtoMapper locationDtoMapper;                          // NEW
     private final IamPort iamPort;
     private final MediaService mediaService;
 
@@ -79,6 +86,11 @@ public class VendorService {
 
         List<Category> cuisines = resolveCuisines(request.cuisineCategoryIds());
 
+        // Resolve city                                                         // NEW
+        City city = cityRepository.findById(request.cityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found: " + request.cityId()));
+
         iamPort.assignRealmRole(keycloakUserId.toString(), "VENDOR");
 
         Vendor vendor = Vendor.builder()
@@ -87,6 +99,7 @@ public class VendorService {
                 .ownerName(request.ownerName())
                 .description(request.description())
                 .address(request.address())
+                .city(city)                                                     // NEW
                 .email(email)
                 .phone(request.phone())
                 .ratingAvg(BigDecimal.ZERO)
@@ -106,7 +119,6 @@ public class VendorService {
 
         Vendor saved = vendorRepository.save(vendor);
 
-        // Mark all provided images as USED
         markUsed(
                 saved.getProfileImageStorageRef(),
                 saved.getCoverImageStorageRef(),
@@ -127,7 +139,7 @@ public class VendorService {
         );
 
         log.info("Vendor registered with ID: {}", saved.getId());
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);     // FIXED
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -138,7 +150,7 @@ public class VendorService {
     public VendorResponse getVendorById(UUID vendorId) {
         log.debug("Fetching vendor: {}", vendorId);
         Vendor vendor = findVendorOrThrow(vendorId);
-        return dtoMapper.toResponse(vendor);
+        return dtoMapper.toResponse(vendor, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     @Transactional(readOnly = true)
@@ -147,7 +159,7 @@ public class VendorService {
         Vendor vendor = vendorRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Vendor not found for user: " + userId));
-        return dtoMapper.toResponse(vendor);
+        return dtoMapper.toResponse(vendor, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     @Transactional(readOnly = true)
@@ -160,7 +172,7 @@ public class VendorService {
                     "Vendor not found or not active: " + vendorId);
         }
 
-        return dtoMapper.toResponse(vendor);
+        return dtoMapper.toResponse(vendor, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -170,7 +182,8 @@ public class VendorService {
     @Transactional(readOnly = true)
     public DataPage<VendorResponse> searchVendors(VendorSearchRequest request) {
         log.debug("Searching vendors with filters");
-        return vendorRepository.search(request).map(dtoMapper::toResponse);
+        return vendorRepository.search(request)
+                .map(v -> dtoMapper.toResponse(v, categoryDtoMapper, locationDtoMapper));   // FIXED
     }
 
     @Transactional(readOnly = true)
@@ -184,14 +197,17 @@ public class VendorService {
                 .businessName(request.getBusinessName())
                 .email(request.getEmail())
                 .phone(request.getPhone())
+                .cityId(request.getCityId())
                 .status(VendorStatus.ACTIVE)
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
                 .categoryIds(request.getCategoryIds())
+                .sort(request.getSort())
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();
 
-        return vendorRepository.search(approvedRequest).map(dtoMapper::toSummary);
+        return vendorRepository.search(approvedRequest)
+                .map(v -> dtoMapper.toSummary(v, categoryDtoMapper));
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -233,6 +249,13 @@ public class VendorService {
                 ? resolveCuisines(request.cuisineCategoryIds())
                 : existing.getCategories();
 
+        // Resolve city only when provided (null = unchanged)                   // NEW
+        City newCity = request.cityId() != null
+                ? cityRepository.findById(request.cityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found: " + request.cityId()))
+                : existing.getCity();
+
         // Resolve each image ref (null = keep, "" = clear, value = replace)
         String prevProfile = existing.getProfileImageStorageRef();
         String prevCover   = existing.getCoverImageStorageRef();
@@ -253,6 +276,7 @@ public class VendorService {
                         ? request.description() : existing.getDescription())
                 .address(request.address() != null
                         ? request.address() : existing.getAddress())
+                .city(newCity)                                                   // NEW
                 .email(request.email() != null
                         ? request.email() : existing.getEmail())
                 .phone(request.phone() != null
@@ -276,14 +300,13 @@ public class VendorService {
 
         Vendor saved = vendorRepository.save(updated);
 
-        // Sync MinIO metadata for each changed ref
         syncRef(prevProfile, newProfile);
         syncRef(prevCover,   newCover);
         syncRef(prevCniF,    newCniF);
         syncRef(prevCniB,    newCniB);
 
         log.info("Vendor updated: {}", saved.getId());
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     @Transactional
@@ -305,7 +328,7 @@ public class VendorService {
 
         Vendor saved = vendorRepository.save(updated);
         syncRef(previous, imageStorageRef);
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     @Transactional
@@ -327,7 +350,7 @@ public class VendorService {
 
         Vendor saved = vendorRepository.save(updated);
         syncRef(previous, imageStorageRef);
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     @Transactional
@@ -353,7 +376,7 @@ public class VendorService {
         Vendor saved = vendorRepository.save(updated);
         syncRef(prevFront, frontStorageRef);
         syncRef(prevBack,  backStorageRef);
-        return dtoMapper.toResponse(saved);
+        return dtoMapper.toResponse(saved, categoryDtoMapper, locationDtoMapper);    // FIXED
     }
 
     @Transactional
@@ -373,7 +396,11 @@ public class VendorService {
                 .categories(cuisines)
                 .build();
 
-        return dtoMapper.toResponse(vendorRepository.save(updated));
+        return dtoMapper.toResponse(
+                vendorRepository.save(updated),
+                categoryDtoMapper,
+                locationDtoMapper
+        );                                                                           // FIXED
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -396,7 +423,6 @@ public class VendorService {
             );
         }
 
-        // Release all images — the vendor is gone, they're orphans now
         releaseAllImages(existing);
 
         vendorRepository.deleteById(vendorId);
@@ -433,21 +459,11 @@ public class VendorService {
         }
     }
 
-    /**
-     * Resolve an image ref from an update request.
-     *   requested == null → keep current
-     *   requested == ""   → clear
-     *   otherwise         → replace
-     */
     private String resolveRef(String requested, String current) {
         if (requested == null) return current;
         return requested.isBlank() ? null : requested;
     }
 
-    /**
-     * Sync MinIO metadata for a single ref change:
-     *   old → PENDING, new → USED. No-op if equal.
-     */
     private void syncRef(String previous, String next) {
         if (Objects.equals(previous, next)) return;
         if (previous != null && !previous.isBlank()) mediaService.markPending(previous);
@@ -503,6 +519,12 @@ public class VendorService {
                         "Category not found: " + categoryId));
     }
 
+    /**
+     * Base builder for all partial-update paths (image-only, cuisine-only, …).
+     * MUST carry every required field — including {@code city} — or
+     * {@code DomainValidation.validate(...)} will throw on the missing
+     * {@code @NotNull} constraint.                                            // NEW
+     */
     private Vendor.Builder baseCopy(Vendor existing) {
         return Vendor.builder()
                 .id(existing.getId())
@@ -511,6 +533,7 @@ public class VendorService {
                 .ownerName(existing.getOwnerName())
                 .description(existing.getDescription())
                 .address(existing.getAddress())
+                .city(existing.getCity())
                 .email(existing.getEmail())
                 .phone(existing.getPhone())
                 .ratingAvg(existing.getRatingAvg())

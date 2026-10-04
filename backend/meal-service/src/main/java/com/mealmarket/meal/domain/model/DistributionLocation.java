@@ -10,13 +10,6 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Represents a physical location where a vendor distributes meals.
- * Fully owned by the vendor.
- *
- * Moderation: ALL locations go through moderation before they appear
- * to customers. Creation always sets moderationStatus = PENDING.
- */
 @Getter
 public class DistributionLocation {
 
@@ -30,6 +23,10 @@ public class DistributionLocation {
     @NotBlank(message = "Location name is required")
     @Size(min = 2, max = 100, message = "Location name must be between 2 and 100 characters")
     private final String name;
+
+    // ─── City ─────────────────────────────────────────────────
+    @NotNull(message = "City is required")
+    private final City city;                        // NEW
 
     @NotBlank(message = "Address is required")
     @Size(max = 255, message = "Address cannot exceed 255 characters")
@@ -61,6 +58,7 @@ public class DistributionLocation {
         this.id = builder.id;
         this.vendor = builder.vendor;
         this.name = builder.name;
+        this.city = builder.city;                   // NEW
         this.address = builder.address;
         this.phone = builder.phone;
         this.latitude = builder.latitude;
@@ -75,48 +73,14 @@ public class DistributionLocation {
         return new Builder();
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  Derived Properties
-    // ═══════════════════════════════════════════════════════════
-
-    public boolean isActive() {
-        return moderationStatus == ModerationStatus.APPROVED;
+    // ─── Business Methods ────────────────────────────────────
+    public boolean isInCity(UUID cityId) {          // NEW
+        return city != null && city.getId().equals(cityId);
     }
 
-    public boolean isPending() {
-        return moderationStatus == ModerationStatus.PENDING;
+    public boolean isActive(){
+        return ModerationStatus.APPROVED.equals(moderationStatus);
     }
-
-    public boolean belongsTo(UUID vendorId) {
-        return vendor != null && vendor.getId().equals(vendorId);
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    //  Business Methods
-    // ═══════════════════════════════════════════════════════════
-
-    public boolean canDeliverTo(double customerLat, double customerLng) {
-        if (latitude == null || longitude == null || deliveryRadius == null) {
-            return false;
-        }
-
-        double earthRadiusKm = 6371.0;
-
-        double dLat = Math.toRadians(customerLat - latitude);
-        double dLng = Math.toRadians(customerLng - longitude);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(latitude))
-                * Math.cos(Math.toRadians(customerLat))
-                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        double distanceKm = earthRadiusKm * c;
-
-        return distanceKm <= deliveryRadius;
-    }
-
     // ═══════════════════════════════════════════════════════════
     //  Factory — Creation always starts as PENDING
     // ═══════════════════════════════════════════════════════════
@@ -124,6 +88,7 @@ public class DistributionLocation {
     public static DistributionLocation create(
             Vendor vendor,
             String name,
+            City city,                              // NEW
             String address,
             String phone,
             Double latitude,
@@ -133,6 +98,7 @@ public class DistributionLocation {
         return DistributionLocation.builder()
                 .vendor(vendor)
                 .name(name)
+                .city(city)                         // NEW
                 .address(address)
                 .phone(phone)
                 .latitude(latitude)
@@ -144,20 +110,18 @@ public class DistributionLocation {
                 .build();
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  Copy Helpers
-    // ═══════════════════════════════════════════════════════════
-
+    // ─── Copy Helpers ────────────────────────────────────────
     public DistributionLocation withModerationStatus(ModerationStatus newStatus) {
         return baseBuilder().moderationStatus(newStatus).build();
     }
 
     public DistributionLocation withUpdatedDetails(
-            String name, String address, String phone,
+            String name, City city, String address, String phone,
             Double latitude, Double longitude, Integer deliveryRadius
     ) {
         return baseBuilder()
                 .name(name != null ? name : this.name)
+                .city(city != null ? city : this.city)   // NEW
                 .address(address != null ? address : this.address)
                 .phone(phone != null ? phone : this.phone)
                 .latitude(latitude != null ? latitude : this.latitude)
@@ -172,6 +136,7 @@ public class DistributionLocation {
                 .id(this.id)
                 .vendor(this.vendor)
                 .name(this.name)
+                .city(this.city)                    // NEW
                 .address(this.address)
                 .phone(this.phone)
                 .latitude(this.latitude)
@@ -182,14 +147,16 @@ public class DistributionLocation {
                 .updatedAt(Instant.now());
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  Manual Builder
-    // ═══════════════════════════════════════════════════════════
+    public boolean belongsTo(UUID vendorId) {
+        return vendorId != null && vendor != null && vendorId.equals(vendor.getId());
+    }
 
+    // ─── Builder ─────────────────────────────────────────────
     public static class Builder {
         private UUID id;
         private Vendor vendor;
         private String name;
+        private City city;                          // NEW
         private String address;
         private String phone;
         private Double latitude;
@@ -202,6 +169,7 @@ public class DistributionLocation {
         public Builder id(UUID v) { this.id = v; return this; }
         public Builder vendor(Vendor v) { this.vendor = v; return this; }
         public Builder name(String v) { this.name = v; return this; }
+        public Builder city(City v) { this.city = v; return this; }   // NEW
         public Builder address(String v) { this.address = v; return this; }
         public Builder phone(String v) { this.phone = v; return this; }
         public Builder latitude(Double v) { this.latitude = v; return this; }

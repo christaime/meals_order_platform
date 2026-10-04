@@ -2,44 +2,50 @@ import {
   APP_INITIALIZER,
   ApplicationConfig,
   provideZoneChangeDetection,
+  LOCALE_ID
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { SERVICE_PROVIDERS } from './core/services/service.providers';
 import { environment } from '@environments/environment';
-import {
-  provideKeycloak,
-  includeBearerTokenInterceptor,
-  INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-  createInterceptorCondition,
-} from 'keycloak-angular';
 import { initializeApp } from './core/initializers/app.initializer';
 import { authInterceptor } from './core/interceptor/auth.interceptor';
+import { languageInterceptor } from './core/interceptor/language.interceptor';
+import { provideKeycloak } from 'keycloak-angular';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import localeFrExtra from '@angular/common/locales/extra/fr';
+import localeEn from '@angular/common/locales/en';
+import localeEnExtra from '@angular/common/locales/extra/en';
 
-const apiBearerTokenCondition = createInterceptorCondition({
-  urlPattern: new RegExp(
-    `^${environment.apiUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/.*$`,
-    'i',
-  ),
-  bearerPrefix: 'Bearer',
-});
+registerLocaleData(localeFr, 'fr', localeFrExtra);
+registerLocaleData(localeEn, 'en', localeEnExtra);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+
+    { provide: LOCALE_ID, useValue: 'fr' },
     provideRouter(routes, withComponentInputBinding()),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
-    // Public routes only. Route-level guards (e.g. vendorRegistrationGuard)
-    // handle the few flows that need auth. The catalog, home, vendor detail,
-    // meal detail, etc. are all reachable anonymously.
-    provideRouter(routes),
-
-    // The bearer interceptor only injects a token when the request matches
-    // `apiBearerTokenCondition` (our API base URL) AND a token exists.
-    // Anonymous requests to public endpoints (catalog, vendors, meals) pass
-    // through untouched.
-    provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
+    // ─── HTTP interceptors ────────────────────────────────────
+    //
+    // Order matters — interceptors run in registration order on the
+    // request and in reverse order on the response.
+    //
+    //  1. authInterceptor      — attaches the bearer token to our API,
+    //                            handles 401 with refresh + retry,
+    //                            redirects to login on refresh failure.
+    //                            Anonymous requests pass through untouched.
+    //  2. languageInterceptor  — adds Accept-Language for the chat
+    //                            system prompt's default language.
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        languageInterceptor,
+      ]),
+    ),
 
     provideKeycloak({
       config: {
@@ -58,11 +64,6 @@ export const appConfig: ApplicationConfig = {
         pkceMethod: 'S256',
       },
     }),
-
-    {
-      provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-      useValue: [apiBearerTokenCondition],
-    },
 
     // ─── Boot sequence ───────────────────────────────────────
     //

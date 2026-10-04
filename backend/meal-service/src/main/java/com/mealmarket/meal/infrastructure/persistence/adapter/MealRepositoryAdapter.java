@@ -8,30 +8,37 @@ import com.mealmarket.meal.domain.model.DistributionLocation;
 import com.mealmarket.meal.domain.model.Ingredient;
 import com.mealmarket.meal.domain.model.Meal;
 import com.mealmarket.meal.domain.model.Vendor;
-import com.mealmarket.meal.domain.repository.CategoryRepository;
-import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
-import com.mealmarket.meal.domain.repository.IngredientRepository;
 import com.mealmarket.meal.domain.repository.MealRepository;
-import com.mealmarket.meal.domain.repository.VendorRepository;
 import com.mealmarket.meal.domain.repository.criteria.MealSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.adapter.utils.SortConverter;
+import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
+import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.MealEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
+import com.mealmarket.meal.infrastructure.persistence.mapper.CategoryPersistenceMapper;
+import com.mealmarket.meal.infrastructure.persistence.mapper.DistributionLocationPersistenceMapper;
+import com.mealmarket.meal.infrastructure.persistence.mapper.IngredientPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.mapper.MealPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.mapper.VendorPersistenceMapper;
+import com.mealmarket.meal.infrastructure.persistence.repository.CategoryJpaRepository;
+import com.mealmarket.meal.infrastructure.persistence.repository.CityJpaRepository;
+import com.mealmarket.meal.infrastructure.persistence.repository.DistributionLocationJpaRepository;
+import com.mealmarket.meal.infrastructure.persistence.repository.IngredientJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.MealJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.specification.MealSpecification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,14 +46,23 @@ import java.util.stream.Collectors;
 public class MealRepositoryAdapter implements MealRepository {
 
     private final MealJpaRepository jpaRepository;
-    private final VendorJpaRepository jpaVendorRepository;
     private final MealPersistenceMapper mapper;
+
+    private final VendorJpaRepository vendorJpaRepository;
     private final VendorPersistenceMapper vendorMapper;
 
-    private final @Lazy VendorRepository vendorRepository;
-    private final @Lazy CategoryRepository categoryRepository;
-    private final @Lazy IngredientRepository ingredientRepository;
-    private final @Lazy DistributionLocationRepository locationRepository;
+    private final CategoryJpaRepository categoryJpaRepository;
+    private final CategoryPersistenceMapper categoryMapper;
+
+    private final IngredientJpaRepository ingredientJpaRepository;
+    private final IngredientPersistenceMapper ingredientMapper;
+
+    private final DistributionLocationJpaRepository locationJpaRepository;
+    private final DistributionLocationPersistenceMapper locationMapper;
+
+    private final CityJpaRepository cityJpaRepository;
+
+    private final MealSpecification mealSpecification;
 
     // ═══════════════════════════════════════════════════════════
     //  CRUD
@@ -61,13 +77,7 @@ public class MealRepositoryAdapter implements MealRepository {
 
     @Override
     public Optional<Meal> findById(UUID id) {
-        return jpaRepository.findById(id)
-                .map(entity -> {
-                    VendorEntity vendor = jpaVendorRepository.findById(entity.getVendorId())
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                    "Vendor not found: " + entity.getVendorId()));
-                    return mapper.toDomain(entity, vendor);
-                });
+        return jpaRepository.findById(id).map(this::toShallowDomain);
     }
 
     @Override
@@ -81,11 +91,6 @@ public class MealRepositoryAdapter implements MealRepository {
     }
 
     @Override
-    public boolean existsByIngredientId(UUID ingredientId) {
-        return jpaRepository.existsByIngredientId(ingredientId);
-    }
-
-    @Override
     public void deleteById(UUID id) {
         jpaRepository.deleteById(id);
     }
@@ -96,7 +101,7 @@ public class MealRepositoryAdapter implements MealRepository {
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  Uniqueness (per vendor, case-insensitive)
+    //  Uniqueness
     // ═══════════════════════════════════════════════════════════
 
     @Override
@@ -109,6 +114,11 @@ public class MealRepositoryAdapter implements MealRepository {
         return jpaRepository.existsByCategoryId(categoryId);
     }
 
+    @Override
+    public boolean existsByIngredientId(UUID ingredientId) {
+        return jpaRepository.existsByIngredientId(ingredientId);
+    }
+
     // ═══════════════════════════════════════════════════════════
     //  Vendor-Scoped Queries
     // ═══════════════════════════════════════════════════════════
@@ -116,7 +126,7 @@ public class MealRepositoryAdapter implements MealRepository {
     @Override
     public List<Meal> findByVendorId(UUID vendorId) {
         return jpaRepository.findByVendorId(vendorId).stream()
-                .map(this::toFullDomain)
+                .map(this::toShallowDomain)
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +137,7 @@ public class MealRepositoryAdapter implements MealRepository {
 
     @Override
     public long countAvailableByVendorId(UUID vendorId) {
-        return jpaRepository.countByVendorIdAndIsAvailable(vendorId, true);
+        return jpaRepository.countByVendorIdAndIsAvailable(vendorId, Boolean.TRUE);
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -140,7 +150,7 @@ public class MealRepositoryAdapter implements MealRepository {
             return List.of();
         }
         return jpaRepository.findByIdIn(ids).stream()
-                .map(this::toFullDomain)
+                .map(this::toShallowDomain)
                 .collect(Collectors.toList());
     }
 
@@ -148,16 +158,22 @@ public class MealRepositoryAdapter implements MealRepository {
     //  Category Queries
     // ═══════════════════════════════════════════════════════════
 
+    /**
+     * Filter a meal's category list by {@link CategoryType}.
+     * Loads the meal entity, then its categories, and filters in memory.
+     */
     @Override
     public List<Category> findCategoriesByMealIdAndType(UUID mealId, CategoryType type) {
-        MealEntity entity = jpaRepository.findById(mealId)
-                .orElseThrow(() -> new ResourceNotFoundException("Meal not found: " + mealId));
-
-        if (entity.getCategoryIds() == null || entity.getCategoryIds().isEmpty()) {
+        Optional<MealEntity> mealEntity = jpaRepository.findById(mealId);
+        if (mealEntity.isEmpty()) {
             return List.of();
         }
-
-        return categoryRepository.findAllById(entity.getCategoryIds()).stream()
+        List<UUID> categoryIds = mealEntity.get().getCategoryIds();
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return List.of();
+        }
+        return categoryJpaRepository.findByIdIn(categoryIds).stream()
+                .map(categoryMapper::toDomain)
                 .filter(c -> c.getType() == type)
                 .collect(Collectors.toList());
     }
@@ -165,25 +181,35 @@ public class MealRepositoryAdapter implements MealRepository {
     // ═══════════════════════════════════════════════════════════
     //  Search
     // ═══════════════════════════════════════════════════════════
-
     @Override
     public DataPage<Meal> search(MealSearchRequest request) {
-        Specification<MealEntity> spec = MealSpecification.build(request);
+        Specification<MealEntity> spec = mealSpecification.build(request);
+
+        var springSort = SortConverter.toSpringSort(request.validSortOrders());
+
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
-                request.getPageRequest().getSize()
+                request.getPageRequest().getSize(),
+                springSort
         );
+
         Page<MealEntity> page = jpaRepository.findAll(spec, pageable);
-        return toFullDataPage(page);
+        return toDataPage(page, request);
     }
 
     // ═══════════════════════════════════════════════════════════
     //  Updates
     // ═══════════════════════════════════════════════════════════
 
+    /**
+     * Domain signature takes {@code Double}; JPA takes {@code BigDecimal}.
+     */
     @Override
     public void updateAverageRating(UUID mealId, Double newRating) {
-        jpaRepository.updateAverageRating(mealId, BigDecimal.valueOf(newRating));
+        java.math.BigDecimal value = newRating != null
+                ? java.math.BigDecimal.valueOf(newRating)
+                : null;
+        jpaRepository.updateAverageRating(mealId, value);
     }
 
     @Override
@@ -201,54 +227,124 @@ public class MealRepositoryAdapter implements MealRepository {
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  Helpers — Full Assembly
+    //  Helpers
     // ═══════════════════════════════════════════════════════════
 
+    /**
+     * Shallow — vendor only. No ingredients / locations / categories.
+     * Matches the semantics of {@code findById}, {@code findByVendorId},
+     * {@code findAllById}.
+     */
+    private Meal toShallowDomain(MealEntity entity) {
+        Vendor vendor = loadMinimalVendor(entity.getVendorId());
+        return mapper.toDomain(entity, vendor);
+    }
+
+    /**
+     * Full — vendor + ingredients + locations + categories.
+     * Matches the semantics of {@code findByIdWithDetails}, {@code save},
+     * and search results when {@code loadFull} or {@code withCount} is set.
+     */
     private Meal toFullDomain(MealEntity entity) {
+        Vendor vendor = loadMinimalVendor(entity.getVendorId());
 
-        VendorEntity vendorEntity = jpaVendorRepository.findById(entity.getVendorId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Vendor not found: " + entity.getVendorId()));
+        List<Category> categories = loadCategories(entity.getCategoryIds());
+        List<Ingredient> ingredients = loadIngredients(entity.getIngredientIds());
+        List<DistributionLocation> locations =
+                loadLocationsShallow(entity.getDistributionLocationIds(), vendor);
 
-        List<Category> categories = (entity.getCategoryIds() != null
-                && !entity.getCategoryIds().isEmpty())
-                ? categoryRepository.findAllById(entity.getCategoryIds())
-                : List.of();
-
-        List<Ingredient> ingredients = (entity.getIngredientIds() != null
-                && !entity.getIngredientIds().isEmpty())
-                ? ingredientRepository.findAllById(entity.getIngredientIds())
-                : List.of();
-
-        List<DistributionLocation> locations = (entity.getDistributionLocationIds() != null
-                && !entity.getDistributionLocationIds().isEmpty())
-                ? locationRepository.findAllById(entity.getDistributionLocationIds())
-                : List.of();
+        Meal shallow = mapper.toDomain(entity, vendor);
 
         return Meal.builder()
-                .id(entity.getId())
-                .vendor(vendorMapper.toMinimalDomain(vendorEntity))
-                .name(entity.getName())
-                .description(entity.getDescription())
-                .price(entity.getPrice())
-                .imageStorageRef(entity.getImageStorageRef())   // ← fixed
-                .isAvailable(entity.getIsAvailable())
-                .averageRating(entity.getAverageRating() != null ? entity.getAverageRating().doubleValue() : null)
-                .totalRatings(entity.getTotalRatings())
-                .prepTimeMinutes(entity.getPrepTimeMinutes())
+                .id(shallow.getId())
+                .vendor(shallow.getVendor())
+                .name(shallow.getName())
+                .description(shallow.getDescription())
+                .price(shallow.getPrice())
+                .imageStorageRef(shallow.getImageStorageRef())
+                .isAvailable(shallow.getIsAvailable())
+                .averageRating(shallow.getAverageRating())
+                .totalRatings(shallow.getTotalRatings())
+                .prepTimeMinutes(shallow.getPrepTimeMinutes())
                 .categories(categories)
                 .ingredients(ingredients)
                 .distributionLocations(locations)
-                .moderationStatus(entity.getModerationStatus()) // ← added
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .moderationStatus(shallow.getModerationStatus())
+                .createdAt(shallow.getCreatedAt())
+                .updatedAt(shallow.getUpdatedAt())
                 .build();
     }
 
-    private DataPage<Meal> toFullDataPage(Page<MealEntity> page) {
+    /**
+     * Minimal domain Vendor (no locations, no categories) to break the
+     * meal → vendor → locations → vendor recursion.
+     */
+    private Vendor loadMinimalVendor(UUID vendorId) {
+        VendorEntity vendorEntity = vendorJpaRepository.findById(vendorId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Vendor not found: " + vendorId));
+
+        CityEntity vendorCity = cityJpaRepository.findById(vendorEntity.getCityId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "City not found for vendor: " + vendorEntity.getCityId()));
+
+        return vendorMapper.toMinimalDomain(vendorEntity, vendorCity);
+    }
+
+    private List<Category> loadCategories(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return categoryJpaRepository.findByIdIn(ids).stream()
+                .map(categoryMapper::toDomain)
+                .toList();
+    }
+
+    private List<Ingredient> loadIngredients(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return ingredientJpaRepository.findByIdIn(ids).stream()
+                .map(ingredientMapper::toDomain)
+                .toList();
+    }
+
+    private List<DistributionLocation> loadLocationsShallow(
+            List<UUID> ids,
+            Vendor minimalVendor
+    ) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+
+        List<DistributionLocationEntity> locationEntities =
+                locationJpaRepository.findByIdIn(ids);
+
+        Set<UUID> cityIds = locationEntities.stream()
+                .map(DistributionLocationEntity::getCityId)
+                .collect(Collectors.toSet());
+
+        Map<UUID, CityEntity> cityById = cityJpaRepository.findAllById(cityIds).stream()
+                .collect(Collectors.toMap(CityEntity::getId, Function.identity()));
+
+        return locationEntities.stream()
+                .map(loc -> locationMapper.toDomain(
+                        loc,
+                        minimalVendor,
+                        cityById.get(loc.getCityId())
+                ))
+                .toList();
+    }
+
+    private DataPage<Meal> toDataPage(Page<MealEntity> page, MealSearchRequest request) {
+        boolean withCount = Boolean.TRUE.equals(request.getWithCount());
+        boolean loadFull  = Boolean.TRUE.equals(request.getLoadFull());
+        boolean needsFull = withCount || loadFull;
+
         List<Meal> content = page.getContent().stream()
-                .map(this::toFullDomain)
+                .map(entity -> needsFull ? toFullDomain(entity) : toShallowDomain(entity))
                 .collect(Collectors.toList());
+
         return new DataPage<>(
                 content,
                 page.getNumber(),

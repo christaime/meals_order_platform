@@ -5,6 +5,7 @@ import com.mealmarket.meal.domain.model.VendorState;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -18,6 +19,7 @@ public class VendorSearchRequest extends SearchRequest {
     private final Double minRating;
     private final Double maxRating;
     private final List<UUID> categoryIds;
+    private final UUID cityId;
     private final LocationProximity locationProximity;
 
     private VendorSearchRequest(Builder builder) {
@@ -30,7 +32,18 @@ public class VendorSearchRequest extends SearchRequest {
         this.minRating = builder.minRating;
         this.maxRating = builder.maxRating;
         this.categoryIds = builder.categoryIds;
+        this.cityId = builder.cityId;
         this.locationProximity = builder.locationProximity;
+    }
+
+    @Override
+    protected Set<String> getSortableProperties() {
+        return Set.of("businessName","ownerName","email", "ratingAvg");
+    }
+
+    @Override
+    protected String getDefaultSortProperty() {
+        return "ratingAvg";
     }
 
     public static Builder builder() {
@@ -51,6 +64,7 @@ public class VendorSearchRequest extends SearchRequest {
         private Double minRating;
         private Double maxRating;
         private List<UUID> categoryIds;
+        private UUID cityId;
         private LocationProximity locationProximity;
 
         public Builder keyword(String keyword) {
@@ -90,6 +104,11 @@ public class VendorSearchRequest extends SearchRequest {
 
         public Builder categoryIds(List<UUID> categoryIds) {
             this.categoryIds = categoryIds;
+            return this;
+        }
+
+        public Builder cityId(UUID cityId) {
+            this.cityId = cityId;
             return this;
         }
 

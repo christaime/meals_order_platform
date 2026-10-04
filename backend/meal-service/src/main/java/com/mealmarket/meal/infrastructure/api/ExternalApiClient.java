@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class ExternalApiClient {

@@ -15,11 +15,14 @@
 <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
 
-    <!-- Left Column: Gallery Section -->
+    <!-- ─── Left Column: Image ─────────────────────────── -->
     <div class="flex flex-col gap-4">
       <div class="relative w-full aspect-4/3 rounded-3xl bg-surface-container-high overflow-hidden border border-outline-variant/30 shadow-md">
-        @if (activeImage()) {
-        <img [src]="activeImage()" [alt]="meal()!.name" class="w-full h-full object-cover" />
+        @if (meal()!.imageUrl) {
+        <img
+          [src]="meal()!.imageUrl"
+          [alt]="meal()!.name"
+          class="w-full h-full object-cover" />
         } @else {
         <div class="w-full h-full flex flex-col items-center justify-center text-on-surface-variant/40">
           <app-icon name="restaurant" size="xl" />
@@ -34,27 +37,11 @@
         </div>
         }
       </div>
-
-      <!-- Thumbnail Strip -->
-      @if (meal()!.images && meal()!.images.length > 1) {
-      <div class="flex items-center gap-3 overflow-x-auto pb-2">
-        @for (img of meal()!.images; track $index) {
-        <button
-          type="button"
-          (click)="onSelectImage($index)"
-          [class.ring-2]="selectedImageIndex() === $index"
-          [class.ring-primary]="$index === selectedImageIndex()"
-          class="w-20 h-20 rounded-2xl overflow-hidden bg-surface-container-high shrink-0 transition-all border border-outline-variant/30"
-        >
-          <img [src]="img" [alt]="meal()!.name" class="w-full h-full object-cover" />
-        </button>
-        }
-      </div>
-      }
     </div>
 
-    <!-- Right Column: Info, Customization & CTA -->
+    <!-- ─── Right Column: Info, Customization & CTA ────── -->
     <div class="flex flex-col gap-6">
+
       <!-- Title & Rating -->
       <div class="flex flex-col gap-2 border-b border-surface-container-high pb-4">
         <h1 class="font-headline-md text-2xl sm:text-3xl font-bold text-on-surface">
@@ -63,93 +50,121 @@
 
         <div class="flex flex-wrap items-center gap-4 text-xs text-on-surface-variant">
           <app-rating-stars
-            [rating]="meal()!.rating"
-            [count]="meal()!.reviewCount"
+            [rating]="meal()!.averageRating"
+            [count]="meal()!.totalRatings"
             size="md" />
 
+          @if (meal()!.prepTimeMinutes) {
           <span class="flex items-center gap-1 font-medium">
-              <app-icon name="schedule" size="sm" class="text-primary" />
-              {{ meal()!.preparationTimeMinutes }} min de préparation
-            </span>
+                <app-icon name="schedule" size="sm" class="text-primary" />
+                {{ meal()!.prepTimeMinutes }} min de préparation
+              </span>
+          }
         </div>
       </div>
 
-      <!-- Vendor Header Banner -->
+      <!-- Vendor banner -->
       <div
-        (click)="selectVendor.emit(meal()!.vendor.id)"
-        class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer border border-outline-variant/30"
-      >
+        (click)="selectVendor.emit(meal()!.vendorId)"
+        class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer border border-outline-variant/30">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-surface-container-highest overflow-hidden flex items-center justify-center font-bold text-primary">
-            @if (meal()!.vendor.logoUrl) {
-            <img [src]="meal()!.vendor.logoUrl" [alt]="meal()!.vendor.name" class="w-full h-full object-cover" />
-            } @else {
-            {{ meal()!.vendor.name.charAt(0) }}
-            }
+            {{ meal()!.vendorBusinessName.charAt(0) }}
           </div>
           <div class="flex flex-col">
             <span class="text-xs text-on-surface-variant">Proposé par</span>
-            <span class="text-sm font-bold text-on-surface leading-tight">{{ meal()!.vendor.name }}</span>
+            <span class="text-sm font-bold text-on-surface leading-tight">
+                {{ meal()!.vendorBusinessName }}
+              </span>
           </div>
         </div>
         <app-icon name="chevron_right" size="sm" class="text-on-surface-variant" />
       </div>
 
       <!-- Description -->
+      @if (meal()!.description) {
       <p class="text-sm text-on-surface-variant leading-relaxed">
         {{ meal()!.description }}
       </p>
+      }
 
-      <!-- Allergens Badges -->
-      @if (meal()!.allergens && meal()!.allergens!.length > 0) {
+      <!-- ─── Categories: cuisines + dish types ─────────── -->
+      @if (hasCategories()) {
+      <div class="flex flex-wrap gap-2">
+        @for (c of meal()!.cuisines; track c.id) {
+        <span class="px-2.5 py-1 rounded-md
+                           bg-primary-container text-on-primary-container
+                           text-[11px] font-medium">
+                {{ c.name }}
+              </span>
+        }
+        @for (d of meal()!.dishTypes; track d.id) {
+        <span class="px-2.5 py-1 rounded-md
+                           bg-secondary-container text-on-secondary-container
+                           text-[11px] font-medium">
+                {{ d.name }}
+              </span>
+        }
+      </div>
+      }
+
+      <!-- ─── Ingredients — allergens flagged ──────────── -->
+      @if (hasIngredients()) {
       <div class="flex flex-col gap-1.5">
-        <span class="text-xs font-bold text-on-surface">Allergènes :</span>
+        <span class="text-xs font-bold text-on-surface">Ingrédients :</span>
         <div class="flex flex-wrap gap-1.5">
-          @for (allergen of meal()!.allergens; track allergen) {
-          <span class="px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface-variant text-[11px] font-medium">
-                  {{ allergen }}
+          @for (ing of meal()!.ingredients; track ing.id) {
+          <span
+            class="px-2.5 py-1 rounded-md text-[11px] font-medium
+                         inline-flex items-center gap-1"
+            [class.bg-surface-container-high]="!ing.isAllergen"
+            [class.text-on-surface-variant]="!ing.isAllergen"
+            [class.bg-error-container]="ing.isAllergen"
+            [class.text-on-error-container]="ing.isAllergen">
+                  {{ ing.name }}
+                  @if (ing.isAllergen) {
+                    <app-icon name="warning" size="sm" class="!text-xs !w-3 !h-3" />
+                  }
                 </span>
           }
         </div>
       </div>
       }
 
-      <!-- Customization Options -->
-      @if (meal()!.optionGroups && meal()!.optionGroups!.length > 0) {
-      <div class="flex flex-col gap-5 border-t border-surface-container-high pt-4">
-        <h3 class="font-bold text-sm text-on-surface">Personnalisez votre plat</h3>
-
-        @for (group of meal()!.optionGroups; track group.id) {
+      <!-- ─── Pickup locations ─────────────────────────── -->
+      @if (hasLocations()) {
+      <div class="flex flex-col gap-1.5">
+        <span class="text-xs font-bold text-on-surface">Points de retrait :</span>
         <div class="flex flex-col gap-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-on-surface">{{ group.title }}</span>
-            <span class="text-[11px] text-on-surface-variant">
-                    {{ group.required ? 'Obligatoire' : 'Optionnel' }}
-                  </span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            @for (opt of group.options; track opt.id) {
-            <button
-              type="button"
-              (click)="toggleOption(group.id, opt.id, group.maxSelectable === 1)"
-              [class.bg-primary-container]="selectedOptionIds().has(opt.id)"
-              [class.border-primary]="selectedOptionIds().has(opt.id)"
-              class="flex items-center justify-between p-3 rounded-xl border border-outline-variant/50 bg-surface-container-lowest hover:bg-surface-container-low transition-all text-left"
-            >
-              <span class="text-xs font-medium text-on-surface">{{ opt.name }}</span>
-              @if (opt.extraPrice > 0) {
-              <span class="text-xs font-bold text-primary">+{{ opt.extraPrice }} FCFA</span>
+          @for (loc of meal()!.distributionLocations; track loc.id) {
+          <div class="flex items-start gap-2 text-sm">
+            <app-icon name="place" size="sm" class="text-primary mt-0.5 shrink-0" />
+            <div class="min-w-0">
+              <div>
+                <span class="font-medium text-on-surface">{{ loc.name }}</span>
+                @if (loc.city) {
+                <span class="text-on-surface-variant"> · {{ loc.city.name }}</span>
+                }
+              </div>
+              @if (loc.address) {
+              <div class="text-xs text-on-surface-variant truncate">
+                {{ loc.address }}
+              </div>
               }
-            </button>
-            }
+            </div>
           </div>
+          }
         </div>
-        }
       </div>
       }
 
-      <!-- Action Bar: Price, Quantity & Add to Cart -->
+      <!-- ─── Customization options — not yet available ──── -->
+      <!--
+        When the backend adds optionGroups to the Meal model,
+        re-enable the option-picker UI here.
+      -->
+
+      <!-- ─── Price + Quantity + Add to cart ─────────────── -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-outline-variant/40 pt-6 mt-auto">
         <div class="flex flex-col">
           <span class="text-xs text-on-surface-variant">Prix Total</span>
@@ -157,14 +172,13 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- Quantity Control -->
+          <!-- Quantity -->
           <div class="flex items-center bg-surface-container-high rounded-full p-1 border border-outline-variant/40">
             <button
               type="button"
               aria-label="Réduire la quantité"
               (click)="onDecrement()"
-              class="w-8 h-8 rounded-full bg-surface-container-lowest hover:bg-surface flex items-center justify-center text-on-surface transition-colors shadow-xs"
-            >
+              class="w-8 h-8 rounded-full bg-surface-container-lowest hover:bg-surface flex items-center justify-center text-on-surface transition-colors shadow-xs">
               <app-icon name="remove" size="sm" />
             </button>
             <span class="w-10 text-center font-bold text-sm text-on-surface">
@@ -174,19 +188,17 @@
               type="button"
               aria-label="Augmenter la quantité"
               (click)="onIncrement()"
-              class="w-8 h-8 rounded-full bg-surface-container-lowest hover:bg-surface flex items-center justify-center text-on-surface transition-colors shadow-xs"
-            >
+              class="w-8 h-8 rounded-full bg-surface-container-lowest hover:bg-surface flex items-center justify-center text-on-surface transition-colors shadow-xs">
               <app-icon name="add" size="sm" />
             </button>
           </div>
 
-          <!-- Submit Button -->
+          <!-- Add to cart -->
           <button
             type="button"
             [disabled]="!meal()!.isAvailable"
             (click)="onAddToCart()"
-            class="flex-1 sm:flex-initial px-6 py-3.5 rounded-full bg-primary text-on-primary font-bold text-sm hover:bg-primary-container disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2"
-          >
+            class="flex-1 sm:flex-initial px-6 py-3.5 rounded-full bg-primary text-on-primary font-bold text-sm hover:bg-primary-container disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
             <app-icon name="add_shopping_cart" size="sm" />
             <span>Ajouter au panier</span>
           </button>
