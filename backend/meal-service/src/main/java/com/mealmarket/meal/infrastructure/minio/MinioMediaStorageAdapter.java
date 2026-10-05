@@ -18,12 +18,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component
-/*@ConditionalOnProperty(
+@ConditionalOnProperty(
         prefix = "minio",
         name = "enabled",
         havingValue = "true",
         matchIfMissing = true
-)*/
+)
 @RequiredArgsConstructor
 @Slf4j
 public class MinioMediaStorageAdapter implements MediaStoragePort {
