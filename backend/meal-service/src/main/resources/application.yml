@@ -9,6 +9,7 @@ app:
       - http://localhost:3000
       - https://*.pages.dev
       - https://*.vercel.app
+      - https://*.onrender.com
 
 spring:
   application:
