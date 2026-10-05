@@ -165,10 +165,7 @@ failsafe-reports/
 *.sqlite3
 postgres-data/
 pgadmin-data/
-minio-data/
-minio/
 uploads/
-media/
 
 # ═══════════════════════════════════════════════════════════════
 #  MISC
