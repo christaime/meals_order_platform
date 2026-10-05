@@ -114,7 +114,7 @@ server:
 
 # ─── MinIO ──────────────────────────────────────────────────────
 minio:
-  enabled: true                    # Keep enabled—your adapter just points at Garage now
+  enabled: ${MINIO_ENABLED:true}                    # Keep enabled—your adapter just points at Garage now
   url: ${MINIO_URL:http://localhost:3900}       # Garage S3 API endpoint
   access-key: ${MINIO_ACCESS_KEY:GK0514f8c0f3dbb3f683d53d65}  # Set from env or paste generated value
   secret-key: ${MINIO_SECRET_KEY:d4e2f9e1aa30b932d6bb80de7639b5ab1640d48533f6822a8c99428e6335de77}
