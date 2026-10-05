@@ -8,7 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(name = "minio.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+        prefix = "minio",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 @Getter
 public class MinioConfig {
 
