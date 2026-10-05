@@ -1,12 +1,14 @@
 # ─── Application-specific ───────────────────────────────────────
 app:
   openapi:
-    server-url: http://localhost:8081
+    server-url: ${APP_OPENAPI_SERVER_URL:http://localhost:8081}
     contact-email: support@mealmarket.com
   cors:
     allowed-origins:
       - http://localhost:4200
       - http://localhost:3000
+      - https://*.pages.dev
+      - https://*.vercel.app
 
 spring:
   application:
