@@ -161,28 +161,19 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // setAllowedOriginPatterns supports wildcards like https://*.pages.dev
+        // Supports wildcards like https://*.pages.dev as well as exact URLs
         configuration.setAllowedOriginPatterns(allowedOrigins);
 
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-        ));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "X-Total-Count"
-        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        configuration.setExposedHeaders(List.of("Authorization", "Link", "X-Total-Count"));
 
-        // Angular sends a Bearer token, not cookies. Keeping credentials off
-        // lets the browser accept wildcard origins without complaint.
-        configuration.setAllowCredentials(false);
-
-        configuration.setMaxAge(3600L);
+        // Set to true to allow Angular to send Authorization headers across domains
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache preflight OPTIONS responses for 1 hour
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-
     }
 }
