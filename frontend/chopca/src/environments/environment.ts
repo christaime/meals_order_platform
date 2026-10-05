@@ -5,7 +5,7 @@ export const environment = {
   turnstileSiteKey: '0x4AAAAAAE5RiI1HJe_SE42A',
   googleMapsApiKey:"AIzaSyCpKHlclKRd2gwJiC56KO08UIC_ucaB-Cg",
   keycloak: {
-    url: 'https://lemur-7.cloud-iam.com',
+    url: 'https://lemur-7.cloud-iam.com/auth',
     realm: 'mealmarket',
     clientId: 'meal-marketplace-frontend',
   },
