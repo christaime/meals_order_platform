@@ -3,8 +3,10 @@ package com.mealmarket.meal.infrastructure.web;
 import com.mealmarket.common.exception.ResourceNotFoundException;
 import com.mealmarket.common.pagination.DataPage;
 import com.mealmarket.meal.application.dto.CityResponse;
+import com.mealmarket.meal.application.dto.MealStatFilter;
 import com.mealmarket.meal.application.dto.UserContextDto;
 import com.mealmarket.meal.application.service.CityService;
+import com.mealmarket.meal.application.service.MealStatService;
 import com.mealmarket.meal.application.service.UserManagementService;
 import com.mealmarket.meal.domain.repository.criteria.CitySearchRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +47,16 @@ public class ReferenceController {
 
     private final UserManagementService userManagementService;
     private final CityService cityService;
+    private final MealStatService mealStatService;
 
+    // ═══════════════════════════════════════════════════════════
+    //  Stats for meal search
+    // ═══════════════════════════════════════════════════════════
+    @GetMapping("/meal-stats-filter")
+    @Operation(summary = "Public meal statistics for the landing page filter")
+    public ResponseEntity<MealStatFilter> mealStats() {
+        return ResponseEntity.ok(mealStatService.computeStats());
+    }
     // ═══════════════════════════════════════════════════════════
     //  CITIES
     // ═══════════════════════════════════════════════════════════

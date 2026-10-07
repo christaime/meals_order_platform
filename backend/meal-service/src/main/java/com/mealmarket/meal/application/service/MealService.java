@@ -249,6 +249,8 @@ public class MealService {
                 .maxPrice(request.getMaxPrice())
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
+                .maxPrepTime(request.getMaxPrepTime())
+                .minPrepTime(request.getMinPrepTime())
                 .isAvailable(true)
                 .distributionLocationIds(request.getDistributionLocationIds())
                 .moderationStatus(APPROVED)

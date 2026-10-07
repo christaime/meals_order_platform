@@ -509,6 +509,9 @@ public class VendorController {
             @Parameter(description = "Cuisine category IDs filter (comma-separated)")
             @RequestParam(required = false) List<UUID> categoryIds,
 
+            @Parameter(description = "Location IDs filter (comma-separated)")
+            @RequestParam(required = false) List<UUID> anyLocationIds,
+
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
 
@@ -526,6 +529,7 @@ public class VendorController {
                 .businessName(businessName)
                 .minRating(minRating)
                 .categoryIds(categoryIds)
+                .anyLocationIds(anyLocationIds)
                 .cityId(cityId)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)

@@ -31,48 +31,25 @@
     <!-- ─── Right Side Actions ───────────────────────────── -->
     <div class="flex items-center gap-2 sm:gap-3">
 
-      <!-- Language Selector -->
-      <div class="header-dropdown relative">
+      <!-- Language selector -->
+      <div class="flex items-center
+                  bg-surface-container-low rounded-lg p-0.5
+                  border border-outline-variant
+                  font-label text-[11px]">
+        <span class="material-symbols-outlined text-[16px] text-outline mx-1.5">language</span>
+        @for (lang of languages; track lang) {
         <button
           type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest border border-outline-variant/60 text-on-surface font-label text-xs font-semibold hover:bg-surface-container-low transition-colors"
-          (click)="toggleLanguageDropdown($event)"
-          [attr.aria-expanded]="languageOpen()"
-          aria-haspopup="listbox"
-          aria-label="Changer de langue"
-        >
-          <app-icon name="language" size="md" class="text-primary" />
-          <span>{{ currentLanguage() }}</span>
-          <app-icon
-            name="expand_more"
-            size="sm"
-            [class.rotate-180]="languageOpen()"
-            class="transition-transform"
-          />
+          (click)="selectLanguage(lang)"
+          class="px-2 py-1 rounded cursor-pointer border-0 transition-colors"
+          [class.bg-surface-container-lowest]="currentLanguage() === lang"
+          [class.text-primary]="currentLanguage() === lang"
+          [class.font-bold]="currentLanguage() === lang"
+          [class.shadow-sm]="currentLanguage() === lang"
+          [class.bg-transparent]="currentLanguage() !== lang"
+          [class.text-on-surface-variant]="currentLanguage() !== lang">
+          {{ lang }}
         </button>
-
-        @if (languageOpen()) {
-        <ul
-          class="absolute top-[calc(100%+0.5rem)] right-0 min-w-[7rem] bg-surface-container-lowest border border-outline-variant/60 rounded-xl shadow-modal py-2 z-[60] list-none m-0"
-          role="listbox"
-        >
-          @for (lang of languages; track lang) {
-          <li>
-            <button
-              type="button"
-              class="w-full text-left px-4 py-2 font-label text-xs font-medium text-on-surface hover:bg-surface-container-low transition-colors"
-              [class.!text-primary]="lang === currentLanguage()"
-              [class.!bg-surface-container-low]="lang === currentLanguage()"
-              [class.!font-semibold]="lang === currentLanguage()"
-              (click)="selectLanguage(lang)"
-              role="option"
-              [attr.aria-selected]="lang === currentLanguage()"
-            >
-              {{ lang === 'FR' ? 'Français' : 'English' }}
-            </button>
-          </li>
-          }
-        </ul>
         }
       </div>
 
@@ -97,13 +74,6 @@
       @if (!isAuthenticated()) {
       <!-- Desktop: login link + two primary CTAs -->
       <div class="hidden md:flex items-center gap-2">
-        <a
-          [routerLink]="links.login.route"
-          class="px-3 py-2 rounded-full text-on-surface-variant font-label text-xs font-semibold no-underline whitespace-nowrap hover:text-primary hover:bg-surface-container-low transition-colors"
-          (click)="closeAllDropdowns()"
-        >
-          {{ links.login.label }}
-        </a>
         <button
           type="button"
           class="px-4 py-2 rounded-full border border-secondary text-secondary font-label text-xs font-bold whitespace-nowrap hover:bg-secondary/10 transition-colors"
@@ -120,15 +90,6 @@
         </button>
       </div>
 
-      <!-- Mobile: compact login icon only (the CTAs live in the mobile menu) -->
-      <a
-        [routerLink]="links.login.route"
-        class="md:hidden p-2.5 rounded-full bg-surface-container-lowest border border-outline-variant/60 text-on-surface hover:bg-surface-container-low transition-colors"
-        aria-label="Se connecter"
-        (click)="closeAllDropdowns()"
-      >
-        <app-icon name="login" size="md" class="text-primary" />
-      </a>
       }
 
       <!-- Authenticated Profile Dropdown -->
@@ -227,13 +188,6 @@
 
     @if (!isAuthenticated()) {
     <div class="flex flex-col gap-2 pt-2 border-t border-outline-variant/30">
-      <a
-        [routerLink]="links.login.route"
-        (click)="closeAllDropdowns()"
-        class="text-center py-2.5 rounded-full border border-outline-variant text-on-surface font-bold text-xs no-underline"
-      >
-        {{ links.login.label }}
-      </a>
       <button
         type="button"
         class="text-center py-2.5 rounded-full border border-secondary text-secondary font-bold text-xs"

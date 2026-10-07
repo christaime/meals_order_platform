@@ -7,6 +7,7 @@ import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
+import com.mealmarket.meal.domain.repository.criteria.LocationProximity;
 import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
@@ -18,6 +19,7 @@ import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaReposi
 import com.mealmarket.meal.infrastructure.persistence.specification.DistributionLocationSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -117,6 +119,11 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
 
     @Override
     public DataPage<DistributionLocation> search(DistributionLocationSearchRequest request) {
+        LocationProximity proximity = request.getLocationProximity();
+
+        if (proximity != null && proximity.isValid()) {
+            return searchWithProximity(request, proximity);
+        }
 
         Specification<DistributionLocationEntity> spec =
                 DistributionLocationSpecification.build(request);
@@ -125,6 +132,51 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
                 request.getPageRequest().getSize()
         );
         Page<DistributionLocationEntity> page = jpaRepository.findAll(spec, pageable);
+        return toDataPage(page);
+    }
+
+    private DataPage<DistributionLocation> searchWithProximity(
+            DistributionLocationSearchRequest request,
+            LocationProximity proximity) {
+
+        double lat = proximity.getLatitude();
+        double lng = proximity.getLongitude();
+        int radiusKm = proximity.getRadiusKm();
+
+        double latDelta = radiusKm / 111.0;
+        double lngDelta = radiusKm / (111.0 * Math.cos(Math.toRadians(lat)));
+
+        String keyword = request.getKeyword() == null || request.getKeyword().isBlank()
+                ? null
+                : "%" + request.getKeyword().toLowerCase().trim() + "%";
+
+        // Normalize empty list → null so the SQL guard disables the filter.
+        UUID[] cityIds = request.getCityIds() == null || request.getCityIds().isEmpty()
+                ? null
+                : request.getCityIds().toArray(UUID[]::new);
+
+        Pageable pageable = PageRequest.of(
+                request.getPageRequest().getPage(),
+                request.getPageRequest().getSize()
+        );
+
+        Page<DistributionLocationEntity> page = jpaRepository.searchWithinRadius(
+                request.getModerationStatus() != null
+                        ? request.getModerationStatus().name()
+                        : null,
+                request.getVendorId(),
+                cityIds,
+                keyword,
+                lat,
+                lng,
+                radiusKm,
+                lat - latDelta,
+                lat + latDelta,
+                lng - lngDelta,
+                lng + lngDelta,
+                pageable
+        );
+
         return toDataPage(page);
     }
 

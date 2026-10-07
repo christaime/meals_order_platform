@@ -1,0 +1,15 @@
+{
+  "mostDemandedCuisines": [
+    { "id": "c17a0000-0000-4000-8000-000000000001",
+      "name": "Cuisine de l'ouest", "count": 42 },
+    { "id": "c17a0000-0000-4000-8000-000000000002",
+      "name": "Cuisines du centre",
+      "count": 18 }
+  ],
+  "mostDemandedDish": [
+    { "id": "d18b0000-0000-4000-8000-000000000003","name": "Plat principal", "count": 30 },
+    { "id": "d18b0000-0000-4000-8000-000000000004", "name": "Sauces et legumes","count": 12 }
+  ],
+  "expressPrepTimeInMinutes": { "time": 10, "count": 7 },
+  "minMealPrice": { "price": 500, "count": 3 }
+}

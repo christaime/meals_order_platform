@@ -71,12 +71,11 @@ export class HeaderComponent {
   // ─── Static Data ────────────────────────────────────────
   readonly navItems: readonly NavItem[] = [
     { label: 'Explorer les plats', route: '/meals', exact: true },
-    { label: 'Restaurants partenaires', route: '/meals/vendor/directory', exact: false },
-    { label: 'Comment ça marche', route: '/comment-ca-marche', exact: false },
+    { label: 'Restaurants & Restaurateurs Partenaires', route: '/meals/vendor/directory', exact: false },
+   // { label: 'Comment ça marche', route: '/comment-ca-marche', exact: false },
   ];
 
   protected readonly links = {
-    login: {label : 'Se connecter', route:'/auth/login'},
     vendor: {label : 'Je Cook!', route:'/vendor/meals'},
     customer: {label : 'Je Chop!', route:'/customer/orders'},
   } as const;

@@ -19,7 +19,7 @@ export const routes: Routes = [
 
   // Marketplace public routes (Wrapped in MainLayoutComponent)
   {
-    path: '',
+    path: 'meals',
     component: MainLayoutComponent,
     loadChildren: () =>
       import('./components/pages/marketplace/marketplace.routes').then(
@@ -68,7 +68,12 @@ export const routes: Routes = [
            (m) => m.VENDOR_ROUTES
          ),
      },
-
+      {
+        path: 'about',
+        loadComponent: () =>
+          import('./components/pages/marketplace/about-us/about.page')
+            .then(m => m.AboutPageComponent),
+      },
   // Fallback
   { path: '**', redirectTo: 'meals' },
 ];

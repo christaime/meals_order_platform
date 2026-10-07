@@ -117,6 +117,7 @@ export class LocationApiService implements LocationService {
     if (request.keyword)              params = params.set('keyword', request.keyword);
     if (request.vendorId)             params = params.set('vendorId', request.vendorId);
     if (request.name)                 params = params.set('name', request.name);
+    if (request.cityIds)              params = params.set('cityIds', request.cityIds.join(','));
     if (request.moderationStatus)     params = params.set('moderationStatus', request.moderationStatus);
     if (request.nearLatitude != null) params = params.set('nearLatitude', request.nearLatitude.toString());
     if (request.nearLongitude != null) params = params.set('nearLongitude', request.nearLongitude.toString());

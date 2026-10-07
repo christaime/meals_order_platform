@@ -8,6 +8,7 @@ import com.mealmarket.meal.application.dto.UpdateLocationRequest;
 import com.mealmarket.meal.application.service.DistributionLocationService;
 import com.mealmarket.meal.application.service.VendorService;
 import com.mealmarket.meal.domain.model.ModerationStatus;
+import com.mealmarket.meal.domain.repository.criteria.LocationProximity;
 import com.mealmarket.meal.infrastructure.security.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -484,6 +485,15 @@ public class DistributionLocationController {
             @Parameter(description = "Exact city name or region match")
             @RequestParam(required = false) String cityNameLike,
 
+            @Parameter(description = "Latitude of the point to look locations near by")
+            @RequestParam(required = false) Double nearLatitude,
+
+            @Parameter(description = "Longitude of the point to look locations near by")
+            @RequestParam(required = false) Double nearLongitude,
+
+            @Parameter(description = "Radius to cover around the point we look locations from")
+            @RequestParam(required = false) Integer radiusKm,
+
             @Parameter(description = "Exact location cityId match in")
             @RequestParam(required = false) List<UUID> cityIds,
 
@@ -506,6 +516,7 @@ public class DistributionLocationController {
                 .name(name)
                 .cityIds(cityIds)
                 .cityNameLike(cityNameLike)
+                .locationProximity(LocationProximity.of(nearLatitude,nearLongitude,radiusKm))
                 .moderationStatus(ModerationStatus.APPROVED)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)

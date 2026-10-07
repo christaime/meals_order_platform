@@ -7,8 +7,6 @@ export * from './badge/badge.component';
 export * from './rating-stars/rating-stars.component';
 export * from './price-tag/price-tag.component';
 export * from './logo/logo.component';
-export * from './header/header.component';
-export * from './footer/footer.component';
 export * from './form-error/form-error.component';
 export * from './form-field/form-field.component';
 export * from './password-field/password-field.component';

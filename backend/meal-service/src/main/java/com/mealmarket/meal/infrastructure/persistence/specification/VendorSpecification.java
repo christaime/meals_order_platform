@@ -103,6 +103,17 @@ public class VendorSpecification {
                 }
             }
 
+            // ─── Distribution locations (ANY of these) ────────────
+            if (request.getAnyLocationIds() != null && !request.getAnyLocationIds().isEmpty()) {
+                Subquery<UUID> vendorIdsWithLocation = query.subquery(UUID.class);
+                Root<DistributionLocationEntity> locRoot =
+                        vendorIdsWithLocation.from(DistributionLocationEntity.class);
+                vendorIdsWithLocation
+                        .select(locRoot.get("vendorId"))
+                        .where(locRoot.get("id").in(request.getAnyLocationIds()));
+
+                predicates.add(root.get("id").in(vendorIdsWithLocation));
+            }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

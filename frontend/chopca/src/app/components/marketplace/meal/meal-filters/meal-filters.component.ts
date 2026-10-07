@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import {
   AdvancedFilterDrawerComponent,
-  FilterState,
+  FilterState, DEFAULT_FILTERS
 } from '@components/marketplace/meal/view';
 
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
@@ -46,18 +46,7 @@ export interface MealFiltersValue {
   readonly advanced: FilterState;
 }
 
-/** Default advanced-filter state (delegated to the drawer's own defaults). */
-const DEFAULT_ADVANCED: FilterState = {
-  minPrice: 1000,
-  maxPrice: 10000,
-  maxPrepTime: 60,
-  minRating: 0,
-  availableOnly: false,
-  cuisineIds: [],
-  dishTypeIds: [],
-  excludeIngredientIds: [],
-  distributionLocationId: null,
-};
+
 
 /**
  * MealFiltersComponent — simple filter bar + embedded advanced drawer.
@@ -88,7 +77,7 @@ export class MealFiltersComponent implements OnInit {
   readonly moderationStatus = input<ModerationStatusFilter>('ALL');
   readonly cityId = input<string | null>(null);
   readonly sort = input<MealSort>('name-asc');
-  readonly advanced = input<FilterState>({ ...DEFAULT_ADVANCED });
+  readonly advanced = input<FilterState>({ ...DEFAULT_FILTERS });
 
   /** Option lists owned by the page (vendor-scoped). */
   readonly ingredientOptions = input<IngredientSummary[]>([]);

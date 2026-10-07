@@ -12,7 +12,7 @@
       <!-- Brand block -->
       <div class="flex flex-col gap-4">
         <a
-          routerLink="/explorer"
+          routerLink="/meals"
           aria-label="Chop ça! — Accueil"
           class="inline-flex items-center w-fit transition-transform hover:scale-[1.02]">
           <app-logo variant="full" size="md" label="Chop ça!" />
@@ -47,10 +47,10 @@
           {{ column.title }}
         </h3>
         <ul class="list-none m-0 p-0 flex flex-col gap-3">
-          @for (link of column.links; track link.route) {
+          @for (link of column.links; track link.href) {
           <li>
             <a
-              [routerLink]="link.route"
+              [href]="link.href"
               class="font-body text-xs leading-normal
                          text-on-surface-variant no-underline
                          hover:text-primary transition-colors">

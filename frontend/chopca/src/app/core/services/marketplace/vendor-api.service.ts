@@ -47,7 +47,8 @@ export class VendorApiService implements VendorService {
     if (request.keyword)       params = params.set('keyword', request.keyword);
     if (request.businessName)  params = params.set('businessName', request.businessName);
     if (request.email)         params = params.set('email', request.email);
-    if (request.categoryIds)         params = params.set('categoryIds', request.categoryIds.join(','));
+    if (request.categoryIds?.length)         params = params.set('categoryIds', request.categoryIds.join(','));
+    if (request.anyLocationIds?.length)         params = params.set('anyLocationIds', request.anyLocationIds.join(','));
     if (request.status)        params = params.set('status', request.status);
     if (request.page != null)  params = params.set('page', request.page.toString());
     if (request.size != null)  params = params.set('size', request.size.toString());

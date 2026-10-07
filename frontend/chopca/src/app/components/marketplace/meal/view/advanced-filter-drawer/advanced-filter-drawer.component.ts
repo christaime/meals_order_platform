@@ -10,11 +10,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
-import {
-  CategoryPillsSelectorComponent,
-} from '@components/shared/category-pills-selector/category-pills-selector.component';
+import { CategoryPillsSelectorComponent } from '@components/shared/category-pills-selector/category-pills-selector.component';
 import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model';
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
+import { Category } from '@app/core/models/marketplace';
 
 /** Slider bounds — kept as constants so the two price sliders stay in sync. */
 const PRICE_MIN  = 1000;
@@ -23,45 +22,45 @@ const PRICE_STEP = 500;
 
 export interface FilterState {
   // ─── Base — used by the marketplace filters ───────────────────
-  minPrice: number;
-  maxPrice: number;
-  maxPrepTime: number;
-  minRating: number;
-  availableOnly: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  maxPrepTime?: number;
+  minRating?: number;
+  availableOnly?: boolean | undefined;
 
   // ─── Meal management ──────────────────────────────────────────
+  categoryIds?: string[];
   cuisineIds?: string[];
   dishTypeIds?: string[];
   excludeIngredientIds?: string[];
-  distributionLocationId?: string | null;
 }
 
-/** Defaults used by `resetFilters()` and the initial `filters` model. */
-const DEFAULT_FILTERS: FilterState = {
+/**
+ * Full selected entities, kept alongside the id-based {@link FilterState}
+ * so the parent can render labels without a lookup.
+ */
+export interface FilterSelection {
+  cuisines: Category[];
+  dishTypes: Category[];
+}
+
+export const EMPTY_SELECTION: FilterSelection = {
+  cuisines: [],
+  dishTypes: [],
+};
+
+export const DEFAULT_FILTERS: FilterState = {
   minPrice: PRICE_MIN,
-  maxPrice: 10000,          // preserved from the previous default
+  maxPrice: 10000,
   maxPrepTime: 60,
   minRating: 0,
   availableOnly: false,
+  categoryIds: [],
   cuisineIds: [],
   dishTypeIds: [],
-  excludeIngredientIds: [],
-  distributionLocationId: null,
+  excludeIngredientIds: []
 };
 
-/**
- * AdvancedFilterDrawer — Collapsible side drawer for fine-grained filtering.
- *
- * Base fields (price range, prep time, rating, availability) serve the
- * marketplace/meals-catalog filters. The meal-management fields
- * (cuisineIds, dishTypeIds, excludeIngredientIds, distributionLocationId)
- * are ignored by pages that don't pass ingredient/location options.
- *
- * Cuisines and dish-types are rendered with `CategoryPillsSelectorComponent`,
- * which fetches its own options. Ingredient exclusion and distribution-
- * location selection have no shared component, so the host page passes
- * those lists in via `ingredientOptions` / `locationOptions`.
- */
 @Component({
   selector: 'app-advanced-filter-drawer',
   standalone: true,
@@ -76,7 +75,8 @@ const DEFAULT_FILTERS: FilterState = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdvancedFilterDrawerComponent {
-  // ─── Expose slider bounds to the template ─────────────────────
+
+  // ─── Slider bounds exposed to the template ────────────────────
   protected readonly priceMin  = PRICE_MIN;
   protected readonly priceMax  = PRICE_MAX;
   protected readonly priceStep = PRICE_STEP;
@@ -85,25 +85,58 @@ export class AdvancedFilterDrawerComponent {
   readonly isOpen = model<boolean>(false);
   readonly filters = model<FilterState>({ ...DEFAULT_FILTERS });
 
-  // ─── Option inputs (host-provided) ────────────────────────────
+  /** Initial selection, supplied by the parent so the drawer opens
+   *  with the correct pills already lit. */
+  readonly selection = input<FilterSelection>(EMPTY_SELECTION);
+
+  // ─── Host-provided options ────────────────────────────────────
   readonly ingredientOptions = input<IngredientSummary[]>([]);
   readonly locationOptions   = input<LocationSummary[]>([]);
 
-  /** Emitted when filters are applied. */
+  // ─── Outputs ──────────────────────────────────────────────────
+  /** Emits the id-based filter state. */
   readonly applyFilters = output<FilterState>();
 
-  /** Temporary draft filter state inside the drawer. */
+  /** Emits the full selected entities alongside the filter state. */
+  readonly applySelection = output<FilterSelection>();
+
+  /** Temporary draft state inside the drawer. */
   readonly draftFilters = signal<FilterState>({ ...this.filters() });
+  private readonly draftSelection = signal<FilterSelection>({
+    cuisines: [],
+    dishTypes: [],
+  });
 
   // ─── Form controls required by CategoryPillsSelectorComponent ─
   protected readonly cuisineControl  = new FormControl<string[]>([], { nonNullable: true });
   protected readonly dishTypeControl = new FormControl<string[]>([], { nonNullable: true });
 
-  // ─── Lifecycle-ish ────────────────────────────────────────────
+  // ═════════════════════════════════════════════════════════════
+  //  Open / close
+  // ═════════════════════════════════════════════════════════════
+
   openDrawer(): void {
-    this.draftFilters.set({ ...this.filters() });
+    let filtersToApply = { ...this.filters() };
+    if(!filtersToApply.minPrice){
+      filtersToApply = {...filtersToApply,minPrice: DEFAULT_FILTERS.minPrice};
+    }
+    if(!filtersToApply.maxPrice){
+        filtersToApply = {...filtersToApply,maxPrice: DEFAULT_FILTERS.maxPrice};
+    }
+    if(!filtersToApply.maxPrepTime){
+        filtersToApply = {...filtersToApply,maxPrepTime: DEFAULT_FILTERS.maxPrepTime};
+    }
+    if(!filtersToApply.minRating){
+        filtersToApply = {...filtersToApply,minRating: DEFAULT_FILTERS.minRating};
+    }
+    this.draftFilters.set(filtersToApply);
+    this.draftSelection.set({
+      cuisines: [...this.selection().cuisines],
+      dishTypes: [...this.selection().dishTypes],
+    });
     this.cuisineControl.setValue(this.filters().cuisineIds ?? []);
     this.dishTypeControl.setValue(this.filters().dishTypeIds ?? []);
+
     this.isOpen.set(true);
   }
 
@@ -111,11 +144,14 @@ export class AdvancedFilterDrawerComponent {
     this.isOpen.set(false);
   }
 
-  // ─── Price handlers (mutually constrained) ────────────────────
+  // ═════════════════════════════════════════════════════════════
+  //  Price handlers (mutually constrained)
+  // ═════════════════════════════════════════════════════════════
+
   updateMinPrice(event: Event): void {
     const raw = Number((event.target as HTMLInputElement).value);
     this.draftFilters.update((f) => {
-      const nextMin = Math.min(raw, f.maxPrice - PRICE_STEP);
+      const nextMin = Math.min(raw, (f.maxPrice || PRICE_MAX) - PRICE_STEP);
       return { ...f, minPrice: Math.max(PRICE_MIN, nextMin) };
     });
   }
@@ -123,7 +159,7 @@ export class AdvancedFilterDrawerComponent {
   updateMaxPrice(event: Event): void {
     const raw = Number((event.target as HTMLInputElement).value);
     this.draftFilters.update((f) => {
-      const nextMax = Math.max(raw, f.minPrice + PRICE_STEP);
+      const nextMax = Math.max(raw, (f.minPrice || PRICE_MIN) + PRICE_STEP);
       return { ...f, maxPrice: Math.min(PRICE_MAX, nextMax) };
     });
   }
@@ -141,28 +177,30 @@ export class AdvancedFilterDrawerComponent {
     this.draftFilters.update((f) => ({ ...f, availableOnly: !f.availableOnly }));
   }
 
-  // ─── Category pills handlers ──────────────────────────────────
-  onCuisinesChange(ids: string[]): void {
+  // ═════════════════════════════════════════════════════════════
+  //  Category pills handlers — now capture the full objects
+  // ═════════════════════════════════════════════════════════════
+
+  onCuisinesSelected(cuisines: Category[]): void {
+    const ids = cuisines.map((c) => c.id);
+    this.draftSelection.update((s) => ({ ...s, cuisines }));
     this.draftFilters.update((f) => ({ ...f, cuisineIds: ids }));
   }
 
-  onDishTypesChange(ids: string[]): void {
+  onDishTypesSelected(dishTypes: Category[]): void {
+    const ids = dishTypes.map((c) => c.id);
+    this.draftSelection.update((s) => ({ ...s, dishTypes }));
     this.draftFilters.update((f) => ({ ...f, dishTypeIds: ids }));
   }
 
-  // ─── Ingredient / location handlers ───────────────────────────
+  // ═════════════════════════════════════════════════════════════
+  //  Ingredient / location handlers
+  // ═════════════════════════════════════════════════════════════
+
   toggleExcludeIngredient(id: string): void {
     this.draftFilters.update((f) => ({
       ...f,
       excludeIngredientIds: this.toggle(f.excludeIngredientIds, id),
-    }));
-  }
-
-  setDistributionLocation(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.draftFilters.update((f) => ({
-      ...f,
-      distributionLocationId: value === '' ? null : value,
     }));
   }
 
@@ -177,19 +215,33 @@ export class AdvancedFilterDrawerComponent {
       : [...current, id];
   }
 
-  // ─── Reset / Apply ────────────────────────────────────────────
+  // ═════════════════════════════════════════════════════════════
+  //  Reset / Apply
+  // ═════════════════════════════════════════════════════════════
+
   resetFilters(): void {
     const defaults: FilterState = { ...DEFAULT_FILTERS };
+    const emptySelection: FilterSelection = { cuisines: [], dishTypes: [] };
+
     this.draftFilters.set(defaults);
+    this.draftSelection.set(emptySelection);
     this.cuisineControl.setValue([]);
     this.dishTypeControl.setValue([]);
     this.filters.set(defaults);
+
     this.applyFilters.emit(defaults);
+    this.applySelection.emit(emptySelection);
   }
 
   onApply(): void {
-    this.filters.set({ ...this.draftFilters() });
-    this.applyFilters.emit(this.filters());
+    const filters = { ...this.draftFilters() };
+    const selection = { ...this.draftSelection() };
+
+    this.filters.set(filters);
+
+    this.applyFilters.emit(filters);
+    this.applySelection.emit(selection);
+
     this.closeDrawer();
   }
 

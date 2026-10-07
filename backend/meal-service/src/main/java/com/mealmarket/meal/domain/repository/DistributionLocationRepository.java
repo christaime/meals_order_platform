@@ -80,4 +80,5 @@ public interface DistributionLocationRepository {
     // ═══════════════════════════════════════════════════════════
 
     DataPage<DistributionLocation> search(DistributionLocationSearchRequest request);
+
 }

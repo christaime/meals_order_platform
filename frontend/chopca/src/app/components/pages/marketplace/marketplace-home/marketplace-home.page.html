@@ -1,11 +1,20 @@
-<main class="w-full bg-surface min-h-screen pt-20">
+<main class="w-full bg-surface min-h-screen pt-2">
   <div class="flex flex-col w-full">
-
+    <!-- Top Hero Header -->
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <h3 class="font-headline-lg text-xl sm:text-2xl font-bold leading-tight m-0 text-on-surface">
+        Explorer les repas
+      </h3>
+      <p class="text-sm text-on-surface-variant max-w-2xl m-0">
+        Découvrez les meilleurs mets de chez nous.
+      </p>
+    </div>
     <!-- Quick stats pills -->
+    @if(stats && stats.length > 0){
     <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      <app-quick-stats-pills />
+      <app-quick-stats-pills [stats]="stats" />
     </section>
-
+    }
     <!-- Meal catalog view -->
     <app-meal-catalog-view
       [meals]="meals()"

@@ -1,0 +1,100 @@
+<section class="max-w-3xl mx-auto px-4 py-12">
+
+  <!-- ─── Notre histoire ─────────────────────────────────── -->
+  <article id="our_story" class="scroll-mt-24 mb-16">
+    <h2 class="text-3xl font-bold text-on-surface mb-6">Notre histoire</h2>
+
+    <p class="text-on-surface-variant mb-4">
+      MealMarket est né d'un constat simple : trouver un bon repas en ligne
+      demande aujourd'hui plus d'efforts que de traverser la ville pour aller
+      le chercher.
+    </p>
+
+    <p class="text-on-surface-variant mb-4">
+      Les plateformes existantes obligent à naviguer entre filtres, catégories
+      et listes interminables. Or, quand on a faim, on ne pense pas en
+      catégories. On pense à un plat, à une envie, à un souvenir.
+    </p>
+
+    <p class="text-on-surface-variant">
+      La plateforme rassemble des vendeurs — restaurants, traiteurs, cuisiniers
+      à domicile — et leurs clients autour d'une expérience plus directe :
+      décrire ce que l'on cherche, découvrir les plats qui y répondent, et
+      commander en quelques gestes.
+    </p>
+  </article>
+
+  <!-- ─── Centre d'aide ──────────────────────────────────── -->
+  <article id="help_center" class="scroll-mt-24 mb-16">
+    <h2 class="text-3xl font-bold text-on-surface mb-6">Centre d'aide</h2>
+
+    <p class="text-on-surface-variant mb-4">
+      Une question sur une commande, un compte, un paiement ou une
+      inscription en tant que vendeur ? Consultez les réponses aux questions
+      les plus fréquentes ci-dessous.
+    </p>
+
+    <dl class="space-y-4">
+      <div>
+        <dt class="font-medium text-on-surface">Comment passer une commande ?</dt>
+        <dd class="text-on-surface-variant text-sm mt-1">
+          Parcourez le catalogue, ajoutez les plats à votre panier, puis
+          validez le paiement. Vous recevrez une confirmation dès que le
+          vendeur accepte la commande.
+        </dd>
+      </div>
+
+      <div>
+        <dt class="font-medium text-on-surface">Comment devenir vendeur ?</dt>
+        <dd class="text-on-surface-variant text-sm mt-1">
+          Créez un compte vendeur depuis la page d'inscription, renseignez
+          les informations de votre établissement, et ajoutez vos premiers
+          plats. La validation est effectuée par notre équipe sous 48 heures.
+        </dd>
+      </div>
+
+      <div>
+        <dt class="font-medium text-on-surface">Quels moyens de paiement sont acceptés ?</dt>
+        <dd class="text-on-surface-variant text-sm mt-1">
+          MTN Mobile Money, Orange Money et cartes bancaires
+          (Visa / Mastercard).
+        </dd>
+      </div>
+
+      <div>
+        <dt class="font-medium text-on-surface">Comment signaler un problème ?</dt>
+        <dd class="text-on-surface-variant text-sm mt-1">
+          Contactez-nous par email ou par téléphone — les coordonnées sont
+          dans la section <a href="/about#contact" class="underline hover:text-primary">Nous contacter</a>.
+        </dd>
+      </div>
+    </dl>
+  </article>
+
+  <!-- ─── Nous contacter ─────────────────────────────────── -->
+  <article id="contact" class="scroll-mt-24">
+    <h2 class="text-3xl font-bold text-on-surface mb-6">Nous contacter</h2>
+
+    <p class="text-on-surface-variant mb-6">
+      Une question qui n'est pas dans le centre d'aide ? Écrivez-nous ou
+      appelez-nous, nous répondons sous 24 à 48 heures.
+    </p>
+
+    <ul class="space-y-3">
+      <li class="flex items-center gap-3 text-on-surface-variant">
+        <span class="material-symbols-outlined text-primary">mail</span>
+        <a [href]="'mailto:' + contact.email" class="hover:text-primary transition-colors">
+          {{ contact.email }}
+        </a>
+      </li>
+
+      <li class="flex items-center gap-3 text-on-surface-variant">
+        <span class="material-symbols-outlined text-primary">call</span>
+        <a [href]="'tel:' + contact.phone" class="hover:text-primary transition-colors">
+          {{ contact.phoneDisplay }}
+        </a>
+      </li>
+    </ul>
+  </article>
+
+</section>

@@ -11,21 +11,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
-import { VendorDirectoryViewComponent } from '@components/marketplace/vendor/vendor-directory-view/vendor-directory-view.component';
-import { LocationOption } from '@components/marketplace/meal/view';
+import { VendorDirectoryViewComponent, DirectoryFilterState , DEFAULT_VENDOR_FILTER} from '@components/marketplace/vendor/vendor-directory-view/vendor-directory-view.component';
 
 import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
 import { ToastService } from '@components/shared/toast';
-import { VendorSummary, VendorSearchRequest } from '@app/core/models/marketplace';
+import { VendorSummary, VendorSearchRequest, LocationSummary } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
-
-/** What the view emits on any filter change. */
-interface DirectoryFilterState {
-  readonly query: string;
-  readonly location: LocationOption | null;
-  readonly category: string;
-  readonly page: number;
-}
 
 const DEFAULT_PAGE_SIZE = 9;
 
@@ -54,8 +45,8 @@ export class VendorDirectoryPageComponent {
   protected readonly pageSize = DEFAULT_PAGE_SIZE;
 
   // ─── Filter state (mirrored from the view) ────────────────
-  private readonly query    = signal<string>('');
-  private readonly category = signal<string>('all');
+  private readonly query    = signal<string | undefined>('');
+  private readonly state = signal<DirectoryFilterState>(DEFAULT_VENDOR_FILTER);
   /** The view is 1-indexed; the backend is 0-indexed. */
   private readonly page     = signal<number>(1);
 
@@ -67,11 +58,11 @@ export class VendorDirectoryPageComponent {
   private readonly request = computed<VendorSearchRequest>(() => ({
     page: this.page() - 1,
     size: this.pageSize,
-    sortBy: 'businessName',
-    sortDirection: 'ASC',
+    sortBy: this.state().sortBy,
+    sortDirection: this.state().sortDirection,
     ...(this.query() ? { keyword: this.query() } : {}),
-    ...(this.category() !== 'all' ? { categoryIds: [this.category()] } : {}),
-    // `location` intentionally omitted — the backend has no city filter yet.
+    categoryIds: this.state().categoryIds || [] ,
+    anyLocationIds: this.state().anyLocationIds || []
   }));
 
   constructor() {
@@ -102,10 +93,9 @@ export class VendorDirectoryPageComponent {
   // ─── View events ──────────────────────────────────────────
 
   protected onFilterChange(state: DirectoryFilterState): void {
-    this.query.set(state.query);
-    this.category.set(state.category);
+    this.state.set(state);
     this.page.set(state.page);
-    // `state.location` deliberately ignored — see above.
+    this.query.set(state.query);
   }
 
   protected onSelectVendor(vendor: VendorSummary): void {

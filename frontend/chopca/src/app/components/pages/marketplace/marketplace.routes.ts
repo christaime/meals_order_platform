@@ -11,33 +11,33 @@ import { MealEditorStore } from '@components/marketplace/meal/editor/state/meal-
  */
 export const MARKETPLACE_ROUTES: Routes = [
   {
-    path: 'meals',
+    path: '',
     loadComponent: () =>
         import('./marketplace-home/marketplace-home.page')
           .then(m => m.MarketplaceHomePageComponent),
     title: 'Chop ça! • Les meilleurs plats camerounais livrés chez vous'
   },
   {
-    path: 'meals/:id',
+    path: ':id',
     loadComponent: () =>
       import('./meal-detail/meal-detail.page')
         .then(m => m.MealDetailPageComponent),
     title: 'Détail du plat • Chop ça!',
   },
   {
-    path: 'meals/vendor/directory',
+    path: 'vendor/directory',
     loadComponent: () =>
       import('@components/pages/marketplace/vendor-directory/vendor-directory.page')
         .then(m => m.VendorDirectoryPageComponent),
     title: 'Restaurants partenaires • Chop ça!',
   },
   {
-    path: 'meals/vendor/directory/:id',
+    path: 'vendor/directory/:id',
     loadComponent: () =>
       import('@components/pages/marketplace/vendor-detail/vendor-detail.page')
         .then(m => m.VendorDetailPageComponent),
     title: 'Restaurant • Chop ça!',
-  },
+  }
 ];
 
 /**

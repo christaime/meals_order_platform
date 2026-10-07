@@ -23,7 +23,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
-
+import { CityCoordinatesService } from '@app/core/services/marketplace/city-coordinates.service';
 import { LOCATION_SERVICE } from '@app/core/services/marketplace/location.service';
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { GoogleMapsLoaderService } from '@app/core/services/google-maps-loader.service';
@@ -65,6 +65,7 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   private readonly cityService = inject(CITY_SERVICE);
   private readonly mapsLoader = inject(GoogleMapsLoaderService);
   private readonly zone = inject(NgZone);
+  private readonly cityCoordinates = inject(CityCoordinatesService);
 
   @ViewChild(GoogleMap) map?: GoogleMap;
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
@@ -177,11 +178,10 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   onCityChange(cityId: string): void {
     if (!cityId) return;
     this.selectedCityId.set(cityId);
-    //this.form.controls.cityId.setValue(cityId);
 
     const city = this.cities().find(c => c.id === cityId);
-    const coords = this.getCityCoordinates(city?.name);
-    console.log("Location ",coords, city?.name);
+    const coords = this.cityCoordinates.getCoordinates(city?.name);
+
     this.form.patchValue(
       { latitude: coords.lat, longitude: coords.lng },
       { emitEvent: false },
@@ -243,97 +243,6 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // ═══════════════════════════════════════════════════════════
-  //  Static city coordinates
-  // ═══════════════════════════════════════════════════════════
-
-  /**
-   * Static coordinates for the main Cameroonian cities.
-   *
-   * Keys are *lowercase, accent-stripped* city names, e.g.
-   * "yaoundé" → "yaounde". {@link normalizeCityName} runs the
-   * lookup through the same transformation, so accented spellings
-   * ("Yaoundé", "Limbé", "Ngaoundéré", "Edéa") resolve correctly.
-   *
-   * NOT keyed by city id — the backend sends UUIDs which vary
-   * between environments. Names are stable; ids are not.
-   */
-  private static readonly CITY_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
-    // ─── Major cities ────────────────────────────────────────
-    'douala':      { lat: 4.0511, lng: 9.7679 },
-    'yaounde':     { lat: 3.8480, lng: 11.5021 },
-    'bafoussam':   { lat: 5.4781, lng: 10.4172 },
-    'bamenda':     { lat: 5.9597, lng: 10.1459 },
-    'garoua':      { lat: 9.3017, lng: 13.3921 },
-    'maroua':      { lat: 10.5956, lng: 14.3247 },
-    'ngaoundere':  { lat: 7.3167, lng: 13.5833 },
-    'bertoua':     { lat: 4.5772, lng: 13.6846 },
-    'buea':        { lat: 4.1559, lng: 9.2410 },
-    'limbe':       { lat: 4.0186, lng: 9.2146 },
-    'kribi':       { lat: 2.9372, lng: 9.9100 },
-    'ebolowa':     { lat: 2.9000, lng: 11.1500 },
-    'edea':        { lat: 3.8000, lng: 10.1333 },
-    'kumba':       { lat: 4.6363, lng: 9.4469 },
-    'nkongsamba':  { lat: 4.9547, lng: 9.9404 },
-    'foumban':     { lat: 5.7266, lng: 10.9000 },
-    'sangmelima':  { lat: 2.9333, lng: 11.9833 },
-    'dschang':     { lat: 5.4500, lng: 10.0667 },
-    'mbalmayo':    { lat: 3.5167, lng: 11.5000 },
-    'wum':         { lat: 6.3833, lng: 10.0667 },
-    'bafang':      { lat: 5.1500, lng: 10.1833 },
-    'mbouda':      { lat: 5.6333, lng: 10.2500 },
-    'bangangte':   { lat: 5.1500, lng: 10.5167 },
-    'meiganga':    { lat: 6.5167, lng: 14.3000 },
-    'batouri':     { lat: 4.4333, lng: 14.3667 },
-    'yagoua':      { lat: 10.3428, lng: 15.2406 },
-    'kousseri':    { lat: 12.0769, lng: 15.0306 },
-    'mora':        { lat: 11.0464, lng: 14.1400 },
-    'tiko':        { lat: 4.0750, lng: 9.3600 },
-    'muyuka':      { lat: 4.2900, lng: 9.4100 },
-    'ekondo-titi': { lat: 4.6000, lng: 8.9833 },
-  };
-
-  /**
-   * Default fallback coordinates (Yaoundé — political capital).
-   * Used when a city has no matching entry in {@link CITY_COORDINATES}.
-   */
-  private static readonly DEFAULT_COORDINATES: google.maps.LatLngLiteral =
-    { lat: 3.8480, lng: 11.5021 };
-
-  /**
-   * Normalize a city name for coordinate lookup:
-   * lowercase, strip diacritics, trim, collapse whitespace.
-   *
-   *   "Yaoundé"      → "yaounde"
-   *   "  Douala  "   → "douala"
-   *   "Ngaoundéré"   → "ngaoundere"
-   *   "Edéa"         → "edea"
-   */
-  private static normalizeCityName(name: string | null | undefined): string {
-    if (!name) return '';
-    return name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim()
-      .replace(/\s+/g, ' ');
-  }
-
-  /**
-   * Look up coordinates by city name.
-   *
-   * The backend sends UUIDs for city ids; names are the only stable
-   * key across environments. Falls back to Yaoundé when the name is
-   * missing or not present in {@link CITY_COORDINATES}.
-   *
-   * Always returns a coordinate — never null — so the map never
-   * "doesn't move" when a city is selected.
-   */
-  private getCityCoordinates(cityName: string | null | undefined): google.maps.LatLngLiteral {
-    const key = LocationFormComponent.normalizeCityName(cityName);
-    return LocationFormComponent.CITY_COORDINATES[key]
-        ?? LocationFormComponent.DEFAULT_COORDINATES;
-  }
 
   // ═══════════════════════════════════════════════════════════
   //  Field error accessors

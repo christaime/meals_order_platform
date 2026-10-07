@@ -23,8 +23,14 @@ import { CityApiService } from './marketplace/city-api.service';
 import { CAPACITY_SERVICE } from './marketplace/capacity.service';
 import { CapacityApiService } from './marketplace/capacity-api.service';
 
+import { REFERENCE_SERVICE } from './marketplace/reference.service';
+import { ReferenceApiService } from './marketplace/reference-api.service';
+
 import { MODERATION_SERVICE } from './marketplace/moderation.service';
 import { ModerationApiService } from './marketplace/moderation-api.service';
+
+import { MEDIA_SERVICE } from './marketplace/media.service';
+import { MediaApiService } from './marketplace/media-api.service';
 
 // ─── Mock implementations (isolated in /mock) ─────────────────
 import { MealMockService } from '@app/mock/services/meal-mock.service';
@@ -35,9 +41,7 @@ import { VendorMockService } from '@app/mock/services/vendor-mock.service';
 import { CityMockService } from '@app/mock/services/city-mock.service';
 import { CapacityMockService } from '@app/mock/services/capacity-mock.service';
 import { ModerationMockService } from '@app/mock/services/moderation-mock.service';
-
-import { MEDIA_SERVICE } from './marketplace/media.service';
-import { MediaApiService } from './marketplace/media-api.service';
+import { ReferenceMockService } from '@app/mock/services//reference-mock.service';
 import { MediaMockService } from '@app/mock/services/media-mock.service';
 
 /**
@@ -87,5 +91,9 @@ export const SERVICE_PROVIDERS: Provider[] = [
    {
      provide: MODERATION_SERVICE,
      useClass: environment.useMockServices ? ModerationMockService : ModerationApiService,
+   },
+   {
+      provide: REFERENCE_SERVICE,
+      useClass: environment.useMockServices ? ReferenceMockService : ReferenceApiService,
    },
 ];

@@ -1,13 +1,10 @@
 package com.mealmarket.meal.infrastructure.persistence.specification;
 
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
+import com.mealmarket.meal.domain.repository.criteria.LocationProximity;
 import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 

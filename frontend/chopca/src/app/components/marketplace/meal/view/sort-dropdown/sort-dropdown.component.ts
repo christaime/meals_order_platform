@@ -43,11 +43,7 @@ export class SortDropdownComponent {
 
   /** Available sorting strategies. */
   readonly options = input<SortOption[]>([
-    { id: 'popular', label: 'Plus populaires', icon: 'local_fire_department' },
-    { id: 'rating', label: 'Mieux notés', icon: 'star' },
-    { id: 'price-asc', label: 'Prix : Croissant', icon: 'arrow_upward' },
-    { id: 'price-desc', label: 'Prix : Décroissant', icon: 'arrow_downward' },
-    { id: 'prep-time', label: 'Temps de préparation', icon: 'schedule' },
+    { id: 'name', label: 'Nom des plats alphabetiquement', icon: 'sort_by_alpha' },
   ]);
 
   /** Emitted when the sorting order is changed. */

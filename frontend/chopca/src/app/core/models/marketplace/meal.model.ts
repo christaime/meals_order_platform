@@ -93,7 +93,8 @@ export interface MealSearchRequest extends SearchRequest {
   readonly vendorId?: string;
 
   readonly businessName?: string;
-  readonly availableOnly?: string;
+  readonly availableOnly?: boolean;
+  readonly categoryIds?: string[];
   readonly cuisineIds?: string[];
   readonly dishTypeIds?: string[];
   readonly excludeIngredientIds?: string[];
@@ -104,7 +105,7 @@ export interface MealSearchRequest extends SearchRequest {
   readonly minPrepTime?: number;
   readonly maxPrepTime?: number;
 
-  readonly distributionLocationId?: string;
+  readonly distributionLocationIds?: string[];
   readonly cityId?: string;
 
   readonly moderationStatus?: ModerationStatus;

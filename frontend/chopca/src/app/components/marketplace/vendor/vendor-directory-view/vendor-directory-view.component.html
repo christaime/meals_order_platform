@@ -1,33 +1,37 @@
 <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
   <!-- Top Hero Header -->
-  <div class="flex flex-col gap-2">
-    <h1 class="font-headline-lg text-2xl sm:text-3xl font-bold text-on-surface">
+  <div class="flex flex-col gap-1">
+    <h3 class="font-headline-lg text-xl sm:text-2xl font-bold leading-tight m-0 text-on-surface">
       Restaurants & Restaurateurs Partenaires
-    </h1>
-    <p class="text-sm text-on-surface-variant max-w-2xl">
+    </h3>
+    <p class="text-sm text-on-surface-variant max-w-2xl m-0">
       Découvrez les meilleurs établissements et traiteurs locaux livrant dans votre zone.
     </p>
   </div>
 
-  <!-- Search & Location Filter Toolbar -->
+  <!-- Search & Location Filter Toolbar + Sort-->
   <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-surface-container-lowest p-4 rounded-3xl border border-outline-variant/40 shadow-xs">
     <app-location-selector
-      [selectedLocation]="selectedLocation()"
-      (locationChange)="onLocationChange($event)"
+      (locationsChange)="onLocationsChange($event)"
+      (criteriaChange)="onCriteriaChange($event)"
     />
-    <div class="flex-1">
       <app-search-bar
         [query]="searchQuery()"
         placeholder="Rechercher un restaurant, un établissement..."
         (search)="onSearchChange($event)"
       />
-    </div>
+      <app-sort-dropdown
+        [options]="sortOptions"
+        [selectedSortId]="selectedSort()"
+        (sortChange)="onSortChange($event)"
+      />
   </div>
 
-  <!-- Cuisine Category Selector -->
-  <app-category-chips
-    [selectedCategoryId]="selectedCategory()"
-    (categoryChange)="onCategoryChange($event)"
+  <!-- Sub-Category Quick Chips Filter -->
+  <app-sub-category-filter-chips
+    [subCategories]="subCategoryOptions()"
+    [selectedSubCategoryIds]="selectedSubCategoryIds()"
+    (subCategoryChange)="onSubCategoryChange($event)"
   />
 
   <!-- Vendors Directory Grid Section -->

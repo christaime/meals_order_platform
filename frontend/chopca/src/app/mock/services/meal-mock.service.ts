@@ -78,10 +78,10 @@ export class MealMockService implements MealService {
       result = result.filter(m => m.averageRating >= request.minRating!);
     }
 
-    if (request.distributionLocationId) {
-      const locId = request.distributionLocationId;
+    if (request.distributionLocationIds && request.distributionLocationIds.length > 0) {
+      const locIds = request.distributionLocationIds;
       result = result.filter(m =>
-        m.distributionLocations.some(l => l.id === locId)
+        m.distributionLocations.some(l => locIds.includes(l.id ))
       );
     }
 

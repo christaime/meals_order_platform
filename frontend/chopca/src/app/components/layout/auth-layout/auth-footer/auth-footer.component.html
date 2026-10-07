@@ -14,7 +14,7 @@
       <div class="flex items-center gap-2">
         <app-icon name="verified" size="md" class="text-secondary" />
         <span class="font-label text-xs text-on-surface">
-          Chop ça! Cameroun • Yaoundé &amp; Douala &amp; Bafoussam &amp; Limbé
+          Chop ça! Cameroun
         </span>
       </div>
 
@@ -22,6 +22,7 @@
       <span class="hidden sm:inline text-outline-variant">•</span>
 
       <!-- Payment methods -->
+      @if(showPayment()){
       <div class="flex items-center gap-2 font-label text-xs text-on-surface-variant">
         <span>Paiements certifiés :</span>
         @for (method of paymentMethods; track method) {
@@ -33,12 +34,14 @@
           </span>
         }
       </div>
+      }
     </div>
 
     <!-- ─── Right: support + legal ───────────────────────── -->
     <div class="flex items-center gap-6">
 
       <!-- WhatsApp Pro support -->
+      @if(showWhatsap()){
       <a
         [href]="whatsappUrl"
         target="_blank"
@@ -50,8 +53,10 @@
         <app-icon name="chat" size="sm" />
         <span>Assistance WhatsApp Pro (+237)</span>
       </a>
+      }
 
       <!-- Legal links -->
+      @if(showLegalMention()){
       <a
         routerLink="/mentions-legales"
         class="font-label text-xs text-on-surface-variant
@@ -59,6 +64,7 @@
                transition-colors">
         Mentions Légales &amp; Conditions
       </a>
+      }
     </div>
 
   </div>

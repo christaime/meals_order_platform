@@ -226,4 +226,5 @@ export interface VendorSearchRequest extends SearchRequest {
   readonly minRating?: number;
   readonly maxRating?: number;
   readonly categoryIds?: string[];
+  readonly anyLocationIds?: string[];
 }

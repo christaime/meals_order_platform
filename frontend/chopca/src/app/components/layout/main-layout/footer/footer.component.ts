@@ -5,7 +5,7 @@ import { LogoComponent } from '@components/shared/logo/logo.component';
 
 interface FooterLink {
   readonly label: string;
-  readonly route: string;
+  readonly href: string;
 }
 
 interface FooterColumn {
@@ -44,41 +44,40 @@ export class FooterComponent {
   readonly currentYear = new Date().getFullYear();
 
   readonly tagline =
-    'Mangez local, mangez bon. La première plateforme gastronomique reliant les maîtres braiseurs, mamans cuisinières et gourmets de Douala à Yaoundé.';
+    'Mangez local, mangez bon. La plateforme gastronomique reliant les maîtres braiseurs, mamans cuisinières et gourmets du Cameroun.';
 
   readonly socialLinks: readonly SocialLink[] = [
-    { icon: 'chat',         label: 'WhatsApp',  href: '#' },
-    { icon: 'share',        label: 'Partager',  href: '#' },
-    { icon: 'photo_camera', label: 'Instagram', href: '#' },
-    { icon: 'videocam',     label: 'TikTok',    href: '#' },
+    { icon: 'chat',         label: 'WhatsApp',  href: `https://wa.me/?text=${encodeURIComponent('Découvrez MealMarket : ' + window.location.origin)}` },
+    { icon: 'photo_camera', label: 'Instagram', href: 'https://www.instagram.com/' },
+    { icon: 'videocam',     label: 'TikTok',    href: 'https://www.tiktok.com/' },
   ];
 
   readonly columns: readonly FooterColumn[] = [
     {
       title: 'À propos',
       links: [
-        { label: 'Notre histoire',        route: '/notre-histoire' },
-        { label: 'Nos chefs partenaires', route: '/nos-chefs-partenaires' },
-        { label: 'Engagements qualité',   route: '/engagements-qualite' },
-        { label: 'Blog culinaire',        route: '/blog-culinaire' },
+        { label: 'Notre histoire',        href: '/about' },
+        { label: 'Nos chefs partenaires', href: '/meals/vendor/directory' },
+      //  { label: 'Engagements qualité',   href: '/engagements-qualite' },
+      //  { label: 'Blog culinaire',        href: '/blog-culinaire' },
       ],
     },
     {
       title: 'Aide & Support',
       links: [
-        { label: "Centre d'aide",                       route: '/centre-daide' },
-        { label: 'Zones de livraison Douala & Yaoundé', route: '/zones-de-livraison' },
-        { label: 'Paiement MTN MoMo / Orange Money',    route: '/moyens-de-paiement' },
-        { label: 'FAQ',                                 route: '/faq' },
+        { label: "Centre d'aide",                       href: '/about#help_center' },
+       // { label: 'Zones de livraison Douala & Yaoundé', href: '/zones-de-livraison' },
+       // { label: 'Paiement MTN MoMo / Orange Money',    href: '/moyens-de-paiement' },
+       // { label: 'FAQ',                                 href: '/faq' },
       ],
     },
     {
       title: 'Contact & Légal',
       links: [
-        { label: 'Nous contacter',         route: '/contact' },
-        { label: 'Devenir livreur',        route: '/devenir-livreur' },
-        { label: 'CGU & Mentions légales', route: '/cgu-mentions-legales' },
-        { label: 'Confidentialité',        route: '/confidentialite' },
+        { label: 'Nous contacter',         href: '/about#contact' },
+       // { label: 'Devenir livreur',        href: '/devenir-livreur' },
+       // { label: 'CGU & Mentions légales', href: '/cgu-mentions-legales' },
+       // { label: 'Confidentialité',        href: '/confidentialite' },
       ],
     },
   ];

@@ -10,9 +10,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ToastService } from '@components/shared/toast/toast.service';
 import { MealCatalogViewComponent , QuickStatsPillsComponent,
-  DeliveryCoverageSectionComponent, FloatingCartSummaryComponent , FilterState} from '@components/marketplace/meal/view';
-import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
-import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
+  DeliveryCoverageSectionComponent, FloatingCartSummaryComponent , FilterState, StatItem} from '@components/marketplace/meal/view';
+import { MEAL_SERVICE } from '@core/services/marketplace/meal.service';
+import { MealSummary, MealSearchRequest } from '@core/models/marketplace';
 
 /**
  * Marketplace home page — the public meal catalog.
@@ -57,10 +57,50 @@ export class MarketplaceHomePageComponent implements OnInit {
   readonly cartTotal = signal<number>(0);
   readonly cartVendorName = signal<string | null>(null);
 
+  stats:StatItem[] = [];
+  readonly statistics: {deliveryAverageTimeMin?: string,satisfactionRate?: string, cityCoverage?: string, hygieneCertified?: boolean} = {};
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
+   /* this.onAddToCart({name:"Nouveau",price:3000, id:"", vendorId:"",
+      vendorBusinessName:"Vendor", description:"", imageUrl:"", averageRating:50, totalRatings:100,
+       prepTimeMinutes:30, moderationStatus:"APPROVED", cuisines:[], dishTypes:[]});*/
     this.loadMeals();
+    let stats:StatItem[] = [];
+    if(this.statistics?.deliveryAverageTimeMin){
+      stats.push({
+        id: 'delivery',
+        icon: 'schedule',
+        label: 'Livraison moyenne',
+        highlight: this.statistics?.deliveryAverageTimeMin +' min',
+      });
+    }
+    if(this.statistics?.satisfactionRate){
+        stats.push({
+          id: 'satisfaction',
+          icon: 'star',
+          label: 'Note clients',
+          highlight: this.statistics?.satisfactionRate ,
+        });
+    }
+    if(this.statistics?.cityCoverage){
+        stats.push({
+           id: 'coverage',
+           icon: 'location_on',
+           label: 'Villes',
+           highlight: this.statistics?.cityCoverage ,
+        });
+      }
+    if(this.statistics?.hygieneCertified){
+      stats.push({
+        id: 'hygiene',
+        icon: 'verified',
+        label: 'Cuisines',
+        highlight:'100% Vérifiées' ,
+      });
+    }
+    this.stats = stats;
+
   }
 
   // ─── Data loading ─────────────────────────────────────────
@@ -79,26 +119,22 @@ export class MarketplaceHomePageComponent implements OnInit {
 
   onFilterChange(state: {
     query: string;
-    subCategory: string;
     sort: string;
     page: number;
+    distributionLocationIds?: string[];
     filters: FilterState;
   }): void {
-    // TODO: pass filters to the backend search endpoint
+
     console.log('[MarketplaceHomePage] filter change', state);
     this.load({
       moderationStatus: 'APPROVED',
       page: state.page,
       size: this.pageSize(),
-      sortBy: state.sort,
-      sortDirection: 'ASC',
+      sortBy: ['price-asc','price-desc'].includes(state.sort) ? 'price': state.sort,
+      sortDirection: ['price-asc','prepTimeMinutes','name'].includes(state.sort)? 'ASC' : 'DESC',
       ...(state.query ? { keyword:state.query } : {}),
-      ...(state.subCategory ? { cuisineIds:[state.subCategory] , dishTypeIds:[state.subCategory] } : {}),
-      ...(state.filters && state.filters.maxPrice ? { maxPrice:state.filters.maxPrice } : {}),
-     // ...(state.filters && state.filters.maxPrepTime ? { maxPrepTime:state.filters.maxPrepTime } : {}),
-     // ...(state.filters && state.filters.availableOnly ? { availableOnly:state.filters.availableOnly } : {}),
-      ...(state.filters && state.filters.minRating ? { minRating:state.filters.minRating } : {}),
-      ...(state.filters && state.filters.maxPrice ? { maxPrice:state.filters.maxPrice } : {}),
+      ...(state.filters ? state.filters : {}),
+      distributionLocationIds: state.distributionLocationIds,
       });
 
   }
@@ -137,4 +173,5 @@ export class MarketplaceHomePageComponent implements OnInit {
     // TODO: open cart drawer
     console.log('[MarketplaceHomePage] open cart');
   }
+
 }

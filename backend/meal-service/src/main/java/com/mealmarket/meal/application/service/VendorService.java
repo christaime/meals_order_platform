@@ -202,6 +202,7 @@ public class VendorService {
                 .minRating(request.getMinRating())
                 .maxRating(request.getMaxRating())
                 .categoryIds(request.getCategoryIds())
+                .anyLocationIds(request.getAnyLocationIds())
                 .sort(request.getSort())
                 .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                 .build();

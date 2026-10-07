@@ -24,7 +24,9 @@ export * from './media-api.service';
 export * from './city.service';
 export * from './city-api.service';
 
-export * from './pending-vendor-submit.service';
+export * from './reference.service';
+export * from './reference-api.service';
+
 
 
 

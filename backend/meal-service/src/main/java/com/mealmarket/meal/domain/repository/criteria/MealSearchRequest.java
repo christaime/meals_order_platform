@@ -42,6 +42,8 @@ public class MealSearchRequest extends SearchRequest {
     private final BigDecimal maxPrice;
     private final Double minRating;
     private final Double maxRating;
+    private final Integer minPrepTime;
+    private final Integer maxPrepTime;
     private final Boolean isAvailable;
     private final List<UUID> distributionLocationIds;
     private final LocationProximity locationProximity;
@@ -80,6 +82,8 @@ public class MealSearchRequest extends SearchRequest {
         this.maxPrice = builder.maxPrice;
         this.minRating = builder.minRating;
         this.maxRating = builder.maxRating;
+        this.maxPrepTime = builder.maxPrepTime;
+        this.minPrepTime = builder.minPrepTime;
         this.isAvailable = builder.isAvailable;
         this.distributionLocationIds = builder.distributionLocationIds;
         this.locationProximity = builder.locationProximity;
@@ -150,6 +154,8 @@ public class MealSearchRequest extends SearchRequest {
         private Boolean hasAllergens;
         private BigDecimal minPrice;
         private BigDecimal maxPrice;
+        private Integer minPrepTime;
+        private Integer maxPrepTime;
         private Double minRating;
         private Double maxRating;
         private Boolean isAvailable;
@@ -222,6 +228,16 @@ public class MealSearchRequest extends SearchRequest {
 
         public Builder maxPrice(BigDecimal v) {
             this.maxPrice = v;
+            return this;
+        }
+
+        public Builder minPrepTime(Integer v) {
+            this.minPrepTime = v;
+            return this;
+        }
+
+        public Builder maxPrepTime(Integer v) {
+            this.maxPrepTime = v;
             return this;
         }
 

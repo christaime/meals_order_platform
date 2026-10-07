@@ -5,7 +5,7 @@ import {
   LOCALE_ID
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { SERVICE_PROVIDERS } from './core/services/service.providers';
 import { environment } from '@environments/environment';
@@ -26,7 +26,13 @@ export const appConfig: ApplicationConfig = {
   providers: [
 
     { provide: LOCALE_ID, useValue: 'fr' },
-    provideRouter(routes, withComponentInputBinding()),
+    provideRouter(routes,
+      withComponentInputBinding(),
+       withInMemoryScrolling({
+         anchorScrolling: 'enabled',
+         scrollPositionRestoration: 'enabled',
+       })
+    ),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
     // ─── HTTP interceptors ────────────────────────────────────

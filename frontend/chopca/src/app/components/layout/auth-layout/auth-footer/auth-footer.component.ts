@@ -1,4 +1,8 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  computed,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
@@ -27,9 +31,13 @@ export class AuthFooterComponent {
   /** WhatsApp support phone number (placeholder for now). */
   readonly whatsappUrl = 'https://wa.me/237600000000';
 
+  readonly showPayment = computed<boolean>(()=> {return false;});
   /** Accepted payment methods shown as pills. */
   readonly paymentMethods = [
     'MTN MoMo',
     'Orange Money',
   ] as const;
+
+  readonly showWhatsap = computed<boolean>(()=> {return false;});
+  readonly showLegalMention = computed<boolean>(()=> {return false;});
 }

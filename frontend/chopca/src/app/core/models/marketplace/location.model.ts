@@ -50,4 +50,6 @@ export interface LocationSearchRequest extends SearchRequest {
   readonly nearLatitude?: number;
   readonly nearLongitude?: number;
   readonly radiusKm?: number;
+  readonly cityIds?: string[];
+  readonly cityNameLike?: string;
 }

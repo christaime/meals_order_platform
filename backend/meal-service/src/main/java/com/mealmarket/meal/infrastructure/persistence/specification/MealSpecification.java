@@ -129,6 +129,16 @@ public class MealSpecification {
                         root.get("averageRating"), request.getMaxRating()));
             }
 
+            // ─── Prep time range ─────────────────────────────────────
+            if (request.getMinPrepTime() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                        root.get("prepTimeMinutes"), request.getMinPrepTime()));
+            }
+            if (request.getMaxPrepTime() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(
+                        root.get("prepTimeMinutes"), request.getMaxPrepTime()));
+            }
+
             // ─── Availability ─────────────────────────────────────
             if (request.getIsAvailable() != null) {
                 predicates.add(criteriaBuilder.equal(

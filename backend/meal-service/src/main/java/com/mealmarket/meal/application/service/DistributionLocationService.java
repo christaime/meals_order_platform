@@ -19,6 +19,7 @@ import com.mealmarket.meal.domain.repository.CityRepository;                    
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
 import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
+import com.mealmarket.meal.domain.repository.criteria.LocationProximity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -186,6 +187,7 @@ public class DistributionLocationService {
                         .moderationStatus(ModerationStatus.APPROVED)
                         .cityNameLike(request.getCityNameLike())
                         .cityIds(request.getCityIds())
+                        .locationProximity(request.getLocationProximity())
                         .sort(request.getSort())
                         .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())
                         .build();

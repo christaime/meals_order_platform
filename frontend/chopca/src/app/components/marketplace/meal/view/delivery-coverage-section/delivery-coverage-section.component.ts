@@ -23,11 +23,11 @@ export interface CoverageZone {
 })
 export class DeliveryCoverageSectionComponent {
   /** Optional custom title override. */
-  readonly title = input<string>('Livraison rapide & Zones desservies');
+  readonly title = input<string>('Consommation à temps');
 
   /** Supported delivery zones. Defaults to Douala & Yaoundé hubs if not provided. */
   readonly zones = input<CoverageZone[]>([
-    {
+    /*{
       city: 'Douala',
       neighborhoods: ['Akwa', 'Bonanjo', 'Bonapriso', 'Makepe', 'Kotto', 'Bastos'],
       estimatedTime: '20 - 45 min',
@@ -36,6 +36,6 @@ export class DeliveryCoverageSectionComponent {
       city: 'Yaoundé',
       neighborhoods: ['Bastos', 'Biyem-Assi', 'Mvan', 'Omnisports', 'Nsam'],
       estimatedTime: '25 - 50 min',
-    },
+    },*/
   ]);
 }

@@ -537,6 +537,9 @@ public class MealController {
             @Parameter(description = "Vendor business name search")
             @RequestParam(required = false) String businessName,
 
+            @Parameter(description = "Category IDs filter (comma-separated)")
+            @RequestParam(required = false) List<UUID> categoryIds,
+
             @Parameter(description = "Cuisine category IDs filter (comma-separated)")
             @RequestParam(required = false) List<UUID> cuisineIds,
 
@@ -551,6 +554,12 @@ public class MealController {
 
             @Parameter(description = "Maximum price")
             @RequestParam(required = false) BigDecimal maxPrice,
+
+            @Parameter(description = "Minimum prep time in minutes")
+            @RequestParam(required = false) Integer minPrepTime,
+
+            @Parameter(description = "Maximum prep time in minutes")
+            @RequestParam(required = false) Integer maxPrepTime,
 
             @Parameter(description = "Minimum rating")
             @RequestParam(required = false) Double minRating,
@@ -574,11 +583,14 @@ public class MealController {
                 .keyword(keyword)
                 .vendorId(vendorId)
                 .businessName(businessName)
+                .categoryIds(categoryIds)
                 .cuisineIds(cuisineIds)
                 .dishTypeIds(dishTypeIds)
                 .excludeIngredientIds(excludeIngredientIds)
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
+                .minPrepTime(minPrepTime)
+                .maxPrepTime(maxPrepTime)
                 .minRating(minRating)
                 .distributionLocationIds(distributionLocationIds)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))

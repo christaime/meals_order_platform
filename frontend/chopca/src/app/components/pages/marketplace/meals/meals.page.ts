@@ -46,8 +46,7 @@ const DEFAULT_ADVANCED: FilterState = {
   availableOnly: false,
   cuisineIds: [],
   dishTypeIds: [],
-  excludeIngredientIds: [],
-  distributionLocationId: null,
+  excludeIngredientIds: []
 };
 
 @Component({
@@ -153,17 +152,7 @@ export class MealsPageComponent {
       ...(this.cityId() ? { cityId: this.cityId()! } : {}),
 
       // Advanced
-      ...(adv.minPrice !== 1000 ? { minPrice: adv.minPrice } : {}),
-      ...(adv.maxPrice !== 10000 ? { maxPrice: adv.maxPrice } : {}),
-      ...(adv.maxPrepTime !== 60 ? { maxPrepTime: adv.maxPrepTime } : {}),
-      ...(adv.minRating !== 0 ? { minRating: adv.minRating } : {}),
-      ...(adv.cuisineIds?.length ? { cuisineIds: adv.cuisineIds } : {}),
-      ...(adv.dishTypeIds?.length ? { dishTypeIds: adv.dishTypeIds } : {}),
-      ...(adv.excludeIngredientIds?.length
-        ? { excludeIngredientIds: adv.excludeIngredientIds } : {}),
-      ...(adv.distributionLocationId
-        ? { distributionLocationId: adv.distributionLocationId } : {}),
-      ...(adv.availableOnly ? { availableOnly: true } : {}),
+      ...(adv ? adv : {})
     } as MealSearchRequest;
   });
 

@@ -54,6 +54,7 @@ export class MealApiService implements MealService {
   }
 
   search(request: MealSearchRequest): Observable<DataPage<MealSummary>> {
+    console.log("[MealApiService] search", request);
     const params = this.buildSearchParams(request);
     return this.http.get<DataPage<MealSummary>>(this.getReadBaseUrl(), { params });
   }
@@ -99,6 +100,7 @@ export class MealApiService implements MealService {
     if (request.loadFull)              params = params.set('loadFull', request.loadFull);
     if (request.withCount)          params = params.set('withCount', request.withCount);
 
+    if (request.categoryIds?.length)    params = params.set('categoryIds', request.categoryIds.join(','));
     if (request.cuisineIds?.length)    params = params.set('cuisineIds', request.cuisineIds.join(','));
     if (request.dishTypeIds?.length)   params = params.set('dishTypeIds', request.dishTypeIds.join(','));
     if (request.excludeIngredientIds?.length)
@@ -108,8 +110,13 @@ export class MealApiService implements MealService {
     if (request.maxPrice != null)      params = params.set('maxPrice', request.maxPrice.toString());
     if (request.minRating != null)     params = params.set('minRating', request.minRating.toString());
 
-    if (request.distributionLocationId)
-      params = params.set('distributionLocationId', request.distributionLocationId);
+    if (request.minPrepTime != null)      params = params.set('minPrepTime', request.minPrepTime.toString());
+    if (request.maxPrepTime != null)      params = params.set('maxPrepTime', request.maxPrepTime.toString());
+
+    if (request.cityId != null)      params = params.set('cityId', request.cityId);
+
+    if (request.distributionLocationIds?.length)
+      params = params.set('distributionLocationIds', request.distributionLocationIds.join(","));
 
     if (request.page != null)          params = params.set('page', request.page.toString());
     if (request.size != null)          params = params.set('size', request.size.toString());

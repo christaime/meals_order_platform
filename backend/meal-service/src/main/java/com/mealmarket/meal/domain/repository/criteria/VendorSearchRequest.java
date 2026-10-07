@@ -4,6 +4,7 @@ import com.mealmarket.common.pagination.SearchRequest;
 import com.mealmarket.meal.domain.model.VendorState;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class VendorSearchRequest extends SearchRequest {
     private final Double minRating;
     private final Double maxRating;
     private final List<UUID> categoryIds;
+    private final List<UUID> anyLocationIds;
     private final UUID cityId;
     private final LocationProximity locationProximity;
 
@@ -32,6 +34,7 @@ public class VendorSearchRequest extends SearchRequest {
         this.minRating = builder.minRating;
         this.maxRating = builder.maxRating;
         this.categoryIds = builder.categoryIds;
+        this.anyLocationIds = builder.anyLocationIds;
         this.cityId = builder.cityId;
         this.locationProximity = builder.locationProximity;
     }
@@ -64,6 +67,7 @@ public class VendorSearchRequest extends SearchRequest {
         private Double minRating;
         private Double maxRating;
         private List<UUID> categoryIds;
+        private List<UUID> anyLocationIds;
         private UUID cityId;
         private LocationProximity locationProximity;
 
@@ -104,6 +108,11 @@ public class VendorSearchRequest extends SearchRequest {
 
         public Builder categoryIds(List<UUID> categoryIds) {
             this.categoryIds = categoryIds;
+            return this;
+        }
+
+        public Builder anyLocationIds(List<UUID> anyLocationIds) {
+            this.anyLocationIds = anyLocationIds;
             return this;
         }
 
