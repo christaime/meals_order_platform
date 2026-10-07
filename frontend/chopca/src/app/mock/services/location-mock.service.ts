@@ -188,6 +188,10 @@ export class LocationMockService implements LocationService {
      city: { id: 'c17a0000-0000-4000-8000-000000000001', "name": "Ebolowa","region": "Sud" , countryCode: 'CM' },
     address: location.address,
     moderationStatus: location.moderationStatus,
+    latitude: 3.8480,
+    longitude: 11.5021,
+    vendorId: "c17a0000-0000-4000-8000-000000000001",
+    vendorBusinessName: "The vendor"
   });
 
   /** Haversine distance in km. */

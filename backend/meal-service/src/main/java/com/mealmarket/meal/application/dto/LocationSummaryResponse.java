@@ -12,6 +12,8 @@ public record LocationSummaryResponse(
         String name,
         CityResponse city,
         String address,
+        Double latitude,
+        Double longitude,
         String vendorBusinessName,
         UUID vendorId,
         ModerationStatus moderationStatus

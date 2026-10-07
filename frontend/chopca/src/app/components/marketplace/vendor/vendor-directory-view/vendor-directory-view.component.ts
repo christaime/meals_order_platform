@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { VendorSummary , LocationSummary, MealStatFilter} from '@core/models/marketplace';
 import { IconComponent } from '@components/shared';
 import { SearchBarComponent,
-  LocationSelectorComponent, CommittedSelection,
+  LocationSelectorComponent,
    CategoryChipsComponent, CategoryChip ,
    PaginationControlsComponent,
    SortOption, SortDropdownComponent

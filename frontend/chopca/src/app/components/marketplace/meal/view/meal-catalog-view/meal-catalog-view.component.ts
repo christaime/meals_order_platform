@@ -17,7 +17,7 @@ import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
 
 import { IconComponent } from '@components/shared';
-import { LocationSelectorComponent, CommittedSelection } from '../location-selector/location-selector.component';
+import { LocationSelectorComponent } from '../location-selector/location-selector.component';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { SubCategoryFilterChipsComponent , SubCategoryChip} from '../sub-category-filter-chips/sub-category-filter-chips.component';
 import { ActiveFilterBadgesComponent, ActiveFilterItem } from '../active-filter-badges/active-filter-badges.component';

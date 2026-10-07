@@ -22,3 +22,5 @@ export * from './toast';
 export * from './delete-entity-dialog/delete-entity-dialog.component';
 export * from './vendor-picker/vendor-picker.component';
 export * from './moderation-status/moderation-status.util';
+export * from './location-picker-button/location-picker-button.component';
+export * from './location-picker/location-picker.component';

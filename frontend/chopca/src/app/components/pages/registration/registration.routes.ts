@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { mapsPreloadGuard } from '@core/guards/maps-preload.guard';
 /**
  * Public registration routes.
  *
@@ -10,6 +11,7 @@ import { Routes } from '@angular/router';
 export const REGISTRATION_ROUTES: Routes = [
     {
       path: 'vendor',
+      canActivate: [mapsPreloadGuard],
       loadComponent: () =>
         import('./vendor/vendor-registration.page')
           .then(m => m.VendorRegistrationPage),

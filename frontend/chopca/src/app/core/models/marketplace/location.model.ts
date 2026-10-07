@@ -31,6 +31,10 @@ export interface LocationSummary {
   readonly address: string;
   readonly moderationStatus: ModerationStatus;
   readonly city: City | null;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly vendorId: string;
+  readonly vendorBusinessName: string;
 }
 
 export interface LocationRequest {

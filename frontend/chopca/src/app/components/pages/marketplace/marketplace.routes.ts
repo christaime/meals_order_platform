@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { MealEditorStore } from '@components/marketplace/meal/editor/state/meal-editor.store';
-
+import { mapsPreloadGuard } from '@core/guards/maps-preload.guard';
 /**
  * Public marketplace routes.
  *
@@ -12,6 +12,7 @@ import { MealEditorStore } from '@components/marketplace/meal/editor/state/meal-
 export const MARKETPLACE_ROUTES: Routes = [
   {
     path: '',
+    canActivate: [mapsPreloadGuard],
     loadComponent: () =>
         import('./marketplace-home/marketplace-home.page')
           .then(m => m.MarketplaceHomePageComponent),
@@ -26,6 +27,7 @@ export const MARKETPLACE_ROUTES: Routes = [
   },
   {
     path: 'vendor/directory',
+    canActivate: [mapsPreloadGuard],
     loadComponent: () =>
       import('@components/pages/marketplace/vendor-directory/vendor-directory.page')
         .then(m => m.VendorDirectoryPageComponent),
@@ -67,6 +69,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
     path: 'locations',
+    canActivate: [mapsPreloadGuard],
     loadComponent: () =>
       import('./locations/locations.page')
         .then(m => m.LocationsPageComponent),
@@ -98,6 +101,7 @@ export const ADMIN_ROUTES: Routes = [
 export const VENDOR_ROUTES: Routes = [
   {
       path: 'locations',
+      canActivate: [mapsPreloadGuard],
       loadComponent: () =>
         import('./locations/locations.page')
           .then(m => m.LocationsPageComponent),
@@ -106,6 +110,7 @@ export const VENDOR_ROUTES: Routes = [
   },
   {
     path: 'meals',
+    canActivate: [mapsPreloadGuard],
     children: [
       {
         path: '',

@@ -1,0 +1,134 @@
+<div class="relative location-picker-container w-full sm:w-auto">
+
+  <!-- ═══ Closed-state button ═══════════════════════════════ -->
+  <button
+    type="button"
+    (click)="openPanel()"
+    class="w-full sm:w-auto flex items-center justify-between gap-3
+           px-4 py-3 rounded-full
+           bg-surface-container-lowest border border-outline-variant/50
+           text-on-surface hover:border-primary/60 transition-all shadow-xs"
+  >
+    <div class="flex items-center gap-2.5 overflow-hidden">
+      <app-icon name="location_on" class="text-primary flex-shrink-0" />
+      <div class="flex flex-col text-left truncate">
+
+        @if (committedCity(); as city) {
+        <span class="font-body-md text-sm font-semibold text-on-surface truncate">
+            {{ city.name }}
+          </span>
+        <span class="font-label-sm text-[11px] text-on-surface-variant truncate">
+            @if (committedPoint()) {
+              {{ committedLocations().length }}
+              {{ committedLocations().length === 1 ? 'point de retrait' : 'points de retrait' }}
+              dans un rayon de {{ committedPoint()!.radiusKm }} km
+            } @else {
+              {{ committedLocations().length }}
+              {{ committedLocations().length === 1 ? 'point de retrait' : 'points de retrait' }} dans cette ville
+            }
+          </span>
+        } @else {
+        <span class="font-body-md text-sm font-semibold text-on-surface">
+            Choisir une zone
+          </span>
+        <span class="font-label-sm text-[11px] text-on-surface-variant">
+            Ville, point sur la carte, rayon
+          </span>
+        }
+
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1 shrink-0">
+      @if (committedCity()) {
+      <span
+        role="button"
+        tabindex="0"
+        (click)="clear($event)"
+        (keydown.enter)="clear($any($event))"
+        aria-label="Effacer la zone"
+        class="w-7 h-7 rounded-full flex items-center justify-center
+               text-on-surface-variant hover:bg-surface-container transition-colors"
+      >
+        <app-icon name="close" size="sm" />
+      </span>
+      }
+      <app-icon
+        name="keyboard_arrow_down"
+        class="text-on-surface-variant transition-transform duration-200"
+        [class.rotate-180]="isOpen()"
+      />
+    </div>
+  </button>
+
+  <!-- ═══ Panel (dropdown, anchored to the button) ════════════ -->
+  @if (isOpen()) {
+  <div
+    class="absolute left-0 right-0 bottom-full mb-2
+           sm:left-0 sm:right-auto sm:bottom-auto sm:top-full sm:mt-2
+           sm:w-[28rem]
+           max-h-[80vh]
+           bg-surface-container-lowest
+           rounded-2xl shadow-2xl border border-outline-variant
+           flex flex-col overflow-hidden z-50
+           animate-in fade-in duration-150"
+  >
+    <!-- Header -->
+    <div class="p-4 border-b border-outline-variant flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2">
+        <app-icon name="location_on" class="text-primary" />
+        <h2 class="font-headline-sm text-base font-bold text-on-surface">
+          Choisir une zone
+        </h2>
+      </div>
+      <button
+        type="button"
+        (click)="closePanel()"
+        class="w-8 h-8 rounded-full flex items-center justify-center
+               text-on-surface-variant hover:bg-surface-container transition-colors"
+      >
+        <app-icon name="close" size="sm" />
+      </button>
+    </div>
+
+    <!-- Picker body -->
+    <div class="p-4 flex-1 overflow-y-auto">
+      <app-location-picker
+        [initialCity]="committedCity()"
+        [initialLocations]="committedLocations()"
+        [initialPoint]="committedPoint() ? { latitude: committedPoint()!.latitude, longitude: committedPoint()!.longitude } : null"
+        [initialRadiusKm]="committedPoint()?.radiusKm ?? 10"
+        (cityChange)="onPickerCityChange($event)"
+        (pointChange)="onPickerPointChange($event)"
+        (locationsChange)="onPickerLocationsChange($event)"
+      />
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-outline-variant bg-surface-container-low
+                flex items-center gap-3 shrink-0">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2.5 rounded-full border border-outline-variant
+               text-on-surface font-label-md text-xs font-semibold
+               hover:bg-surface-container transition-colors"
+      >
+        Annuler
+      </button>
+      <button
+        type="button"
+        [disabled]="!canApply()"
+        (click)="apply()"
+        class="flex-1 py-2.5 rounded-full
+               bg-primary text-on-primary font-label-md text-xs font-bold
+               hover:bg-primary-container transition-colors shadow-sm
+               disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Appliquer
+      </button>
+    </div>
+  </div>
+  }
+
+</div>
