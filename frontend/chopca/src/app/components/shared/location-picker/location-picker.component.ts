@@ -10,6 +10,8 @@ import {
   NgZone,
   AfterViewInit,
   OnInit,
+  HostListener,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,29 +46,18 @@ export interface PickerPoint {
 /**
  * The map + city + radius picker.
  *
- * Owns:
- *  - the city dropdown
- *  - the Google map with the draggable picker marker
- *  - the radius slider
- *  - the location search that powers the live count
+ * Emits:
+ *  - cityChange       — when the user picks a city
+ *  - pointChange      — when the user places or moves the picker marker
+ *  - locationsChange  — when the search settles with a new result set
  *
- * The Google Maps JS API is injected once by the app initializer
- * (or, as a fallback, by `mapsPreloadGuard`). This component never
- * injects anything — it only reads `GoogleMapsLoaderService.state`.
+ * Detail card: clicking a Chop ça pin opens a card anchored to the
+ * click's browser pixel coordinates. The card does not track the pin
+ * on pan/zoom — it closes on any click outside itself.
  *
- * The <google-map> element is always in the DOM. When the API hasn't
- * loaded, the map slot is rendered at full size with `opacity-0` and
- * an overlay covers it. This keeps `@ViewChild(GoogleMap)` stable
- * and lets Google Maps measure a real container.
- *
- * ## City seeding
- *
- * The initial city is seeded **once** in `ngOnInit`, when the city
- * list resolves. This is deliberately *not* done in an `effect()`,
- * because an effect that both reads `draftCity` and writes to it
- * would re-run whenever the user changed the selection and would
- * overwrite their choice with the initial value. That was the exact
- * bug behind "the select shows Yaoundé but the payload sends Douala".
+ * The Google Maps JS API is injected once by the app initializer.
+ * This component never injects anything — it only reads
+ * `GoogleMapsLoaderService.state`.
  */
 @Component({
   selector: 'app-location-picker',
@@ -91,8 +82,6 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   readonly initialCity = input<City | null>(null);
   readonly initialPoint = input<{ latitude: number; longitude: number } | null>(null);
   readonly initialRadiusKm = input<number>(RADIUS_DEFAULT);
-
-  /** Locations from a previous selection — shown on the count. */
   readonly initialLocations = input<LocationSummary[]>([]);
 
   // ─── Outputs ─────────────────────────────────────────────────
@@ -100,8 +89,16 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   readonly pointChange = output<PickerPoint | null>();
   readonly locationsChange = output<LocationSummary[]>();
 
-  // ─── Maps loader state — read-only, exposed to the template ──
+  // ─── Maps loader state ───────────────────────────────────────
   protected readonly mapsState = this.mapsLoader.state;
+
+  /**
+   * Latches to `true` the first time the loader reports `loaded`.
+   * Gates the `<google-map>` element so it is created once, never
+   * destroyed, and never constructed before the API exists.
+   */
+  private readonly _apiLatched = signal<boolean>(false);
+  protected readonly apiLatched = this._apiLatched.asReadonly();
 
   // ─── Public UI state ─────────────────────────────────────────
   protected readonly radiusMin = RADIUS_MIN;
@@ -115,6 +112,16 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   protected readonly results = signal<LocationSummary[]>([]);
   protected readonly isSearching = signal<boolean>(false);
 
+  /** The location currently shown in the detail card. */
+  protected readonly selectedLocation = signal<LocationSummary | null>(null);
+
+  /**
+   * The browser-pixel position of the detail card, taken from the
+   * click's `clientX`/`clientY`. The card uses `position: fixed`, so
+   * these coordinates map directly to its `left`/`top` styles.
+   */
+  protected readonly cardPosition = signal<{ x: number; y: number } | null>(null);
+
   protected readonly mapCenter = signal<google.maps.LatLngLiteral>({
     lat: 3.8480, lng: 11.5021,
   });
@@ -123,7 +130,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   protected readonly circleCenter = signal<google.maps.LatLngLiteral | null>(null);
   protected readonly circleRadiusMeters = signal<number>(RADIUS_DEFAULT * 1000);
 
-  // ─── Maps options — plain objects, safe to declare at field init ───
+  // ─── Maps options — plain objects, safe at field-init time ───
   protected readonly mapOptions: google.maps.MapOptions = {
     mapTypeControl: false,
     streetViewControl: false,
@@ -144,6 +151,16 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
     strokeWeight: 2,
   };
 
+  /**
+   * Chop ça pin icon. Plain object with structural Size/Point shapes
+   * so nothing touches `google.maps.*` at field-init time.
+   */
+  protected readonly resultPinIcon = {
+    url: '/assets/icons/chopca-pin.svg',
+    scaledSize: { width: 28, height: 60 } as google.maps.Size,
+    anchor: { x: 14, y: 60 } as google.maps.Point,
+  };
+
   // ─── Internals ───────────────────────────────────────────────
   private searchHandle: ReturnType<typeof setTimeout> | null = null;
   private searchToken = 0;
@@ -154,6 +171,13 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   // ═════════════════════════════════════════════════════════════
 
   constructor() {
+    // Latch the API-ready flag the first time the loader succeeds.
+    effect(() => {
+      if (this.mapsState() === 'loaded' && !this._apiLatched()) {
+        this._apiLatched.set(true);
+      }
+    });
+
     this.destroyRef.onDestroy(() => {
       if (this.searchHandle) clearTimeout(this.searchHandle);
     });
@@ -165,15 +189,13 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: (cities: City[]) => {
           this.cities.set(cities);
-          this.seedInitialCity(cities);
+          this.seedInitialState(cities);
         },
         error: (err) => console.error('[LocationPicker] cities error', err),
       });
   }
 
   ngAfterViewInit(): void {
-    // Restore the initial point and radius. The map options are plain
-    // objects set at field init, so nothing to build here.
     const p = this.initialPoint();
     if (p) {
       const literal = { lat: p.latitude, lng: p.longitude };
@@ -193,9 +215,6 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
       this.results.set(seededLocations);
     }
 
-    // If the city was seeded synchronously (fast network), run the
-    // initial search now. If seeding hasn't happened yet, the
-    // `seedInitialCity` callback will trigger it when cities arrive.
     if (this.seeded && this.mapsState() === 'loaded'
         && this.draftCity() && this.results().length === 0) {
       this.scheduleSearch({ cityOnly: !this.draftPoint() });
@@ -203,36 +222,19 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   }
 
   // ═════════════════════════════════════════════════════════════
-  //  City seeding — runs at most once per picker instance
+  //  Initial state seeding
   // ═════════════════════════════════════════════════════════════
 
-  /**
-   * Applies the initial city (if provided) exactly once, and pans the
-   * map / triggers the initial search.
-   *
-   * The `seeded` flag makes this idempotent. Nothing else in the
-   * component writes to `draftCity` except `onCityChangeById` (user
-   * input), so once seeded, the user's choice is the single source of
-   * truth for the rest of the picker's lifetime.
-   */
-  private seedInitialCity(cities: City[]): void {
+  private seedInitialState(cities: City[]): void {
     if (this.seeded) return;
+    this.seeded = true;
 
     const initial = this.initialCity();
-    if (!initial) {
-      // No initial city — nothing to seed. But mark as seeded so a
-      // future re-entry (defensive) doesn't try to run again.
-      this.seeded = true;
-      return;
-    }
+    if (!initial) return;
 
     const match = cities.find((c) => c.id === initial.id);
-    if (!match) {
-      this.seeded = true;
-      return;
-    }
+    if (!match) return;
 
-    this.seeded = true;
     this.draftCity.set(match);
 
     const p = this.draftPoint();
@@ -243,8 +245,6 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
     this.mapCenter.set(target.center);
     this.mapZoom.set(target.zoom);
 
-    // Pan once the map is rendered. On first open it might not exist
-    // yet — the microtask deferral covers that.
     queueMicrotask(() => {
       const gmap = this.map?.googleMap;
       if (gmap) {
@@ -255,7 +255,6 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // Trigger the initial search once the map is available.
     if (this.mapsState() === 'loaded' && this.initialLocations().length === 0) {
       this.scheduleSearch({ cityOnly: !this.draftPoint() });
     }
@@ -266,6 +265,9 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   // ═════════════════════════════════════════════════════════════
 
   protected onCityChangeById(id: string): void {
+    // City changes close the detail card.
+    this.clearSelectedLocation();
+
     const city = this.cities().find((c) => c.id === id) ?? null;
     this.draftCity.set(city);
     this.cityChange.emit(city);
@@ -302,6 +304,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
 
   protected onMapClick(event: google.maps.MapMouseEvent): void {
     if (!event.latLng) return;
+    this.clearSelectedLocation();
     this.applyPoint({ lat: event.latLng.lat(), lng: event.latLng.lng() });
   }
 
@@ -337,6 +340,64 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
       longitude: p.lng,
       radiusKm: this.draftRadiusKm(),
     });
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  //  Detail card
+  // ═════════════════════════════════════════════════════════════
+
+  /**
+   * Opens the detail card at the click's browser pixel coordinates.
+   *
+   * The map event carries the original DOM event in `.domEvent`, so
+   * `clientX`/`clientY` are the actual screen coordinates of the
+   * click. Since the card uses `position: fixed`, those coordinates
+   * map directly to its `left`/`top`.
+   *
+   * The card does not track the pin on pan/zoom — it closes on any
+   * click outside itself (see `onDocumentClick`).
+   */
+  protected onPinClick(loc: LocationSummary, event: google.maps.MapMouseEvent): void {
+    const domEvent = event.domEvent as MouseEvent | undefined;
+    if (!domEvent) return;
+
+    this.selectedLocation.set(loc);
+    this.cardPosition.set({
+      x: domEvent.clientX,
+      y: domEvent.clientY,
+    });
+  }
+
+  protected clearSelectedLocation(): void {
+    this.selectedLocation.set(null);
+    this.cardPosition.set(null);
+  }
+
+  /**
+   * Any document click that isn't inside the card, the map, or
+   * Google's own map chrome closes the card.
+   *
+   * The three exclusions handle:
+   *  - `.picker-detail-card` → the card itself (its × closes it,
+   *    and it calls stopPropagation on other clicks).
+   *  - `google-map` → the `<google-map>` element, which contains
+   *    the canvas, markers, and controls. Clicks there have their
+   *    own handlers (`onMapClick`, `onPinClick`).
+   *  - `.gm-style` → Google's injected root class, covering marker
+   *    and control DOM that may be rendered outside `<google-map>`.
+   */
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    if (!this.selectedLocation()) return;
+
+    const target = event.target as HTMLElement;
+    if (!target) return;
+
+    if (target.closest('.picker-detail-card')) return;
+    if (target.closest('google-map')) return;
+    if (target.closest('.gm-style')) return;
+
+    this.clearSelectedLocation();
   }
 
   // ═════════════════════════════════════════════════════════════

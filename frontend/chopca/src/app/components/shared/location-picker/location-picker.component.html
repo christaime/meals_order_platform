@@ -23,11 +23,12 @@
   </label>
 
   <!-- ═══════════════════════════════════════════════════════════
-       Map slot — the <google-map> element is ALWAYS in the DOM.
+       Map slot — the <google-map> is latched (created once).
+       Overlays are gated on mapsState() === 'loaded'.
        ═══════════════════════════════════════════════════════════ -->
-  <div class="relative h-[260px]">
+  <div class="relative h-[260px] overflow-hidden rounded-xl">
 
-    <!-- The map — always rendered, faded until loaded -->
+    @if (apiLatched()) {
     <div
       class="rounded-xl overflow-hidden border border-outline-variant/40
              h-full w-full transition-opacity duration-200"
@@ -42,6 +43,9 @@
         [options]="mapOptions"
         (mapClick)="onMapClick($event)"
       >
+        @if (mapsState() === 'loaded') {
+
+        <!-- Coverage circle -->
         @if (circleCenter(); as center) {
         <map-circle
           [center]="center"
@@ -50,6 +54,19 @@
         />
         }
 
+        <!-- Found distribution locations — Chop ça pins -->
+        @for (loc of results(); track loc.id) {
+        @if (loc.latitude != null && loc.longitude != null) {
+        <map-marker
+          [position]="{ lat: loc.latitude, lng: loc.longitude }"
+          [title]="loc.name ?? ''"
+          [icon]="resultPinIcon"
+          (mapClick)="onPinClick(loc, $event)"
+        />
+        }
+        }
+
+        <!-- Draggable picker marker — on top, default Google pin -->
         @if (markerPosition(); as pos) {
         <map-marker
           [position]="pos"
@@ -57,8 +74,49 @@
           (mapDragend)="onMarkerDragEnd($event)"
         />
         }
+
+        }
       </google-map>
     </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════════
+         Detail card — plain DOM element, absolutely positioned over
+         the map at the pixel coordinate of the selected pin.
+         ═══════════════════════════════════════════════════════════ -->
+    @if (selectedLocation(); as loc) {
+    @if (cardPosition(); as pos) {
+    <div
+      class="picker-detail-card"
+      [style.left.px]="pos.x"
+      [style.top.px]="pos.y"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="picker-detail-card__close"
+        (click)="clearSelectedLocation()"
+        aria-label="Fermer"
+      >
+        <app-icon name="close" size="sm" />
+      </button>
+
+      <div class="picker-detail-card__name">{{ loc.name }}</div>
+
+      @if (loc.vendorBusinessName) {
+      <div class="picker-detail-card__vendor">{{ loc.vendorBusinessName }}</div>
+      }
+
+      @if (loc.address) {
+      <div class="picker-detail-card__address">{{ loc.address }}</div>
+      }
+
+      @if (loc.city?.name) {
+      <div class="picker-detail-card__city">{{ loc.city!.name }}</div>
+      }
+    </div>
+    }
+    }
 
     <!-- Overlay — placeholder or warning, based on the loader state -->
     @if (mapsState() !== 'loaded') {
@@ -93,6 +151,7 @@
        ═══════════════════════════════════════════════════════════ -->
   <p class="font-label-sm text-[11px] text-on-surface-variant -mt-2">
     Cliquez sur la carte ou déplacez le repère rouge pour définir votre point de repère.
+    Les points de retrait disponibles s'affichent avec l'épingle Chop ça.
   </p>
 
   <!-- ═══════════════════════════════════════════════════════════
