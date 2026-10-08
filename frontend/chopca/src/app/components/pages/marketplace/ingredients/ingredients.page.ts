@@ -22,7 +22,7 @@ import {
 } from '@app/core/models/marketplace';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
 import { ModerationDataResponse } from '@app/core/models/marketplace/moderation.model';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { DataPage } from '@app/core/models/shared';
 import {
   IngredientSort, AllergenFilter,
@@ -52,7 +52,7 @@ export class IngredientsPageComponent {
   private readonly ingredientService = inject(INGREDIENT_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);
-  private readonly roleContext = inject(RoleContext);
+  private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
 
   // Filters

@@ -9,7 +9,7 @@ import {
 } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
 import { LocationService } from './location.service';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { environment } from '@environments/environment';
 import { WorkspaceService } from './workspace.service';
 /**
@@ -23,7 +23,7 @@ import { WorkspaceService } from './workspace.service';
 export class LocationApiService implements LocationService {
 
   private http = inject(HttpClient);
-  private readonly roleContext = inject(RoleContext);
+  private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly workspace = inject(WorkspaceService);
 
   private readonly publicUrl = `${environment.apiUrl}/public/locations`;

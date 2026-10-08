@@ -1,10 +1,9 @@
 import {
   DestroyRef, Injectable, NgZone, effect, inject, signal,
 } from '@angular/core';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
-import { AppSessionStore, RETURN_URL_KEY } from '@app/core/storage/app.store';
-import Keycloak from 'keycloak-js';
+import { AppSessionStore, RETURN_URL_KEY, IDP_HINT_KEY } from '@app/core/storage/app.store';
 import { SESSION_CHANNEL, SessionMessage } from './session-messages';
+import { KEYCLOAK_SERVICE } from '../auth/keycloak.service';
 
 const LEADER_HEARTBEAT_MS     = 5_000;
 const LEADER_TIMEOUT_MS       = 12_000;   // if no heartbeat in 12s, leader is dead
@@ -15,10 +14,9 @@ const REVALIDATE_COOLDOWN_MS  = 1_000;    // debounce visibility+focus bursts
 @Injectable({ providedIn: 'root' })
 export class SessionManager {
 
-  private readonly keycloak = inject(Keycloak);
+  private readonly keycloakUser = inject(KEYCLOAK_SERVICE);
   private readonly zone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly roles = inject(RoleContext);
 
   /** Unique per tab (not per service instance). */
   private readonly tabId = crypto.randomUUID();
@@ -47,19 +45,23 @@ export class SessionManager {
 
   constructor() {
     // Start/stop the session machinery based on auth state.
-    // RoleContext already listens to Keycloak callbacks, so we don't
-    // touch them here (avoids callback clobbering).
     effect(() => {
-      if (this.roles.isAuthenticated()) this.start();
+      if (this.keycloakUser.hasAnyRole()) this.start();
       else this.stop();
     }, { allowSignalWrites: true });
+
+    // Shutdown on logout request, before keycloak.logout() runs.
+    effect(() => {
+      const n = this.keycloakUser.logoutRequested();
+      if (n > 0) this.shutdown();
+    });
 
     this.destroyRef.onDestroy(() => this.stop());
   }
 
   /** Whether a session currently exists. Cheap; no network. */
   hasSession(): boolean {
-    return this.keycloak.authenticated;
+    return this.keycloakUser.isAuthenticated();
   }
 
   private start(): void {
@@ -115,19 +117,19 @@ export class SessionManager {
    * (safety net — leader might be dead and we haven't noticed yet).
    */
   async getFreshToken(): Promise<string> {
-    if (this.keycloak.token && !this.isExpiring(this.keycloak.token, REFRESH_THRESHOLD_S)) {
-      return this.keycloak.token;
+    if (this.keycloakUser.getToken() && !this.isExpiring(this.keycloakUser.getToken() as string, REFRESH_THRESHOLD_S)) {
+      return this.keycloakUser.getToken() ?? '' ;
     }
     if (this._isLeader()) {
       await this.refreshNow();
-      return this.keycloak.token ?? '';
+      return this.keycloakUser.getToken() ?? '';
     }
     const fromLeader = await this.requestTokenFromLeader();
     if (fromLeader) return fromLeader;
     // Fallback: leader didn't answer — refresh locally and try to become leader.
     await this.refreshNow();
     this.attemptLeadership();
-    return this.keycloak.token ?? '';
+    return this.keycloakUser.getToken() ?? '';
   }
 
   /**
@@ -139,20 +141,20 @@ export class SessionManager {
    * signal the interceptor needs to redirect to login.
    */
   async forceRefresh(): Promise<string> {
-    if (!this.keycloak.authenticated) {
+    if (!this.keycloakUser.isAuthenticated()) {
       throw new Error('No authenticated session');
     }
-    await this.keycloak.updateToken(0);
-    const token = this.keycloak.token;
+    await this.keycloakUser.updateToken(0);
+    const token = this.keycloakUser.getToken();
     if (!token) throw new Error('No token after forced refresh');
     return token;
   }
 
   /** Force a token refresh. Safe to call from anywhere. */
   async refreshNow(): Promise<void> {
-    if (!this.keycloak.authenticated) return;
+    if (!this.keycloakUser.isAuthenticated()) return;
     try {
-      const refreshed = await this.keycloak.updateToken(REFRESH_THRESHOLD_S);
+      const refreshed = await this.keycloakUser.updateToken(REFRESH_THRESHOLD_S);
       if (refreshed && this._isLeader()) {
         this.broadcastToken();
       }
@@ -174,14 +176,14 @@ export class SessionManager {
    * we don't want two concurrent `updateToken` calls.
    */
   private async revalidate(): Promise<void> {
-    if (!this.keycloak.authenticated) return;
+    if (!this.keycloakUser.isAuthenticated()) return;
 
     const now = Date.now();
     if (now - this.lastRevalidate < REVALIDATE_COOLDOWN_MS) return;
     this.lastRevalidate = now;
 
     try {
-      const refreshed = await this.keycloak.updateToken(REFRESH_THRESHOLD_S);
+      const refreshed = await this.keycloakUser.updateToken(REFRESH_THRESHOLD_S);
       if (refreshed && this._isLeader()) {
         this.broadcastToken();
       }
@@ -253,7 +255,7 @@ export class SessionManager {
   }
 
   private broadcastToken(): void {
-    const token = this.keycloak.token;
+    const token = this.keycloakUser.getToken();
     if (!token) return;
     this.broadcast({ type: 'TOKEN_REFRESHED', tabId: this.tabId, accessToken: token, at: Date.now() });
   }
@@ -299,14 +301,14 @@ export class SessionManager {
       case 'TOKEN_REFRESHED':
         this.lastLeaderHeartbeat = msg.at;
         // Adopt the fresh token so this tab's keycloak instance stays in sync.
-        // keycloak-js exposes a way to update its internal token; if not,
+        // keycloakUser exposes a way to update its internal token; if not,
         // we rely on the fact that all tabs share the same refresh token,
         // so our own updateToken will still work.
         break;
 
       case 'REQUEST_TOKEN':
         if (this._isLeader()) {
-          const token = this.keycloak.token;
+          const token = this.keycloakUser.getToken();
           if (token) {
             this.broadcast({ type: 'HERE_IS_TOKEN', tabId: this.tabId, accessToken: token, at: Date.now() });
           }
@@ -319,7 +321,7 @@ export class SessionManager {
 
       case 'LOGOUT':
         // Another tab logged out — log out here too.
-        this.keycloak.logout({ redirectUri: window.location.origin });
+        this.keycloakUser.logout();
         break;
     }
   }
@@ -337,10 +339,9 @@ export class SessionManager {
   private async loginAgain(): Promise<void> {
     const returnUrl = window.location.pathname + window.location.search;
     AppSessionStore.set(RETURN_URL_KEY, returnUrl);
+    const idpHint = AppSessionStore.consume(IDP_HINT_KEY) as (string | undefined);
 
-    await this.keycloak.login({
-      redirectUri: window.location.origin + '/auth/callback',
-    });
+    await this.keycloakUser.login(idpHint);
   }
 
   private isExpiring(token: string, withinSeconds: number): boolean {

@@ -29,7 +29,7 @@ import {
 
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
 import { UserContextService } from '@app/core/services/auth/user-context.service';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
 import { ModerationDataResponse } from '@app/core/models/marketplace/moderation.model';
@@ -71,7 +71,7 @@ export class MealsPageComponent {
   private readonly router = inject(Router);
   private readonly mealService = inject(MEAL_SERVICE);
   private readonly userContext = inject(UserContextService);
-  private readonly roleContext = inject(RoleContext);
+  private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);

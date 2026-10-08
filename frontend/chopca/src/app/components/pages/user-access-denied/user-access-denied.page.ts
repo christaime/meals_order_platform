@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { IconComponent } from '@components/shared/icon/icon.component';
-import { KeycloakService } from '@app/core/services/auth/keycloak.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 
 type DeniedRole = 'ADMIN' | 'VENDOR' | 'CUSTOMER';
 type DeniedReason = 'role-missing' | 'context-missing';
@@ -18,7 +18,7 @@ type DeniedReason = 'role-missing' | 'context-missing';
 export class UserAccessDeniedPage {
   private readonly route    = inject(ActivatedRoute);
   private readonly router   = inject(Router);
-  private readonly keycloak = inject(KeycloakService);
+  private readonly keycloak = inject(KEYCLOAK_SERVICE);
 
   /** Live view of the query params. */
   private readonly queryParams = toSignal(

@@ -1,9 +1,9 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { NEVER, catchError, from, switchMap, throwError } from 'rxjs';
-import Keycloak from 'keycloak-js';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { SessionManager } from '@app/core/services/session/session-manager.service';
-import { AppSessionStore, RETURN_URL_KEY } from '@app/core/storage/app.store';
+import { AppSessionStore, RETURN_URL_KEY, IDP_HINT_KEY } from '@app/core/storage/app.store';
 import { environment } from '@environments/environment';
 
 /**
@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const session = inject(SessionManager);
-  const keycloak = inject(Keycloak);
+  const keycloak = inject(KEYCLOAK_SERVICE);
 
   return from(session.getFreshToken()).pipe(
     switchMap(token => {
@@ -53,9 +53,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
           // Fire the redirect. NEVER prevents a spurious error reaching
           // the caller while the browser navigates away.
-          void keycloak.login({
-            redirectUri: window.location.origin + '/auth/callback',
-          });
+          const idpHint = AppSessionStore.consume(IDP_HINT_KEY) as (string | undefined);
+          void keycloak.login(idpHint);
           return NEVER;
         }),
       );

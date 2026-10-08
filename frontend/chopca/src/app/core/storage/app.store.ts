@@ -1,5 +1,6 @@
-export type StoreKey = 'return_url';
+export type StoreKey = 'return_url' | 'idpHint';
 export const RETURN_URL_KEY = 'return_url';
+export const IDP_HINT_KEY = 'idpHint';
 
 /**
  * Session-scoped key-value store.

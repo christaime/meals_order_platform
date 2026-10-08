@@ -5,9 +5,9 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import Keycloak from 'keycloak-js';
-import { UserContextService } from '@app/core/services/auth/user-context.service';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { UserContextService } from '@core/services/auth/user-context.service';
+import { KEYCLOAK_SERVICE ,AppRole, APP_ROLES, ADMIN_ROLE, VENDOR_ROLE, CUSTOMER_ROLE } from '@core/services/auth/keycloak.service';
+
 
 const AUTHENTICATED_PREFIXES = ['/registration', '/admin', '/vendor', '/customer'] as const;
 const ADMIN_PREFIXES         = ['/admin'] as const;
@@ -16,6 +16,7 @@ const CUSTOMER_PREFIXES      = ['/customer'] as const;
 const VENDOR_REG_PREFIXES    = ['/registration/vendor'] as const;
 const CUSTOMER_REG_PREFIXES  = ['/registration/customer'] as const;
 
+const LOGIN_ROUTE = '/auth/login';
 const VENDOR_REGISTRATION   = '/registration/vendor';
 const CUSTOMER_REGISTRATION = '/registration/customer';
 
@@ -47,9 +48,8 @@ export const appGuard: CanActivateFn = async (
   _route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot,
 ) => {
-  const keycloak = inject(Keycloak);
+  const keycloakUser = inject(KEYCLOAK_SERVICE);
   const router   = inject(Router);
-  const roles    = inject(RoleContext);
   const ctx      = inject(UserContextService);
 
   const url = state.url;
@@ -58,16 +58,16 @@ export const appGuard: CanActivateFn = async (
   if (!matches(url, AUTHENTICATED_PREFIXES)) return true;
 
   // ─── 2. Auth required ─────────────────────────────────────
-  if (!keycloak.authenticated) {
-    return router.createUrlTree(['/auth/login'], {
+  if (!keycloakUser.isAuthenticated) {
+    return router.createUrlTree([LOGIN_ROUTE], {
       queryParams: { returnUrl: url },
     });
   }
 
   // ─── 3. /admin/* ──────────────────────────────────────────
   if (matches(url, ADMIN_PREFIXES)) {
-    if (!roles.isAdmin()) {
-      return accessDenied(router, 'role-missing', 'ADMIN', url);
+    if (!keycloakUser.isAdmin()) {
+      return accessDenied(router, 'role-missing', ADMIN_ROLE, url);
     }
     return true;
   }
@@ -91,11 +91,11 @@ export const appGuard: CanActivateFn = async (
       return router.parseUrl(CUSTOMER_REGISTRATION);
     }
 
-    if (needsVendor && !roles.isVendor()) {
-      return accessDenied(router, 'role-missing', 'VENDOR', url);
+    if (needsVendor && !keycloakUser.isVendor()) {
+      return accessDenied(router, 'role-missing', VENDOR_ROLE, url);
     }
-    if (needsCustomer && !roles.isCustomer()) {
-      return accessDenied(router, 'role-missing', 'CUSTOMER', url);
+    if (needsCustomer && !keycloakUser.isCustomer()) {
+      return accessDenied(router, 'role-missing', CUSTOMER_ROLE, url);
     }
   }
 

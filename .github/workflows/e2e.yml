@@ -1,0 +1,68 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:        # allow manual trigger from the Actions tab
+
+jobs:
+  e2e:
+    name: Cypress E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/chopca/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend/chopca
+        run: npm ci
+
+      - name: Run Cypress E2E tests
+        id: cypress
+        working-directory: frontend/chopca
+        run: npm run e2e
+        continue-on-error: true
+
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/chopca/cypress/screenshots
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: frontend/chopca/cypress/videos
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload Cypress report artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-report
+          path: |
+            frontend/chopca/cypress/reports
+            frontend/chopca/cypress/results
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Mark the job as failed if Cypress failed
+        if: steps.cypress.outcome == 'failure'
+        run: exit 1

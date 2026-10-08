@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserContextService } from '../../core/services/auth';
-import { RoleContext } from '../../core/services/auth/role-context.service';
 import { AppSessionStore, RETURN_URL_KEY } from '../../core/storage/app.store';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 
 @Component({
   standalone: true,
@@ -10,12 +10,12 @@ import { AppSessionStore, RETURN_URL_KEY } from '../../core/storage/app.store';
 })
 export class CallbackComponent implements OnInit {
   private readonly ctx    = inject(UserContextService);
-  private readonly roles  = inject(RoleContext);
+  private readonly keycloakUserRoles  = inject(KEYCLOAK_SERVICE);
   private readonly router = inject(Router);
 
   async ngOnInit(): Promise<void> {
     // Refresh session state from the new token.
-    this.roles.reload();
+    this.keycloakUserRoles.reload();
     await this.ctx.reload().catch(() => null);
 
     // Consume the returnUrl (reads and clears it).

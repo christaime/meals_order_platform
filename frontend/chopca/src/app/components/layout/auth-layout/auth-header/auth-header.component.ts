@@ -12,10 +12,9 @@ import { LogoComponent } from '@components/shared/logo/logo.component';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
 import { WorkspaceService } from '@app/core/services/marketplace/workspace.service';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
 import { UserContextService } from '@app/core/services/auth/user-context.service';
 import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.models';
-import { KeycloakService } from '@app/core/services/auth'
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 
 /**
  * Application header — used by authenticated areas.
@@ -48,9 +47,8 @@ import { KeycloakService } from '@app/core/services/auth'
 export class AuthHeaderComponent {
 
   private readonly workspaceService = inject(WorkspaceService);
-  private readonly roleContext = inject(RoleContext);
   private readonly userContext = inject(UserContextService);
-  private readonly keycloakService = inject(KeycloakService);
+  private readonly keycloakService = inject(KEYCLOAK_SERVICE);
 
   // ─── Workspace (menu + badge) ─────────────────────────────
   readonly workspace = this.workspaceService.workspace;
@@ -59,9 +57,9 @@ export class AuthHeaderComponent {
   readonly isCustomerWorkspace = this.workspaceService.isCustomerWorkspace;
 
   // ─── Roles (profile dropdown links) ───────────────────────
-  readonly isVendor = this.roleContext.isVendor;
-  readonly isAdmin = this.roleContext.isAdmin;
-  readonly isCustomer = this.roleContext.isCustomer;
+  readonly isVendor = this.keycloakService.isVendor;
+  readonly isAdmin = this.keycloakService.isAdmin;
+  readonly isCustomer = this.keycloakService.isCustomer;
 
   // ─── UI state ─────────────────────────────────────────────
   readonly languageOpen = signal<boolean>(false);

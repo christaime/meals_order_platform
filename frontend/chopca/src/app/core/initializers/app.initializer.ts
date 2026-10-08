@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { UserContextService } from '@app/core/services/auth/user-context.service';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
-import { KeycloakService } from '@app/core/services/auth/keycloak.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { GoogleMapsLoaderService } from '@core/services/google-maps-loader.service';
 
 /**
@@ -21,18 +20,17 @@ import { GoogleMapsLoaderService } from '@core/services/google-maps-loader.servi
  */
 export function initializeApp(): () => Promise<void> {
   const ctx = inject(UserContextService);
-  const roles = inject(RoleContext);
-  const keycloak = inject(KeycloakService);
+  const keycloakUser = inject(KEYCLOAK_SERVICE);
   const mapsLoader = inject(GoogleMapsLoaderService);
 
   return async () => {
-    roles.reload();
+    keycloakUser.reload();
 
     // Fire the load once and record the outcome in the loader's state.
     // Not awaited — the app should render while the script downloads.
     void mapsLoader.load();
 
-    if (!keycloak.isAuthenticated()) return;
+    if (!keycloakUser.isAuthenticated()) return;
 
     try {
       await ctx.ensureLoaded();

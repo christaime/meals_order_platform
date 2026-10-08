@@ -37,7 +37,7 @@ import {
   MediaRef,
   MediaUploadResponse,
 } from '@app/core/models/marketplace';
-import { KeycloakService } from '@core/services/auth/keycloak.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { UserContextService } from '@core/services/auth/user-context.service';
 import { AppSessionStore, RETURN_URL_KEY } from '@core/storage/app.store';
 
@@ -93,7 +93,7 @@ export class VendorRegistrationPage {
 
   private readonly fb = inject(FormBuilder);
   private readonly vendorService = inject(VENDOR_SERVICE);
-  private readonly keycloak = inject(KeycloakService);
+  private readonly keycloak = inject(KEYCLOAK_SERVICE);
   private readonly ctx = inject(UserContextService);
   private readonly router = inject(Router);
 

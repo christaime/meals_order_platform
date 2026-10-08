@@ -59,7 +59,7 @@
         @if (loc.latitude != null && loc.longitude != null) {
         <map-marker
           [position]="{ lat: loc.latitude, lng: loc.longitude }"
-          [title]="loc.name ?? ''"
+          [title]="loc.name"
           [icon]="resultPinIcon"
           (mapClick)="onPinClick(loc, $event)"
         />

@@ -52,25 +52,24 @@ export const appConfig: ApplicationConfig = {
         languageInterceptor,
       ]),
     ),
-
-    provideKeycloak({
-      config: {
-        url: environment.keycloak.url,
-        realm: environment.keycloak.realm,
-        clientId: environment.keycloak.clientId,
-      },
-      initOptions: {
-        // `check-sso` = silent SSO check, no redirect. Anonymous users
-        // continue straight into the catalog without touching Keycloak's
-        // login page.
-        onLoad: 'check-sso',
-        silentCheckSsoRedirectUri:
-          window.location.origin + '/silent-check-sso.html',
-        checkLoginIframe: false,
-        pkceMethod: 'S256',
-      },
-    }),
-
+    ...(environment.useMockServices ? []: [provideKeycloak({
+            config: {
+              url: environment.keycloak.url,
+              realm: environment.keycloak.realm,
+              clientId: environment.keycloak.clientId,
+            },
+            initOptions: {
+              // `check-sso` = silent SSO check, no redirect. Anonymous users
+              // continue straight into the catalog without touching Keycloak's
+              // login page.
+              onLoad: 'check-sso',
+              silentCheckSsoRedirectUri:
+                window.location.origin + '/silent-check-sso.html',
+              checkLoginIframe: false,
+              pkceMethod: 'S256',
+            },
+      })]
+    ),
     // ─── Boot sequence ───────────────────────────────────────
     //
     // Runs AFTER keycloak-angular's own APP_INITIALIZER (registration order).

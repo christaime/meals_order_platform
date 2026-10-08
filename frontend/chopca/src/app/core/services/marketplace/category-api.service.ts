@@ -9,7 +9,7 @@ import {
 import { DataPage } from '@app/core/models/shared';
 import { CategoryService } from './category.service';
 import { environment } from '@environments/environment';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { WorkspaceService } from './workspace.service';
 /**
  * Real implementation of CategoryService.
@@ -20,7 +20,7 @@ export class CategoryApiService implements CategoryService {
 
   private http = inject(HttpClient);
 
-  private readonly roleContext = inject(RoleContext);
+  private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly workspace = inject(WorkspaceService);
 
   /** Public read endpoints (no auth). */

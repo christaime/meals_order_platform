@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { IconComponent } from '@components/shared/icon/icon.component';
 import { DataPage } from '@app/core/models/shared';
 
 @Component({
   selector: 'app-paginator',
   standalone: true,
-  imports: [IconComponent],
+  imports: [],
   templateUrl: './paginator.component.html',
   styleUrl: './paginator.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

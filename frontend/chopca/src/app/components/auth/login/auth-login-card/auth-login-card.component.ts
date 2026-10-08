@@ -5,7 +5,7 @@ import {
   SocialLoginButtonsComponent,
   SocialProvider,
 } from '@components/shared';
-import { KeycloakService } from '@core/services/auth/keycloak.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 
 @Component({
   selector: 'app-auth-login-card',
@@ -17,7 +17,7 @@ import { KeycloakService } from '@core/services/auth/keycloak.service';
 })
 export class AuthLoginCardComponent {
 
-  private readonly keycloak = inject(KeycloakService);
+  private readonly keycloak = inject(KEYCLOAK_SERVICE);
 
   readonly loading = signal(false);
 

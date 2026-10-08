@@ -20,7 +20,7 @@ import {
 } from '@app/core/models/marketplace';
 import { CategoryType, ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
 import { DataPage } from '@app/core/models/shared';
-import { RoleContext } from '@app/core/services/auth/role-context.service';
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { ModerationPanelComponent } from '@components/marketplace/moderation';
 import { ModerationDataResponse } from '@app/core/models/marketplace/moderation.model';
 import {
@@ -48,6 +48,7 @@ export class CategoriesPageComponent {
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly roleContext = inject(KEYCLOAK_SERVICE);
 
   // ─── Filter state ──────────────────────────────────────────
   protected readonly name = signal<string>('');
@@ -76,8 +77,6 @@ export class CategoriesPageComponent {
       ...(this.status() !== 'ALL' ? { status: this.status() as ModerationStatus } : {}),
       ...(this.sort() ? { sort: this.sort() } : {}),
     } as CategorySearchRequest));
-
-  private readonly roleContext = inject(RoleContext);
 
   /** Panel renders only when a category is selected AND the user is ADMIN. */
   protected readonly moderableCategory = computed(() =>

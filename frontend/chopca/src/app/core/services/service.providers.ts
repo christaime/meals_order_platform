@@ -2,6 +2,9 @@ import { Provider } from '@angular/core';
 import { environment } from '@environments/environment';
 
 // ─── Production contracts ─────────────────────────────────────
+import { KEYCLOAK_SERVICE } from './auth/keycloak.service';
+import { KeycloakApiService } from './auth/keycloak-api.service';
+
 import { MEAL_SERVICE } from './marketplace/meal.service';
 import { MealApiService } from './marketplace/meal-api.service';
 
@@ -33,6 +36,7 @@ import { MEDIA_SERVICE } from './marketplace/media.service';
 import { MediaApiService } from './marketplace/media-api.service';
 
 // ─── Mock implementations (isolated in /mock) ─────────────────
+import { KeycloakMockService } from '@app/mock/services/keycloak-mock.service';
 import { MealMockService } from '@app/mock/services/meal-mock.service';
 import { CategoryMockService } from '@app/mock/services/category-mock.service';
 import { IngredientMockService } from '@app/mock/services/ingredient-mock.service';
@@ -56,6 +60,10 @@ import { MediaMockService } from '@app/mock/services/media-mock.service';
  * 3. That's it — no component changes.
  */
 export const SERVICE_PROVIDERS: Provider[] = [
+  {
+    provide: KEYCLOAK_SERVICE,
+    useClass: environment.useMockServices ? KeycloakMockService : KeycloakApiService,
+  },
   {
     provide: MEAL_SERVICE,
     useClass: environment.useMockServices ? MealMockService : MealApiService,
