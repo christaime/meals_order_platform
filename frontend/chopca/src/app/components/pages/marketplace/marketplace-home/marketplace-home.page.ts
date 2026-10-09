@@ -50,7 +50,7 @@ export class MarketplaceHomePageComponent implements OnInit {
   readonly meals = signal<MealSummary[] | null>(null);
   readonly isLoading = signal<boolean>(true);
   readonly totalMeals = signal<number>(0);
-  readonly pageSize = signal<number>(12);
+  readonly pageSize = signal<number>(8);
 
   // ─── Cart state (temporary — to be replaced by CartService) ───
   readonly cartItemCount = signal<number>(0);

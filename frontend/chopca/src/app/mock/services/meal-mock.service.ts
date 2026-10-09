@@ -14,7 +14,13 @@ import mealsData from '@app/mock/data/meals.json';
 @Injectable()
 export class MealMockService implements MealService {
 
-  private meals: Meal[] = mealsData as Meal[];
+  private meals: Meal[] = (mealsData as unknown as Meal[]).map((meal) => ({
+    ...meal,
+    ingredients: (meal.ingredients ?? []).map((ing) => ({
+      ...ing,
+      moderationStatus: ing.moderationStatus ?? meal.moderationStatus?? 'PENDING',
+    }))
+  }));
   private readonly latency = 300;
 
   // ─── Reads ────────────────────────────────────────────────

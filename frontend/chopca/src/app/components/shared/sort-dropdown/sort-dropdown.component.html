@@ -2,6 +2,9 @@
   <!-- Dropdown Trigger Button -->
   <button
     type="button"
+    data-testid="sort-dropdown-trigger"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="listbox"
     (click)="toggleDropdown()"
     class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low transition-all duration-150 text-xs font-label-md font-semibold cursor-pointer select-none shadow-xs"
   >
@@ -10,7 +13,7 @@
       @if (selectedOption.icon) {
       <app-icon [name]="selectedOption.icon" size="sm" />
       }
-      <span>{{ selectedOption.label }}</span>
+      <span data-testid="sort-dropdown-label">{{ selectedOption.label }}</span>
     </div>
     <app-icon
       name="expand_more"
@@ -23,11 +26,16 @@
   <!-- Options Menu Popover -->
   @if (isOpen()) {
   <div
+    data-testid="sort-dropdown-menu"
+    role="listbox"
     class="absolute right-0 mt-2 w-56 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-xl z-30 py-1.5 animate-in fade-in-50 zoom-in-95 duration-150"
   >
     @for (option of options(); track option.id) {
     <button
       type="button"
+      [attr.data-testid]="'sort-dropdown-option-' + option.id"
+      [attr.aria-selected]="selectedSortId() === option.id"
+      role="option"
       (click)="selectOption(option)"
       class="w-full flex items-center justify-between px-4 py-2.5 text-xs font-label-md transition-colors text-left cursor-pointer"
       [class.bg-secondary-container]="selectedSortId() === option.id"

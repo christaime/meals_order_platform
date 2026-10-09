@@ -12,6 +12,8 @@ import { IngredientService } from './ingredient.service';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { environment } from '@environments/environment';
 import { WorkspaceService } from './workspace.service';
+import { ModerationStatus } from '@core/models/marketplace';
+import { SortDirection } from '@core/models/shared';
 /**
  * Real implementation of IngredientService.
  * Talks to the backend's ingredient API through the Gateway.
@@ -54,10 +56,12 @@ export class IngredientApiService implements IngredientService {
   searchIngredientsFlat(request: {
     keyword?: string;
     size?: number;
+    moderationStatus?: ModerationStatus
   }): Observable<IngredientSummary[]> {
     const params = this.buildSearchParams({
       keyword: request.keyword,
       size: request.size ?? 10,
+      moderationStatus: request.moderationStatus,
       sortBy: 'name',
       sortDirection: 'ASC',
     });

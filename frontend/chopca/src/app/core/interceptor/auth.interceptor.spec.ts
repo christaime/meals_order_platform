@@ -10,11 +10,10 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
-import Keycloak from 'keycloak-js';
-
+import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { authInterceptor } from './auth.interceptor';
 import { SessionManager } from '../services/session/session-manager.service';
-import { AppSessionStore, RETURN_URL_KEY } from '@app/core/storage/app.store';
+import { AppSessionStore, RETURN_URL_KEY, IDP_HINT_KEY } from '@app/core/storage/app.store';
 import { environment } from '@environments/environment';
 
 describe('authInterceptor', () => {
@@ -43,7 +42,7 @@ describe('authInterceptor', () => {
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
         { provide: SessionManager, useValue: session },
-        { provide: Keycloak, useValue: keycloak },
+        { provide: KEYCLOAK_SERVICE, useValue: keycloak },
       ],
     });
 
@@ -162,6 +161,9 @@ describe('authInterceptor', () => {
     }));
 
     it('redirects to login when the refresh itself fails', fakeAsync(() => {
+      // Set idpHint to be send while calling login
+      const idpHint = "google";
+      AppSessionStore.set(IDP_HINT_KEY, idpHint);
       session.getFreshToken.and.returnValue(Promise.resolve('stale-token'));
       // callFake: create the rejected promise ON CALL, not at spy setup,
       // so zone.js doesn't flag it as an unhandled rejection.
@@ -180,9 +182,7 @@ describe('authInterceptor', () => {
 
       expect(keycloak.login).toHaveBeenCalledTimes(1);
       const loginArgs = keycloak.login.calls.mostRecent().args[0];
-      expect(loginArgs.redirectUri).toBe(
-        `${window.location.origin}/auth/callback`,
-      );
+      expect(loginArgs).toBe(idpHint);
     }));
 
     it('persists the current URL to AppSessionStore before redirecting', fakeAsync(() => {

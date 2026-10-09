@@ -1,7 +1,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  model,
   signal,
   output,
   input,
@@ -9,26 +8,30 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { CategoryPillsSelectorComponent } from '@components/shared/category-pills-selector/category-pills-selector.component';
-import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model';
-import { LocationSummary } from '@app/core/models/marketplace/location.model';
-import { Category } from '@app/core/models/marketplace';
+import { AppAmountPipe } from '@components/shared/pipes/app-amount.pipe';
+import { IngredientAutocompleteComponent } from '@components/shared/ingredient-autocomplete/ingredient-autocomplete.component';
 
-/** Slider bounds — kept as constants so the two price sliders stay in sync. */
-const PRICE_MIN  = 1000;
+import { Category, IngredientSummary } from '@app/core/models/marketplace';
+
+const PRICE_MIN  = 500;
 const PRICE_MAX  = 20000;
 const PRICE_STEP = 500;
 
+/**
+ * The filter state shared between the drawer and the parent.
+ *
+ * `availableOnly` is intentionally absent — availability is being
+ * replaced by quantity tracking later.
+ */
 export interface FilterState {
-  // ─── Base — used by the marketplace filters ───────────────────
   minPrice?: number;
   maxPrice?: number;
   maxPrepTime?: number;
   minRating?: number;
-  availableOnly?: boolean | undefined;
 
-  // ─── Meal management ──────────────────────────────────────────
   categoryIds?: string[];
   cuisineIds?: string[];
   dishTypeIds?: string[];
@@ -36,29 +39,38 @@ export interface FilterState {
 }
 
 /**
- * Full selected entities, kept alongside the id-based {@link FilterState}
- * so the parent can render labels without a lookup.
+ * The full entities associated with the current filter state, kept
+ * alongside the id-based {@link FilterState} so the parent can render
+ * labels and cards without a lookup.
  */
 export interface FilterSelection {
   cuisines: Category[];
   dishTypes: Category[];
+  ingredients: IngredientSummary[];
 }
 
 export const EMPTY_SELECTION: FilterSelection = {
   cuisines: [],
   dishTypes: [],
+  ingredients: [],
 };
 
 export const DEFAULT_FILTERS: FilterState = {
-  minPrice: PRICE_MIN,
-  maxPrice: 10000,
-  maxPrepTime: 60,
+  minPrice: undefined,
+  maxPrice: undefined,
+  maxPrepTime: undefined,
+  /**
+   * `0` is the "Toutes" sentinel — it means "no minimum rating",
+   * equivalent to `undefined`. Consumers must skip it:
+   *  - activeFilterItems must not emit a badge for it
+   *  - buildSearchParams must not send it
+   *  - the search must not filter by it
+   */
   minRating: 0,
-  availableOnly: false,
   categoryIds: [],
   cuisineIds: [],
   dishTypeIds: [],
-  excludeIngredientIds: []
+  excludeIngredientIds: [],
 };
 
 @Component({
@@ -69,6 +81,8 @@ export const DEFAULT_FILTERS: FilterState = {
     ReactiveFormsModule,
     IconComponent,
     CategoryPillsSelectorComponent,
+    IngredientAutocompleteComponent,
+    AppAmountPipe,
   ],
   templateUrl: './advanced-filter-drawer.component.html',
   styleUrl: './advanced-filter-drawer.component.scss',
@@ -81,62 +95,62 @@ export class AdvancedFilterDrawerComponent {
   protected readonly priceMax  = PRICE_MAX;
   protected readonly priceStep = PRICE_STEP;
 
-  // ─── Two-way state ────────────────────────────────────────────
-  readonly isOpen = model<boolean>(false);
-  readonly filters = model<FilterState>({ ...DEFAULT_FILTERS });
+  // ═════════════════════════════════════════════════════════════
+  //  Inputs — the parent's committed state
+  // ═════════════════════════════════════════════════════════════
 
-  /** Initial selection, supplied by the parent so the drawer opens
-   *  with the correct pills already lit. */
-  readonly selection = input<FilterSelection>(EMPTY_SELECTION);
+  /** Filter ids the parent committed the last time Apply was pressed. */
+  readonly initialFilter = input<FilterState>({});
 
-  // ─── Host-provided options ────────────────────────────────────
-  readonly ingredientOptions = input<IngredientSummary[]>([]);
-  readonly locationOptions   = input<LocationSummary[]>([]);
+  /** Full entities the parent committed the last time Apply was pressed. */
+  readonly initialSelection = input<FilterSelection>(EMPTY_SELECTION);
 
-  // ─── Outputs ──────────────────────────────────────────────────
-  /** Emits the id-based filter state. */
+  // ═════════════════════════════════════════════════════════════
+  //  Outputs — emitted only on Apply
+  // ═════════════════════════════════════════════════════════════
+
+  /** Emits the id-based filter state on Apply. */
   readonly applyFilters = output<FilterState>();
 
-  /** Emits the full selected entities alongside the filter state. */
+  /** Emits the full selected entities on Apply. */
   readonly applySelection = output<FilterSelection>();
 
-  /** Temporary draft state inside the drawer. */
-  readonly draftFilters = signal<FilterState>({ ...this.filters() });
-  private readonly draftSelection = signal<FilterSelection>({
+  // ═════════════════════════════════════════════════════════════
+  //  Internal state — never exposed to the parent
+  // ═════════════════════════════════════════════════════════════
+
+  protected readonly isOpen = signal<boolean>(false);
+
+  /**
+   * The working copy of the filter state. Updated on every user
+   * edit. Not a `model()` — nothing about this signal is visible to
+   * the parent; the commit point is `onApply`.
+   */
+  protected readonly draftFilters = signal<FilterState>({ ...DEFAULT_FILTERS });
+
+  /**
+   * The working copy of the full selected entities. Kept in sync
+   * with `draftFilters` (every id in `draftFilters` has a
+   * corresponding entry here) so Apply can emit both without a
+   * lookup.
+   */
+  protected readonly draftSelection = signal<FilterSelection>({
     cuisines: [],
     dishTypes: [],
+    ingredients: [],
   });
 
-  // ─── Form controls required by CategoryPillsSelectorComponent ─
+  // ─── Form controls required by the pill selectors ────────────
   protected readonly cuisineControl  = new FormControl<string[]>([], { nonNullable: true });
   protected readonly dishTypeControl = new FormControl<string[]>([], { nonNullable: true });
+  protected initialIngredients: IngredientSummary[] = [];
 
   // ═════════════════════════════════════════════════════════════
   //  Open / close
   // ═════════════════════════════════════════════════════════════
 
   openDrawer(): void {
-    let filtersToApply = { ...this.filters() };
-    if(!filtersToApply.minPrice){
-      filtersToApply = {...filtersToApply,minPrice: DEFAULT_FILTERS.minPrice};
-    }
-    if(!filtersToApply.maxPrice){
-        filtersToApply = {...filtersToApply,maxPrice: DEFAULT_FILTERS.maxPrice};
-    }
-    if(!filtersToApply.maxPrepTime){
-        filtersToApply = {...filtersToApply,maxPrepTime: DEFAULT_FILTERS.maxPrepTime};
-    }
-    if(!filtersToApply.minRating){
-        filtersToApply = {...filtersToApply,minRating: DEFAULT_FILTERS.minRating};
-    }
-    this.draftFilters.set(filtersToApply);
-    this.draftSelection.set({
-      cuisines: [...this.selection().cuisines],
-      dishTypes: [...this.selection().dishTypes],
-    });
-    this.cuisineControl.setValue(this.filters().cuisineIds ?? []);
-    this.dishTypeControl.setValue(this.filters().dishTypeIds ?? []);
-
+    this.seedFromCommittedState();
     this.isOpen.set(true);
   }
 
@@ -145,13 +159,13 @@ export class AdvancedFilterDrawerComponent {
   }
 
   // ═════════════════════════════════════════════════════════════
-  //  Price handlers (mutually constrained)
+  //  Price handlers — mutually constrained
   // ═════════════════════════════════════════════════════════════
 
   updateMinPrice(event: Event): void {
     const raw = Number((event.target as HTMLInputElement).value);
     this.draftFilters.update((f) => {
-      const nextMin = Math.min(raw, (f.maxPrice || PRICE_MAX) - PRICE_STEP);
+      const nextMin = Math.min(raw, (f.maxPrice ?? PRICE_MAX) - PRICE_STEP);
       return { ...f, minPrice: Math.max(PRICE_MIN, nextMin) };
     });
   }
@@ -159,7 +173,7 @@ export class AdvancedFilterDrawerComponent {
   updateMaxPrice(event: Event): void {
     const raw = Number((event.target as HTMLInputElement).value);
     this.draftFilters.update((f) => {
-      const nextMax = Math.max(raw, (f.minPrice || PRICE_MIN) + PRICE_STEP);
+      const nextMax = Math.max(raw, (f.minPrice ?? PRICE_MIN) + PRICE_STEP);
       return { ...f, maxPrice: Math.min(PRICE_MAX, nextMax) };
     });
   }
@@ -173,75 +187,88 @@ export class AdvancedFilterDrawerComponent {
     this.draftFilters.update((f) => ({ ...f, minRating: rating }));
   }
 
-  toggleAvailableOnly(): void {
-    this.draftFilters.update((f) => ({ ...f, availableOnly: !f.availableOnly }));
-  }
-
   // ═════════════════════════════════════════════════════════════
-  //  Category pills handlers — now capture the full objects
+  //  Category pills — keep draftFilters and draftSelection in sync
   // ═════════════════════════════════════════════════════════════
 
   onCuisinesSelected(cuisines: Category[]): void {
     const ids = cuisines.map((c) => c.id);
-    this.draftSelection.update((s) => ({ ...s, cuisines }));
     this.draftFilters.update((f) => ({ ...f, cuisineIds: ids }));
+    this.draftSelection.update((s) => ({ ...s, cuisines }));
   }
 
   onDishTypesSelected(dishTypes: Category[]): void {
-    const ids = dishTypes.map((c) => c.id);
-    this.draftSelection.update((s) => ({ ...s, dishTypes }));
+    const ids = dishTypes.map((d) => d.id);
     this.draftFilters.update((f) => ({ ...f, dishTypeIds: ids }));
+    this.draftSelection.update((s) => ({ ...s, dishTypes }));
   }
 
   // ═════════════════════════════════════════════════════════════
-  //  Ingredient / location handlers
+  //  Excluded ingredients — driven by the autocomplete component
   // ═════════════════════════════════════════════════════════════
 
-  toggleExcludeIngredient(id: string): void {
-    this.draftFilters.update((f) => ({
-      ...f,
-      excludeIngredientIds: this.toggle(f.excludeIngredientIds, id),
-    }));
-  }
-
-  isSelected(list: string[] | undefined, id: string): boolean {
-    return !!list?.includes(id);
-  }
-
-  private toggle(list: string[] | undefined, id: string): string[] {
-    const current = list ?? [];
-    return current.includes(id)
-      ? current.filter((x) => x !== id)
-      : [...current, id];
+  onExcludedIngredientsChange(ingredients: IngredientSummary[]): void {
+    const ids = ingredients.map((i) => i.id);
+    this.draftFilters.update((f) => ({ ...f, excludeIngredientIds: ids }));
+    this.draftSelection.update((s) => ({ ...s, ingredients }));
   }
 
   // ═════════════════════════════════════════════════════════════
-  //  Reset / Apply
+  //  Clear all — set every draft to the empty state.
+  //
+  //  Distinct from openDrawer(), which seeds the drafts from the
+  //  parent's committed state. Does not emit; the user must still
+  //  click Appliquer to commit.
   // ═════════════════════════════════════════════════════════════
 
-  resetFilters(): void {
-    const defaults: FilterState = { ...DEFAULT_FILTERS };
-    const emptySelection: FilterSelection = { cuisines: [], dishTypes: [] };
+  clearAll(): void {
+    this.draftFilters.set({ ...DEFAULT_FILTERS });
+    this.draftSelection.set({
+      cuisines: [],
+      dishTypes: [],
+      ingredients: [],
+    });
 
-    this.draftFilters.set(defaults);
-    this.draftSelection.set(emptySelection);
+    // emitEvent: true — the pill selector mirrors this control via
+    // valueChanges. With emitEvent: false its internal selectedIds
+    // would keep the old values and the pills would stay selected.
     this.cuisineControl.setValue([]);
     this.dishTypeControl.setValue([]);
-    this.filters.set(defaults);
 
-    this.applyFilters.emit(defaults);
-    this.applySelection.emit(emptySelection);
+    this.initialIngredients = [];
   }
 
+  /**
+   * Seeds the drafts from the parent's last committed state. Called
+   * on open so the drawer always shows what the parent currently has.
+   */
+  private seedFromCommittedState(): void {
+    const merged: FilterState = {
+      ...DEFAULT_FILTERS,
+      ...this.initialFilter(),
+    };
+    this.draftFilters.set(merged);
+
+    const details = this.initialSelection();
+
+    this.draftSelection.set({
+      cuisines: [...details.cuisines],
+      dishTypes: [...details.dishTypes],
+      ingredients: [...details.ingredients],
+    });
+
+    this.cuisineControl.setValue(merged.cuisineIds ?? [], { emitEvent: false });
+    this.dishTypeControl.setValue(merged.dishTypeIds ?? [], { emitEvent: false });
+    this.initialIngredients = [...details.ingredients];
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  //  Apply — the only point where the parent is notified
+  // ═════════════════════════════════════════════════════════════
+
   onApply(): void {
-    const filters = { ...this.draftFilters() };
-    const selection = { ...this.draftSelection() };
-
-    this.filters.set(filters);
-
-    this.applyFilters.emit(filters);
-    this.applySelection.emit(selection);
-
+    this.applyFilters.emit({ ...this.draftFilters() });
+    this.applySelection.emit({ ...this.draftSelection() });
     this.closeDrawer();
   }
 

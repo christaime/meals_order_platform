@@ -18,5 +18,7 @@ export interface SearchRequest {
   readonly sortBy?: string;
 
   /** Sort direction. */
-  readonly sortDirection?: 'ASC' | 'DESC';
+  readonly sortDirection?: SortDirection;
 }
+
+export type SortDirection = 'ASC' | 'DESC';

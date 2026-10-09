@@ -7,6 +7,7 @@
   <!-- Search Input -->
   <input
     type="text"
+    data-testid="search-bar-input"
     [value]="query()"
     [placeholder]="placeholder()"
     (input)="onInput($event)"
@@ -20,6 +21,7 @@
     @if (query().length > 0) {
     <button
       type="button"
+      data-testid="search-bar-clear"
       aria-label="Effacer la recherche"
       (click)="onClear()"
       class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
@@ -31,6 +33,7 @@
     <!-- Search Action Button -->
     <button
       type="button"
+      data-testid="search-bar-submit"
       aria-label="Lancer la recherche"
       (click)="onSubmit()"
       class="px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-xs font-semibold hover:bg-primary-container transition-colors shadow-xs"

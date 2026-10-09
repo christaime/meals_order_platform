@@ -1,15 +1,12 @@
 {
   "mostDemandedCuisines": [
-    { "id": "c17a0000-0000-4000-8000-000000000001",
-      "name": "Cuisine de l'ouest", "count": 42 },
-    { "id": "c17a0000-0000-4000-8000-000000000002",
-      "name": "Cuisines du centre",
-      "count": 18 }
+    { "id": "cuisine-camerounaise", "name": "Camerounaise", "count": 8 },
+    { "id": "cuisine-libanaise",    "name": "Libanaise",    "count": 3 }
   ],
   "mostDemandedDish": [
-    { "id": "d18b0000-0000-4000-8000-000000000003","name": "Plat principal", "count": 30 },
-    { "id": "d18b0000-0000-4000-8000-000000000004", "name": "Sauces et legumes","count": 12 }
+    { "id": "dish-main",      "name": "Plat de résistance", "count": 11 },
+    { "id": "dish-grill",     "name": "Grillades",          "count": 3 }
   ],
-  "expressPrepTimeInMinutes": { "time": 10, "count": 7 },
-  "minMealPrice": { "price": 500, "count": 3 }
+  "expressPrepTimeInMinutes": { "time": 15, "count": 5 },
+  "minMealPrice": { "price": 800, "count": 2 }
 }

@@ -128,6 +128,7 @@ export class CategoryPillsSelectorComponent implements OnInit {
     this.control().valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value: string[] | null) => {
+        //console.log("selectedIds on control().valueChanges", this.selectedIds());
         this.selectedIds.set(value ?? []);
       });
 

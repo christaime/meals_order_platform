@@ -3,6 +3,7 @@
   <!-- ═══ Closed-state button ═══════════════════════════════ -->
   <button
     type="button"
+    data-testid="location-picker-button"
     (click)="openPanel()"
     class="w-full sm:w-auto flex items-center justify-between gap-3
            px-4 py-3 rounded-full
@@ -14,10 +15,14 @@
       <div class="flex flex-col text-left truncate">
 
         @if (committedCity(); as city) {
-        <span class="font-body-md text-sm font-semibold text-on-surface truncate">
+        <span
+          data-testid="location-picker-button-city"
+          class="font-body-md text-sm font-semibold text-on-surface truncate">
             {{ city.name }}
           </span>
-        <span class="font-label-sm text-[11px] text-on-surface-variant truncate">
+        <span
+          data-testid="location-picker-button-summary"
+          class="font-label-sm text-[11px] text-on-surface-variant truncate">
             @if (committedPoint()) {
               {{ committedLocations().length }}
               {{ committedLocations().length === 1 ? 'point de retrait' : 'points de retrait' }}
@@ -44,6 +49,7 @@
       <span
         role="button"
         tabindex="0"
+        data-testid="location-picker-button-clear"
         (click)="clear($event)"
         (keydown.enter)="clear($any($event))"
         aria-label="Effacer la zone"
@@ -61,9 +67,10 @@
     </div>
   </button>
 
-  <!-- ═══ Panel (dropdown, anchored to the button) ════════════ -->
+  <!-- ═══ Panel ═════════════════════════════════════════════ -->
   @if (isOpen()) {
   <div
+    data-testid="location-picker-panel"
     class="absolute left-0 right-0 bottom-full mb-2
            sm:left-0 sm:right-auto sm:bottom-auto sm:top-full sm:mt-2
            sm:w-[28rem]
@@ -83,6 +90,7 @@
       </div>
       <button
         type="button"
+        data-testid="location-picker-panel-close"
         (click)="closePanel()"
         class="w-8 h-8 rounded-full flex items-center justify-center
                text-on-surface-variant hover:bg-surface-container transition-colors"
@@ -109,6 +117,7 @@
                 flex items-center gap-3 shrink-0">
       <button
         type="button"
+        data-testid="location-picker-cancel"
         (click)="cancel()"
         class="px-4 py-2.5 rounded-full border border-outline-variant
                text-on-surface font-label-md text-xs font-semibold
@@ -118,6 +127,7 @@
       </button>
       <button
         type="button"
+        data-testid="location-picker-apply"
         [disabled]="!canApply()"
         (click)="apply()"
         class="flex-1 py-2.5 rounded-full

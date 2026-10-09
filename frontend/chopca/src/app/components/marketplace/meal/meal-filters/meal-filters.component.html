@@ -66,9 +66,10 @@
     <!-- Advanced drawer trigger — shrink-0 -->
     <app-advanced-filter-drawer
       class="shrink-0"
-      [filters]="advanced()"
+      [initialFilter]="advanced()"
+      [initialSelection]="initialSelection()"
       (applyFilters)="onAdvancedChange($event)"
-      [ingredientOptions]="ingredientOptions()"
-      [locationOptions]="locationOptions()" />
+      (applySelection)="onAdvancedSelectionChange($event)"
+      />
   </div>
 </div>

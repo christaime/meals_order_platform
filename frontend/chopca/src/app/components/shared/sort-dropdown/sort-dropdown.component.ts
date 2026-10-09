@@ -43,7 +43,7 @@ export class SortDropdownComponent {
 
   /** Available sorting strategies. */
   readonly options = input<SortOption[]>([
-    { id: 'name', label: 'Nom des plats alphabetiquement', icon: 'sort_by_alpha' },
+    { id: 'name', label: 'Noms alphabetiquement', icon: 'sort_by_alpha' },
   ]);
 
   /** Emitted when the sorting order is changed. */

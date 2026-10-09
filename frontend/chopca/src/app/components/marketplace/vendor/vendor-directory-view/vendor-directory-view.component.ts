@@ -12,12 +12,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { VendorSummary , LocationSummary, MealStatFilter} from '@core/models/marketplace';
 import { IconComponent } from '@components/shared';
-import { SearchBarComponent,
-  LocationSelectorComponent,
+import {
    CategoryChipsComponent, CategoryChip ,
    PaginationControlsComponent,
-   SortOption, SortDropdownComponent
   } from '@components/marketplace/meal/view';
+import {
+   SortOption, SortDropdownComponent, SearchBarComponent, LocationSelectorComponent
+  } from '@components/shared';
 import { Category } from '@core/models/marketplace';
 import { SubCategoryFilterChipsComponent , SubCategoryChip} from '@components/marketplace/meal/view/sub-category-filter-chips/sub-category-filter-chips.component';
 import { CATEGORY_SERVICE } from '@core/services/marketplace';

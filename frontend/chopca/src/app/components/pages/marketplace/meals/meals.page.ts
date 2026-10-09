@@ -43,7 +43,6 @@ const DEFAULT_ADVANCED: FilterState = {
   maxPrice: 10000,
   maxPrepTime: 60,
   minRating: 0,
-  availableOnly: false,
   cuisineIds: [],
   dishTypeIds: [],
   excludeIngredientIds: []

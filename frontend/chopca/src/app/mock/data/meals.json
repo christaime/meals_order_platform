@@ -1,63 +1,625 @@
 [
   {
-    "id": "meal-ndole-royal",
-    "vendorId": "vendor-maman-pauline",
-    "vendorBusinessName": "Chez Maman Pauline",
-    "name": "Ndolé Royal Crevettes & Viande Fumée",
-    "description": "Feuilles de ndolé fraîches cuisinées aux arachides concassées, grosses crevettes fraîches et bœuf fumé. Servi avec miondo ou plantains mûrs.",
+    "id": "meal-taro",
+    "vendorId": "vendor-chaudron",
+    "vendorBusinessName": "Le Chaudron du bon gout",
+    "name": "Taro sauce jaune",
+    "description": "Taro frais servi avec une sauce jaune traditionnelle",
     "price": 4500,
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+    "imageUrl": "https://example.com/taro.jpg",
+    "imageStorageRef": "meal_image/taro.webp",
     "isAvailable": true,
-    "averageRating": 4.9,
-    "totalRatings": 184,
-    "prepTimeMinutes": 35,
+    "averageRating": 4.5,
+    "totalRatings": 20,
+    "prepTimeMinutes": 120,
     "cuisines": [
-      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
     ],
     "dishTypes": [
-      { "id": "cat-plat-resistance", "name": "Plat de résistance", "iconUrl": null, "type": "DISH_TYPE" }
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
     ],
     "ingredients": [
-      { "id": "ing-ndole", "name": "Feuilles de Ndolé", "isAllergen": false },
-      { "id": "ing-arachide", "name": "Pâte d'arachides", "isAllergen": true },
-      { "id": "ing-crevette", "name": "Crevettes Kribi", "isAllergen": true }
+      { "id": "ing-taro",       "name": "Taro",            "isAllergen": false },
+      { "id": "ing-huile-palme","name": "Huile de palme",  "isAllergen": false }
     ],
     "distributionLocations": [
-      { "id": "loc-akwa", "name": "Akwa", "address": "Akwa, Douala", "moderationStatus": "APPROVED" }
+      { "id": "loc-akwa", "name": "Akwa", "address": "Rue Joss, Akwa", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0480, "longitude": 9.7040, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" },
+      { "id": "loc-bonapriso", "name": "Bonapriso", "address": "Rue Njo-Njo, Bonapriso", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0320, "longitude": 9.7010, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
     ],
+    "supplements": [],
     "moderationStatus": "APPROVED",
     "isActive": true,
-    "createdAt": "2025-08-01T10:00:00Z",
-    "updatedAt": "2025-09-10T14:30:00Z"
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
   },
+
   {
-    "id": "meal-poisson-braise",
-    "vendorId": "vendor-grill-rond-point",
-    "vendorBusinessName": "Le Grill du Rond-Point",
-    "name": "Poisson Braisé au Pèbè & Rondelles",
-    "description": "Bar frais mariné aux épices du pays (djansang, pèbè, ail, gingembre), braisé au feu de bois. Servi avec bobolo chaud et sauce pimentée.",
-    "price": 3800,
-    "imageUrl": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800",
+    "id": "meal-salade",
+    "vendorId": "vendor-chaudron",
+    "vendorBusinessName": "Le Chaudron du bon gout",
+    "name": "Salade de fruits",
+    "description": "Salade fraîche d'ananas et de pastèque",
+    "price": 1500,
+    "imageUrl": "https://example.com/salade.jpg",
+    "imageStorageRef": "meal_image/salade.webp",
+    "isAvailable": true,
+    "averageRating": 4.0,
+    "totalRatings": 8,
+    "prepTimeMinutes": 15,
+    "cuisines": [],
+    "dishTypes": [
+      { "id": "dish-dessert", "name": "Dessert", "iconUrl": "icecream", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-ananas",   "name": "Ananas",   "isAllergen": false },
+      { "id": "ing-pasteque", "name": "Pastèque", "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-akwa", "name": "Akwa", "address": "Rue Joss, Akwa", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0480, "longitude": 9.7040, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-poulet-braise",
+    "vendorId": "vendor-chaudron",
+    "vendorBusinessName": "Le Chaudron du bon gout",
+    "name": "Poulet braisé",
+    "description": "Poulet entier braisé aux épices locales",
+    "price": 3500,
+    "imageUrl": "https://example.com/poulet.jpg",
+    "imageStorageRef": "meal_image/poulet.webp",
     "isAvailable": true,
     "averageRating": 4.8,
-    "totalRatings": 212,
-    "prepTimeMinutes": 40,
+    "totalRatings": 42,
+    "prepTimeMinutes": 45,
     "cuisines": [
-      { "id": "cat-street-food", "name": "Street Food (Braises)", "iconUrl": null, "type": "CUISINE" }
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
     ],
     "dishTypes": [
-      { "id": "cat-poissons-viandes", "name": "Poissons & Viandes", "iconUrl": null, "type": "DISH_TYPE" }
+      { "id": "dish-main",  "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" },
+      { "id": "dish-grill", "name": "Grillades",          "iconUrl": "outdoor_grill",   "type": "DISH_TYPE" }
     ],
     "ingredients": [
-      { "id": "ing-poisson", "name": "Bar frais", "isAllergen": false },
-      { "id": "ing-pebe", "name": "Épices Pèbè", "isAllergen": false }
+      { "id": "ing-poulet",   "name": "Poulet",   "isAllergen": false },
+      { "id": "ing-arachide", "name": "Arachide", "isAllergen": true }
     ],
     "distributionLocations": [
-      { "id": "loc-bonapriso", "name": "Bonapriso", "address": "Bonapriso, Douala", "moderationStatus": "APPROVED" }
+      { "id": "loc-akwa", "name": "Akwa", "address": "Rue Joss, Akwa", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0480, "longitude": 9.7040, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
     ],
+    "supplements": [],
     "moderationStatus": "APPROVED",
     "isActive": true,
-    "createdAt": "2025-08-05T09:00:00Z",
-    "updatedAt": "2025-09-11T11:15:00Z"
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-ndole",
+    "vendorId": "vendor-mama",
+    "vendorBusinessName": "Chez Mama Ngo",
+    "name": "Ndolé",
+    "description": "Ndolé traditionnel avec arachide et poisson fumé",
+    "price": 5000,
+    "imageUrl": "https://example.com/ndole.jpg",
+    "imageStorageRef": "meal_image/ndole.webp",
+    "isAvailable": true,
+    "averageRating": 4.2,
+    "totalRatings": 15,
+    "prepTimeMinutes": 90,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-ndole",    "name": "Ndolé",    "isAllergen": false },
+      { "id": "ing-arachide", "name": "Arachide", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-bastos", "name": "Bastos", "address": "Rue 1756, Bastos", "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8830, "longitude": 11.5170, "vendorId": "vendor-mama", "vendorBusinessName": "Chez Mama Ngo" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-pizza",
+    "vendorId": "vendor-pizza",
+    "vendorBusinessName": "Bella Italia",
+    "name": "Pizza Margherita",
+    "description": "Pizza classique tomate, mozzarella, basilic",
+    "price": 6000,
+    "imageUrl": "https://example.com/pizza.jpg",
+    "imageStorageRef": "meal_image/pizza.webp",
+    "isAvailable": true,
+    "averageRating": 3.5,
+    "totalRatings": 10,
+    "prepTimeMinutes": 20,
+    "cuisines": [
+      { "id": "cuisine-italienne", "name": "Italienne", "iconUrl": "local_pizza", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-tomate",      "name": "Tomate",     "isAllergen": false },
+      { "id": "ing-mozzarella",  "name": "Mozzarella", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-marche", "name": "Marché Central", "address": "Marché Central, Garoua", "moderationStatus": "APPROVED", "city": { "id": "city-garoua", "name": "Garoua", "region": "Nord", "countryCode": "CM" }, "latitude": 9.3017, "longitude": 13.3921, "vendorId": "vendor-pizza", "vendorBusinessName": "Bella Italia" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-mbongo",
+    "vendorId": "vendor-mama",
+    "vendorBusinessName": "Chez Mama Ngo",
+    "name": "Mbongo Tchobi",
+    "description": "Poisson braisé à la sauce noire",
+    "price": 7000,
+    "imageUrl": "https://example.com/mbongo.jpg",
+    "imageStorageRef": "meal_image/mbongo.webp",
+    "isAvailable": false,
+    "averageRating": 5.0,
+    "totalRatings": 30,
+    "prepTimeMinutes": 120,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-poisson", "name": "Poisson",  "isAllergen": false },
+      { "id": "ing-epices",  "name": "Épices",   "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-omnisports", "name": "Omnisports", "address": "Avenue Kennedy, Omnisports", "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8700, "longitude": 11.5200, "vendorId": "vendor-mama", "vendorBusinessName": "Chez Mama Ngo" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-okok",
+    "vendorId": "vendor-mama",
+    "vendorBusinessName": "Chez Mama Ngo",
+    "name": "Okok",
+    "description": "Feuilles d'okok cuisinées avec arachide",
+    "price": 4000,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.6,
+    "totalRatings": 18,
+    "prepTimeMinutes": 75,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-okok",     "name": "Okok",     "isAllergen": false },
+      { "id": "ing-arachide", "name": "Arachide", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-mvog-ada", "name": "Mvog-Ada", "address": "Rue Mvog-Ada", "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8560, "longitude": 11.5270, "vendorId": "vendor-mama", "vendorBusinessName": "Chez Mama Ngo" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-riz-sauce",
+    "vendorId": "vendor-mama",
+    "vendorBusinessName": "Chez Mama Ngo",
+    "name": "Riz sauce tomate",
+    "description": "Riz blanc avec sauce tomate maison",
+    "price": 2000,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.1,
+    "totalRatings": 25,
+    "prepTimeMinutes": 30,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" },
+      { "id": "dish-side", "name": "Accompagnement",     "iconUrl": "rice_bowl",      "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-riz",    "name": "Riz",    "isAllergen": false },
+      { "id": "ing-tomate", "name": "Tomate", "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-bastos", "name": "Bastos", "address": "Rue 1756, Bastos", "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8830, "longitude": 11.5170, "vendorId": "vendor-mama", "vendorBusinessName": "Chez Mama Ngo" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-poulet-dg",
+    "vendorId": "vendor-mama",
+    "vendorBusinessName": "Chez Mama Ngo",
+    "name": "Poulet DG",
+    "description": "Poulet Directeur Général aux légumes",
+    "price": 5500,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.9,
+    "totalRatings": 38,
+    "prepTimeMinutes": 60,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-poulet",  "name": "Poulet",   "isAllergen": false },
+      { "id": "ing-legumes", "name": "Légumes",  "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-bastos", "name": "Bastos", "address": "Rue 1756, Bastos", "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8830, "longitude": 11.5170, "vendorId": "vendor-mama", "vendorBusinessName": "Chez Mama Ngo" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-spaghetti",
+    "vendorId": "vendor-pizza",
+    "vendorBusinessName": "Bella Italia",
+    "name": "Spaghetti Bolognaise",
+    "description": "Spaghetti à la sauce bolognaise",
+    "price": 5000,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.3,
+    "totalRatings": 20,
+    "prepTimeMinutes": 25,
+    "cuisines": [
+      { "id": "cuisine-italienne", "name": "Italienne", "iconUrl": "local_pizza", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-spaghetti", "name": "Spaghetti", "isAllergen": true },
+      { "id": "ing-boeuf",     "name": "Boeuf",     "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-marche", "name": "Marché Central", "address": "Marché Central, Garoua", "moderationStatus": "APPROVED", "city": { "id": "city-garoua", "name": "Garoua", "region": "Nord", "countryCode": "CM" }, "latitude": 9.3017, "longitude": 13.3921, "vendorId": "vendor-pizza", "vendorBusinessName": "Bella Italia" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-croissant",
+    "vendorId": "vendor-pizza",
+    "vendorBusinessName": "Bella Italia",
+    "name": "Croissant au beurre",
+    "description": "Croissant frais du matin",
+    "price": 800,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.7,
+    "totalRatings": 50,
+    "prepTimeMinutes": 5,
+    "cuisines": [
+      { "id": "cuisine-francaise", "name": "Française", "iconUrl": "restaurant", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-snack", "name": "Snack", "iconUrl": "fastfood", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-farine", "name": "Farine", "isAllergen": true },
+      { "id": "ing-beurre", "name": "Beurre", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-marche", "name": "Marché Central", "address": "Marché Central, Garoua", "moderationStatus": "APPROVED", "city": { "id": "city-garoua", "name": "Garoua", "region": "Nord", "countryCode": "CM" }, "latitude": 9.3017, "longitude": 13.3921, "vendorId": "vendor-pizza", "vendorBusinessName": "Bella Italia" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-sushi",
+    "vendorId": "vendor-sea",
+    "vendorBusinessName": "Saveurs Marines",
+    "name": "Sushi saumon",
+    "description": "Sushis au saumon frais",
+    "price": 8000,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.4,
+    "totalRatings": 22,
+    "prepTimeMinutes": 30,
+    "cuisines": [
+      { "id": "cuisine-asiatique", "name": "Asiatique", "iconUrl": "ramen_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-main", "name": "Plat de résistance", "iconUrl": "restaurant_menu", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-saumon", "name": "Saumon", "isAllergen": true },
+      { "id": "ing-riz",    "name": "Riz",    "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-port", "name": "Port de Kribi", "address": "Avenue du Port, Kribi", "moderationStatus": "APPROVED", "city": { "id": "city-kribi", "name": "Kribi", "region": "Sud", "countryCode": "CM" }, "latitude": 2.9372, "longitude": 9.9100, "vendorId": "vendor-sea", "vendorBusinessName": "Saveurs Marines" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-crevettes",
+    "vendorId": "vendor-sea",
+    "vendorBusinessName": "Saveurs Marines",
+    "name": "Crevettes grillées",
+    "description": "Crevettes sautées à l'ail",
+    "price": 6500,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.6,
+    "totalRatings": 15,
+    "prepTimeMinutes": 20,
+    "cuisines": [
+      { "id": "cuisine-asiatique", "name": "Asiatique", "iconUrl": "ramen_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-grill", "name": "Grillades", "iconUrl": "outdoor_grill", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-crevette", "name": "Crevette", "isAllergen": true },
+      { "id": "ing-ail",      "name": "Ail",      "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-port", "name": "Port de Kribi", "address": "Avenue du Port, Kribi", "moderationStatus": "APPROVED", "city": { "id": "city-kribi", "name": "Kribi", "region": "Sud", "countryCode": "CM" }, "latitude": 2.9372, "longitude": 9.9100, "vendorId": "vendor-sea", "vendorBusinessName": "Saveurs Marines" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-poisson-braise",
+    "vendorId": "vendor-sea",
+    "vendorBusinessName": "Saveurs Marines",
+    "name": "Poisson braisé",
+    "description": "Bar entier braisé aux épices",
+    "price": 7500,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.8,
+    "totalRatings": 28,
+    "prepTimeMinutes": 40,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-grill", "name": "Grillades", "iconUrl": "outdoor_grill", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-poisson", "name": "Poisson", "isAllergen": false },
+      { "id": "ing-epices",  "name": "Épices",  "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-buea-town", "name": "Buea Town", "address": "Main Road, Buea Town", "moderationStatus": "APPROVED", "city": { "id": "city-buea", "name": "Buea", "region": "Sud-Ouest", "countryCode": "CM" }, "latitude": 4.1559, "longitude": 9.2410, "vendorId": "vendor-sea", "vendorBusinessName": "Saveurs Marines" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-falafel",
+    "vendorId": "vendor-liban",
+    "vendorBusinessName": "Beyrouth Express",
+    "name": "Falafel",
+    "description": "Boulettes de pois chiches frites",
+    "price": 1500,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.5,
+    "totalRatings": 40,
+    "prepTimeMinutes": 10,
+    "cuisines": [
+      { "id": "cuisine-libanaise", "name": "Libanaise", "iconUrl": "kebab_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-appetizer", "name": "Entrée", "iconUrl": "tapas", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-pois-chiche", "name": "Pois chiche", "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-plateau", "name": "Plateau", "address": "Quartier Plateau, Douala", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0550, "longitude": 9.7100, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-houmous",
+    "vendorId": "vendor-liban",
+    "vendorBusinessName": "Beyrouth Express",
+    "name": "Houmous",
+    "description": "Houmous crémeux aux pois chiches",
+    "price": 1200,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.2,
+    "totalRatings": 22,
+    "prepTimeMinutes": 15,
+    "cuisines": [
+      { "id": "cuisine-libanaise", "name": "Libanaise", "iconUrl": "kebab_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-appetizer", "name": "Entrée", "iconUrl": "tapas", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-pois-chiche", "name": "Pois chiche", "isAllergen": false },
+      { "id": "ing-tahini",      "name": "Tahini",      "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-plateau", "name": "Plateau", "address": "Quartier Plateau, Douala", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0550, "longitude": 9.7100, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-taboule",
+    "vendorId": "vendor-liban",
+    "vendorBusinessName": "Beyrouth Express",
+    "name": "Taboulé",
+    "description": "Salade de persil, menthe et boulgour",
+    "price": 1800,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.0,
+    "totalRatings": 18,
+    "prepTimeMinutes": 10,
+    "cuisines": [
+      { "id": "cuisine-libanaise", "name": "Libanaise", "iconUrl": "kebab_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-side", "name": "Accompagnement", "iconUrl": "rice_bowl", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-boulgour", "name": "Boulgour", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-plateau", "name": "Plateau", "address": "Quartier Plateau, Douala", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0550, "longitude": 9.7100, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-jus-bissap",
+    "vendorId": "vendor-chaudron",
+    "vendorBusinessName": "Le Chaudron du bon gout",
+    "name": "Jus de bissap",
+    "description": "Boisson fraîche à l'hibiscus",
+    "price": 800,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.9,
+    "totalRatings": 60,
+    "prepTimeMinutes": 5,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-beverage", "name": "Boisson", "iconUrl": "local_drink", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-hibiscus", "name": "Hibiscus", "isAllergen": false }
+    ],
+    "distributionLocations": [
+      { "id": "loc-akwa", "name": "Akwa", "address": "Rue Joss, Akwa", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0480, "longitude": 9.7040, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+
+  {
+    "id": "meal-soupe-pistache",
+    "vendorId": "vendor-chaudron",
+    "vendorBusinessName": "Le Chaudron du bon gout",
+    "name": "Soupe de pistache",
+    "description": "Soupe traditionnelle à la pistache",
+    "price": 3000,
+    "imageUrl": null,
+    "imageStorageRef": null,
+    "isAvailable": true,
+    "averageRating": 4.4,
+    "totalRatings": 12,
+    "prepTimeMinutes": 50,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining", "type": "CUISINE" }
+    ],
+    "dishTypes": [
+      { "id": "dish-soup", "name": "Soupe", "iconUrl": "soup_kitchen", "type": "DISH_TYPE" }
+    ],
+    "ingredients": [
+      { "id": "ing-pistache", "name": "Pistache", "isAllergen": true }
+    ],
+    "distributionLocations": [
+      { "id": "loc-akwa", "name": "Akwa", "address": "Rue Joss, Akwa", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0480, "longitude": 9.7040, "vendorId": "vendor-chaudron", "vendorBusinessName": "Le Chaudron du bon gout" }
+    ],
+    "supplements": [],
+    "moderationStatus": "APPROVED",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
   }
 ]

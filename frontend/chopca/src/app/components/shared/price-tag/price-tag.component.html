@@ -1,4 +1,8 @@
-<span [class]="classes()">
-  <span class="amount">{{ formattedAmount() }}</span>
-  <span class="currency">{{ currency() }}</span>
+<span
+  data-testid="price-tag"
+  [attr.data-amount]="amount()"
+  [attr.data-variant]="variant()"
+  [class]="classes()">
+  <span data-testid="price-tag-amount" class="amount">{{ formattedAmount() }}</span>
+  <span data-testid="price-tag-currency" class="currency">{{ currency() }}</span>
 </span>

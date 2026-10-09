@@ -17,11 +17,11 @@ import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
 
 import { IconComponent } from '@components/shared';
-import { LocationSelectorComponent } from '../location-selector/location-selector.component';
-import { SearchBarComponent } from '../search-bar/search-bar.component';
+import { LocationSelectorComponent } from '@components/shared/location-selector/location-selector.component';
+import { SearchBarComponent } from '@components/shared/search-bar/search-bar.component';
 import { SubCategoryFilterChipsComponent , SubCategoryChip} from '../sub-category-filter-chips/sub-category-filter-chips.component';
 import { ActiveFilterBadgesComponent, ActiveFilterItem } from '../active-filter-badges/active-filter-badges.component';
-import { SortDropdownComponent, SortOption } from '../sort-dropdown/sort-dropdown.component';
+import { SortDropdownComponent, SortOption } from '@components/shared/sort-dropdown/sort-dropdown.component';
 import {
   AdvancedFilterDrawerComponent,
   FilterState,
@@ -43,7 +43,6 @@ export const EMPTY_ADVANCE_FILTERS: FilterState = {
   maxPrice: undefined,
   maxPrepTime: undefined,
   minRating: undefined,
-  availableOnly: undefined,
   categoryIds: [],
   cuisineIds: [],
   dishTypeIds: [],
@@ -146,11 +145,11 @@ export class MealCatalogViewComponent implements OnInit {
   } | null>(null);
 
   /** Full objects the drawer emitted, kept for label rendering. */
-  private readonly _drawerSelection = signal<FilterSelection>({
+  readonly drawerSelection = signal<FilterSelection>({
     cuisines: [],
     dishTypes: [],
+    ingredients: []
   });
-  protected readonly drawerSelection = this._drawerSelection.asReadonly();
 
   protected readonly subCategoryOptions = signal<SubCategoryChip[]>([DEFAULT_CHIP]);
 
@@ -175,7 +174,6 @@ export class MealCatalogViewComponent implements OnInit {
     const list: ActiveFilterItem[] = [];
     const filters = this.advancedFilters();
     const chips = this.selectedSubCategories();
-
     // ── Search ────────────────────────────────────────────────
     if (this.searchQuery()) {
       list.push({
@@ -224,7 +222,7 @@ export class MealCatalogViewComponent implements OnInit {
     // ── Drawer cuisines not already shown as a chip ───────────
     const chipCuisineIds = new Set(
       chips.filter((c) => c.kind === 'CUISINE').map((c) => c.id));
-    for (const c of this._drawerSelection().cuisines) {
+    for (const c of this.drawerSelection().cuisines) {
       if (chipCuisineIds.has(c.id)) continue;
       list.push({ key: 'cuisine', label: c.name, value: c.id });
     }
@@ -232,7 +230,7 @@ export class MealCatalogViewComponent implements OnInit {
     // ── Drawer dish types not already shown as a chip ─────────
     const chipDishIds = new Set(
       chips.filter((c) => c.kind === 'DISH_TYPE').map((c) => c.id));
-    for (const d of this._drawerSelection().dishTypes) {
+    for (const d of this.drawerSelection().dishTypes) {
       if (chipDishIds.has(d.id)) continue;
       list.push({ key: 'dishType', label: d.name, value: d.id });
     }
@@ -241,21 +239,21 @@ export class MealCatalogViewComponent implements OnInit {
     // Skip the maxPrepTime / maxPrice entries when the corresponding
     // shortcut chip already covers them — otherwise the same filter
     // shows up twice.
-    if (filters.minPrice && filters.minPrice > 1000) {
+    if (filters.minPrice) {
       list.push({
         key: 'minPrice',
         label: `Min ${filters.minPrice} FCFA`,
         value: filters.minPrice,
       });
     }
-    if (filters.maxPrice && filters.maxPrice < 10000 && !hasEco) {
+    if (filters.maxPrice && !hasEco) {
       list.push({
         key: 'maxPrice',
         label: `Max ${filters.maxPrice} FCFA`,
         value: filters.maxPrice,
       });
     }
-    if (filters.maxPrepTime && filters.maxPrepTime < 60 && !hasExpress) {
+    if (filters.maxPrepTime && !hasExpress) {
       list.push({
         key: 'maxPrepTime',
         label: `Prépa ≤  ${filters.maxPrepTime} min`,
@@ -269,17 +267,10 @@ export class MealCatalogViewComponent implements OnInit {
         value: filters.minRating,
       });
     }
-    if (filters.availableOnly) {
-      list.push({
-        key: 'availableOnly',
-        label: 'Disponible de suite',
-        value: true,
-      });
-    }
 
     // ── Excluded ingredients ──────────────────────────────────
     for (const id of filters.excludeIngredientIds ?? []) {
-      const ing = this.ingredientOptions().find((i) => i.id === id);
+      const ing = this.drawerSelection().ingredients.find((i) => i.id === id);
       list.push({
         key: 'excludeIngredient',
         label: `Sans ${ing?.name ?? 'ingrédient'}`,
@@ -390,6 +381,8 @@ export class MealCatalogViewComponent implements OnInit {
     this.advancedFilters.update((f) => {
       const cuisineIds = new Set(f.cuisineIds ?? []);
       const dishTypeIds = new Set(f.dishTypeIds ?? []);
+      const ingredientIds = new Set(f.excludeIngredientIds ?? []);
+
       let maxPrepTime = f.maxPrepTime;
       let maxPrice = f.maxPrice;
 
@@ -418,6 +411,7 @@ export class MealCatalogViewComponent implements OnInit {
         ...f,
         cuisineIds: [...cuisineIds],
         dishTypeIds: [...dishTypeIds],
+        excludeIngredientIds: [...ingredientIds],
         maxPrepTime,
         maxPrice,
       };
@@ -437,16 +431,39 @@ export class MealCatalogViewComponent implements OnInit {
     // any chip whose id is no longer in the drawer's list gets removed
     // from the chip selection, and vice versa — the chips that remain
     // must all still be present in the drawer's arrays.
-    const cuisineSet = new Set(filters.cuisineIds ?? []);
-    const dishTypeSet = new Set(filters.dishTypeIds ?? []);
+    const cuisineIdsSet = new Set(filters.cuisineIds ?? []);
+    const dishTypeIdsSet = new Set(filters.dishTypeIds ?? []);
+    const knownSubCategoryOptions = new Map(this.subCategoryOptions().map((c) => [c.id, c]));
+    this.selectedSubCategories.update((chips) =>{
+          // 1. Drop chips the drawer no longer includes.
+          const kept = chips.filter((chip) => {
+            if (chip.kind === 'CUISINE') return cuisineIdsSet.has(chip.id);
+            if (chip.kind === 'DISH_TYPE') return dishTypeIdsSet.has(chip.id);
+            return true; // shortcuts handled elsewhere
+          });
 
-    this.selectedSubCategories.update((chips) =>
-      chips.filter((chip) => {
-        if (chip.kind === 'CUISINE') return cuisineSet.has(chip.id);
-        if (chip.kind === 'DISH_TYPE') return dishTypeSet.has(chip.id);
-        return true;   // shortcuts handled by deselectStaleShortcuts
-      }),
-    );
+          // 2. Add chips for drawer-selected categories that are knownSubCategoryOptions
+          //    shortcuts but not currently in the row.
+          const presentIds = new Set(kept.map((c) => c.id));
+          const added: SubCategoryChip[] = [];
+
+          for (const cuisineId of cuisineIdsSet) {
+            const chip = knownSubCategoryOptions.get(cuisineId);
+            if (chip && chip.kind === 'CUISINE' && !presentIds.has(chip.id)) {
+              added.push(chip);
+              presentIds.add(chip.id);
+            }
+          }
+          for (const dishId of dishTypeIdsSet) {
+            const chip = knownSubCategoryOptions.get(dishId);
+            if (chip && chip.kind === 'DISH_TYPE' && !presentIds.has(chip.id)) {
+              added.push(chip);
+              presentIds.add(chip.id);
+            }
+          }
+
+          return [...kept, ...added];
+      });
 
     this.currentPage.set(1);
     this.emitState();
@@ -454,7 +471,7 @@ export class MealCatalogViewComponent implements OnInit {
   }
 
   onApplySelection(selection: FilterSelection): void {
-    this._drawerSelection.set(selection);
+    this.drawerSelection.set(selection);
   }
 
   onSortChange(sort: SortOption): void {
@@ -476,7 +493,7 @@ export class MealCatalogViewComponent implements OnInit {
       case 'cuisine':
         this.selectedSubCategories.update((list) =>
           list.filter((c) => !(c.kind === 'CUISINE' && c.id === filter.value)));
-        this._drawerSelection.update((s) => ({
+        this.drawerSelection.update((s) => ({
           ...s,
           cuisines: s.cuisines.filter((c) => c.id !== filter.value),
         }));
@@ -489,7 +506,7 @@ export class MealCatalogViewComponent implements OnInit {
       case 'dishType':
         this.selectedSubCategories.update((list) =>
           list.filter((c) => !(c.kind === 'DISH_TYPE' && c.id === filter.value)));
-        this._drawerSelection.update((s) => ({
+        this.drawerSelection.update((s) => ({
           ...s,
           dishTypes: s.dishTypes.filter((d) => d.id !== filter.value),
         }));
@@ -505,7 +522,7 @@ export class MealCatalogViewComponent implements OnInit {
       case 'maxPrepTime':
         this.selectedSubCategories.update((list) =>
           list.filter((c) => !(c.kind === 'SHORTCUT' && c.id === 'express')));
-        this.advancedFilters.update((f) => ({ ...f, maxPrepTime: 60 }));
+        this.advancedFilters.update((f) => ({ ...f, maxPrepTime: undefined }));
         break;
 
       // eco and maxPrice are aliases — same underlying state.
@@ -513,19 +530,15 @@ export class MealCatalogViewComponent implements OnInit {
       case 'maxPrice':
         this.selectedSubCategories.update((list) =>
           list.filter((c) => !(c.kind === 'SHORTCUT' && c.id === 'eco')));
-        this.advancedFilters.update((f) => ({ ...f, maxPrice: 10000 }));
+        this.advancedFilters.update((f) => ({ ...f, maxPrice: undefined }));
         break;
 
       case 'minPrice':
-        this.advancedFilters.update((f) => ({ ...f, minPrice: 1000 }));
+        this.advancedFilters.update((f) => ({ ...f, minPrice: undefined }));
         break;
 
       case 'minRating':
         this.advancedFilters.update((f) => ({ ...f, minRating: 0 }));
-        break;
-
-      case 'availableOnly':
-        this.advancedFilters.update((f) => ({ ...f, availableOnly: false }));
         break;
 
       case 'excludeIngredient':
@@ -546,7 +559,7 @@ export class MealCatalogViewComponent implements OnInit {
     this.searchQuery.set('');
     this.selectedSubCategories.set([]);
     this.advancedFilters.set({ ...EMPTY_ADVANCE_FILTERS });
-    this._drawerSelection.set({ cuisines: [], dishTypes: [] });
+    this.drawerSelection.set({ cuisines: [], dishTypes: [], ingredients: [] });
     this.currentPage.set(1);
     this.emitState();
   }

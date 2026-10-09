@@ -31,7 +31,7 @@ export interface IngredientSummary {
   readonly id: string;
   readonly name: string;
   readonly isAllergen: boolean;
-  readonly moderationStatus: ModerationStatus;   // ← add
+  readonly moderationStatus: ModerationStatus;
 }
 
 /**

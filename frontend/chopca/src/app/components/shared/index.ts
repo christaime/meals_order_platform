@@ -24,3 +24,7 @@ export * from './vendor-picker/vendor-picker.component';
 export * from './moderation-status/moderation-status.util';
 export * from './location-picker-button/location-picker-button.component';
 export * from './location-picker/location-picker.component';
+export * from './sort-dropdown/sort-dropdown.component';
+export * from './search-bar/search-bar.component';
+export * from './location-selector/location-selector.component';
+export * from './ingredient-autocomplete/ingredient-autocomplete.component';

@@ -90,7 +90,8 @@ export class MealCardComponent {
   /**
    * Emits signal to open detail view / navigate to meal page.
    */
-  onViewDetails(): void {
+  onViewDetails(event?: MouseEvent): void {
+    event?.stopPropagation();
     this.viewDetails.emit(this.meal());
   }
 }

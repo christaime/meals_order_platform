@@ -1,8 +1,13 @@
 @if (totalPages() > 1) {
-<nav class="flex items-center justify-between py-4" aria-label="Pagination">
+<nav
+  data-testid="pagination"
+  class="flex items-center justify-between py-4"
+  aria-label="Pagination">
+
   <!-- Previous Button -->
   <button
     type="button"
+    data-testid="pagination-previous"
     (click)="previousPage()"
     [disabled]="currentPage() === 1"
     class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-on-surface bg-surface-container-low border border-outline-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
@@ -15,10 +20,14 @@
   <div class="flex items-center gap-1">
     @for (page of pages(); track $index) {
     @if (page === '...') {
-    <span class="px-2 text-xs text-on-surface-variant select-none">...</span>
+    <span
+      [attr.data-testid]="'pagination-ellipsis-' + $index"
+      class="px-2 text-xs text-on-surface-variant select-none">...</span>
     } @else {
     <button
       type="button"
+      [attr.data-testid]="'pagination-page-' + page"
+      [attr.aria-current]="currentPage() === page ? 'page' : null"
       (click)="goToPage(page)"
       class="w-8 h-8 rounded-xl text-xs font-semibold flex items-center justify-center transition-all cursor-pointer"
       [class.bg-primary]="currentPage() === page"
@@ -37,6 +46,7 @@
   <!-- Next Button -->
   <button
     type="button"
+    data-testid="pagination-next"
     (click)="nextPage()"
     [disabled]="currentPage() === totalPages()"
     class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-on-surface bg-surface-container-low border border-outline-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"

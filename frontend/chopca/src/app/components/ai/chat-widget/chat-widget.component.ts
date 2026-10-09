@@ -21,7 +21,7 @@ import {
   PAYLOAD_TYPE,
   VendorCard,
 } from '@core/models/ai/chat.models';
-import { ChatService, ChatSessionStore } from '@core/services/ai';
+import { CHAT_SERVICE, ChatSessionStore } from '@core/services/ai';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { ChatMealCardComponent } from '../chat-meal-card/chat-meal-card.component';
 import { ChatVendorCardComponent } from '../chat-vendor-card/chat-vendor-card.component';
@@ -36,7 +36,7 @@ import { ChatVendorCardComponent } from '../chat-vendor-card/chat-vendor-card.co
 })
 export class ChatWidgetComponent {
 
-  private readonly chatService = inject(ChatService);
+  private readonly chatService = inject(CHAT_SERVICE);
   private readonly chat = inject(ChatSessionStore);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);

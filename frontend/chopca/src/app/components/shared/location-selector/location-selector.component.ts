@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import {
   LocationPickerButtonComponent,
-} from '@components/shared/location-picker-button/location-picker-button.component';
+} from '../location-picker-button/location-picker-button.component';
 import { LocationSummary } from '@core/models/marketplace';
 
 /**

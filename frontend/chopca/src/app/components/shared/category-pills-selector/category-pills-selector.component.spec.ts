@@ -1,178 +1,179 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { By } from '@angular/platform-browser';
 
 import { CategoryPillsSelectorComponent } from './category-pills-selector.component';
-import { CATEGORY_SERVICE, CategoryService } from '@app/core/services/marketplace/category.service';
-import { DataPage } from '@app/core/models/shared';
-import { Category, CategoryType } from '@app/core/models/marketplace';
-import { aCategory } from 'src/testing/factories';
-
-@Component({
-  standalone: true,
-  imports: [CategoryPillsSelectorComponent, ReactiveFormsModule],
-  template: `
-    <app-category-pills-selector
-      [categoryType]="categoryType"
-      [control]="control"
-      [maxSelection]="3"
-      [minSelection]="1" />
-  `,
-})
-class HostComponent {
-  readonly categoryType: CategoryType = 'CUISINE';
-  readonly control = new FormControl<string[]>([], { nonNullable: true });
-}
+import { CATEGORY_SERVICE } from '@core/services/marketplace/category.service';
+import { Category, CategoryType } from '@core/models/marketplace';
 
 describe('CategoryPillsSelectorComponent', () => {
-  let fixture: ComponentFixture<HostComponent>;
-  let host: HostComponent;
-  let categoryService: jasmine.SpyObj<CategoryService>;
+  let fixture: ComponentFixture<CategoryPillsSelectorComponent>;
+  let component: CategoryPillsSelectorComponent;
+  let control: FormControl<string[]>;
+  let categoryServiceMock: jasmine.SpyObj<any>;
 
   const CATEGORIES: Category[] = [
-    aCategory({ id: 'c1', name: 'Cuisine Sawa' }),
-    aCategory({ id: 'c2', name: 'Cuisine Bamiléké' }),
-    aCategory({ id: 'c3', name: 'Cuisine Beti' }),
-    aCategory({ id: 'c4', name: 'Cuisine Douala' }),
+    { id: 'cat-1', name: 'Camerounaise', iconUrl: 'flag' } as Category,
+    { id: 'cat-2', name: 'Africaine',    iconUrl: 'public' } as Category,
+    { id: 'cat-3', name: 'Italienne',    iconUrl: 'pizza' } as Category,
   ];
 
   beforeEach(async () => {
-    categoryService = jasmine.createSpyObj<CategoryService>('CategoryService', [
-      'searchCategories',
-    ]);
-
-    categoryService.searchCategories.and.returnValue(
-      of({
-        content: CATEGORIES,
-        page: 0, size: 100, totalElements: CATEGORIES.length,
-        totalPages: 1, first: true, last: true, empty: false,
-      } as DataPage<Category>),
+    categoryServiceMock = jasmine.createSpyObj('CategoryService', ['searchCategories']);
+    categoryServiceMock.searchCategories.and.returnValue(
+      of({ content: CATEGORIES, page: 0, size: 100, totalElements: 3, totalPages: 1 }),
     );
 
     await TestBed.configureTestingModule({
-      imports: [HostComponent],
+      imports: [CategoryPillsSelectorComponent, ReactiveFormsModule],
       providers: [
-        { provide: CATEGORY_SERVICE, useValue: categoryService },
+        { provide: CATEGORY_SERVICE, useValue: categoryServiceMock },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HostComponent);
-    host = fixture.componentInstance;
+    control = new FormControl<string[]>([], { nonNullable: true });
+    fixture = TestBed.createComponent(CategoryPillsSelectorComponent);
+    component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('categoryType', 'CUISINE' as CategoryType);
+    fixture.componentRef.setInput('control', control);
+    fixture.componentRef.setInput('maxSelection', 3);
+    fixture.componentRef.setInput('minSelection', 0);
+
     fixture.detectChanges();
   });
 
-  /** Query the rendered pills. Cast the NodeList to a typed array. */
-  function pills(): HTMLButtonElement[] {
-    return Array.from(
-      fixture.nativeElement.querySelectorAll('button'),
-    ) as HTMLButtonElement[];
-  }
+  // ═══════════════════════════════════════════════════════════
+  //  Loading and fetch
+  // ═══════════════════════════════════════════════════════════
 
-  function findPill(name: string): HTMLButtonElement | undefined {
-    return pills().find(b => b.textContent?.includes(name) ?? false);
-  }
+  describe('fetch', () => {
+    it('calls the service with the correct category type', () => {
+      expect(categoryServiceMock.searchCategories).toHaveBeenCalledOnceWith(
+        jasmine.objectContaining({ type: 'CUISINE', moderationStatus: 'APPROVED' }),
+      );
+    });
 
-  function isSelected(pill: HTMLButtonElement): boolean {
-    return pill.classList.contains('bg-primary-fixed');
-  }
-
-  it('fetches categories for the given type on init', () => {
-    expect(categoryService.searchCategories).toHaveBeenCalledWith(
-      jasmine.objectContaining({ type: 'CUISINE' }),
-    );
-  });
-
-  it('renders one pill per returned category', () => {
-    expect(pills().length).toBe(CATEGORIES.length);
-  });
-
-  it('seeds the selection from the FormControl value', () => {
-    host.control.setValue(['c2']);
-    fixture.detectChanges();
-
-    const pill = findPill('Cuisine Bamiléké');
-    expect(pill).toBeDefined();
-    expect(isSelected(pill!)).toBe(true);
-  });
-
-  it('adds an id to the control when a pill is clicked', () => {
-    findPill('Cuisine Sawa')!.click();
-    fixture.detectChanges();
-
-    expect(host.control.value).toEqual(['c1']);
-  });
-
-  it('removes the id when a selected pill is clicked again', () => {
-    host.control.setValue(['c1']);
-    fixture.detectChanges();
-
-    findPill('Cuisine Sawa')!.click();
-    fixture.detectChanges();
-
-    expect(host.control.value).toEqual([]);
-  });
-
-  it('enforces the maxSelection limit', () => {
-    host.control.setValue(['c1', 'c2', 'c3']);
-    fixture.detectChanges();
-
-    findPill('Cuisine Douala')!.click();
-    fixture.detectChanges();
-
-    expect(host.control.value).toEqual(['c1', 'c2', 'c3']);
-  });
-
-  describe('reset via programmatic control value', () => {
-    it('deselects every pill when the control is set to []', () => {
-      host.control.setValue(['c1', 'c2']);
-      fixture.detectChanges();
-
-      expect(isSelected(findPill('Cuisine Sawa')!)).toBe(true);
-      expect(isSelected(findPill('Cuisine Bamiléké')!)).toBe(true);
-
-      host.control.setValue([]);
-      fixture.detectChanges();
-
-      for (const pill of pills()) {
-        expect(isSelected(pill)).toBe(false);
+    it('renders one pill per category after loading', () => {
+      for (const cat of CATEGORIES) {
+        const pill = fixture.nativeElement.querySelector(
+          `[data-testid=category-pill-CUISINE-${cat.id}]`);
+        expect(pill).toBeTruthy();
       }
     });
 
-    it('deselects when the drawer-style reset writes with emitEvent: true', () => {
-      host.control.setValue(['c1', 'c2']);
-      fixture.detectChanges();
-      expect(isSelected(findPill('Cuisine Sawa')!)).toBe(true);
+    it('shows an error when the service fails', () => {
+      categoryServiceMock.searchCategories.and.returnValue(
+        throwError(() => new Error('boom')),
+      );
 
-      host.control.setValue([]);
-      fixture.detectChanges();
-
-      expect(isSelected(findPill('Cuisine Sawa')!)).toBe(false);
-    });
-
-    it('reacts to a fresh selection set programmatically', () => {
-      host.control.setValue(['c1']);
+      // Recreate the component to trigger a new fetch with the failing mock.
+      fixture = TestBed.createComponent(CategoryPillsSelectorComponent);
+      component = fixture.componentInstance;
+      fixture.componentRef.setInput('categoryType', 'CUISINE' as CategoryType);
+      fixture.componentRef.setInput('control', new FormControl<string[]>([], { nonNullable: true }));
       fixture.detectChanges();
 
-      host.control.setValue(['c3']);
-      fixture.detectChanges();
-
-      expect(isSelected(findPill('Cuisine Sawa')!)).toBe(false);
-      expect(isSelected(findPill('Cuisine Beti')!)).toBe(true);
+      // The component renders the error through <app-form-error>. Check
+      // that the fetch failed and the error was recorded.
+      expect(component['fetchError']()).toBeTruthy();
     });
   });
 
-  it('emits selectionChange when a pill is toggled', () => {
-    const emitted: string[][] = [];
-    // Cast on the same line, or wrap the chained expression in parens.
-    const pillsComponent =
-      fixture.debugElement.children[0].componentInstance as CategoryPillsSelectorComponent;
+  // ═══════════════════════════════════════════════════════════
+  //  Toggle
+  // ═══════════════════════════════════════════════════════════
 
-    pillsComponent.selectionChange.subscribe((v: string[]) => emitted.push(v));
+  describe('toggle', () => {
+    it('selects a pill on click', () => {
+      clickPill('cat-1');
+      expect(control.value).toEqual(['cat-1']);
+    });
 
-    findPill('Cuisine Sawa')!.click();
+    it('deselects a pill when clicked twice', () => {
+      clickPill('cat-1');
+      clickPill('cat-1');
+      expect(control.value).toEqual([]);
+    });
+
+    it('updates the counter', () => {
+      clickPill('cat-1');
+      clickPill('cat-2');
+      const counter = fixture.nativeElement.querySelector(
+        '[data-testid=category-pills-counter-CUISINE]');
+      expect(counter?.textContent).toContain('2');
+    });
+
+    it('emits selectionChange on each toggle', () => {
+      const spy = jasmine.createSpy('selectionChange');
+      component.selectionChange.subscribe(spy);
+
+      clickPill('cat-1');
+      expect(spy).toHaveBeenCalledOnceWith(['cat-1']);
+    });
+
+    it('emits categoriesSelected with the full Category objects', () => {
+      const spy = jasmine.createSpy('categoriesSelected');
+      component.categoriesSelected.subscribe(spy);
+
+      clickPill('cat-1');
+      expect(spy.calls.mostRecent().args[0]).toEqual([CATEGORIES[0]]);
+    });
+
+    it('respects maxSelection', () => {
+      fixture.componentRef.setInput('maxSelection', 2);
+      fixture.detectChanges();
+
+      clickPill('cat-1');
+      clickPill('cat-2');
+      clickPill('cat-3');   // should be blocked
+
+      expect(control.value).toEqual(['cat-1', 'cat-2']);
+    });
+
+    it('replaces the selection in single-select mode', () => {
+      fixture.componentRef.setInput('maxSelection', 1);
+      fixture.detectChanges();
+
+      clickPill('cat-1');
+      clickPill('cat-2');
+      expect(control.value).toEqual(['cat-2']);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════
+  //  External control sync
+  // ═══════════════════════════════════════════════════════════
+
+  describe('control sync', () => {
+    it('reflects external control changes in the selected state', () => {
+      control.setValue(['cat-2']);
+      fixture.detectChanges();
+
+      const pill = fixture.nativeElement.querySelector(
+        '[data-testid=category-pill-CUISINE-cat-2]');
+      expect(pill.getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('marks external selections in the counter', () => {
+      control.setValue(['cat-1', 'cat-3']);
+      fixture.detectChanges();
+
+      const counter = fixture.nativeElement.querySelector(
+        '[data-testid=category-pills-counter-CUISINE]');
+      expect(counter?.textContent).toContain('2');
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════
+  //  Helpers
+  // ═══════════════════════════════════════════════════════════
+
+  function clickPill(id: string): void {
+    const pill = fixture.nativeElement.querySelector(
+      `[data-testid=category-pill-CUISINE-${id}]`);
+    pill.click();
     fixture.detectChanges();
-
-    expect(emitted).toEqual([['c1']]);
-  });
+  }
 });

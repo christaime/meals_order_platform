@@ -1,0 +1,128 @@
+<div class="flex flex-col gap-2">
+
+  <!-- Label row -->
+  <div class="flex flex-col gap-0.5">
+    <label
+      [attr.for]="'ingredient-autocomplete-input'"
+      class="font-label text-xs font-semibold text-on-surface">
+      {{ label() }}
+    </label>
+    @if (hint()) {
+    <span class="font-label text-[11px] font-normal text-on-surface-variant">
+      {{ hint() }}
+    </span>
+    }
+  </div>
+
+  <!-- Selected chips -->
+  @if (selected().length > 0) {
+  <div
+    data-testid="ingredient-autocomplete-selection"
+    class="flex flex-wrap gap-2">
+    @for (ing of selected(); track ing.id) {
+    <span
+      [attr.data-testid]="'ingredient-chip-' + ing.id"
+      [attr.data-ingredient-id]="ing.id"
+      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+             bg-error/10 text-error border border-error/40
+             text-xs font-semibold">
+      <span>{{ ing.name }}</span>
+      <button
+        type="button"
+        [attr.data-testid]="'ingredient-chip-remove-' + ing.id"
+        [attr.aria-label]="'Retirer ' + ing.name"
+        (click)="remove(ing)"
+        class="w-4 h-4 rounded-full inline-flex items-center justify-center
+               hover:bg-error hover:text-on-error transition-colors cursor-pointer">
+        <app-icon name="close" size="sm" />
+      </button>
+    </span>
+    }
+  </div>
+  }
+
+  <!-- Search input + dropdown -->
+  <div class="relative">
+    <div class="relative flex items-center">
+      <div class="absolute left-3 flex items-center pointer-events-none text-on-surface-variant">
+        <app-icon name="search" size="sm" />
+      </div>
+
+      <input
+        id="ingredient-autocomplete-input"
+        type="text"
+        data-testid="ingredient-autocomplete-input"
+        [formControl]="searchControl"
+        [placeholder]="placeholder()"
+        (focus)="onInputFocus()"
+        (blur)="onInputBlur()"
+        (keydown)="onKeyDown($event)"
+        autocomplete="off"
+        class="w-full h-10 pl-9 pr-3 rounded-lg
+               bg-surface-container-low text-on-surface
+               font-body-md text-sm border border-outline-variant
+               focus:outline-none focus:ring-2 focus:ring-primary"
+      />
+
+      @if (isSearching()) {
+      <div class="absolute right-3 flex items-center text-on-surface-variant">
+        <span class="text-xs">…</span>
+      </div>
+      }
+    </div>
+
+    <!-- Results dropdown -->
+    @if (isDropdownOpen() && availableResults().length > 0) {
+    <div
+      data-testid="ingredient-autocomplete-dropdown"
+      class="absolute left-0 right-0 mt-1 z-30
+             bg-surface-container-lowest rounded-lg shadow-xl
+             border border-outline-variant max-h-60 overflow-y-auto py-1">
+      @for (ing of availableResults(); track ing.id) {
+      <button
+        type="button"
+        [attr.data-testid]="'ingredient-option-' + ing.id"
+        [attr.data-ingredient-id]="ing.id"
+        [attr.data-ingredient-name]="ing.name"
+        [attr.data-disabled]="atLimit() ? '' : null"
+        [disabled]="atLimit()"
+        (mousedown)="tryAdd(ing, $event)"
+        class="w-full text-left px-3 py-2 text-sm
+               font-body-md text-on-surface
+               hover:bg-surface-container transition-colors
+               flex items-center justify-between
+               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+        <span>{{ ing.name }}</span>
+        @if (ing.isAllergen) {
+        <span class="text-[10px] font-bold uppercase tracking-wider text-error">
+          Allergène
+        </span>
+        }
+      </button>
+      }
+    </div>
+    }
+
+    <!-- No-results hint -->
+    @if (!isSearching() && availableResults().length === 0 && searchControl.value.trim().length > 0) {
+    <div
+      data-testid="ingredient-autocomplete-empty"
+      class="absolute left-0 right-0 mt-1 z-30
+             bg-surface-container-lowest rounded-lg shadow-xl
+             border border-outline-variant px-3 py-2
+             text-xs text-on-surface-variant">
+      Aucun ingrédient ne correspond.
+    </div>
+    }
+
+    <!-- Limit hint -->
+    @if (atLimit()) {
+    <span
+      data-testid="ingredient-autocomplete-limit-hint"
+      class="block mt-1 text-[11px] font-label text-error">
+      Maximum {{ maxSelection() }} ingrédients exclus.
+    </span>
+    }
+  </div>
+
+</div>

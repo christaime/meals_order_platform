@@ -1,93 +1,18 @@
 [
-  {
-    "id": "cat-camerounais",
-    "name": "Camerounais traditionnel",
-    "description": "Cuisine traditionnelle du Cameroun",
-    "iconUrl": null,
-    "type": "CUISINE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-street-food",
-    "name": "Street Food (Braises)",
-    "description": "Grillades et spécialités de rue",
-    "iconUrl": null,
-    "type": "CUISINE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-patisseries",
-    "name": "Pâtisseries & Beignets",
-    "description": "Douceurs et pâtisseries locales",
-    "iconUrl": null,
-    "type": "CUISINE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-boissons",
-    "name": "Boissons locales",
-    "description": "Foléré, Baobab, jus naturels",
-    "iconUrl": null,
-    "type": "CUISINE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-plat-resistance",
-    "name": "Plat de résistance",
-    "description": "Le plat principal du repas",
-    "iconUrl": null,
-    "type": "DISH_TYPE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-poissons-viandes",
-    "name": "Poissons & Viandes",
-    "description": "Grillades et plats protéinés",
-    "iconUrl": null,
-    "type": "DISH_TYPE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-soupes-sauces",
-    "name": "Soupes & Sauces",
-    "description": "Sauces traditionnelles et bouillons",
-    "iconUrl": null,
-    "type": "DISH_TYPE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-feculents",
-    "name": "Miondo, Bobolo & Plantain",
-    "description": "Accompagnements traditionnels",
-    "iconUrl": null,
-    "type": "DISH_TYPE",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  },
-  {
-    "id": "cat-supplement",
-    "name": "Accompagnement payant",
-    "type": "DISH_TYPE",
-    "createdByType": "ADMIN",
-    "createdById": "admin-1",
-    "moderationStatus": "APPROVED",
-    "isActive": true,
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-08-01T08:00:00Z"
-  }
+  { "id": "cuisine-camerounaise", "name": "Camerounaise", "description": "Cuisine traditionnelle du Cameroun", "iconUrl": "local_dining",  "type": "CUISINE",   "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "cuisine-africaine",    "name": "Africaine",    "description": "Cuisine du continent africain",       "iconUrl": "public",        "type": "CUISINE",   "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "cuisine-italienne",    "name": "Italienne",    "description": "Cuisine italienne",                   "iconUrl": "local_pizza",   "type": "CUISINE",   "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "cuisine-francaise",    "name": "Française",    "description": "Cuisine française",                   "iconUrl": "restaurant",    "type": "CUISINE",   "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "cuisine-asiatique",    "name": "Asiatique",    "description": "Cuisine asiatique",                   "iconUrl": "ramen_dining",  "type": "CUISINE",   "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "cuisine-libanaise",    "name": "Libanaise",    "description": "Cuisine libanaise",                   "iconUrl": "kebab_dining",  "type": "CUISINE",   "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+
+  { "id": "dish-main",            "name": "Plat de résistance", "description": "Plat principal du repas",        "iconUrl": "restaurant_menu", "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-appetizer",       "name": "Entrée",             "description": "Entrée ou amuse-bouche",         "iconUrl": "tapas",           "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-dessert",         "name": "Dessert",            "description": "Dessert sucré",                  "iconUrl": "icecream",        "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-side",            "name": "Accompagnement",     "description": "Accompagnement du plat",         "iconUrl": "rice_bowl",       "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-sauce",           "name": "Sauce seule",        "description": "Sauce servie seule",             "iconUrl": "soup_kitchen",    "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-beverage",        "name": "Boisson",            "description": "Boisson",                        "iconUrl": "local_drink",     "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-snack",           "name": "Snack",              "description": "En-cas",                         "iconUrl": "fastfood",        "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-grill",           "name": "Grillades",          "description": "Viandes et poissons grillés",    "iconUrl": "outdoor_grill",   "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  { "id": "dish-soup",            "name": "Soupe",              "description": "Soupe chaude",                   "iconUrl": "soup_kitchen",    "type": "DISH_TYPE", "isActive": true, "status": "APPROVED", "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" }
 ]

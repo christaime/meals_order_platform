@@ -1,6 +1,7 @@
 <!-- Trigger Button -->
 <button
   type="button"
+  data-testid="advanced-filter-trigger"
   (click)="openDrawer()"
   class="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors shadow-xs"
 >
@@ -11,11 +12,13 @@
 <!-- Backdrop & Drawer -->
 @if (isOpen()) {
 <div
+  data-testid="advanced-filter-backdrop"
   class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 transition-opacity"
   (click)="closeDrawer()"
 ></div>
 
 <aside
+  data-testid="advanced-filter-drawer"
   class="fixed inset-y-0 right-0 w-full max-w-md bg-surface-container-lowest z-50 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-250"
 >
   <!-- Drawer Header -->
@@ -26,6 +29,7 @@
     </div>
     <button
       type="button"
+      data-testid="advanced-filter-close"
       (click)="closeDrawer()"
       class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors"
     >
@@ -43,12 +47,15 @@
           <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
             Prix minimum
           </label>
-          <span class="font-body-md text-sm font-bold text-primary">
-            {{ draftFilters().minPrice }} FCFA
+          <span
+            data-testid="advanced-filter-min-price-value"
+            class="font-body-md text-sm font-bold text-primary">
+            {{ draftFilters().minPrice | appAmount }}
           </span>
         </div>
         <input
           type="range"
+          data-testid="advanced-filter-min-price"
           [min]="priceMin"
           [max]="priceMax"
           [step]="priceStep"
@@ -67,12 +74,15 @@
           <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
             Prix maximum
           </label>
-          <span class="font-body-md text-sm font-bold text-primary">
-            {{ draftFilters().maxPrice }} FCFA
+          <span
+            data-testid="advanced-filter-max-price-value"
+            class="font-body-md text-sm font-bold text-primary">
+            {{ draftFilters().maxPrice | appAmount }}
           </span>
         </div>
         <input
           type="range"
+          data-testid="advanced-filter-max-price"
           [min]="priceMin"
           [max]="priceMax"
           [step]="priceStep"
@@ -99,6 +109,7 @@
       </div>
       <input
         type="range"
+        data-testid="advanced-filter-max-prep-time"
         min="15"
         max="180"
         step="5"
@@ -117,6 +128,8 @@
         @for (stars of [0, 3, 4, 4.5]; track stars) {
         <button
           type="button"
+          [attr.data-testid]="'advanced-filter-rating-' + stars"
+          [attr.aria-pressed]="draftFilters().minRating === stars"
           (click)="setMinRating(stars)"
           class="flex-1 py-2 rounded-xl border text-xs font-semibold transition-all"
           [class.bg-primary]="draftFilters().minRating === stars"
@@ -132,20 +145,16 @@
       </div>
     </div>
 
-    <!-- Availability Toggle -->
-    <div class="flex items-center justify-between pt-2 border-t border-outline-variant">
-      <div class="flex flex-col">
-        <span class="font-label-md text-sm font-bold text-on-surface">Disponible immédiatement</span>
-        <span class="text-xs text-on-surface-variant">Exclure les plats épuisés</span>
-      </div>
-      <input
-        type="checkbox"
-        [checked]="draftFilters().availableOnly"
-        (change)="toggleAvailableOnly()"
-        class="w-5 h-5 accent-primary rounded cursor-pointer"
+    <!-- Excluded ingredients -->
+    <div class="flex flex-col gap-2 pt-2 border-t border-outline-variant">
+      <app-ingredient-autocomplete
+        label="Exclure des ingrédients"
+        hint="Les plats contenant ces ingrédients seront masqués."
+        [maxSelection]="5"
+        [initialSelection]="initialIngredients"
+        (selectionChange)="onExcludedIngredientsChange($event)"
       />
     </div>
-
     <!-- Category pills -->
     <div class="flex flex-col gap-4 pt-2 border-t border-outline-variant">
       <app-category-pills-selector
@@ -165,47 +174,24 @@
         (categoriesSelected)="onDishTypesSelected($event)" />
     </div>
 
-    <!-- Excluded ingredients -->
-    @if (ingredientOptions().length > 0) {
-    <div class="flex flex-col gap-2">
-      <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-        Exclure des ingrédients
-      </label>
-      <p class="text-[11px] text-on-surface-variant -mt-1">
-        Les plats contenant ces ingrédients seront masqués.
-      </p>
-      <div class="flex flex-wrap gap-2">
-        @for (ing of ingredientOptions(); track ing.id) {
-        <button
-          type="button"
-          (click)="toggleExcludeIngredient(ing.id)"
-          class="px-3 py-1.5 rounded-full border text-xs font-semibold transition-all"
-          [class.bg-error]="isSelected(draftFilters().excludeIngredientIds, ing.id)"
-          [class.text-on-error]="isSelected(draftFilters().excludeIngredientIds, ing.id)"
-          [class.border-error]="isSelected(draftFilters().excludeIngredientIds, ing.id)"
-          [class.bg-surface-container-low]="!isSelected(draftFilters().excludeIngredientIds, ing.id)"
-          [class.text-on-surface-variant]="!isSelected(draftFilters().excludeIngredientIds, ing.id)"
-          [class.border-outline-variant]="!isSelected(draftFilters().excludeIngredientIds, ing.id)"
-        >
-          {{ ing.name }}
-        </button>
-        }
-      </div>
-    </div>
-    }
   </div>
 
   <!-- Footer -->
   <div class="p-5 border-t border-outline-variant bg-surface-container-low flex items-center gap-3">
     <button
       type="button"
-      (click)="resetFilters()"
-      class="px-4 py-3 rounded-full border border-outline-variant text-on-surface font-label-md text-xs font-semibold hover:bg-surface-container transition-colors"
+      data-testid="clear-all-advanced-filter"
+      (click)="clearAll()"
+      class="px-4 py-3 rounded-full border border-outline-variant text-on-surface font-label-md text-xs font-semibold hover:bg-surface-container
+         active:scale-95 active:bg-surface-container-high
+         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+         transition-all duration-150"
     >
-      Réinitialiser
+      Tout effacer
     </button>
     <button
       type="button"
+      data-testid="advanced-filter-apply"
       (click)="onApply()"
       class="flex-1 py-3 rounded-full bg-primary text-on-primary font-label-md text-xs font-bold hover:bg-primary-container transition-colors shadow-sm"
     >

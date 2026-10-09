@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import {
   AdvancedFilterDrawerComponent,
-  FilterState, DEFAULT_FILTERS
+  FilterState, DEFAULT_FILTERS, FilterSelection
 } from '@components/marketplace/meal/view';
 
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
@@ -78,6 +78,7 @@ export class MealFiltersComponent implements OnInit {
   readonly cityId = input<string | null>(null);
   readonly sort = input<MealSort>('name-asc');
   readonly advanced = input<FilterState>({ ...DEFAULT_FILTERS });
+  readonly initialSelection = signal<FilterSelection>({cuisines: [], dishTypes: [], ingredients: []});
 
   /** Option lists owned by the page (vendor-scoped). */
   readonly ingredientOptions = input<IngredientSummary[]>([]);
@@ -155,6 +156,10 @@ export class MealFiltersComponent implements OnInit {
    */
   protected onAdvancedChange(advanced: FilterState): void {
     this.emit({ advanced });
+  }
+
+  protected onAdvancedSelectionChange(advanced: FilterSelection): void {
+    this.initialSelection.set(advanced);
   }
 
   // ─── Helpers ──────────────────────────────────────────────

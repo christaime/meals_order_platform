@@ -3,6 +3,8 @@
     @for (item of subCategories(); track item.id) {
     <button
       type="button"
+      [attr.data-testid]="'subcategory-chip-' + item.kind + '-' + item.id"
+      [attr.aria-pressed]="isSelected(item.id)"
       (click)="selectSubCategory(item)"
       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-label-sm font-medium transition-all duration-150 border cursor-pointer select-none"
       [class.bg-secondary-container]="isSelected(item.id)"
@@ -15,16 +17,17 @@
       [class.hover:bg-surface-container]="!isSelected(item.id)"
     >
       @if(item.iconUrl){
-        <app-icon [name]="item.iconUrl" size="sm" />
+      <app-icon [name]="item.iconUrl" size="sm" />
       }@else if(item.kind=='CUISINE'){
-        <app-icon name="local_dining" size="sm" />
+      <app-icon name="local_dining" size="sm" />
       }@else if(item.kind=='DISH_TYPE'){
-        <app-icon name="restaurant" size="sm" />
+      <app-icon name="restaurant" size="sm" />
       }
       <span>{{ item.name }}</span>
 
       @if (item.count !== undefined) {
       <span
+        [attr.data-testid]="'subcategory-chip-' + item.kind + '-' + item.id + '-count'"
         class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
         [class.bg-surface-container-lowest]="isSelected(item.id)"
         [class.text-secondary]="isSelected(item.id)"

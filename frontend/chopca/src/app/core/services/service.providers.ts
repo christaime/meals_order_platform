@@ -35,6 +35,9 @@ import { ModerationApiService } from './marketplace/moderation-api.service';
 import { MEDIA_SERVICE } from './marketplace/media.service';
 import { MediaApiService } from './marketplace/media-api.service';
 
+import { CHAT_SERVICE } from './ai/chat.service';
+import { ChatApiService } from './ai/chat-api.service';
+
 // ─── Mock implementations (isolated in /mock) ─────────────────
 import { KeycloakMockService } from '@app/mock/services/keycloak-mock.service';
 import { MealMockService } from '@app/mock/services/meal-mock.service';
@@ -47,6 +50,7 @@ import { CapacityMockService } from '@app/mock/services/capacity-mock.service';
 import { ModerationMockService } from '@app/mock/services/moderation-mock.service';
 import { ReferenceMockService } from '@app/mock/services//reference-mock.service';
 import { MediaMockService } from '@app/mock/services/media-mock.service';
+import { ChatMockService } from '@app/mock/services/chat-mock.service';
 
 /**
  * Service providers with environment-based switching.
@@ -104,4 +108,8 @@ export const SERVICE_PROVIDERS: Provider[] = [
       provide: REFERENCE_SERVICE,
       useClass: environment.useMockServices ? ReferenceMockService : ReferenceApiService,
    },
+  {
+     provide: CHAT_SERVICE,
+     useClass: environment.useMockServices ? ChatMockService : ChatApiService,
+  },
 ];

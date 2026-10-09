@@ -7,6 +7,8 @@ import {
   IngredientSearchRequest,
 } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
+import { ModerationStatus } from '@core/models/marketplace';
+import { SortDirection } from '@core/models/shared';
 
 /**
  * Abstract contract for the Ingredient service.
@@ -40,6 +42,7 @@ export abstract class IngredientService {
   abstract searchIngredientsFlat(request: {
     keyword?: string;
     size?: number;
+    moderationStatus?: ModerationStatus
   }): Observable<IngredientSummary[]>;
 
   /**
