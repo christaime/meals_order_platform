@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { UserContextService } from '@app/core/services/auth/user-context.service';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { GoogleMapsLoaderService } from '@core/services/google-maps-loader.service';
 
@@ -19,7 +19,7 @@ import { GoogleMapsLoaderService } from '@core/services/google-maps-loader.servi
  *  - Any failure: logged, swallowed. The app boots into a public state.
  */
 export function initializeApp(): () => Promise<void> {
-  const ctx = inject(UserContextService);
+  const ctx = inject(USER_CONTEXT_SERVICE);
   const keycloakUser = inject(KEYCLOAK_SERVICE);
   const mapsLoader = inject(GoogleMapsLoaderService);
 

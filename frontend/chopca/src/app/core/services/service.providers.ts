@@ -5,6 +5,9 @@ import { environment } from '@environments/environment';
 import { KEYCLOAK_SERVICE } from './auth/keycloak.service';
 import { KeycloakApiService } from './auth/keycloak-api.service';
 
+import { USER_CONTEXT_SERVICE } from './auth/user-context.service';
+import { UserContextApiService } from './auth/user-context-api.service';
+
 import { MEAL_SERVICE } from './marketplace/meal.service';
 import { MealApiService } from './marketplace/meal-api.service';
 
@@ -40,6 +43,7 @@ import { ChatApiService } from './ai/chat-api.service';
 
 // ─── Mock implementations (isolated in /mock) ─────────────────
 import { KeycloakMockService } from '@app/mock/services/keycloak-mock.service';
+import { UserContextMockService } from '@app/mock/services/user-context-mock.service';
 import { MealMockService } from '@app/mock/services/meal-mock.service';
 import { CategoryMockService } from '@app/mock/services/category-mock.service';
 import { IngredientMockService } from '@app/mock/services/ingredient-mock.service';
@@ -67,6 +71,10 @@ export const SERVICE_PROVIDERS: Provider[] = [
   {
     provide: KEYCLOAK_SERVICE,
     useClass: environment.useMockServices ? KeycloakMockService : KeycloakApiService,
+  },
+  {
+    provide: USER_CONTEXT_SERVICE,
+    useClass: environment.useMockServices ? UserContextMockService : UserContextApiService,
   },
   {
     provide: MEAL_SERVICE,

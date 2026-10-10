@@ -5,8 +5,8 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { UserContextService } from '@core/services/auth/user-context.service';
 import { KEYCLOAK_SERVICE ,AppRole, APP_ROLES, ADMIN_ROLE, VENDOR_ROLE, CUSTOMER_ROLE } from '@core/services/auth/keycloak.service';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 
 
 const AUTHENTICATED_PREFIXES = ['/registration', '/admin', '/vendor', '/customer'] as const;
@@ -50,15 +50,16 @@ export const appGuard: CanActivateFn = async (
 ) => {
   const keycloakUser = inject(KEYCLOAK_SERVICE);
   const router   = inject(Router);
-  const ctx      = inject(UserContextService);
+  const ctx      = inject(USER_CONTEXT_SERVICE);
 
   const url = state.url;
-
+  //console.log(" GUARDING ROUTE", url);
   // ─── 1. Public route ──────────────────────────────────────
   if (!matches(url, AUTHENTICATED_PREFIXES)) return true;
-
+  //console.log("IS A RESTRICTED ROUTE");
   // ─── 2. Auth required ─────────────────────────────────────
-  if (!keycloakUser.isAuthenticated) {
+  if (!keycloakUser.isAuthenticated()) {
+    //console.log("RESTRICTED ROUTE, USER UNAUTHENTICATED, ROUTE TO LOGIN");
     return router.createUrlTree([LOGIN_ROUTE], {
       queryParams: { returnUrl: url },
     });

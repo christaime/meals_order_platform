@@ -28,7 +28,7 @@ import {
 } from '@components/shared/delete-entity-dialog/delete-entity-dialog.component';
 
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
-import { UserContextService } from '@app/core/services/auth/user-context.service';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
@@ -69,7 +69,7 @@ export class MealsPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly mealService = inject(MEAL_SERVICE);
-  private readonly userContext = inject(UserContextService);
+  private readonly userContext = inject(USER_CONTEXT_SERVICE);
   private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);

@@ -15,7 +15,7 @@ import { WorkspaceService } from '@app/core/services/marketplace/workspace.servi
 import { UserContextService } from '@app/core/services/auth/user-context.service';
 import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.models';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
-
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 /**
  * Application header — used by authenticated areas.
  *
@@ -47,7 +47,7 @@ import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 export class AuthHeaderComponent {
 
   private readonly workspaceService = inject(WorkspaceService);
-  private readonly userContext = inject(UserContextService);
+  private readonly userContext = inject(USER_CONTEXT_SERVICE);
   private readonly keycloakService = inject(KEYCLOAK_SERVICE);
 
   // ─── Workspace (menu + badge) ─────────────────────────────

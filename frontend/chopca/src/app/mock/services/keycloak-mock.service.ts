@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
 import {
   AppRole,
   ADMIN_ROLE,
@@ -7,7 +7,7 @@ import {
   KeycloakService,
   VENDOR_ROLE,
 } from '@core/services/auth/keycloak.service';
-
+import { Router } from '@angular/router';
 /**
  * A synthetic user for tests.
  *
@@ -27,13 +27,18 @@ export class KeycloakMockService implements KeycloakService {
 
   private readonly _user = signal<MockUser | null>(null);
   private readonly _logoutRequested = signal<number>(0);
+  private readonly router = inject(Router);
 
   readonly logoutRequested = this._logoutRequested.asReadonly();
   readonly roles = computed<ReadonlySet<AppRole>>(
     () => new Set(this._user()?.roles ?? []),
   );
 
-  readonly isAuthenticated = computed(() => this._user() !== null);
+  readonly isAuthenticated = computed(() => {
+    const isAuthenticated = this._user() !== null;
+    console.log("isAuthenticated ",isAuthenticated);
+    return isAuthenticated;
+  });
   readonly isAnonymous     = computed(() => this._user() === null);
   readonly isAdmin         = computed(() => this._user()?.roles.includes(ADMIN_ROLE) ?? false);
   readonly isVendor        = computed(() => this._user()?.roles.includes(VENDOR_ROLE) ?? false);
@@ -48,6 +53,8 @@ export class KeycloakMockService implements KeycloakService {
     if (!this._user()) {
       this.signIn(defaultUserFor(idpHint));
     }
+    this.router.navigate(['/auth/callback']);
+    console.log("Sign in as default user ", this._user());
   }
 
   async logout(): Promise<void> {
@@ -172,7 +179,7 @@ function defaultUserFor(idpHint?: string): MockUser {
     email: `user@${idpHint ?? 'local'}.com`,
     name: 'Default User',
     idp: (idpHint as MockUser['idp']) ?? 'local',
-    roles: ['CUSTOMER'],
+    roles: ['ADMIN', 'VENDOR', 'CUSTOMER'],
   };
 }
 

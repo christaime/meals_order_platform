@@ -12,7 +12,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 import { LogoComponent } from '@components/shared/logo/logo.component';
 import { BadgeComponent } from '@components/shared/badge/badge.component';
 import { Router } from '@angular/router';
-import { UserContextService } from '@core/services/auth';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 
 interface NavItem {
   readonly label: string;
@@ -43,7 +43,7 @@ interface CurrentUser {
 })
 export class HeaderComponent {
 
-  private readonly userContext = inject(UserContextService);
+  private readonly userContext = inject(USER_CONTEXT_SERVICE);
   // ─── Component Inputs & Outputs ─────────────────────────
   readonly cartCount = input<number>(0);
   readonly toggleCart = output<void>();

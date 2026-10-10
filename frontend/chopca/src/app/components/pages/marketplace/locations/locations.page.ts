@@ -17,7 +17,7 @@ import {
 import { LocationFormComponent } from '@components/marketplace/location/location-form/location-form.component';
 
 import { LOCATION_SERVICE } from '@app/core/services/marketplace/location.service';
-import { UserContextService } from '@app/core/services/auth/user-context.service';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { Location, LocationSearchRequest } from '@app/core/models/marketplace';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
@@ -51,7 +51,7 @@ export class LocationsPageComponent {
 
   private readonly route = inject(ActivatedRoute);
   private readonly locationService = inject(LOCATION_SERVICE);
-  private readonly userContext = inject(UserContextService);
+  private readonly userContext = inject(USER_CONTEXT_SERVICE);
   private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);

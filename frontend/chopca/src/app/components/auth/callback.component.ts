@@ -3,13 +3,14 @@ import { Router } from '@angular/router';
 import { UserContextService } from '../../core/services/auth';
 import { AppSessionStore, RETURN_URL_KEY } from '../../core/storage/app.store';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 
 @Component({
   standalone: true,
   template: `<div class="p-8 text-center">Signing you in…</div>`,
 })
 export class CallbackComponent implements OnInit {
-  private readonly ctx    = inject(UserContextService);
+  private readonly ctx    = inject(USER_CONTEXT_SERVICE);
   private readonly keycloakUserRoles  = inject(KEYCLOAK_SERVICE);
   private readonly router = inject(Router);
 

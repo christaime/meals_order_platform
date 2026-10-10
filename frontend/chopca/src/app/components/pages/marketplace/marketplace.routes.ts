@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MealEditorStore } from '@components/marketplace/meal/editor/state/meal-editor.store';
 import { mapsPreloadGuard } from '@core/guards/maps-preload.guard';
+import { appGuard } from '@core/guards/app.guard';
 /**
  * Public marketplace routes.
  *
@@ -48,6 +49,7 @@ export const MARKETPLACE_ROUTES: Routes = [
 export const ADMIN_ROUTES: Routes = [
   {
     path: 'cities',
+    canActivate: [appGuard],
     loadComponent: () =>
       import('./cities/cities.page')
         .then(m => m.CitiesPageComponent),
@@ -55,6 +57,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
       path: 'categories',
+      canActivate: [appGuard],
       loadComponent: () =>
         import('./categories/categories.page')
           .then(m => m.CategoriesPageComponent),
@@ -62,6 +65,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
       path: 'ingredients',
+      canActivate: [appGuard],
       loadComponent: () =>
         import('./ingredients/ingredients.page')
           .then(m => m.IngredientsPageComponent),
@@ -69,7 +73,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
     path: 'locations',
-    canActivate: [mapsPreloadGuard],
+    canActivate: [appGuard,mapsPreloadGuard],
     loadComponent: () =>
       import('./locations/locations.page')
         .then(m => m.LocationsPageComponent),
@@ -78,6 +82,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
     path: 'meals',
+    canActivate: [appGuard],
     loadComponent: () =>
       import('@components/pages/marketplace/meals/meals.page')
         .then(m => m.MealsPageComponent),
@@ -85,6 +90,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
     path: 'vendors',
+    canActivate: [appGuard],
     loadComponent: () =>
       import('@components/pages/marketplace/vendors/vendors.page')
         .then(m => m.VendorsPageComponent),
@@ -101,7 +107,7 @@ export const ADMIN_ROUTES: Routes = [
 export const VENDOR_ROUTES: Routes = [
   {
       path: 'locations',
-      canActivate: [mapsPreloadGuard],
+      canActivate: [appGuard,mapsPreloadGuard],
       loadComponent: () =>
         import('./locations/locations.page')
           .then(m => m.LocationsPageComponent),
@@ -110,7 +116,7 @@ export const VENDOR_ROUTES: Routes = [
   },
   {
     path: 'meals',
-    canActivate: [mapsPreloadGuard],
+    canActivate: [appGuard,mapsPreloadGuard],
     children: [
       {
         path: '',
