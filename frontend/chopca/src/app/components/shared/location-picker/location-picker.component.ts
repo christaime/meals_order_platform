@@ -27,6 +27,7 @@ import {
   LocationSearchRequest,
   LocationSummary,
 } from '@app/core/models/marketplace';
+import { VendorContextService } from '@core/services/marketplace/vendor-context.service';
 
 const RADIUS_MIN = 1;
 const RADIUS_MAX = 30;
@@ -75,6 +76,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   private readonly mapsLoader = inject(GoogleMapsLoaderService);
   private readonly zone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly ctx = inject(VendorContextService, { optional: true });
 
   @ViewChild(GoogleMap) map?: GoogleMap;
 
@@ -88,6 +90,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   readonly cityChange = output<City | null>();
   readonly pointChange = output<PickerPoint | null>();
   readonly locationsChange = output<LocationSummary[]>();
+  readonly searchStateChange = output<{ searching: boolean; count: number }>();
 
   // ─── Maps loader state ───────────────────────────────────────
   protected readonly mapsState = this.mapsLoader.state;
@@ -123,9 +126,9 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
   protected readonly cardPosition = signal<{ x: number; y: number } | null>(null);
 
   protected readonly mapCenter = signal<google.maps.LatLngLiteral>({
-    lat: 3.8480, lng: 11.5021,
+    lat: 5.6930, lng: 12.7400,
   });
-  protected readonly mapZoom = signal<number>(12);
+  protected readonly mapZoom = signal<number>(7);
   protected readonly markerPosition = signal<google.maps.LatLngLiteral | null>(null);
   protected readonly circleCenter = signal<google.maps.LatLngLiteral | null>(null);
   protected readonly circleRadiusMeters = signal<number>(RADIUS_DEFAULT * 1000);
@@ -414,6 +417,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
     if (!city) {
       this.results.set([]);
       this.locationsChange.emit([]);
+      this.searchStateChange.emit({ searching: false, count: 0 });
       return;
     }
 
@@ -421,10 +425,12 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
     if (!opts.cityOnly && !point) {
       this.results.set([]);
       this.locationsChange.emit([]);
+      this.searchStateChange.emit({ searching: false, count: 0 });
       return;
     }
 
     const request: LocationSearchRequest = {
+      vendorId: this.ctx?.vendorId()?? undefined,
       cityIds: [city.id],
       moderationStatus: 'APPROVED',
       size: 100,
@@ -441,6 +447,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
 
     const token = ++this.searchToken;
     this.isSearching.set(true);
+    this.searchStateChange.emit({ searching: true, count: this.results().length });
 
     this.locationService.searchLocations(request)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -450,6 +457,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
           this.results.set(page.content);
           this.locationsChange.emit(page.content);
           this.isSearching.set(false);
+          this.searchStateChange.emit({ searching: false, count: page.content.length });
         },
         error: (err) => {
           if (token !== this.searchToken) return;
@@ -457,6 +465,7 @@ export class LocationPickerComponent implements OnInit, AfterViewInit {
           this.results.set([]);
           this.locationsChange.emit([]);
           this.isSearching.set(false);
+          this.searchStateChange.emit({ searching: false, count: 0 });
         },
       });
   }

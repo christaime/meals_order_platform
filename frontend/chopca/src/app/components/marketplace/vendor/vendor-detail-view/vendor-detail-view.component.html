@@ -1,6 +1,6 @@
 @if (isLoading()) {
 <!-- Skeleton View -->
-<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-pulse flex flex-col gap-6">
+<div data-testid="vendor-detail-view-loading" class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-pulse flex flex-col gap-6">
   <div class="h-64 rounded-3xl bg-surface-container-high w-full"></div>
   <div class="h-10 w-full rounded-2xl bg-surface-container-high"></div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -12,11 +12,11 @@
 } @else if (vendor()) {
 <section class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
   <!-- Header Banner Card -->
-  <div class="relative rounded-3xl bg-surface-container-lowest border border-outline-variant/40 overflow-hidden shadow-xs">
+  <div data-testid="vendor-detail-view-banner" class="relative rounded-3xl bg-surface-container-lowest border border-outline-variant/40 overflow-hidden shadow-xs">
     <!-- Top Cover Image -->
     <div class="h-44 sm:h-60 w-full bg-surface-container-high relative overflow-hidden">
       @if (vendor()!.bannerUrl) {
-      <img [src]="vendor()!.bannerUrl" [alt]="vendor()!.businessName" class="w-full h-full object-cover" />
+      <img data-testid="vendor-detail-view-banner-img" [src]="vendor()!.bannerUrl" [alt]="vendor()!.businessName" class="w-full h-full object-cover" />
       } @else {
       <div class="w-full h-full bg-gradient-to-r from-primary/20 to-primary-container/40 flex items-center justify-center text-primary/30">
         <app-icon name="storefront" size="xl" />
@@ -26,6 +26,8 @@
       <!-- Status Badge -->
       <div class="absolute top-4 right-4">
           <span
+            data-testid="vendor-detail-view-status"
+            [attr.data-isVendorOpen]="isVendorOpen()"
             [class.bg-emerald-600]="isVendorOpen()"
             [class.text-white]="isVendorOpen()"
             [class.bg-error]="!isVendorOpen()"
@@ -44,14 +46,14 @@
         <!-- Logo / Profile Image -->
         <div class="w-24 h-24 rounded-2xl bg-surface-container-lowest border-4 border-surface-container-lowest shadow-md overflow-hidden shrink-0 flex items-center justify-center font-bold text-2xl text-primary">
           @if (vendor()!.profileImageUrl) {
-          <img [src]="vendor()!.profileImageUrl" [alt]="vendor()!.businessName" class="w-full h-full object-cover" />
+          <img data-testid="vendor-detail-view-profile-img" [src]="vendor()!.profileImageUrl" [alt]="vendor()!.businessName" class="w-full h-full object-cover" />
           } @else {
           {{ vendor()!.businessName.charAt(0) }}
           }
         </div>
 
         <div class="flex flex-col gap-1 pb-1">
-          <h1 class="font-headline-md text-xl sm:text-2xl font-bold text-on-surface">
+          <h1 data-testid="vendor-detail-view-name" class="font-headline-md text-xl sm:text-2xl font-bold text-on-surface">
             {{ vendor()!.businessName }}
           </h1>
           <app-rating-stars [rating]="vendor()!.ratingAvg" [count]="vendor()!.totalRatings" />
@@ -63,76 +65,43 @@
         @if (vendor()!.estimatedDeliveryTimeMinutes) {
         <div class="flex items-center gap-1.5">
           <app-icon name="schedule" size="sm" class="text-primary" />
-          <span>{{ vendor()!.estimatedDeliveryTimeMinutes }} min</span>
+          <span data-testid="vendor-detail-view-delivery-time"
+                [attr.data-estimatedDeliveryTimeMinutes]="vendor()!.estimatedDeliveryTimeMinutes"
+          >{{ vendor()!.estimatedDeliveryTimeMinutes }} min</span>
         </div>
         <span class="text-outline-variant">•</span>
         }
         @if (vendor()!.minimumOrderAmount) {
         <div class="flex items-center gap-1.5">
           <app-icon name="payments" size="sm" class="text-primary" />
-          <span>Min. {{ vendor()!.minimumOrderAmount }} FCFA</span>
+          <span data-testid="vendor-detail-view-min-expense"
+                [attr.data-minExpense]="vendor()!.minimumOrderAmount"
+          >Min. {{ vendor()!.minimumOrderAmount }} FCFA</span>
         </div>
         <span class="text-outline-variant">•</span>
         }
         <div class="flex items-center gap-1.5">
           <app-icon name="location_on" size="sm" class="text-primary" />
-          <span class="truncate max-w-[150px]">{{ vendor()!.address }}</span>
+          <span data-testid="vendor-detail-view-address" class="truncate max-w-[150px]">{{ vendor()!.address }}</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Category Menu Navigation Tabs -->
-  @if (categories() && categories().length > 0) {
-  <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-surface-container-high">
-    <button
-      type="button"
-      (click)="onSelectCategory('all')"
-      [class.bg-primary]="selectedCategoryId() === 'all'"
-      [class.text-on-primary]="selectedCategoryId() === 'all'"
-      [class.bg-surface-container-high]="selectedCategoryId() !== 'all'"
-      [class.text-on-surface]="selectedCategoryId() !== 'all'"
-      class="px-4 py-2 rounded-full font-label-md text-xs font-bold shrink-0 transition-colors"
-    >
-      Tous les plats
-    </button>
-
-    @for (cat of categories(); track cat.id) {
-    <button
-      type="button"
-      (click)="onSelectCategory(cat.id)"
-      [class.bg-primary]="selectedCategoryId() === cat.id"
-      [class.text-on-primary]="selectedCategoryId() === cat.id"
-      [class.bg-surface-container-high]="selectedCategoryId() !== cat.id"
-      [class.text-on-surface]="selectedCategoryId() !== cat.id"
-      class="px-4 py-2 rounded-full font-label-md text-xs font-bold shrink-0 transition-colors flex items-center gap-1.5"
-    >
-      <span>{{ cat.name }}</span>
-      <span class="opacity-75 text-[10px]">({{ cat.itemCount }})</span>
-    </button>
-    }
-  </div>
-  }
-
-  <!-- Vendor Menu Meals Grid -->
-  <div class="min-h-[300px]">
-    @if (filteredMeals().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (meal of filteredMeals(); track meal.id) {
-      <app-meal-card
-        [meal]="meal"
-        (addToCart)="addToCart.emit($event)"
-        (viewDetails)="viewMealDetails.emit($event)"
-      />
-      }
-    </div>
-    } @else {
-    <!-- Empty Category State -->
-    <div class="flex flex-col items-center justify-center text-center py-12 bg-surface-container-low/40 rounded-3xl border border-dashed border-outline-variant">
-      <app-icon name="restaurant_menu" size="xl" class="text-on-surface-variant/40 mb-2" />
-      <p class="text-sm font-bold text-on-surface">Aucun plat disponible dans cette catégorie</p>
-    </div>
-    }
-  </div>
 </section>
+<!-- Vendor Menu Meals Grid -->
+<app-meal-catalog-view
+  [meals]="meals()"
+  [isLoading]="isLoadingMeals()"
+  [totalMeals]="totalMeals()"
+  [pageSize]="pageSize()"
+  (addToCart)="onAddToCart($event)"
+  (viewMealDetails)="onViewMealDetails($event)"
+  (filterChange)="onFilterChange($event)" />
 }
+<!-- Floating cart summary -->
+<app-floating-cart-summary
+  [itemCount]="cartItemCount()"
+  [totalAmount]="cartTotal()"
+  [vendorName]="cartVendorName()"
+  (openCart)="onOpenCart()" />

@@ -1,4 +1,6 @@
 <article
+  [attr.data-testid]="'vendor-card-' + vendor().id"
+  [attr.data-vendor-id]="vendor().id"
   (click)="onSelectVendor()"
   class="group relative flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant/40 overflow-hidden shadow-[0_4px_16px_rgba(41,37,36,0.05)] hover:shadow-[0_12px_28px_rgba(41,37,36,0.1)] hover:border-outline transition-all duration-300 cursor-pointer h-full"
 >
@@ -11,9 +13,9 @@
     <!-- Status Badge -->
     <div class="absolute top-3 right-3">
       @if (isOpen()) {
-      <app-badge variant="secondary" icon="check_circle">Ouvert</app-badge>
+      <app-badge data-testid="vendor-card-status" variant="secondary" icon="check_circle">Ouvert</app-badge>
       } @else {
-      <app-badge variant="danger" icon="schedule">Fermé</app-badge>
+      <app-badge data-testid="vendor-card-status" variant="danger" icon="schedule">Fermé</app-badge>
       }
     </div>
   </div>
@@ -21,7 +23,7 @@
   <!-- Content Body -->
   <div class="p-4 flex flex-col flex-1 justify-between gap-3 relative pt-7">
     <!-- Floating Avatar Profile Image -->
-    <div
+    <div data-testid="vendor-card-avatar"
       class="absolute -top-7 left-4 w-14 h-14 rounded-2xl bg-surface-container-lowest border-2 border-surface-container-lowest shadow-md overflow-hidden flex items-center justify-center shrink-0"
     >
       @if (vendor().profileImageUrl) {
@@ -31,28 +33,30 @@
         class="w-full h-full object-cover"
       />
       } @else {
-      <div class="w-full h-full bg-primary-fixed text-primary font-bold text-lg flex items-center justify-center">
+      <div data-testid="vendor-card-initial" class="w-full h-full bg-primary-fixed text-primary font-bold text-lg flex items-center justify-center">
         {{ vendorInitial() }}
       </div>
       }
     </div>
 
     <!-- Vendor Header -->
-    <div class="flex flex-col gap-1">
+    <div  class="flex flex-col gap-1">
       <div class="flex items-center gap-1.5">
-        <h3 class="font-headline-sm text-sm font-bold text-on-surface group-hover:text-primary transition-colors truncate">
+        <h3 data-testid="vendor-card-name" class="font-headline-sm text-sm font-bold text-on-surface group-hover:text-primary transition-colors truncate">
           {{ vendor().businessName }}
         </h3>
         @if (vendor().subscriptionTier === 'PRO' || vendor().subscriptionTier === 'ENTERPRISE') {
-        <app-icon name="verified" size="sm" class="text-primary shrink-0" />
+        <app-icon data-testid="vendor-card-verified-tag" name="verified" size="sm" class="text-primary shrink-0" />
         }
       </div>
 
       <!-- Cuisines -->
       @if (cuisineList().length > 0) {
-      <div class="flex flex-wrap gap-1 mt-1">
+      <div data-testid="vendor-card-cuisines" class="flex flex-wrap gap-1 mt-1">
         @for (cuisine of cuisineList(); track cuisine) {
-        <span class="px-2 py-0.5 rounded-md bg-surface-container-high/60 text-[11px] font-medium text-on-surface-variant">
+        <span
+          [attr.data-testid]="'vendor-card-cuisine-name-' + cuisine"
+          class="px-2 py-0.5 rounded-md bg-surface-container-high/60 text-[11px] font-medium text-on-surface-variant">
               {{ cuisine }}
             </span>
         }
@@ -61,7 +65,7 @@
 
       <!-- Description -->
       @if (vendor().description) {
-      <p class="text-xs text-on-surface-variant line-clamp-2 mt-1 font-body-sm">
+      <p data-testid="vendor-card-description" class="text-xs text-on-surface-variant line-clamp-2 mt-1 font-body-sm">
         {{ vendor().description }}
       </p>
       }
@@ -72,14 +76,23 @@
       @if (vendor().totalRatings > 0) {
       <div class="flex items-center gap-1.5 text-xs text-on-surface-variant font-label-md">
         <app-rating-stars [rating]="vendor().ratingAvg" [showValue]="false" size="sm" />
-        <span class="font-semibold text-on-surface">{{ vendor().ratingAvg | number:'1.1-1' }}</span>
-        <span>({{ vendor().totalRatings }})</span>
+        <span
+          data-testid="vendor-card-rating"
+          [attr.data-rating]="vendor().ratingAvg"
+          class="font-semibold text-on-surface">{{ vendor().ratingAvg | number:'1.1-1' }}</span>
+        <span data-testid="vendor-card-totalRatings"
+          [attr.data-totalRatings]="vendor().totalRatings">({{ vendor().totalRatings }})</span>
       </div>
       }
 
       <div class="flex items-center gap-1 text-xs text-on-surface-variant">
         <app-icon name="location_on" size="sm" class="text-primary shrink-0" />
-        <span class="truncate">{{ vendor().address }}</span>
+        <span data-testid="vendor-card-address" class="truncate">{{ vendor().address }}</span>
+        @if (vendor().city?.name) {
+          <span data-testid="vendor-card-city" [attr.data-city-id]="vendor().city?.id" class="shrink-0">
+            · {{ vendor().city!.name }}
+          </span>
+        }
       </div>
     </div>
   </div>

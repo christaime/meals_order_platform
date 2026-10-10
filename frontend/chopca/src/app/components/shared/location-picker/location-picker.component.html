@@ -1,9 +1,9 @@
-<div class="flex flex-col gap-4">
+<div class="h-full flex flex-col gap-3 min-h-0">
 
   <!-- ═══════════════════════════════════════════════════════════
-       City selector
+       City selector — shrink-0: sized by content
        ═══════════════════════════════════════════════════════════ -->
-  <label class="flex flex-col gap-1.5">
+  <label class="flex flex-col gap-1.5 shrink-0">
     <span class="font-label-sm text-xs font-semibold text-on-surface">Ville</span>
     <select
       data-testid="location-picker-city"
@@ -24,11 +24,14 @@
   </label>
 
   <!-- ═══════════════════════════════════════════════════════════
-       Map slot
+       Map slot — the ONLY flex-1 in the picker.
+       Absorbs whatever vertical space remains after the other
+       children; `min-h-[260px]` is the floor below which it
+       refuses to shrink (the body scrolls instead).
        ═══════════════════════════════════════════════════════════ -->
   <div
     data-testid="location-picker-map-slot"
-    class="relative h-[260px] overflow-hidden rounded-xl">
+    class="relative flex-1 min-h-[260px] overflow-hidden rounded-xl">
 
     @if (apiLatched()) {
     <div
@@ -38,11 +41,12 @@
       [class.pointer-events-none]="mapsState() !== 'loaded'"
     >
       <google-map
-        height="260px"
         width="100%"
         [center]="mapCenter()"
         [zoom]="mapZoom()"
         [options]="mapOptions"
+        (centerChanged)="clearSelectedLocation()"
+        (zoomChanged)="clearSelectedLocation()"
         (mapClick)="onMapClick($event)"
       >
         @if (mapsState() === 'loaded') {
@@ -153,14 +157,14 @@
 
   </div>
 
-  <!-- Hint -->
-  <p class="font-label-sm text-[11px] text-on-surface-variant -mt-2">
+  <!-- Hint — shrink-0 -->
+  <p class="font-label-sm text-[11px] text-on-surface-variant -mt-1 shrink-0">
     Cliquez sur la carte ou déplacez le repère rouge pour définir votre point de repère.
     Les points de retrait disponibles s'affichent avec l'épingle Chop ça.
   </p>
 
-  <!-- Radius slider -->
-  <div class="flex flex-col gap-1.5">
+  <!-- Radius slider — shrink-0 -->
+  <div class="flex flex-col gap-1.5 shrink-0">
     <div class="flex items-center justify-between">
       <span class="font-label-sm text-xs font-semibold text-on-surface">
         Rayon de couverture
@@ -185,35 +189,6 @@
       <span>{{ radiusMin }} km</span>
       <span>{{ radiusMax }} km</span>
     </div>
-  </div>
-
-  <!-- Live result count -->
-  <div
-    data-testid="location-picker-count"
-    class="flex items-center justify-between gap-3 p-3 rounded-xl
-           bg-surface-container-low border border-outline-variant/40">
-    @if (isSearching()) {
-    <span class="text-xs text-on-surface-variant">Recherche…</span>
-    } @else if (results().length > 0) {
-    <div class="flex items-center gap-2">
-      <app-icon name="check_circle" class="text-primary" size="sm" />
-      <span class="text-xs text-on-surface">
-        <strong>{{ results().length }}</strong>
-        {{ results().length === 1 ? 'point de retrait trouvé' : 'points de retrait trouvés' }}
-      </span>
-    </div>
-    } @else if (draftCity()) {
-    <div class="flex items-center gap-2">
-      <app-icon name="warning" class="text-error" size="sm" />
-      <span class="text-xs text-on-surface-variant">
-        Aucun point de retrait dans cette zone.
-      </span>
-    </div>
-    } @else {
-    <span class="text-xs text-on-surface-variant">
-      Sélectionnez une ville pour commencer.
-    </span>
-    }
   </div>
 
 </div>

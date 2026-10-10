@@ -34,7 +34,7 @@ export const MARKETPLACE_ROUTES: Routes = [
     title: 'Restaurants partenaires • Chop ça!',
   },
   {
-    path: 'vendor/directory/:id',
+    path: 'vendor/directory/:vendorId',
     loadComponent: () =>
       import('@components/pages/marketplace/vendor-detail/vendor-detail.page')
         .then(m => m.VendorDetailPageComponent),

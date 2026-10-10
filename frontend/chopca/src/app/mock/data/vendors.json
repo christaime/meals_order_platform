@@ -1,118 +1,196 @@
 [
   {
-    "id": "vendor-maman-pauline",
-    "userId": "user-maman-pauline",
-    "businessName": "Chez Maman Pauline",
-    "description": "Maître Cuisinière Sawa — 22 ans de cuisine traditionnelle transmise de mère en fille. Spécialiste respectée des grands classiques de la gastronomie côtière camerounaise.",
-    "address": "Akwa, Douala",
-    "email": "pauline@chopca.cm",
-    "phone": "+237612345678",
-    "ratingAvg": 4.9,
-    "totalRatings": 184,
+    "id": "vendor-chaudron",
+    "userId": "user-chaudron",
+    "businessName": "Le Chaudron du bon gout",
+    "ownerName": "Marie Ndongo",
+    "description": "Cuisine camerounaise traditionnelle, préparée avec des produits frais du marché.",
+    "address": "Rue Joss, Akwa",
+    "email": "contact@chaudron.cm",
+    "phone": "+237690000001",
+    "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" },
+    "ratingAvg": 4.5,
+    "totalRatings": 120,
     "status": "ACTIVE",
-    "statusReason": "Vendor activated",
-    "statusChangedAt": "2025-08-01T08:00:00Z",
+    "statusReason": null,
+    "statusChangedAt": "2024-01-01T00:00:00Z",
     "statusChangedBy": "admin-1",
     "statusChangeType": "ADMIN_ACTION",
     "subscriptionTier": "PRO",
     "deliveryRadius": 5,
-    "pickupAddress": "Akwa, Douala",
-    "profileImageUrl": "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400",
+    "pickupAddress": "Rue Joss, Akwa",
+    "profileImageUrl": null,
     "coverImageUrl": null,
     "cuisines": [
-      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+      { "id": "cuisine-camerounaise", "name": "Camerounaise", "iconUrl": "local_dining",  "type": "CUISINE",  "status": "APPROVED" }
     ],
     "distributionLocations": [
-      { "id": "loc-akwa", "name": "Akwa", "address": "Akwa, Douala", "moderationStatus": "APPROVED" }
+      { "id": "loc-akwa",      "vendorId": "vendor-chaudron", "name": "Akwa",      "address": "Rue Joss, Akwa",         "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0480, "longitude": 9.7040 },
+      { "id": "loc-bonapriso", "vendorId": "vendor-chaudron", "name": "Bonapriso", "address": "Rue Njo-Njo, Bonapriso","moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0320, "longitude": 9.7010 },
+      { "id": "loc-bonanjo",   "vendorId": "vendor-chaudron", "name": "Bonanjo",   "address": "Boulevard de la Liberté","moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0430, "longitude": 9.6870 },
+      { "id": "loc-plateau",   "vendorId": "vendor-chaudron", "name": "Plateau",   "address": "Quartier Plateau, Douala","moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0550, "longitude": 9.7100 }
     ],
-    "createdAt": "2025-08-01T08:00:00Z",
-    "updatedAt": "2025-09-10T14:30:00Z"
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
   },
   {
-    "id": "vendor-grill-rond-point",
-    "userId": "user-grill-rond-point",
-    "businessName": "Le Grill du Rond-Point",
-    "description": "Le meilleur du braisé au feu de bois. Spécialité de poisson et viandes grillées du Littoral.",
-    "address": "Bonapriso, Douala",
-    "email": "grill@chopca.cm",
-    "phone": "+237623456789",
-    "ratingAvg": 4.8,
-    "totalRatings": 212,
+    "id": "vendor-mama",
+    "userId": "user-mama",
+    "businessName": "Chez Mama Ngo",
+    "ownerName": "Ngo Bakang",
+    "description": "Cuisine familiale camerounaise, spécialités du Centre.",
+    "address": "Rue 1756, Bastos",
+    "email": "contact@mamango.cm",
+    "phone": "+237690000004",
+    "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" },
+    "ratingAvg": 4.4,
+    "totalRatings": 98,
     "status": "ACTIVE",
-    "statusReason": "Vendor activated",
-    "statusChangedAt": "2025-08-05T09:00:00Z",
-    "statusChangedBy": "admin-1",
-    "statusChangeType": "ADMIN_ACTION",
-    "subscriptionTier": "STARTER",
-    "deliveryRadius": 7,
-    "pickupAddress": "Bonapriso, Douala",
-    "profileImageUrl": "https://images.unsplash.com/photo-1583394293214-28ded15ee548?w=400",
-    "coverImageUrl": null,
-    "cuisines": [
-      { "id": "cat-street-food", "name": "Street Food (Braises)", "iconUrl": null, "type": "CUISINE" }
-    ],
-    "distributionLocations": [
-      { "id": "loc-bonapriso", "name": "Bonapriso", "address": "Bonapriso, Douala", "moderationStatus": "APPROVED" }
-    ],
-    "createdAt": "2025-08-05T09:00:00Z",
-    "updatedAt": "2025-09-11T11:15:00Z"
-  },
-  {
-    "id": "vendor-saveurs-bamileke",
-    "userId": "user-saveurs-bamileke",
-    "businessName": "Saveurs Bamiléké",
-    "description": "Authentiques plats de l'Ouest Cameroun. Koki, taro, achou préparés selon les traditions familiales.",
-    "address": "Bastos, Yaoundé",
-    "email": "bamileke@chopca.cm",
-    "phone": "+237634567890",
-    "ratingAvg": 4.7,
-    "totalRatings": 95,
-    "status": "ACTIVE",
-    "statusReason": "Vendor activated",
-    "statusChangedAt": "2025-08-06T10:00:00Z",
+    "statusReason": null,
+    "statusChangedAt": "2024-01-01T00:00:00Z",
     "statusChangedBy": "admin-1",
     "statusChangeType": "ADMIN_ACTION",
     "subscriptionTier": "FREE",
     "deliveryRadius": 6,
-    "pickupAddress": "Bastos, Yaoundé",
-    "profileImageUrl": "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=400",
+    "pickupAddress": "Rue 1756, Bastos",
+    "profileImageUrl": null,
     "coverImageUrl": null,
     "cuisines": [
-      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+      { "id": "cuisine-camerounaise", "name": "Camerounaise",  "iconUrl": "local_dining",  "type": "CUISINE",  "status": "APPROVED" }
     ],
     "distributionLocations": [
-      { "id": "loc-bastos", "name": "Bastos", "address": "Bastos, Yaoundé", "moderationStatus": "APPROVED" }
+      { "id": "loc-bastos",     "vendorId": "vendor-mama", "name": "Bastos",     "address": "Rue 1756, Bastos",       "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8830, "longitude": 11.5170 },
+      { "id": "loc-omnisports", "vendorId": "vendor-mama", "name": "Omnisports", "address": "Avenue Kennedy, Omnisports","moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8700, "longitude": 11.5200 },
+      { "id": "loc-mvog-ada",   "vendorId": "vendor-mama", "name": "Mvog-Ada",   "address": "Rue Mvog-Ada",           "moderationStatus": "APPROVED", "city": { "id": "city-yaounde", "name": "Yaoundé", "region": "Centre", "countryCode": "CM" }, "latitude": 3.8560, "longitude": 11.5270 }
     ],
-    "createdAt": "2025-08-06T10:00:00Z",
-    "updatedAt": "2025-09-08T16:00:00Z"
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
   },
   {
-    "id": "vendor-chef-enya",
-    "userId": "user-chef-enya",
-    "businessName": "Chef Enya & Co.",
-    "description": "Cuisine festive et raffinée. Le fameux Poulet DG et autres plats de célébration.",
-    "address": "Omnisports, Yaoundé",
-    "email": "enya@chopca.cm",
-    "phone": "+237645678901",
-    "ratingAvg": 4.95,
-    "totalRatings": 340,
+    "id": "vendor-pizza",
+    "userId": "user-pizza",
+    "businessName": "Bella Italia",
+    "ownerName": "Luca Rossi",
+    "description": "Pizzeria italienne authentique, pâte fraîche chaque matin.",
+    "address": "Marché Central, Garoua",
+    "email": "contact@bellaitalia.cm",
+    "phone": "+237690000009",
+    "city": { "id": "city-garoua", "name": "Garoua", "region": "Nord", "countryCode": "CM" },
+    "ratingAvg": 4.0,
+    "totalRatings": 60,
     "status": "ACTIVE",
-    "statusReason": "Vendor activated",
-    "statusChangedAt": "2025-08-07T11:00:00Z",
+    "statusReason": null,
+    "statusChangedAt": "2024-01-01T00:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "FREE",
+    "deliveryRadius": 6,
+    "pickupAddress": "Marché Central, Garoua",
+    "profileImageUrl": null,
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cuisine-italienne",    "name": "Italienne", "iconUrl": "local_pizza",   "type": "CUISINE",   "status": "APPROVED"}
+    ],
+    "distributionLocations": [
+      { "id": "loc-marche", "vendorId": "vendor-pizza", "name": "Marché Central", "address": "Marché Central, Garoua", "moderationStatus": "APPROVED", "city": { "id": "city-garoua", "name": "Garoua", "region": "Nord", "countryCode": "CM" }, "latitude": 9.3017, "longitude": 13.3921 }
+    ],
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "vendor-sea",
+    "userId": "user-sea",
+    "businessName": "Saveurs Marines",
+    "ownerName": "Paul Etoundi",
+    "description": "Poissons et fruits de mer frais du jour, spécialités grillées.",
+    "address": "Avenue du Port, Kribi",
+    "email": "contact@saveursmarines.cm",
+    "phone": "+237690000010",
+    "city": { "id": "city-kribi", "name": "Kribi", "region": "Sud", "countryCode": "CM" },
+    "ratingAvg": 4.6,
+    "totalRatings": 75,
+    "status": "ACTIVE",
+    "statusReason": null,
+    "statusChangedAt": "2024-01-01T00:00:00Z",
     "statusChangedBy": "admin-1",
     "statusChangeType": "ADMIN_ACTION",
     "subscriptionTier": "ENTERPRISE",
-    "deliveryRadius": 8,
-    "pickupAddress": "Omnisports, Yaoundé",
-    "profileImageUrl": "https://images.unsplash.com/photo-1581349485608-9469926a8e5e?w=400",
+    "deliveryRadius": 5,
+    "pickupAddress": "Avenue du Port, Kribi",
+    "profileImageUrl": null,
     "coverImageUrl": null,
     "cuisines": [
-      { "id": "cat-camerounais", "name": "Camerounais traditionnel", "iconUrl": null, "type": "CUISINE" }
+      { "id": "cuisine-camerounaise", "name": "Camerounaise","iconUrl": "local_dining",  "type": "CUISINE",  "status": "APPROVED" },
+      { "id": "cuisine-asiatique",    "name": "Asiatique", "iconUrl": "ramen_dining",  "type": "CUISINE",  "status": "APPROVED"}
     ],
     "distributionLocations": [
-      { "id": "loc-omnisports", "name": "Omnisports", "address": "Omnisports, Yaoundé", "moderationStatus": "APPROVED" }
+      { "id": "loc-port",      "vendorId": "vendor-sea", "name": "Port de Kribi", "address": "Avenue du Port, Kribi", "moderationStatus": "APPROVED", "city": { "id": "city-kribi", "name": "Kribi", "region": "Sud", "countryCode": "CM" }, "latitude": 2.9372, "longitude": 9.9100 },
+      { "id": "loc-buea-town", "vendorId": "vendor-sea", "name": "Buea Town",     "address": "Main Road, Buea Town",  "moderationStatus": "APPROVED", "city": { "id": "city-buea", "name": "Buea", "region": "Sud-Ouest", "countryCode": "CM" }, "latitude": 4.1559, "longitude": 9.2410 }
     ],
-    "createdAt": "2025-08-07T11:00:00Z",
-    "updatedAt": "2025-09-12T09:00:00Z"
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "vendor-liban",
+    "userId": "user-liban",
+    "businessName": "Beyrouth Express",
+    "ownerName": "Karim Haddad",
+    "description": "Mezzés libanais, falafel, houmous et grillades.",
+    "address": "Quartier Plateau, Douala",
+    "email": "contact@beyrouth.cm",
+    "phone": "+237690000013",
+    "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" },
+    "ratingAvg": 4.2,
+    "totalRatings": 80,
+    "status": "ACTIVE",
+    "statusReason": null,
+    "statusChangedAt": "2024-01-01T00:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "PRO",
+    "deliveryRadius": 7,
+    "pickupAddress": "Quartier Plateau, Douala",
+    "profileImageUrl": null,
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cuisine-libanaise",    "name": "Libanaise",  "iconUrl": "kebab_dining",  "type": "CUISINE",  "status": "APPROVED" }
+    ],
+    "distributionLocations": [
+      { "id": "loc-plateau", "vendorId": "vendor-chaudron", "name": "Plateau", "address": "Quartier Plateau, Douala", "moderationStatus": "APPROVED", "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" }, "latitude": 4.0550, "longitude": 9.7100 }
+    ],
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "vendor-grill",
+    "userId": "user-grill",
+    "businessName": "Grillades du Plateau",
+    "ownerName": "Jean Kamdem",
+    "description": "Grillades au feu de bois, viandes locales et poissons.",
+    "address": "Avenue de la Réunification, Bafoussam",
+    "email": "contact@grillades.cm",
+    "phone": "+237690000007",
+    "city": { "id": "city-bafoussam", "name": "Bafoussam", "region": "Ouest", "countryCode": "CM" },
+    "ratingAvg": 4.3,
+    "totalRatings": 45,
+    "status": "ACTIVE",
+    "statusReason": null,
+    "statusChangedAt": "2024-01-01T00:00:00Z",
+    "statusChangedBy": "admin-1",
+    "statusChangeType": "ADMIN_ACTION",
+    "subscriptionTier": "FREE",
+    "deliveryRadius": 4,
+    "pickupAddress": "Avenue de la Réunification, Bafoussam",
+    "profileImageUrl": null,
+    "coverImageUrl": null,
+    "cuisines": [
+      { "id": "cuisine-camerounaise", "name": "Camerounaise","iconUrl": "local_dining",  "type": "CUISINE",  "status": "APPROVED" }
+    ],
+    "distributionLocations": [
+      { "id": "loc-centre-baf", "vendorId": "vendor-grill", "name": "Centre-ville",      "address": "Avenue de la Réunification",     "moderationStatus": "APPROVED", "city": { "id": "city-bafoussam", "name": "Bafoussam", "region": "Ouest", "countryCode": "CM" }, "latitude": 5.4781, "longitude": 10.4172 },
+      { "id": "loc-commercial", "vendorId": "vendor-grill", "name": "Commercial Avenue", "address": "Commercial Avenue, Bamenda", "moderationStatus": "APPROVED", "city": { "id": "city-bamenda", "name": "Bamenda", "region": "Nord-Ouest", "countryCode": "CM" }, "latitude": 5.9597, "longitude": 10.1459 }
+    ],
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
   }
 ]

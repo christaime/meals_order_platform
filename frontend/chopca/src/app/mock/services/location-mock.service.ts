@@ -34,6 +34,7 @@ export class LocationMockService implements LocationService {
   ): Observable<DataPage<Location>> {
     let result = [...this.locations];
 
+    console.log("searchLocations",{request});
     // ─── Filters ────────────────────────────────────────────
     if (request.vendorId) {
       result = result.filter(l => l.vendorId === request.vendorId);

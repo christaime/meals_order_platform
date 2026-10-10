@@ -69,6 +69,7 @@ export interface VendorSummary {
   readonly description: string | null;
   readonly address?: string;
   readonly email?: string;
+  readonly city?: City;
   readonly ratingAvg: number;
   readonly totalRatings: number;
   readonly subscriptionTier: SubscriptionTier;

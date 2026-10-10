@@ -79,6 +79,6 @@
         opacity="0.4"/>
 
   <!-- Pin tip — anchor is the bottom point at (28, 110) -->
-  <path d="M 19 91 L 28 110 L 37 91 Z" fill="#732500"/>
-  <path d="M 21 91 L 28 108 L 35 91 Z" fill="#a43700"/>
+  <path d="M 19 94 L 28 113 L 37 94 Z" fill="#732500"/>
+  <path d="M 21 94 L 28 111 L 35 94 Z" fill="#a43700"/>
 </svg>

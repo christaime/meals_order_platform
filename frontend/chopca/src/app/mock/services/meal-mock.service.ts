@@ -33,6 +33,7 @@ export class MealMockService implements MealService {
   search(request: MealSearchRequest): Observable<DataPage<MealSummary>> {
     let result = [...this.meals];
 
+    console.log("MealMockService",{request});
     // ─── Filters ────────────────────────────────────────────
     if (request.keyword) {
       const needle = request.keyword.toLowerCase();

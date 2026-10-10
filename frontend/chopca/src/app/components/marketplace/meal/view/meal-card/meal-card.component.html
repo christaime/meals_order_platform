@@ -1,5 +1,6 @@
 <div
   [attr.data-testid]="'meal-card-' + meal().id"
+  [attr.data-vendor-id]="meal().vendorId"
   class="group bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/40 shadow-[0_4px_16px_rgba(41,37,36,0.05)] hover:shadow-[0_12px_28px_rgba(41,37,36,0.1)] transition-all duration-300 flex flex-col h-full cursor-pointer"
   [class.cursor-pointer]="!readonly()"
   (click)="readonly() ? null : onViewDetails($event)"

@@ -12,6 +12,7 @@
   <!-- Search & Location Filter Toolbar + Sort-->
   <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-surface-container-lowest p-4 rounded-3xl border border-outline-variant/40 shadow-xs">
     <app-location-selector
+      [pickerSize]="'immersive'"
       (locationsChange)="onLocationsChange($event)"
       (criteriaChange)="onCriteriaChange($event)"
     />
@@ -63,7 +64,7 @@
     </div>
     } @else {
     <!-- Empty Results State -->
-    <div class="flex flex-col items-center justify-center text-center py-16 px-4 bg-surface-container-low/40 rounded-3xl border border-dashed border-outline-variant">
+    <div data-testid="vendor-directory-empty" class="flex flex-col items-center justify-center text-center py-16 px-4 bg-surface-container-low/40 rounded-3xl border border-dashed border-outline-variant">
       <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/50 mb-4">
         <app-icon name="storefront" size="xl" />
       </div>

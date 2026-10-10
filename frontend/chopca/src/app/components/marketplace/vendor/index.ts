@@ -7,3 +7,4 @@ export * from './vendor-header/vendor-header.component';
 export * from './vendor-filters/vendor-filters.component';
 export * from './vendor-table/vendor-table.component';
 export * from './vendor-moderation-panel/vendor-moderation-panel.component';
+

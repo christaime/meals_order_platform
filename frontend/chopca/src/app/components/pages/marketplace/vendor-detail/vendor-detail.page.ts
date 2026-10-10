@@ -16,7 +16,7 @@ import {
   VendorDetailViewComponent,
   VendorMenuCategory,
 } from '@components/marketplace/vendor/vendor-detail-view/vendor-detail-view.component';
-
+import { VendorContextService } from '@core/services/marketplace/vendor-context.service';
 import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
 import { ToastService } from '@components/shared/toast';
@@ -27,32 +27,28 @@ import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
   selector: 'app-vendor-detail-page',
   standalone: true,
   imports: [VendorDetailViewComponent],
+  providers: [VendorContextService],
   template: `
     <app-vendor-detail-view
       [vendor]="vendorSummary()"
-      [categories]="categories()"
-      [meals]="meals()"
       [isLoading]="loading()"
-      (addToCart)="onAddToCart($event)"
-      (viewMealDetails)="onViewMealDetails($event)"
-      (categorySelect)="onCategorySelect($event)" />
+      />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VendorDetailPageComponent {
 
   /** Route param, bound via `withComponentInputBinding()`. */
-  readonly id = input<string | null>(null);
+  readonly vendorId = input<string | null>(null);
+  private readonly ctx = inject(VendorContextService);
 
   private readonly vendorService = inject(VENDOR_SERVICE);
-  private readonly mealService = inject(MEAL_SERVICE);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly loading = signal<boolean>(true);
   private readonly vendor = signal<Vendor | null>(null);
-  private readonly mealPage = signal<MealSummary[]>([]);
 
   // ─── View-shaped derived data ─────────────────────────────
 
@@ -62,41 +58,14 @@ export class VendorDetailPageComponent {
     return v ? (v as unknown as VendorSummary) : null;
   });
 
-  protected readonly meals = computed<MealSummary[]>(() => this.mealPage());
-
-  /**
-   * Menu categories derived from the meals' cuisines and dish types.
-   * Each unique category becomes one tab with an item count.
-   */
-  protected readonly categories = computed<VendorMenuCategory[]>(() => {
-    const allMeals = this.meals();
-    const counts = new Map<string, { name: string; count: number }>();
-
-    for (const meal of allMeals) {
-      for (const cat of [...meal.cuisines, ...meal.dishTypes]) {
-        const existing = counts.get(cat.id);
-        if (existing) {
-          existing.count += 1;
-        } else {
-          counts.set(cat.id, { name: cat.name, count: 1 });
-        }
-      }
-    }
-
-    return Array.from(counts.entries()).map(([id, { name, count }]) => ({
-      id,
-      name,
-      itemCount: count,
-    }));
-  });
-
   constructor() {
     effect(() => {
-      const vendorId = this.id();
+      const vendorId = this.vendorId();
       if (!vendorId) {
         this.loading.set(false);
         return;
       }
+      this.ctx.vendorId.set(this.vendorId())
       this.load(vendorId);
     });
   }
@@ -104,24 +73,11 @@ export class VendorDetailPageComponent {
   private load(vendorId: string): void {
     this.loading.set(true);
 
-    const mealRequest: MealSearchRequest = {
-      vendorId,
-      moderationStatus: 'APPROVED',
-      page: 0,
-      size: 100,
-      sortBy: 'name',
-      sortDirection: 'ASC',
-    };
-
-    forkJoin({
-      vendor: this.vendorService.getVendorById(vendorId),
-      meals:  this.mealService.search(mealRequest),
-    })
+   this.vendorService.getVendorById(vendorId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ vendor, meals }) => {
+        next: (vendor) => {
           this.vendor.set(vendor);
-          this.mealPage.set(meals.content);
           this.loading.set(false);
         },
         error: err => {
@@ -132,17 +88,4 @@ export class VendorDetailPageComponent {
       });
   }
 
-  // ─── View events ──────────────────────────────────────────
-
-  protected onAddToCart(_meal: MealSummary): void {
-    this.toast.show('Ajout au panier — à venir', 'info');
-  }
-
-  protected onViewMealDetails(meal: MealSummary): void {
-    this.router.navigate(['/meals', meal.id]);
-  }
-
-  protected onCategorySelect(_categoryId: string): void {
-    // Filtering is handled inside VendorDetailViewComponent.
-  }
 }

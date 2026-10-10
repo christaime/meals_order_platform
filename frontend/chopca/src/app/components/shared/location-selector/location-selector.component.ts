@@ -1,11 +1,14 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  output,
+  output, input
 } from '@angular/core';
 import {
   LocationPickerButtonComponent,
 } from '../location-picker-button/location-picker-button.component';
+import {
+  PickerSize
+} from '../location-picker-button/picker-size';
 import { LocationSummary } from '@core/models/marketplace';
 
 /**
@@ -21,6 +24,7 @@ import { LocationSummary } from '@core/models/marketplace';
   imports: [LocationPickerButtonComponent],
   template: `
     <app-location-picker-button
+      [size]="pickerSize()"
       (locationsChange)="locationsChange.emit($event)"
       (criteriaChange)="criteriaChange.emit($event)"
     />
@@ -29,6 +33,17 @@ import { LocationSummary } from '@core/models/marketplace';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LocationSelectorComponent {
+
+ // ─── Inputs ──────────────────────────────────────────────────
+  /**
+   * Display intent for the picker panel.
+   *
+   * The component maps this to per-breakpoint dimensions. Callers
+   * never set width or height directly.
+   *
+   * Defaults to `comfortable` so existing call sites are unaffected.
+   */
+  readonly pickerSize = input<PickerSize>('comfortable');
 
   readonly locationsChange = output<LocationSummary[]>();
 

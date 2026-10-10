@@ -4,7 +4,7 @@
   <button
     type="button"
     data-testid="location-picker-button"
-    (click)="openPanel()"
+    (click)="togglePanel()"
     class="w-full sm:w-auto flex items-center justify-between gap-3
            px-4 py-3 rounded-full
            bg-surface-container-lowest border border-outline-variant/50
@@ -67,40 +67,55 @@
     </div>
   </button>
 
-  <!-- ═══ Panel ═════════════════════════════════════════════ -->
+  <!-- ═══ Panel — anchored below the button (above on phones) ═ -->
   @if (isOpen()) {
   <div
     data-testid="location-picker-panel"
-    class="absolute left-0 right-0 bottom-full mb-2
-           sm:left-0 sm:right-auto sm:bottom-auto sm:top-full sm:mt-2
-           sm:w-[28rem]
-           max-h-[80vh]
+    [class]="surfaceClasses() + ' ' + panelHeightClasses()"
+    class="absolute left-0 right-0 mb-2
+           sm:left-0 sm:right-auto sm:bottom-auto top-full mt-2
            bg-surface-container-lowest
            rounded-2xl shadow-2xl border border-outline-variant
            flex flex-col overflow-hidden z-50
            animate-in fade-in duration-150"
   >
     <!-- Header -->
-    <div class="p-4 border-b border-outline-variant flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <app-icon name="location_on" class="text-primary" />
-        <h2 class="font-headline-sm text-base font-bold text-on-surface">
-          Choisir une zone
-        </h2>
+    <div class="px-3 py-2 border-b border-outline-variant flex items-center justify-between shrink-0">
+      <div
+        data-testid="location-picker-count"
+        class="flex items-center gap-2 min-w-0">
+        @if (isSearchingLocations()) {
+        <span class="text-xs text-on-surface-variant">Recherche…</span>
+        } @else if (foundLocationsCount() > 0) {
+        <app-icon name="check_circle" class="text-primary" size="sm" />
+        <span class="text-xs text-on-surface truncate">
+      <strong>{{ foundLocationsCount() }}</strong>
+      {{ foundLocationsCount() === 1 ? 'point de restauration trouvé' : 'points de restauration trouvés' }}
+    </span>
+        } @else if (draftCity()) {
+        <app-icon name="warning" class="text-error" size="sm" />
+        <span class="text-xs text-on-surface-variant truncate">
+      Aucun point de restauration dans cette zone.
+    </span>
+        } @else {
+        <span class="text-xs text-on-surface-variant truncate">
+      Choisir une ville
+    </span>
+        }
       </div>
       <button
         type="button"
         data-testid="location-picker-panel-close"
         (click)="closePanel()"
-        class="w-8 h-8 rounded-full flex items-center justify-center
-               text-on-surface-variant hover:bg-surface-container transition-colors"
+        class="w-7 h-7 rounded-full flex items-center justify-center
+           text-on-surface-variant hover:bg-surface-container transition-colors"
       >
         <app-icon name="close" size="sm" />
       </button>
     </div>
 
     <!-- Picker body -->
-    <div class="p-4 flex-1 overflow-y-auto">
+    <div class="px-3 py-3 flex-1 overflow-y-auto">
       <app-location-picker
         [initialCity]="committedCity()"
         [initialLocations]="committedLocations()"
@@ -109,11 +124,12 @@
         (cityChange)="onPickerCityChange($event)"
         (pointChange)="onPickerPointChange($event)"
         (locationsChange)="onPickerLocationsChange($event)"
+        (searchStateChange)="onPickerSearchStateChange($event)"
       />
     </div>
 
     <!-- Footer -->
-    <div class="p-4 border-t border-outline-variant bg-surface-container-low
+    <div class="px-3 py-2 border-t border-outline-variant bg-surface-container-low
                 flex items-center gap-3 shrink-0">
       <button
         type="button"

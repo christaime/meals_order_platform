@@ -104,6 +104,8 @@ export class VendorMockService implements VendorService {
       if (request.status && v.status !== request.status) return false;
       if (request.minRating != null && v.ratingAvg < request.minRating) return false;
       if (request.maxRating != null && v.ratingAvg > request.maxRating) return false;
+      if (request.categoryIds && request.categoryIds.length && !v.cuisines.some((c)=> request.categoryIds?.includes(c.id))) return false;
+      if (request.anyLocationIds && request.anyLocationIds.length && !v.distributionLocations.some((c)=> request.anyLocationIds?.includes(c.id))) return false;
       return true;
     });
 
