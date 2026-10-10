@@ -8,16 +8,16 @@
 
     <!-- ─── Brand ─────────────────────────────────────────── -->
     <div class="flex items-center gap-3 shrink-0">
-      <a
-        routerLink="/meals"
-        aria-label="Chop ça! — Accueil"
-        class="flex items-center transition-transform hover:scale-[1.02]">
+      <a data-testid="header-brand-link"
+         routerLink="/meals"
+         aria-label="Chop ça! — Accueil"
+         class="flex items-center transition-transform hover:scale-[1.02]">
         <app-logo variant="full" size="sm" label="Chop ça!" />
       </a>
 
       @if (portalLabel()) {
-      <span
-        class="hidden sm:inline-flex items-center
+      <span data-testid="header-portal-label"
+            class="hidden sm:inline-flex items-center
                  px-2.5 py-1 rounded-full
                  bg-surface-container
                  border border-outline-variant
@@ -29,27 +29,28 @@
     </div>
 
     <!-- ─── Primary navigation (workspace-aware) ──────────── -->
-    <nav class="hidden xl:flex items-center gap-1" aria-label="Navigation principale">
+    <nav data-testid="header-menu-container" class="hidden xl:flex items-center gap-1" aria-label="Navigation principale">
       @for (item of menu(); track item.label; let i = $index) {
 
       <!-- ─── Direct link ─────────────────────────────── -->
       @if (isLink(item)) {
-      <a
-        class="px-4 py-2 rounded-lg
+      <a [attr.data-testid]="'header-menu-item-' + i"
+         [attr.data-label]="item.label"
+         class="px-4 py-2 rounded-lg
                    font-label text-sm
                    no-underline whitespace-nowrap
                    transition-colors
                    text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface
                    [&.nav-active]:bg-primary-fixed [&.nav-active]:text-on-primary-fixed
                    [&.nav-active]:font-bold [&.nav-active]:shadow-sm"
-        [routerLink]="item.route"
-        routerLinkActive="nav-active"
-        [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
+         [routerLink]="item.route"
+         routerLinkActive="nav-active"
+         [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
         <span class="flex items-center gap-1.5">
           @if (item.icon) {
           <app-icon [name]="item.icon" size="sm" />
           }
-          <span>{{ item.label }}</span>
+          <span data-testid="header-menu-item-label">{{ item.label }}</span>
           @if (item.badge?.type === 'count') {
           <span class="bg-secondary text-on-secondary text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
             {{ $any(item.badge).value }}
@@ -65,25 +66,26 @@
       <!-- ─── Dropdown group ──────────────────────────── -->
       @if (isGroup(item)) {
       <div class="relative">
-        <button
-          type="button"
-          (click)="toggleDropdown(i, $event)"
-          [attr.aria-expanded]="openDropdownIndex() === i"
-          class="px-4 py-2 rounded-lg
+        <button [attr.data-testid]="'header-menu-item-' + i"
+                [attr.data-label]="item.label"
+                type="button"
+                (click)="toggleDropdown(i, $event)"
+                [attr.aria-expanded]="openDropdownIndex() === i"
+                class="px-4 py-2 rounded-lg
                      font-label text-sm
                      flex items-center gap-1
                      transition-colors cursor-pointer border-0
                      bg-transparent
                      text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
-          [class.bg-primary-fixed]="openDropdownIndex() === i"
-          [class.text-on-primary-fixed]="openDropdownIndex() === i"
-          [class.font-bold]="openDropdownIndex() === i"
-          [class.shadow-sm]="openDropdownIndex() === i">
+                [class.bg-primary-fixed]="openDropdownIndex() === i"
+                [class.text-on-primary-fixed]="openDropdownIndex() === i"
+                [class.font-bold]="openDropdownIndex() === i"
+                [class.shadow-sm]="openDropdownIndex() === i">
 
           @if (item.icon) {
           <app-icon [name]="item.icon" size="sm" />
           }
-          <span>{{ item.label }}</span>
+          <span data-testid="header-menu-item-label">{{ item.label }}</span>
           <app-icon
             name="keyboard_arrow_down"
             size="sm"
@@ -93,6 +95,7 @@
 
         @if (openDropdownIndex() === i) {
         <div
+          [attr.data-testid]="'header-menu-dropdown-' + i"
           class="absolute left-0 top-[calc(100%+0.375rem)]
                        min-w-[220px]
                        bg-surface-container-lowest
@@ -102,6 +105,9 @@
                        z-50">
           @for (child of item.children; track child.route) {
           <a
+            [attr.data-testid]="'header-menu-child-' + child.label"
+            [attr.data-label]="child.label"
+            [attr.data-route]="child.route"
             class="px-3 py-2 rounded-lg
                            font-label text-xs
                            text-on-surface no-underline
@@ -136,6 +142,7 @@
       <div class="hidden md:flex items-center gap-2">
         @if (!isVendorWorkspace()) {
         <a
+          data-testid="header-switch-vendor"
           [routerLink]="links.vendor.route"
           class="px-3 py-2 rounded-full
                  border border-secondary text-secondary
@@ -146,6 +153,7 @@
         }
         @if (!isCustomerWorkspace()) {
         <a
+          data-testid="header-switch-customer"
           [routerLink]="links.customer.route"
           class="px-3 py-2 rounded-full
                  border border-primary text-primary
@@ -158,9 +166,11 @@
 
       <!-- Status pill (vendor workspace only) -->
       @if (isVendorWorkspace()) {
-      <div class="hidden md:flex items-center gap-1.5
-                    bg-secondary-container/50 border border-secondary
-                    px-2.5 py-1 rounded-full">
+      <div
+        data-testid="header-vendor-status"
+        class="hidden md:flex items-center gap-1.5
+               bg-secondary-container/50 border border-secondary
+               px-2.5 py-1 rounded-full">
         <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
         <span class="font-label text-[11px] font-semibold text-on-secondary-container whitespace-nowrap">
           Cuisine Ouverte • Accepte les commandes
@@ -169,14 +179,19 @@
       }
 
       <!-- Language selector -->
-      <div class="flex items-center
-                  bg-surface-container-low rounded-lg p-0.5
-                  border border-outline-variant
-                  font-label text-[11px]">
+      <div
+        data-testid="header-language-selector"
+        class="flex items-center
+               bg-surface-container-low rounded-lg p-0.5
+               border border-outline-variant
+               font-label text-[11px]">
         <span class="material-symbols-outlined text-[16px] text-outline mx-1.5">language</span>
         @for (lang of languages; track lang) {
         <button
           type="button"
+          [attr.data-testid]="'header-language-' + lang"
+          [attr.data-lang]="lang"
+          [attr.aria-pressed]="currentLanguage() === lang"
           (click)="selectLanguage(lang)"
           class="px-2 py-1 rounded cursor-pointer border-0 transition-colors"
           [class.bg-surface-container-lowest]="currentLanguage() === lang"
@@ -193,6 +208,7 @@
       <!-- Notifications -->
       <button
         type="button"
+        data-testid="header-notifications"
         aria-label="Notifications"
         class="relative p-2 rounded-full border-0 cursor-pointer
                text-on-surface-variant hover:text-on-surface
@@ -206,21 +222,26 @@
       <div class="relative header-dropdown">
         <button
           type="button"
+          data-testid="header-profile-trigger"
           (click)="toggleProfileDropdown($event)"
           [attr.aria-expanded]="profileOpen()"
           class="flex items-center gap-2 p-1 rounded-full border-0 cursor-pointer
                  bg-transparent transition-shadow hover:ring-2 hover:ring-primary/30">
 
-          <span class="w-9 h-9 rounded-full
-                       bg-primary text-on-primary
-                       border border-outline
-                       inline-flex items-center justify-center
-                       font-label text-xs font-bold">
+          <span
+            data-testid="header-profile-initials"
+            class="w-9 h-9 rounded-full
+                   bg-primary text-on-primary
+                   border border-outline
+                   inline-flex items-center justify-center
+                   font-label text-xs font-bold">
             {{ currentUser().initials }}
           </span>
 
           <div class="hidden 2xl:flex flex-col text-left">
-            <span class="font-label text-xs font-semibold text-on-surface leading-tight">
+            <span
+              data-testid="header-profile-name-compact"
+              class="font-label text-xs font-semibold text-on-surface leading-tight">
               {{ currentUser().name }}
             </span>
           </div>
@@ -230,6 +251,7 @@
 
         @if (profileOpen()) {
         <div
+          data-testid="header-profile-dropdown"
           class="absolute right-0 top-[calc(100%+0.5rem)]
                      min-w-[240px]
                      bg-surface-container-lowest
@@ -238,53 +260,47 @@
                      py-2 z-50">
 
           <div class="px-4 py-2.5 border-b border-surface-container-high">
-            <p class="m-0 font-label text-xs font-bold text-on-surface truncate">
+            <p
+              data-testid="header-profile-name"
+              class="m-0 font-label text-xs font-bold text-on-surface truncate">
               {{ currentUser().name }}
             </p>
           </div>
 
           <!-- Vendor role -->
           @if (isVendor()) {
-          <a routerLink="/vendor/profile"
-             class="flex items-center gap-2.5 px-4 py-2
-                    font-label text-xs text-on-surface no-underline
-                    hover:bg-surface-container-low transition-colors">
+          <a
+            data-testid="header-profile-vendor-profile"
+            routerLink="/vendor/profile"
+            class="flex items-center gap-2.5 px-4 py-2
+                   font-label text-xs text-on-surface no-underline
+                   hover:bg-surface-container-low transition-colors">
             <app-icon name="storefront" size="sm" class="text-primary" />
-            <span>Profil restaurant</span>
-          </a>
-          <a routerLink="/vendor/settings"
-             class="flex items-center gap-2.5 px-4 py-2
-                    font-label text-xs text-on-surface no-underline
-                    hover:bg-surface-container-low transition-colors">
-            <app-icon name="settings" size="sm" class="text-primary" />
-            <span>Paramètres vendeur</span>
+            <span>Mon restaurant</span>
           </a>
           }
 
           <!-- Customer role -->
           @if (isCustomer()) {
-          <a routerLink="/account"
-             class="flex items-center gap-2.5 px-4 py-2
-                    font-label text-xs text-on-surface no-underline
-                    hover:bg-surface-container-low transition-colors">
+          <a
+            data-testid="header-profile-account"
+            routerLink="/account"
+            class="flex items-center gap-2.5 px-4 py-2
+                   font-label text-xs text-on-surface no-underline
+                   hover:bg-surface-container-low transition-colors">
             <app-icon name="person" size="sm" class="text-primary" />
             <span>Mon compte</span>
-          </a>
-          <a routerLink="/account/orders"
-             class="flex items-center gap-2.5 px-4 py-2
-                    font-label text-xs text-on-surface no-underline
-                    hover:bg-surface-container-low transition-colors">
-            <app-icon name="receipt_long" size="sm" class="text-primary" />
-            <span>Mes commandes</span>
           </a>
           }
 
           <!-- Admin role -->
           @if (isAdmin()) {
-          <a routerLink="/admin/settings"
-             class="flex items-center gap-2.5 px-4 py-2
-                    font-label text-xs text-on-surface no-underline
-                    hover:bg-surface-container-low transition-colors">
+          <a
+            data-testid="header-profile-admin-settings"
+            routerLink="/admin/settings"
+            class="flex items-center gap-2.5 px-4 py-2
+                   font-label text-xs text-on-surface no-underline
+                   hover:bg-surface-container-low transition-colors">
             <app-icon name="settings" size="sm" class="text-primary" />
             <span>Paramètres admin</span>
           </a>
@@ -294,6 +310,7 @@
 
           <button
             type="button"
+            data-testid="header-profile-logout"
             (click)="logout()"
             class="w-full flex items-center gap-2.5 px-4 py-2 text-left
                    font-label text-xs text-error

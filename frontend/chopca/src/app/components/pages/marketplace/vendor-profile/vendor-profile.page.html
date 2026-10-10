@@ -1,0 +1,200 @@
+<section
+  data-testid="vendor-profile"
+  class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+  <!-- Loading -->
+  @if (isLoading()) {
+  <div
+    data-testid="vendor-profile-loading"
+    class="flex items-center justify-center py-24 text-on-surface-variant">
+    <span class="text-sm">Chargement du profil…</span>
+  </div>
+  }
+
+  <!-- Error -->
+  @else if (hasError()) {
+  <div
+    data-testid="vendor-profile-error"
+    class="flex flex-col items-center justify-center text-center py-16 px-4
+           bg-error/5 rounded-3xl border border-error/40">
+    <app-icon name="error" size="xl" class="text-error mb-3" />
+    <h2 class="font-bold text-lg text-on-surface mb-1">Profil indisponible</h2>
+    <p class="text-xs text-on-surface-variant">
+      Impossible de charger les informations de votre restaurant.
+    </p>
+  </div>
+  }
+
+  <!-- Content -->
+  @if (vendor(); as v) {
+
+  <!-- Header -->
+  <header class="flex items-center gap-4">
+    <div
+      class="w-16 h-16 rounded-2xl bg-surface-container-high
+             border border-outline-variant overflow-hidden shrink-0
+             flex items-center justify-center text-2xl font-bold text-primary">
+      @if (v.profileImageUrl) {
+      <img
+        data-testid="vendor-profile-image"
+        [src]="v.profileImageUrl"
+        [alt]="v.businessName"
+        class="w-full h-full object-cover" />
+      } @else {
+      {{ v.businessName.charAt(0) }}
+      }
+    </div>
+
+    <div class="flex flex-col gap-0.5 min-w-0">
+      <h1
+        data-testid="vendor-profile-name"
+        class="font-headline-md text-xl font-bold text-on-surface truncate">
+        {{ v.businessName }}
+      </h1>
+      <p
+        data-testid="vendor-profile-owner"
+        class="text-xs text-on-surface-variant truncate">
+        Géré par {{ v.ownerName }}
+      </p>
+    </div>
+  </header>
+
+  <!-- Restaurant info -->
+  <section
+    data-testid="vendor-profile-section-info"
+    class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-4">
+    <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
+      Informations du restaurant
+    </h2>
+
+    @if (v.description) {
+    <p
+      data-testid="vendor-profile-description"
+      class="text-sm text-on-surface-variant m-0">
+      {{ v.description }}
+    </p>
+    }
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 m-0">
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Adresse</dt>
+        <dd
+          data-testid="vendor-profile-address"
+          class="text-sm text-on-surface m-0">{{ v.address }}</dd>
+      </div>
+
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Ville</dt>
+        <dd
+          data-testid="vendor-profile-city"
+          [attr.data-city-id]="v.city.id"
+          class="text-sm text-on-surface m-0">{{ v.city.name }}</dd>
+      </div>
+
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Email</dt>
+        <dd
+          data-testid="vendor-profile-email"
+          class="text-sm text-on-surface m-0 truncate">{{ v.email }}</dd>
+      </div>
+
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Téléphone</dt>
+        <dd
+          data-testid="vendor-profile-phone"
+          class="text-sm text-on-surface m-0">{{ v.phone }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- Delivery info -->
+  <section
+    data-testid="vendor-profile-section-delivery"
+    class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-4">
+    <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
+      Livraison
+    </h2>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 m-0">
+      @if (v.deliveryRadius != null) {
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Rayon</dt>
+        <dd
+          data-testid="vendor-profile-delivery-radius"
+          [attr.data-radius-km]="v.deliveryRadius"
+          class="text-sm text-on-surface m-0">{{ v.deliveryRadius }} km</dd>
+      </div>
+      }
+
+      @if (v.pickupAddress) {
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Point de retrait</dt>
+        <dd
+          data-testid="vendor-profile-pickup-address"
+          class="text-sm text-on-surface m-0">{{ v.pickupAddress }}</dd>
+      </div>
+      }
+    </dl>
+
+    @if (v.distributionLocations.length > 0) {
+    <ul
+      data-testid="vendor-profile-locations"
+      class="list-none m-0 p-0 flex flex-wrap gap-2">
+      @for (loc of v.distributionLocations; track loc.id) {
+      <li
+        [attr.data-testid]="'vendor-profile-location-' + loc.id"
+        class="px-2.5 py-1 rounded-md bg-surface-container-high/60
+               text-[11px] font-medium text-on-surface-variant">
+        {{ loc.name }}
+      </li>
+      }
+    </ul>
+    }
+  </section>
+
+  <!-- Cuisines -->
+  @if (v.cuisines.length > 0) {
+  <section
+    data-testid="vendor-profile-section-cuisines"
+    class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-3">
+    <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
+      Cuisines
+    </h2>
+    <ul class="list-none m-0 p-0 flex flex-wrap gap-2">
+      @for (cuisine of v.cuisines; track cuisine.id) {
+      <li
+        [attr.data-testid]="'vendor-profile-cuisine-' + cuisine.id"
+        class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed
+               text-xs font-semibold">
+        {{ cuisine.name }}
+      </li>
+      }
+    </ul>
+  </section>
+  }
+
+  <!-- Account -->
+  <section
+    data-testid="vendor-profile-section-account"
+    class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-3">
+    <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
+      Compte
+    </h2>
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 m-0">
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Propriétaire</dt>
+        <dd
+          data-testid="vendor-profile-owner-name"
+          class="text-sm text-on-surface m-0">{{ v.ownerName }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Email du compte</dt>
+        <dd
+          data-testid="vendor-profile-account-email"
+          class="text-sm text-on-surface m-0 truncate">{{ v.email }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  }
+</section>

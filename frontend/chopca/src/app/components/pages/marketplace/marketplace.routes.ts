@@ -115,6 +115,12 @@ export const VENDOR_ROUTES: Routes = [
       data: { scope: 'vendor' as const },
   },
   {
+    path: 'profile',
+    loadComponent: () =>
+      import('./vendor-profile/vendor-profile.page')
+        .then((m) => m.VendorProfilePageComponent),
+  },
+  {
     path: 'meals',
     canActivate: [appGuard,mapsPreloadGuard],
     children: [

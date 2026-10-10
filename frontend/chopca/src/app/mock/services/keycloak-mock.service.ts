@@ -7,7 +7,9 @@ import {
   KeycloakService,
   VENDOR_ROLE,
 } from '@core/services/auth/keycloak.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AppSessionStore, RETURN_URL_KEY , IDP_HINT_KEY} from '@core/storage/app.store';
+
 /**
  * A synthetic user for tests.
  *
@@ -28,6 +30,7 @@ export class KeycloakMockService implements KeycloakService {
   private readonly _user = signal<MockUser | null>(null);
   private readonly _logoutRequested = signal<number>(0);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly logoutRequested = this._logoutRequested.asReadonly();
   readonly roles = computed<ReadonlySet<AppRole>>(
@@ -48,6 +51,10 @@ export class KeycloakMockService implements KeycloakService {
   // ─── Interface methods ──────────────────────────────────────
 
   async login(idpHint?: string): Promise<void> {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) AppSessionStore.set(RETURN_URL_KEY, returnUrl);
+    if(idpHint) AppSessionStore.set(IDP_HINT_KEY, idpHint);
+
     // Optionally honor the idpHint so tests can simulate
     // "the user picked Google on the login page."
     if (!this._user()) {
@@ -63,6 +70,7 @@ export class KeycloakMockService implements KeycloakService {
     this._logoutRequested.update(n => n + 1);
     await Promise.resolve();
     this._user.set(null);
+    this.router.navigate(['/meals']);
   }
 
   async refreshToken(): Promise<void> {

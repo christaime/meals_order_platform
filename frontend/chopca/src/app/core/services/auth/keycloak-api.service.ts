@@ -2,13 +2,14 @@ import { Injectable, inject , computed, signal} from '@angular/core';
 import Keycloak from 'keycloak-js';
 import { KeycloakService, AppRole, APP_ROLES, ADMIN_ROLE, VENDOR_ROLE, CUSTOMER_ROLE } from './keycloak.service';
 import { AppSessionStore, RETURN_URL_KEY, IDP_HINT_KEY } from '../../storage/app.store';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakApiService implements KeycloakService {
 
   private readonly keycloak = inject(Keycloak);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   private readonly _roles = signal<ReadonlySet<AppRole>>(new Set());
 
@@ -46,6 +47,7 @@ export class KeycloakApiService implements KeycloakService {
     // Notify observers (SessionManager) so they can clean up.
     this._logoutRequested.update(n => n + 1);
     await this.keycloak.logout({ redirectUri: window.location.origin });
+    this.router.navigate(['/meals']);
   }
 
   async refreshToken(): Promise<void> {
