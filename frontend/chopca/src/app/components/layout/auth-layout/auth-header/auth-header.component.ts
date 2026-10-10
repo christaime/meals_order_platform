@@ -195,7 +195,7 @@ const VENDOR_MENU: readonly NavItem[] = [
       { kind: 'link', label: 'Nouveau plat',     route: '/vendor/meals/new', icon: 'add_circle' },
     ],
   },
-  {
+  /*{
     kind: 'group',
     label: 'Gestion des Commandes',
     children: [
@@ -203,7 +203,7 @@ const VENDOR_MENU: readonly NavItem[] = [
       { kind: 'link', label: 'Stocks & Disponibilités', route: '/vendor/stocks', icon: 'inventory_2' },
     ],
   },
-  { kind: 'link', label: 'Statistiques', route: '/vendor/stats' },
+  { kind: 'link', label: 'Statistiques', route: '/vendor/stats' },*/
 ];
 
 const ADMIN_MENU: readonly NavItem[] = [
@@ -224,8 +224,8 @@ const ADMIN_MENU: readonly NavItem[] = [
       { kind: 'link', label: 'Emplacements', route: '/admin/locations', icon: 'location_on' },
     ],
   },
-  { kind: 'link', label: 'Modération', route: '/admin/moderation' },
-  { kind: 'link', label: 'Paramètres', route: '/admin/settings' },
+  //{ kind: 'link', label: 'Modération', route: '/admin/moderation' },
+  //{ kind: 'link', label: 'Paramètres', route: '/admin/settings' },
 ];
 
 const CUSTOMER_MENU: readonly NavItem[] = [
