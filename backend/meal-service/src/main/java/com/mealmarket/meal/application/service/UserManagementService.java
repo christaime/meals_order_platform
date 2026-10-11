@@ -43,8 +43,7 @@ public class UserManagementService {
      * Roles are not a precondition — the frontend reads roles from the JWT.
      */
     @Transactional(readOnly = true)
-    public UserContextDto getContext(String keycloakId) {
-        UUID userId = UUID.fromString(keycloakId);
+    public UserContextDto getContext( UUID userId, String email, String name) {
 
         UserContextDto.VendorContext vendor = vendorRepository.findByUserId(userId)
                 .map(v -> new UserContextDto.VendorContext(
@@ -71,8 +70,7 @@ public class UserManagementService {
                         a.getDisplayName(),
                         a.getStatus().name()))
                 .orElse(null);*/
-        String email = vendor != null ? vendor.email() : "";
-        return new UserContextDto(keycloakId, email, vendor, null, null);
+        return new UserContextDto(userId.toString(), email, name, vendor, null, null);
     }
 
     // ---------------------------------------------------------------------

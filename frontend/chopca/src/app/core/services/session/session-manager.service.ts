@@ -135,7 +135,7 @@ export class SessionManager {
   /**
    * Force a token refresh — used by the interceptor on a 401.
    *
-   * Unlike `getFreshToken()`, this always calls `updateToken(0)`,
+   * Unlike `getFreshToken()`, this always calls `updateToken(-1)`,
    * which forces a refresh if the current token is invalid, and
    * throws if the refresh token is also dead. Throwing is the
    * signal the interceptor needs to redirect to login.
@@ -144,10 +144,39 @@ export class SessionManager {
     if (!this.keycloakUser.isAuthenticated()) {
       throw new Error('No authenticated session');
     }
-    await this.keycloakUser.updateToken(0);
+    await this.keycloakUser.updateToken(-1);
     const token = this.keycloakUser.getToken();
     if (!token) throw new Error('No token after forced refresh');
     return token;
+  }
+
+  /**
+   * Force a token refresh AND broadcast the new token to sibling tabs.
+   *
+   * Use this after a deliberate role change (vendor registration, role
+   * grant) rather than `forceRefresh()`, which exists to unblock a
+   * single 401'd request. The broadcast keeps sibling tabs from
+   * acting on a stale token until their own refresh cycle catches up.
+   *
+   * On a dead refresh token, delegates to the same logout + re-login
+   * flow as `refreshNow()`.
+   */
+  async forceRefreshAndBroadcast(): Promise<void> {
+    console.log("forceRefreshAndBroadcast");
+    if (!this.keycloakUser.isAuthenticated()) {
+      throw new Error('No authenticated session');
+    }
+    try {
+      await this.keycloakUser.updateToken(-1);
+      if (this._isLeader()) {
+        this.broadcastToken();
+      }
+    } catch {
+      this.broadcast({ type: 'LOGOUT', tabId: this.tabId });
+      await this.loginAgain();
+      // Rethrow so the caller knows not to continue with navigation.
+      throw new Error('Session expired after forced refresh');
+    }
   }
 
   /** Force a token refresh. Safe to call from anywhere. */

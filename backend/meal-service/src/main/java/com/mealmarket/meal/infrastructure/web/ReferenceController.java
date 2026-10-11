@@ -9,6 +9,7 @@ import com.mealmarket.meal.application.service.CityService;
 import com.mealmarket.meal.application.service.MealStatService;
 import com.mealmarket.meal.application.service.UserManagementService;
 import com.mealmarket.meal.domain.repository.criteria.CitySearchRequest;
+import com.mealmarket.meal.infrastructure.security.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,6 +49,7 @@ public class ReferenceController {
     private final UserManagementService userManagementService;
     private final CityService cityService;
     private final MealStatService mealStatService;
+    private final CurrentUser currentUser;
 
     // ═══════════════════════════════════════════════════════════
     //  Stats for meal search
@@ -290,8 +292,8 @@ public class ReferenceController {
                     description = "Keycloak `sub` claim is not a UUID (configuration error)"
             )
     })
-    public UserContextDto getContext(Authentication auth) {
-        return userManagementService.getContext(auth.getName());
+    public UserContextDto getContext() {
+        return userManagementService.getContext(currentUser.getUserId(), currentUser.getEmail(), currentUser.getUserName());
     }
 
     // ═══════════════════════════════════════════════════════════

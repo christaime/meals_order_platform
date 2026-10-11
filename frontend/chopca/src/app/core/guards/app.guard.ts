@@ -53,13 +53,13 @@ export const appGuard: CanActivateFn = async (
   const ctx      = inject(USER_CONTEXT_SERVICE);
 
   const url = state.url;
-  //console.log(" GUARDING ROUTE", url);
+  console.log(" GUARDING ROUTE", url);
   // ─── 1. Public route ──────────────────────────────────────
   if (!matches(url, AUTHENTICATED_PREFIXES)) return true;
-  //console.log("IS A RESTRICTED ROUTE");
+  console.log("IS A RESTRICTED ROUTE");
   // ─── 2. Auth required ─────────────────────────────────────
   if (!keycloakUser.isAuthenticated()) {
-    //console.log("RESTRICTED ROUTE, USER UNAUTHENTICATED, ROUTE TO LOGIN");
+    console.log("RESTRICTED ROUTE, USER UNAUTHENTICATED, ROUTE TO LOGIN");
     return router.createUrlTree([LOGIN_ROUTE], {
       queryParams: { returnUrl: url },
     });
@@ -68,6 +68,7 @@ export const appGuard: CanActivateFn = async (
   // ─── 3. /admin/* ──────────────────────────────────────────
   if (matches(url, ADMIN_PREFIXES)) {
     if (!keycloakUser.isAdmin()) {
+      console.log("TRY ACCESS TO ADMIN WORKSPACE WITHOUT ADMIN ROLE");
       return accessDenied(router, 'role-missing', ADMIN_ROLE, url);
     }
     return true;
@@ -84,6 +85,8 @@ export const appGuard: CanActivateFn = async (
     } catch {
       context = null;
     }
+
+    console.log("CURRENT USER CONTEXT ",{context});
 
     if (needsVendor && !context?.vendor) {
       return router.parseUrl(VENDOR_REGISTRATION);

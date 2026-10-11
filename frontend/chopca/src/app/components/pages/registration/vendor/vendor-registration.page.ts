@@ -40,7 +40,7 @@ import {
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 import { AppSessionStore, RETURN_URL_KEY } from '@core/storage/app.store';
-
+import { SessionManager } from '@app/core/services/session/session-manager.service';
 /**
  * Vendor registration page.
  *
@@ -96,6 +96,7 @@ export class VendorRegistrationPage {
   private readonly keycloak = inject(KEYCLOAK_SERVICE);
   private readonly ctx = inject(USER_CONTEXT_SERVICE);
   private readonly router = inject(Router);
+  private readonly session = inject(SessionManager);
 
   // ══════════════════════════════════════════════════════════
   // Form — single source of truth
@@ -338,11 +339,12 @@ export class VendorRegistrationPage {
       //   1. refresh the token so it picks up the VENDOR role
       //   2. reload context (now includes the vendor)
       //   3. navigate to the returnUrl
-      await this.keycloak.refreshToken();
+      await this.session.forceRefreshAndBroadcast();
       this.ctx.clear();
+      this.keycloak.reload();// Reload roles
       await this.ctx.ensureLoaded();
       // Consume the returnUrl (reads and clears it).
-      const returnUrl = AppSessionStore.consume(RETURN_URL_KEY) ?? '/vendor/dashboard';
+      const returnUrl = AppSessionStore.consume(RETURN_URL_KEY) ?? '/vendor/profile';
       await this.router.navigateByUrl(returnUrl);
     } catch (e: any) {
       this.submitError.set(
@@ -355,7 +357,7 @@ export class VendorRegistrationPage {
 
   protected cancel(): void {
     // Consume the returnUrl (reads and clears it).
-    const returnUrl = AppSessionStore.consume(RETURN_URL_KEY) ?? '/vendor/dashboard';
+    const returnUrl = AppSessionStore.consume(RETURN_URL_KEY) ?? '/vendor/profile';
     void this.router.navigateByUrl(returnUrl);
   }
 

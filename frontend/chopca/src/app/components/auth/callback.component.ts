@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserContextService } from '../../core/services/auth';
 import { AppSessionStore, RETURN_URL_KEY } from '../../core/storage/app.store';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { USER_CONTEXT_SERVICE } from '@core/services/auth';

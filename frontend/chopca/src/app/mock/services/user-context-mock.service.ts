@@ -20,7 +20,7 @@ export class UserContextMockService implements UserContextService{
   readonly hasAdmin = computed(() => this.admin() !== null);
 
   async ensureLoaded(): Promise<UserContext | null> {
-    return this.context();
+    return this.reload();
   }
 
   /** Forces a fresh fetch. Use after role changes or after registration. */
@@ -28,6 +28,7 @@ export class UserContextMockService implements UserContextService{
       const context: UserContext =  {
         keycloakId: "user-id",
         email: this.keycloak.getUserEmail(),
+        name: this.keycloak.getUserName(),
         vendor: this.keycloak.isVendor() ? {
                   id: "vendor-chaudron",
                   businessName: "Le Chaudron du bon gout",
@@ -46,6 +47,7 @@ export class UserContextMockService implements UserContextService{
                 status: 'ACTIVE'
               }: null
       };
+    console.log("UserContext reload ", context);
     this.context.set(context);
     return context;
   }

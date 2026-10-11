@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
+import { LogoComponent } from '@components/shared';
 
 interface RolePillar {
   icon: string;
@@ -14,7 +15,7 @@ interface RolePillar {
 @Component({
   selector: 'app-auth-hero-panel',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, LogoComponent],
   templateUrl: './auth-hero-panel.component.html',
   styleUrl: './auth-hero-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

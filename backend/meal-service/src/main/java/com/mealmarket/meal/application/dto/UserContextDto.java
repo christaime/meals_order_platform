@@ -5,6 +5,7 @@ import java.util.UUID;
 public record UserContextDto(
         String keycloakId,
         String email,
+        String name,
         VendorContext vendor,
         CustomerContext customer,
         AdminContext admin

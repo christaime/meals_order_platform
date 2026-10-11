@@ -12,7 +12,6 @@ import { LogoComponent } from '@components/shared/logo/logo.component';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
 import { WorkspaceService } from '@app/core/services/marketplace/workspace.service';
-import { UserContextService } from '@app/core/services/auth/user-context.service';
 import { NavItem, NavGroup, NavLink } from '@app/core/models/auth/nav-menu.models';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 import { USER_CONTEXT_SERVICE } from '@core/services/auth';
@@ -89,20 +88,13 @@ export class AuthHeaderComponent {
     customer: { label: 'Je Chop!', route: '/customer/dashboard' },
   } as const;
 
-  // ─── Current user (from UserContextService) ───────────────
+
   /**
    * The signed-in user's display name and derived initials.
    */
   readonly currentUser = computed(() => {
-    const ctx = this.userContext.context?.() ?? null;   // ← adjust accessor
-
-    const name =
-      ctx?.vendor?.businessName ??
-      ctx?.admin?.displayName ??
-      ctx?.customer?.displayName ??
-      ctx?.email ??
-      '';
-
+    const ctx = this.userContext.context() ?? null;   // ← adjust accessor
+    const name = ctx?.name ?? '';
     return {
       name,
       email:ctx?.email,
@@ -110,6 +102,10 @@ export class AuthHeaderComponent {
     };
   });
 
+  readonly vendorBusinessName = computed(() => {
+        const ctx = this.userContext.context() ?? null;   // ← adjust accessor
+        return ctx?.vendor?.businessName ?? "";
+  });
   readonly languages = ['FR', 'EN'] as const;
 
   // ─── Helpers ──────────────────────────────────────────────

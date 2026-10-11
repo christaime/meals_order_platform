@@ -30,6 +30,8 @@ export function initializeApp(): () => Promise<void> {
     // Not awaited — the app should render while the script downloads.
     void mapsLoader.load();
 
+    // Wait for keycloak onReady before reading auth state
+    await keycloakUser.whenReady();
     if (!keycloakUser.isAuthenticated()) return;
 
     try {

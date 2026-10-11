@@ -8,6 +8,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { SERVICE_PROVIDERS } from './core/services/service.providers';
+import { authProvider } from './core/services/auth.provider';
 import { environment } from '@environments/environment';
 import { initializeApp } from './core/initializers/app.initializer';
 import { authInterceptor } from './core/interceptor/auth.interceptor';
@@ -52,24 +53,7 @@ export const appConfig: ApplicationConfig = {
         languageInterceptor,
       ]),
     ),
-    ...(environment.useMockServices ? []: [provideKeycloak({
-            config: {
-              url: environment.keycloak.url,
-              realm: environment.keycloak.realm,
-              clientId: environment.keycloak.clientId,
-            },
-            initOptions: {
-              // `check-sso` = silent SSO check, no redirect. Anonymous users
-              // continue straight into the catalog without touching Keycloak's
-              // login page.
-              onLoad: 'check-sso',
-              silentCheckSsoRedirectUri:
-                window.location.origin + '/silent-check-sso.html',
-              checkLoginIframe: false,
-              pkceMethod: 'S256',
-            },
-      })]
-    ),
+    ...authProvider(),
     // ─── Boot sequence ───────────────────────────────────────
     //
     // Runs AFTER keycloak-angular's own APP_INITIALIZER (registration order).

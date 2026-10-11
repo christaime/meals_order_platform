@@ -1,11 +1,6 @@
-import type { MockUser } from '@mock/services/keycloak-mock.service';
+import type { MockUser } from '@mock/mock-shared.types';
 
-/**
- * Storage key the mock KeycloakService reads on boot. Must match
- * the constant used inside KeycloakMockService.
- */
-const MOCK_USER_KEY = 'e2e-mock-user';
-
+const E2E_MOCK_USER_KEY = 'e2e-mock-user';
 /**
  * Visits a URL with the mock auth seeded, so the app boots with
  * a session already established.
@@ -19,9 +14,14 @@ export function visitAs(url: string, user: MockUser | null): void {
   cy.visit(url, {
     onBeforeLoad(win) {
       if (user) {
-        win.sessionStorage.setItem(MOCK_USER_KEY, JSON.stringify(user));
+        win.sessionStorage.setItem(E2E_MOCK_USER_KEY, JSON.stringify(user));
       } else {
-        win.sessionStorage.removeItem(MOCK_USER_KEY);
+        try{
+           win.sessionStorage.removeItem(E2E_MOCK_USER_KEY);
+        }catch(e){
+          console.error(e)
+        }
+
       }
     },
   });

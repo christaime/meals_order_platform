@@ -25,6 +25,11 @@ public class CurrentUser {
         return getJwt().getClaimAsString("email");
     }
 
+    /** Returns the user's email from the JWT. */
+    public String getUserName() {
+        return getJwt().getClaimAsString("name");
+    }
+
     /**
      * Returns the user type based on roles in the JWT.
      * Priority: ADMIN > VENDOR > CUSTOMER > SYSTEM

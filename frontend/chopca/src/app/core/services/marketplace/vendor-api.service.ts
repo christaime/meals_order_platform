@@ -39,7 +39,7 @@ export class VendorApiService implements VendorService {
   }
 
   getOwnProfile(): Observable<Vendor> {
-    return this.http.get<Vendor>(`${this.baseUrl}/me`);
+    return this.http.get<Vendor>(`${this.baseUrl}/profile`);
   }
 
   searchVendors(request: VendorSearchRequest): Observable<DataPage<Vendor>> {

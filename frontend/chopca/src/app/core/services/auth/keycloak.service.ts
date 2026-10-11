@@ -13,6 +13,7 @@ export abstract class KeycloakService {
   abstract login(idpHint?: string): Promise<void>;
   abstract logout(): Promise<void>;
   abstract refreshToken(): Promise<void>;
+  abstract whenReady(): Promise<void> ;
 
   // ─── Reactive state ────────────────────────────────────────
   abstract readonly roles: Signal<ReadonlySet<AppRole>>;

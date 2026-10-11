@@ -1,4 +1,4 @@
-import type { MockUser } from '@mock/services/keycloak-mock.service';
+import type { MockUser } from '@mock/mock-shared.types';
 
 export const MOCK_USERS = {
   anonymous: null,

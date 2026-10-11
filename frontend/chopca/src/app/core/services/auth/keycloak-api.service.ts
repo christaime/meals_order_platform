@@ -17,7 +17,11 @@ export class KeycloakApiService implements KeycloakService {
   readonly logoutRequested = this._logoutRequested.asReadonly();
 
   readonly roles = this._roles.asReadonly();
-  readonly isAuthenticated = computed(() => this.keycloak.authenticated );
+  readonly isAuthenticated = computed(() =>{
+    const roles = this._roles(); // important to read a signal so the compute will refresh the status of isAuthenticated. Roles are change in the callback
+    console.log("Check isAuthenticated", this.keycloak.authenticated,{roles});
+    return this.keycloak.authenticated;
+  });
   readonly isAnonymous = computed(() => !this.keycloak.authenticated);
   readonly isAdmin = computed(() => this._roles().has(ADMIN_ROLE));
   readonly isVendor = computed(() => this._roles().has(VENDOR_ROLE));
@@ -36,7 +40,7 @@ export class KeycloakApiService implements KeycloakService {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     if (returnUrl) AppSessionStore.set(RETURN_URL_KEY, returnUrl);
     if(idpHint) AppSessionStore.set(IDP_HINT_KEY, idpHint);
-
+    console.log("Login in the app ",{idpHint});
     await this.keycloak.login({
       idpHint,
       redirectUri: window.location.origin + '/auth/callback',
@@ -45,13 +49,24 @@ export class KeycloakApiService implements KeycloakService {
 
   async logout(): Promise<void> {
     // Notify observers (SessionManager) so they can clean up.
+    console.log("logout from the app")
     this._logoutRequested.update(n => n + 1);
     await this.keycloak.logout({ redirectUri: window.location.origin });
     this.router.navigate(['/meals']);
   }
 
   async refreshToken(): Promise<void> {
-    await this.keycloak.updateToken(0);
+    await this.keycloak.updateToken(-1);
+  }
+
+  async whenReady(): Promise<void> {
+    await new Promise<void>((resolve) => {
+          this.keycloak.onReady = (authenticated) => {
+            console.log('Keycloak ready, authenticated:', authenticated);
+            this.reload();
+            resolve();
+          };
+        });
   }
 
   getUserEmail(): string | undefined {

@@ -9,20 +9,7 @@ import {
 } from '@core/services/auth/keycloak.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppSessionStore, RETURN_URL_KEY , IDP_HINT_KEY} from '@core/storage/app.store';
-
-/**
- * A synthetic user for tests.
- *
- * Represents everything the app knows about the authenticated user:
- * the identity, the identity provider, and the roles they hold.
- */
-export interface MockUser {
-  readonly sub: string;
-  readonly email: string;
-  readonly name: string;
-  readonly idp: 'google' | 'outlook' | 'yahoo' | 'local';
-  readonly roles: readonly AppRole[];
-}
+import { E2E_MOCK_USER_KEY, MockUser} from '@mock/mock-shared.types';
 
 @Injectable()
 export class KeycloakMockService implements KeycloakService {
@@ -48,6 +35,31 @@ export class KeycloakMockService implements KeycloakService {
   readonly isCustomer      = computed(() => this._user()?.roles.includes(CUSTOMER_ROLE) ?? false);
   readonly hasAnyRole      = computed(() => (this._user()?.roles.length ?? 0) > 0);
 
+  constructor() {
+    this.seedFromSessionStorage();
+  }
+
+  /**
+   * Reads the e2e mock user from sessionStorage, if present.
+   *
+   * `visitAs` in cypress/support/auth.ts writes this key before the
+   * page loads. Reading it here — at construction — means the app
+   * boots with the right identity and roles, so guards and the header
+   * see the correct state on first render.
+   *
+   * Anonymous runs write nothing, so `_user` stays null.
+   */
+  private seedFromSessionStorage(): void {
+    try {
+      const raw = sessionStorage.getItem(E2E_MOCK_USER_KEY);
+      if (!raw) return;
+      const user = JSON.parse(raw) as MockUser;
+      console.log("[KeycloakMockService].seedFromSessionStorage",{user});
+      this._user.set(user);
+    } catch (err) {
+      console.error('[KeycloakMockService] failed to parse mock user', err);
+    }
+  }
   // ─── Interface methods ──────────────────────────────────────
 
   async login(idpHint?: string): Promise<void> {
@@ -58,7 +70,8 @@ export class KeycloakMockService implements KeycloakService {
     // Optionally honor the idpHint so tests can simulate
     // "the user picked Google on the login page."
     if (!this._user()) {
-      this.signIn(defaultUserFor(idpHint));
+      this.asAdmin();
+      //this.signIn(defaultUserFor(idpHint));
     }
     this.router.navigate(['/auth/callback']);
     console.log("Sign in as default user ", this._user());
@@ -79,6 +92,9 @@ export class KeycloakMockService implements KeycloakService {
 
   reload(): void {
     // No-op.
+  }
+
+  async whenReady(): Promise<void>{
   }
 
   getUserEmail(): string | undefined {
