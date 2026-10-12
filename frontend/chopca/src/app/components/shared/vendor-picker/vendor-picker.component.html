@@ -1,77 +1,169 @@
-<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
-  <div class="flex items-start justify-between pb-space-sm">
-    <div>
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
-        <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-          Sélectionner un vendeur
-        </h2>
-      </div>
-      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-        Choisissez un vendeur pour gérer ses plats.
-      </p>
-    </div>
-  </div>
+<div data-testid="vendor-picker" class="w-full">
 
-  <div class="mt-space-md space-y-space-sm">
-    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-      <mat-label>Rechercher un vendeur</mat-label>
-      <mat-icon matPrefix>search</mat-icon>
-      <input
-        matInput
-        [formControl]="search"
-        placeholder="Nom, email, ville…"
-        autocomplete="off" />
-      @if (loading()) {
-      <mat-hint>Recherche…</mat-hint>
-      }
-    </mat-form-field>
+  <!-- Chip container -->
+  <div
+    class="vendor-chip-container
+           w-full min-h-[44px] rounded-full border border-outline-variant bg-surface-container-lowest
+           px-2 py-1 flex flex-wrap items-center gap-1.5
+           transition-shadow
+           focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/40">
 
-    @if (vendors().length > 0) {
-    <div class="flex flex-col gap-1.5 max-h-72 overflow-y-auto">
-      @for (v of vendors(); track v.id) {
-      <button
-        type="button"
-        (click)="onSelect(v.id)"
-        class="flex items-center gap-3 p-space-sm rounded-lg text-left
-                   transition-colors border"
-        [class]="selectedVendorId() === v.id
-              ? 'bg-primary-fixed/40 border-primary'
-              : 'bg-surface-container-low border-transparent hover:bg-surface-container'">
+    <!-- Selected chips — same layout as the dropdown option -->
+    @for (vendor of selectedVendors(); track vendor.id) {
+    <span
+      [attr.data-testid]="'vendor-picker-chip-' + vendor.id"
+      [attr.data-vendor-id]="vendor.id"
+      [style.flex-basis]="chipBasis()"
+      class="shrink-0 grow-0 inline-flex items-center gap-3
+             min-w-0 px-3 py-2 rounded-xl
+             bg-surface-container-lowest text-on-surface
+             border border-primary
+             font-label-md text-sm">
 
-        <img
-          [src]="v.profileImageUrl ?? 'assets/default-vendor.png'"
-          [alt]="v.businessName"
-          class="w-10 h-10 rounded-full object-cover shrink-0 border border-outline-variant/40" />
+      <!-- Image -->
+      <img
+        [src]="vendor.profileImageUrl ?? 'assets/default-vendor.png'"
+        [alt]="vendor.businessName"
+        class="w-10 h-10 rounded-full object-cover border border-outline-variant/40 shrink-0" />
 
-        <div class="flex-1 min-w-0">
-          <div class="font-label-lg text-label-lg font-bold text-on-surface truncate">
-            {{ v.businessName }}
-          </div>
-          <div class="font-body-sm text-body-sm text-on-surface-variant truncate">
-            {{ v.email ?? '—' }}
-          </div>
-          @if (v.address) {
-          <div class="font-body-sm text-body-sm text-outline text-[11px] truncate">
-            {{ v.address }}
-          </div>
+      <!-- Two columns: name + email | address + city -->
+      <div class="flex-1 min-w-0 grid grid-cols-2 gap-x-3 items-start">
+
+        <!-- Left column: name + email -->
+        <div class="min-w-0 flex flex-col leading-tight">
+          <span class="font-label-lg text-label-lg font-bold text-on-surface truncate">
+            {{ vendor.businessName }}
+          </span>
+          @if (vendor.email) {
+          <span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+            {{ vendor.email }}
+          </span>
           }
         </div>
 
-        @if (selectedVendorId() === v.id) {
-        <app-icon name="check_circle" size="md" class="text-primary shrink-0" />
-        }
+        <!-- Right column: address + city -->
+        <div class="min-w-0 flex flex-col leading-tight">
+          @if (vendor.address) {
+          <span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+            {{ vendor.address }}
+          </span>
+          }
+          @if (vendor.city?.name) {
+          <span class="font-body-sm text-body-sm text-outline text-[11px] truncate">
+            {{ vendor.city!.name }}@if (vendor.city!.region) {, {{ vendor.city!.region }}}
+          </span>
+          }
+        </div>
+      </div>
+
+      <!-- Remove button -->
+      <button
+        type="button"
+        [attr.data-testid]="'vendor-picker-remove-' + vendor.id"
+        [attr.aria-label]="'Retirer ' + vendor.businessName"
+        (click)="removeVendor(vendor)"
+        class="border-0 bg-transparent p-0 cursor-pointer leading-none
+               text-primary/70 hover:text-primary transition-colors shrink-0">
+        <app-icon name="close" size="sm" />
       </button>
-      }
-    </div>
-    } @else if (search.value && search.value.length >= 2 && !loading()) {
-    <p class="font-body-sm text-body-sm text-on-surface-variant text-center py-4">
-      Aucun vendeur trouvé.
-    </p>
-    } @else {
-    <p class="font-body-sm text-body-sm text-on-surface-variant text-center py-4">
-      Saisissez au moins 2 caractères pour rechercher.
-    </p>
+    </span>
+    }
+
+    <!-- Input -->
+    @if (!atLimit()) {
+    <input
+      type="text"
+      data-testid="vendor-picker-search"
+      [value]="searchInput()"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown)="onKeyDown($event)"
+      placeholder="Rechercher un vendeur…"
+      autocomplete="off"
+      class="vendor-chip-input flex-1 min-w-[140px] h-9 px-2 bg-transparent border-0
+             outline-none focus:outline-none focus-visible:outline-none
+             ring-0 focus:ring-0 focus-visible:ring-0
+             shadow-none focus:shadow-none focus-visible:shadow-none
+             font-body-md text-sm text-on-surface placeholder:text-outline" />
     }
   </div>
+
+  <!-- Dropdown -->
+  @if (dropdownOpen() && availableResults().length > 0) {
+  <div
+    data-testid="vendor-picker-dropdown"
+    class="mt-1 max-h-72 overflow-y-auto
+           bg-surface-container-lowest rounded-xl shadow-xl
+           border border-outline-variant py-1">
+    @for (vendor of availableResults(); track vendor.id) {
+    <button
+      type="button"
+      [attr.data-testid]="'vendor-picker-option-' + vendor.id"
+      [attr.data-vendor-id]="vendor.id"
+      (mousedown)="$event.preventDefault(); addVendor(vendor)"
+      class="w-full text-left px-3 py-2 border-none
+             hover:bg-surface-container transition-colors
+             flex items-center gap-3">
+
+      <!-- Image -->
+      <img
+        [src]="vendor.profileImageUrl ?? 'assets/default-vendor.png'"
+        [alt]="vendor.businessName"
+        class="w-10 h-10 rounded-full object-cover shrink-0 border border-outline-variant/40" />
+
+      <!-- Two columns: name + email | address + city -->
+      <div class="flex-1 min-w-0 grid grid-cols-2 gap-x-3 items-start">
+
+        <div class="min-w-0 flex flex-col leading-tight">
+          <span class="font-label-lg text-label-lg font-bold text-on-surface truncate">
+            {{ vendor.businessName }}
+          </span>
+          @if (vendor.email) {
+          <span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+            {{ vendor.email }}
+          </span>
+          }
+        </div>
+
+        <div class="min-w-0 flex flex-col leading-tight">
+          @if (vendor.address) {
+          <span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+            {{ vendor.address }}
+          </span>
+          }
+          @if (vendor.city?.name) {
+          <span class="font-body-sm text-body-sm text-outline text-[11px] truncate">
+            {{ vendor.city!.name }}@if (vendor.city!.region) {, {{ vendor.city!.region }}}
+          </span>
+          }
+        </div>
+      </div>
+    </button>
+    }
+  </div>
+  }
+
+  <!-- Empty state -->
+  @if (showEmptyState()) {
+  <div
+    data-testid="vendor-picker-empty"
+    class="mt-1 bg-surface-container-lowest rounded-xl shadow-xl
+           border border-outline-variant px-3 py-2
+           text-xs text-on-surface-variant">
+    Aucun vendeur ne correspond.
+  </div>
+  }
+
+  <!-- Hint -->
+  @if (inputFocused() && searchInput().trim().length > 0 && searchInput().trim().length < minSearchLength && !isSearching()) {
+  <div
+    data-testid="vendor-picker-hint"
+    class="mt-1 bg-surface-container-lowest rounded-xl shadow-xl
+           border border-outline-variant px-3 py-2
+           text-xs text-on-surface-variant">
+    Saisissez au moins {{ minSearchLength }} caractères.
+  </div>
+  }
+
 </div>

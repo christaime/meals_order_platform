@@ -39,14 +39,15 @@ type Scope = 'vendor' | 'admin';
 
 /** Default advanced-filter state (mirrors the drawer's own defaults). */
 const DEFAULT_ADVANCED: FilterState = {
-  minPrice: 1000,
-  maxPrice: 10000,
-  maxPrepTime: 60,
+  minPrice: undefined,
+  maxPrice: undefined,
+  maxPrepTime: undefined,
   minRating: 0,
   cuisineIds: [],
   dishTypeIds: [],
   excludeIngredientIds: []
 };
+
 
 @Component({
   selector: 'app-meals-page',
@@ -83,7 +84,7 @@ export class MealsPageComponent {
   // ─── Simple filters ───────────────────────────────────────
   protected readonly name = signal<string>('');
   protected readonly moderationStatus = signal<ModerationStatusFilter>('ALL');
-  protected readonly cityId = signal<string | null>(null);
+  protected readonly locationsIds = signal<string[] | null>(null);
   protected readonly sort = signal<MealSort>('name-asc');
 
   // ─── Advanced filters ─────────────────────────────────────
@@ -124,6 +125,7 @@ export class MealsPageComponent {
 
     const adv = this.advanced();
     const sort = this.sort();
+    const locationsIds = this.locationsIds();
 
     // Sort mapping: name-asc/desc, price-asc/desc, recent
     let sortBy = 'name';
@@ -148,7 +150,8 @@ export class MealsPageComponent {
       ...(this.moderationStatus() !== 'ALL'
         ? { moderationStatus: this.moderationStatus() as ModerationStatus }
         : {}),
-      ...(this.cityId() ? { cityId: this.cityId()! } : {}),
+
+        distributionLocationIds: locationsIds?.length ? locationsIds : undefined,
 
       // Advanced
       ...(adv ? adv : {})
@@ -189,7 +192,7 @@ export class MealsPageComponent {
   protected onFiltersChange(value: MealFiltersValue): void {
     this.name.set(value.name);
     this.moderationStatus.set(value.moderationStatus);
-    this.cityId.set(value.cityId);
+    this.locationsIds.set(value.distributionLocationIds);
     this.sort.set(value.sort);
     this.advanced.set(value.advanced);
     this.page.set(0);
@@ -199,7 +202,7 @@ export class MealsPageComponent {
   protected onSizeChange(s: number): void { this.size.set(s); this.page.set(0); }
 
   // ─── Admin vendor selection ───────────────────────────────
-  protected onVendorSelected(vendorId: string): void {
+  protected onVendorSelected(vendorId: string | null): void {
     this.adminVendorId.set(vendorId);
     this.editing.set(null);
     this.page.set(0);
@@ -247,4 +250,5 @@ export class MealsPageComponent {
   protected onQuickNew(): void {
     this.router.navigate(['/vendor/meals/new']);
   }
+
 }

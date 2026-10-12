@@ -1,4 +1,6 @@
-<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
+<div
+  data-testid="moderation-panel"
+  class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
   <div class="flex items-start justify-between pb-space-sm">
     <div>
       <div class="flex items-center gap-2">
@@ -11,12 +13,15 @@
         Statut actuel et actions disponibles selon votre rôle.
       </p>
     </div>
-    <app-badge [variant]="statusVariant()" size="sm">
-      {{ statusLabel() }}
-    </app-badge>
+    <span
+      data-testid="moderation-panel-status"
+      [attr.data-status]="currentStatus()">
+      <app-badge [variant]="statusVariant()" size="sm">
+        {{ statusLabel() }}
+      </app-badge>
+    </span>
   </div>
 
-  <!-- Allowed decisions -->
   @if (hasDecisions()) {
   <div class="mt-space-md space-y-space-md">
 
@@ -27,6 +32,7 @@
       </label>
       <textarea
         rows="3"
+        data-testid="moderation-panel-reason"
         [value]="reason()"
         (input)="reason.set($any($event.target).value)"
         [disabled]="busy()"
@@ -43,6 +49,8 @@
       @for (d of decisions(); track d.value) {
       <button
         type="button"
+        [attr.data-testid]="'moderation-panel-decision-' + d.value"
+        [attr.data-decision]="d.value"
         [disabled]="busy() || disabled()"
         (click)="submit(d)"
         [title]="d.confirmText"
@@ -62,14 +70,18 @@
     </div>
 
     @if (error(); as e) {
-    <p class="font-body-sm text-body-sm text-error flex items-center gap-1.5">
+    <p
+      data-testid="moderation-panel-error"
+      class="font-body-sm text-body-sm text-error flex items-center gap-1.5">
       <app-icon name="error" size="sm" />
       {{ e }}
     </p>
     }
   </div>
   } @else {
-  <div class="mt-space-md p-space-sm rounded-lg bg-surface-container-low
+  <div
+    data-testid="moderation-panel-no-decision"
+    class="mt-space-md p-space-sm rounded-lg bg-surface-container-low
                 flex items-start gap-2">
     <app-icon name="info" size="md" class="text-on-surface-variant shrink-0" />
     <p class="font-body-sm text-body-sm text-on-surface-variant">
@@ -86,9 +98,10 @@
   </div>
   }
 
-  <!-- Latest action recap -->
   @if (latest(); as last) {
-  <div class="mt-space-md pt-space-md border-t border-outline-variant/40
+  <div
+    data-testid="moderation-panel-latest"
+    class="mt-space-md pt-space-md border-t border-outline-variant/40
                 flex flex-wrap items-center gap-x-space-md gap-y-1
                 font-body-sm text-body-sm text-on-surface-variant">
       <span class="flex items-center gap-1.5">
@@ -101,11 +114,12 @@
     <span>
         par <strong class="text-on-surface">{{ actorLabel(last.performedByType) }}</strong>
         <span class="text-outline">({{ shortId(last.performedById) }})</span>
-      <!-- TODO: resolve display name via user lookup when backend exposes it -->
       </span>
     <span>{{ formatDate(last.performedAt) }}</span>
     @if (last.reason) {
-    <span class="w-full">Motif&nbsp;: <em>{{ last.reason }}</em></span>
+    <span data-testid="moderation-panel-latest-reason" class="w-full">
+      Motif&nbsp;: <em>{{ last.reason }}</em>
+    </span>
     }
   </div>
   }

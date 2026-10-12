@@ -1,5 +1,6 @@
 package com.mealmarket.meal.infrastructure.web;
 
+import com.mealmarket.common.exception.AccessDeniedException;
 import com.mealmarket.common.pagination.DataPage;
 import com.mealmarket.meal.application.dto.CreateMealRequest;
 import com.mealmarket.meal.application.dto.MealResponse;
@@ -86,6 +87,9 @@ public class MealController {
             @Valid @RequestBody CreateMealRequest request
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
+        if (vendor == null) {
+            throw new AccessDeniedException("You are not a registered Vendor");
+        }
         MealResponse response = mealService.createMeal(request, vendor);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -118,6 +122,9 @@ public class MealController {
             @PathVariable UUID id
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
+        if (vendor == null) {
+            throw new AccessDeniedException("You are not a registered Vendor");
+        }
         return ResponseEntity.ok(mealService.getVendorMealById(id, vendor.getId()));
     }
 
@@ -136,8 +143,33 @@ public class MealController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     public ResponseEntity<DataPage<MealResponse>> searchMyMeals(
+
             @Parameter(description = "Keyword search in name or description")
             @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "Cuisine category IDs filter (comma-separated)")
+            @RequestParam(required = false) List<UUID> cuisineIds,
+
+            @Parameter(description = "Dish type category IDs filter (comma-separated)")
+            @RequestParam(required = false) List<UUID> dishTypeIds,
+
+            @Parameter(description = "Ingredient IDs filter (meals containing ALL of these)")
+            @RequestParam(required = false) List<UUID> allIngredientIds,
+
+            @Parameter(description = "Ingredient IDs filter (meals containing ANY of these)")
+            @RequestParam(required = false) List<UUID> anyIngredientIds,
+
+            @Parameter(description = "Ingredient IDs to exclude (allergens)")
+            @RequestParam(required = false) List<UUID> excludeIngredientIds,
+
+            @Parameter(description = "Minimum price")
+            @RequestParam(required = false) BigDecimal minPrice,
+
+            @Parameter(description = "Maximum price")
+            @RequestParam(required = false) BigDecimal maxPrice,
+
+            @Parameter(description = "Minimum rating")
+            @RequestParam(required = false) Double minRating,
 
             @Parameter(description = "Filter by moderation status")
             @RequestParam(required = false) ModerationStatus moderationStatus,
@@ -145,17 +177,14 @@ public class MealController {
             @Parameter(description = "Filter by availability")
             @RequestParam(required = false) Boolean isAvailable,
 
+            @Parameter(description = "Filter looking if has Allergens or not")
+            @RequestParam(required = false) Boolean hasAllergens,
+
             @Parameter(description = "Get ingredients and distribution locations in the result")
             @RequestParam(required = false) Boolean loadFull,
 
             @Parameter(description = "Count ingredients, allergen and locations")
             @RequestParam(required = false) Boolean withCount,
-
-            @Parameter(description = "Minimum price")
-            @RequestParam(required = false) BigDecimal minPrice,
-
-            @Parameter(description = "Maximum price")
-            @RequestParam(required = false) BigDecimal maxPrice,
 
             @Parameter(description = "Page number (0-indexed)")
             @RequestParam(defaultValue = "0") int page,
@@ -170,16 +199,25 @@ public class MealController {
             @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
-
+        if (vendor == null) {
+            throw new AccessDeniedException("You are not a registered Vendor");
+        }
         var request = com.mealmarket.meal.domain.repository.criteria.MealSearchRequest.builder()
                 .vendorId(vendor.getId())
                 .keyword(keyword)
-                .moderationStatus(moderationStatus)
-                .isAvailable(isAvailable)
-                .loadFull(loadFull)
-                .withCount(withCount)
+                .cuisineIds(cuisineIds)
+                .dishTypeIds(dishTypeIds)
+                .anyIngredientIds(anyIngredientIds)
+                .allIngredientIds(allIngredientIds)
+                .excludeIngredientIds(excludeIngredientIds)
+                .hasAllergens(hasAllergens)
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
+                .minRating(minRating)
+                .moderationStatus(moderationStatus)
+                .isAvailable(isAvailable)
+                .withCount(withCount)
+                .loadFull(loadFull)
                 .sortBy(sortBy, com.mealmarket.common.pagination.Sort.Direction.valueOf(sortDirection.name()))
                 .page(page, size)
                 .build();
@@ -228,6 +266,9 @@ public class MealController {
             @Valid @RequestBody UpdateMealRequest request
     ) {
         var vendor = vendorService.getOwnProfileEntity(currentUser.getUserId());
+        if (vendor == null) {
+            throw new AccessDeniedException("You are not a registered Vendor");
+        }
         return ResponseEntity.ok(
                 mealService.updateMeal(id, request, vendor.getId())
         );
@@ -587,6 +628,7 @@ public class MealController {
                 .cuisineIds(cuisineIds)
                 .dishTypeIds(dishTypeIds)
                 .excludeIngredientIds(excludeIngredientIds)
+                .moderationStatus(ModerationStatus.APPROVED)
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
                 .minPrepTime(minPrepTime)

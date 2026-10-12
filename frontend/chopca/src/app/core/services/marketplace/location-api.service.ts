@@ -55,11 +55,15 @@ export class LocationApiService implements LocationService {
   searchLocationsFlat(request: {
     keyword?: string;
     vendorId?: string;
+    cityNameLike?: string;
+    cityIds?: string[];
     size?: number;
   }): Observable<LocationSummary[]> {
     const params = this.buildSearchParams({
       keyword: request.keyword,
       vendorId: request.vendorId,
+      cityNameLike: request.cityNameLike,
+      cityIds: request.cityIds,
       size: request.size ?? 50,
       sortBy: 'name',
       sortDirection: 'ASC',
@@ -118,6 +122,7 @@ export class LocationApiService implements LocationService {
     if (request.vendorId)             params = params.set('vendorId', request.vendorId);
     if (request.name)                 params = params.set('name', request.name);
     if (request.cityIds)              params = params.set('cityIds', request.cityIds.join(','));
+    if (request.cityNameLike)         params = params.set('cityNameLike', request.cityNameLike);
     if (request.moderationStatus)     params = params.set('moderationStatus', request.moderationStatus);
     if (request.nearLatitude != null) params = params.set('nearLatitude', request.nearLatitude.toString());
     if (request.nearLongitude != null) params = params.set('nearLongitude', request.nearLongitude.toString());

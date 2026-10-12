@@ -40,6 +40,8 @@ export abstract class LocationService {
   abstract searchLocationsFlat(request: {
     keyword?: string;
     vendorId?: string;
+    cityNameLike?: string;
+    cityIds?: string[];
     size?: number;
   }): Observable<LocationSummary[]>;
 

@@ -1,29 +1,27 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   OnInit,
-  computed,
-  inject,
   input,
   output,
   signal,
-  effect
+  effect,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { IconComponent } from '@components/shared/icon/icon.component';
 import {
   AdvancedFilterDrawerComponent,
-  FilterState, DEFAULT_FILTERS, FilterSelection
+  FilterState,
+  DEFAULT_FILTERS,
+  FilterSelection,
 } from '@components/marketplace/meal/view';
+import { InlineLocationSelectorComponent } from '../inline-location-selector/inline-location-selector.component';
 
-import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model';
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
-import { City } from '@app/core/models/marketplace';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
+import { City } from '@app/core/models/marketplace/city.model';
 
 export type MealSort =
   | 'name-asc'
@@ -41,55 +39,59 @@ export type ModerationStatusFilter = ModerationStatus | 'ALL';
 export interface MealFiltersValue {
   readonly name: string;
   readonly moderationStatus: ModerationStatusFilter;
-  readonly cityId: string | null;
+  readonly distributionLocationIds: string[];
   readonly sort: MealSort;
   readonly advanced: FilterState;
 }
 
-
-
 /**
- * MealFiltersComponent — simple filter bar + embedded advanced drawer.
+ * MealFiltersComponent — filter bar for the vendor management page.
  *
- * Owns the four visible controls (name, status, city, sort) and the
- * AdvancedFilterDrawerComponent. Emits one combined `filtersChange`
- * whenever anything changes, so the host page only listens once.
+ * Owns the four visible controls (name, status, locations, sort) and
+ * embeds the advanced drawer and the inline location selector.
+ * Emits one combined `filtersChange` whenever anything changes, so the
+ * host page only listens once.
  *
  * The host page owns the filter state. This component is a pure
  * function of its inputs plus its own transient draft state for the
- * text field.
+ * name text field.
  */
 @Component({
   selector: 'app-meal-filters',
   standalone: true,
-  imports: [FormsModule, IconComponent, AdvancedFilterDrawerComponent],
+  imports: [
+    FormsModule,
+    IconComponent,
+    AdvancedFilterDrawerComponent,
+    InlineLocationSelectorComponent,
+  ],
   templateUrl: './meal-filters.component.html',
   styleUrl: './meal-filters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MealFiltersComponent implements OnInit {
 
-  private readonly cityService = inject(CITY_SERVICE);
-  private readonly destroyRef = inject(DestroyRef);
-
   // ─── Inputs (current state) ───────────────────────────────
   readonly name = input<string>('');
   readonly moderationStatus = input<ModerationStatusFilter>('ALL');
-  readonly cityId = input<string | null>(null);
+  readonly distributionLocationIds = input<string[]>([]);
   readonly sort = input<MealSort>('name-asc');
   readonly advanced = input<FilterState>({ ...DEFAULT_FILTERS });
-  readonly initialSelection = signal<FilterSelection>({cuisines: [], dishTypes: [], ingredients: []});
+  readonly initialSelection = signal<FilterSelection>({
+    cuisines: [],
+    dishTypes: [],
+    ingredients: [],
+  });
 
-  /** Option lists owned by the page (vendor-scoped). */
+  /** When set, the location search is scoped to this vendor. */
+  readonly vendorId = input<string | null>(null);
+
+  /** Option lists owned by the page. */
   readonly ingredientOptions = input<IngredientSummary[]>([]);
   readonly locationOptions = input<LocationSummary[]>([]);
 
   // ─── Outputs ──────────────────────────────────────────────
   readonly filtersChange = output<MealFiltersValue>();
-
-  // ─── Cities ───────────────────────────────────────────────
-  protected readonly cities = signal<City[]>([]);
-  protected readonly citiesLoading = signal<boolean>(false);
 
   // ─── Draft for the text field (committed on Enter / blur) ─
   protected readonly draftName = signal<string>('');
@@ -117,15 +119,14 @@ export class MealFiltersComponent implements OnInit {
       if (initial && !this.draftName()) {
         this.draftName.set(initial);
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   ngOnInit(): void {
     this.draftName.set(this.name());
-    this.loadCities();
   }
 
-  // ─── Handlers ─────────────────────────────────────────────
+  // ─── Name handlers ────────────────────────────────────────
 
   protected onNameInput(event: Event): void {
     this.draftName.set((event.target as HTMLInputElement).value);
@@ -135,14 +136,11 @@ export class MealFiltersComponent implements OnInit {
     this.emit({ name: this.draftName().trim() });
   }
 
+  // ─── Status / sort ────────────────────────────────────────
+
   protected onStatusChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as ModerationStatusFilter;
     this.emit({ moderationStatus: value });
-  }
-
-  protected onCityChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.emit({ cityId: value === '' ? null : value });
   }
 
   protected onSortChange(event: Event): void {
@@ -150,10 +148,23 @@ export class MealFiltersComponent implements OnInit {
     this.emit({ sort: value });
   }
 
+  // ─── Location selector ────────────────────────────────────
+
   /**
-   * The drawer emits the full advanced filter state on apply / reset.
-   * We merge it into the outgoing payload.
+   * The city is a scoping concern for the location search, not a meal
+   * filter. If the host needs to filter meals by city too, add a
+   * `cityId` field to MealFiltersValue and emit it from here.
    */
+  protected onCitySelected(city: City | null): void {
+
+  }
+
+  protected onLocationsSelected(locations: LocationSummary[]): void {
+    this.emit({ distributionLocationIds: locations.map((l) => l.id) });
+  }
+
+  // ─── Advanced drawer ──────────────────────────────────────
+
   protected onAdvancedChange(advanced: FilterState): void {
     this.emit({ advanced });
   }
@@ -172,25 +183,9 @@ export class MealFiltersComponent implements OnInit {
     this.filtersChange.emit({
       name: patch.name ?? this.draftName().trim(),
       moderationStatus: patch.moderationStatus ?? this.moderationStatus(),
-      cityId: patch.cityId !== undefined ? patch.cityId : this.cityId(),
+      distributionLocationIds: patch.distributionLocationIds ?? this.distributionLocationIds(),
       sort: patch.sort ?? this.sort(),
       advanced: patch.advanced ?? this.advanced(),
     });
-  }
-
-  private loadCities(): void {
-    this.citiesLoading.set(true);
-    this.cityService.getCities()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: cities => {
-          this.cities.set(cities);
-          this.citiesLoading.set(false);
-        },
-        error: err => {
-          this.citiesLoading.set(false);
-          console.error('[MealFilters] city fetch error', err);
-        },
-      });
   }
 }

@@ -188,9 +188,10 @@ const VENDOR_MENU: readonly NavItem[] = [
     label: 'Gestion des Plats',
     children: [
       { kind: 'link', label: 'Liste des plats', route: '/vendor/meals',     icon: 'format_list_bulleted' },
-      { kind: 'link', label: 'Nouveau plat',     route: '/vendor/meals/new', icon: 'add_circle' },
+      { kind: 'link', label: 'Nouveau plat',     route: '/vendor/meals/new', icon: 'add_circle' }
     ],
   },
+  { kind: 'link', label: 'Zones de présence',     route: '/vendor/locations', icon: 'location_on' },
   /*{
     kind: 'group',
     label: 'Gestion des Commandes',
@@ -217,7 +218,7 @@ const ADMIN_MENU: readonly NavItem[] = [
     label: 'Vendeurs & lieux',
     children: [
       { kind: 'link', label: 'Vendeurs',     route: '/admin/vendors',   icon: 'storefront' },
-      { kind: 'link', label: 'Emplacements', route: '/admin/locations', icon: 'location_on' },
+      { kind: 'link', label: 'Zones de présence', route: '/admin/locations', icon: 'location_on' },
     ],
   },
   //{ kind: 'link', label: 'Modération', route: '/admin/moderation' },

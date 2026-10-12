@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.location-chip-container {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+.inline-location-selector-input{
+  outline: none!important;
+}

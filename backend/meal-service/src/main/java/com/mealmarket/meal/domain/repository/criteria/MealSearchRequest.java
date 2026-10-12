@@ -59,7 +59,8 @@ public class MealSearchRequest extends SearchRequest {
             "averageRating",
             "name",
             "prepTimeMinutes",
-            "price"
+            "price",
+            "createdAt"
     );
 
     private MealSearchRequest(Builder builder) {

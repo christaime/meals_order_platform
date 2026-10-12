@@ -166,7 +166,7 @@ export class LocationsPageComponent {
   protected onSizeChange(s: number): void { this.size.set(s); this.page.set(0); }
 
   // ─── Admin vendor selection ───────────────────────────────
-  protected onVendorSelected(vendorId: string): void {
+  protected onVendorSelected(vendorId: string | null): void {
     this.adminVendorId.set(vendorId);
     this.editing.set(null);
     this.page.set(0);

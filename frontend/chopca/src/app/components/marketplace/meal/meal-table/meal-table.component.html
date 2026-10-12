@@ -1,4 +1,6 @@
-<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-clip">
+<div
+  data-testid="meal-table"
+  class="bg-surface-container-lowest rounded-xl shadow-sm overflow-clip">
   <div class="overflow-x-auto">
     <table class="w-full text-left">
       <thead>
@@ -15,14 +17,14 @@
       <tbody class="divide-y divide-outline-variant/30">
 
       @if (loading()) {
-      <tr>
+      <tr data-testid="meal-table-loading">
         <td colspan="6" class="py-12 px-space-md text-center text-on-surface-variant">
           <app-icon name="progress_activity" size="xl" class="animate-spin" />
           <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
         </td>
       </tr>
       } @else if (meals().length === 0) {
-      <tr>
+      <tr data-testid="meal-table-empty">
         <td colspan="6" class="py-12 px-space-md text-center">
           <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-surface-container-low
                           flex items-center justify-center text-outline">
@@ -39,6 +41,8 @@
       } @else {
       @for (meal of meals(); track meal.id) {
       <tr
+        [attr.data-testid]="'meal-table-row-' + meal.id"
+        [attr.data-meal-id]="meal.id"
         class="group transition-colors"
         [ngClass]="isEditing(meal)
                 ? 'bg-primary-fixed/20 ring-1 ring-inset ring-primary'
@@ -63,11 +67,15 @@
             </div>
             }
             <div class="min-w-0">
-              <div class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">
+              <div
+                data-testid="meal-table-name"
+                class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">
                 {{ meal.name }}
               </div>
               @if (meal.description) {
-              <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">
+              <p
+                data-testid="meal-table-description"
+                class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">
                 {{ meal.description }}
               </p>
               }
@@ -77,7 +85,9 @@
 
         <!-- ─── Catégories ─────────────────────────────── -->
         <td class="py-3.5 px-space-md">
-          <div class="flex flex-wrap items-center gap-1 max-w-[220px]">
+          <div
+            data-testid="meal-table-categories"
+            class="flex flex-wrap items-center gap-1 max-w-[220px]">
             @for (cat of meal.cuisines; track cat.id; let i = $index) {
             @if (i < 2) {
             <app-badge variant="primary" size="sm" [icon]="cat.iconUrl || 'restaurant'">
@@ -102,15 +112,24 @@
 
         <!-- ─── Prix ───────────────────────────────────── -->
         <td class="py-3.5 px-space-md whitespace-nowrap">
-          <span class="font-currency-tabular text-on-surface font-bold">
+          <span
+            data-testid="meal-table-price"
+            [attr.data-amount]="meal.price"
+            class="font-currency-tabular text-on-surface font-bold">
             {{ meal.price | number:'1.0-0' }} FCFA
           </span>
         </td>
 
         <!-- ─── Composition & distribution ─────────────── -->
         <td class="py-3.5 px-space-md whitespace-nowrap">
-          <div class="flex flex-col gap-0.5 text-[11px]">
-            <span class="flex items-center gap-1">
+          <div
+            data-testid="meal-table-composition"
+            class="flex flex-col gap-0.5 text-[11px]">
+            <span
+              data-testid="meal-table-ingredient-count"
+              [attr.data-ingredient-count]="meal.ingredientCount ?? 0"
+              [attr.data-allergen-count]="meal.allergenIngredientCount ?? 0"
+              class="flex items-center gap-1">
               <app-icon name="restaurant" size="sm" />
               {{ meal.ingredientCount ?? 0 }} ingrédient{{ (meal.ingredientCount ?? 0) > 1 ? 's' : '' }}
               @if ((meal.allergenIngredientCount ?? 0) > 0) {
@@ -119,7 +138,10 @@
               </span>
               }
             </span>
-            <span class="flex items-center gap-1">
+            <span
+              data-testid="meal-table-location-count"
+              [attr.data-location-count]="meal.distributionLocationCount ?? 0"
+              class="flex items-center gap-1">
               <app-icon name="storefront" size="sm" />
               {{ meal.distributionLocationCount ?? 0 }} point{{ (meal.distributionLocationCount ?? 0) > 1 ? 's' : '' }}
             </span>
@@ -128,12 +150,14 @@
 
         <!-- ─── Statut ─────────────────────────────────── -->
         <td class="py-3.5 px-space-md whitespace-nowrap">
-          <app-badge
-            [variant]="statusVariant(meal.moderationStatus)"
-            [icon]="statusIcon(meal.moderationStatus)"
-            size="sm">
-            {{ statusLabel(meal.moderationStatus) }}
-          </app-badge>
+          <span [attr.data-testid]="'meal-table-status-' + meal.id">
+            <app-badge
+              [variant]="statusVariant(meal.moderationStatus)"
+              [icon]="statusIcon(meal.moderationStatus)"
+              size="sm">
+              {{ statusLabel(meal.moderationStatus) }}
+            </app-badge>
+          </span>
         </td>
 
         <!-- ─── Actions ────────────────────────────────── -->
@@ -142,6 +166,7 @@
             @if (scope() === 'vendor') {
             <button
               type="button"
+              [attr.data-testid]="'meal-table-edit-' + meal.id"
               (click)="edit.emit(meal)"
               title="Modifier"
               class="p-1.5 rounded-lg text-on-surface-variant
@@ -151,6 +176,7 @@
             </button>
             <button
               type="button"
+              [attr.data-testid]="'meal-table-delete-' + meal.id"
               (click)="delete.emit(meal)"
               title="Supprimer"
               class="p-1.5 rounded-lg text-on-surface-variant
@@ -161,6 +187,7 @@
             } @else {
             <button
               type="button"
+              [attr.data-testid]="'meal-table-select-' + meal.id"
               (click)="select.emit(meal)"
               [title]="isEditing(meal) ? 'Sélectionné pour modération' : 'Sélectionner pour modération'"
               class="p-1.5 rounded-lg transition-colors

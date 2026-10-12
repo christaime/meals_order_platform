@@ -208,6 +208,7 @@ public class MealService {
                 .keyword(request.getKeyword())
                 .vendorId(vendorId)
                 .loadFull(request.getLoadFull())
+                .withCount(request.getWithCount())
                 .categoryIds(request.getCategoryIds())
                 .cuisineIds(request.getCuisineIds())
                 .dishTypeIds(request.getDishTypeIds())

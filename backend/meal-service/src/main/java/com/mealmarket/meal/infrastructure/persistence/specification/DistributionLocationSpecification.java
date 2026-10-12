@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.meta.When;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,38 +39,63 @@ public class DistributionLocationSpecification {
                 predicates.add(root.get("cityId").in(request.getCityIds()));
             }
 
-            // ─── City name / region substring (subquery) ─────────
+            // ─── Location text search ────────────────────────────
+            // `cityNameLike` and `keyword` both mean "text the user
+            // typed to narrow the list." When they're identical,
+            // they must be OR-ed together, not AND-ed: a location
+            // matches if its name, address, city name, or region
+            // contains the text. AND-ing would require the city to
+            // match AND the name/address to match, which almost never
+            // both hold for the same search.
             //
-            // Only fires when the caller explicitly asked for it.
-            // Searches CityEntity for a matching name OR region, then
-            // constrains the location's cityId to that set.
-            //
-            // A subquery (rather than a @ManyToOne join) keeps the
-            // location entity association-free, in line with the
-            // project convention.
-            if (request.getCityNameLike() != null
-                    && !request.getCityNameLike().isBlank()) {
-                String pattern = "%"
-                        + request.getCityNameLike().toLowerCase().trim()
-                        + "%";
-                predicates.add(root.get("cityId").in(
-                        matchingCityIds(pattern, query, criteriaBuilder)
-                ));
-            }
-
-            // ─── Keyword (name OR address only) ──────────────────
-            //
-            // Location-level fields only. The city is filtered
-            // separately by cityNameLike so the two concerns stay
-            // decoupled and the keyword search stays cheap.
-            if (request.getKeyword() != null && !request.getKeyword().isBlank()) {
+            // When the two differ, keep them as two independent
+            // predicates so each constrains the result on its own —
+            // that's the historical behaviour and it's what callers
+            // sending both expect.
+            if(request.getCityNameLike() != null  && request.getKeyword() != null && request.getCityNameLike().trim().equals(request.getKeyword()) ) {
                 String keyword = "%" + request.getKeyword().toLowerCase().trim() + "%";
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(root.get("name")), keyword),
                         criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("address")), keyword)
+                                criteriaBuilder.lower(root.get("address")), keyword),
+                        root.get("cityId").in(
+                                matchingCityIds(keyword, query, criteriaBuilder))
                 ));
+            }else{
+                // ─── City name / region substring (subquery) ─────────
+                //
+                // Only fires when the caller explicitly asked for it.
+                // Searches CityEntity for a matching name OR region, then
+                // constrains the location's cityId to that set.
+                //
+                // A subquery (rather than a @ManyToOne join) keeps the
+                // location entity association-free, in line with the
+                // project convention.
+                if (request.getCityNameLike() != null
+                        && !request.getCityNameLike().isBlank()) {
+                    String pattern = "%"
+                            + request.getCityNameLike().toLowerCase().trim()
+                            + "%";
+                    predicates.add(root.get("cityId").in(
+                            matchingCityIds(pattern, query, criteriaBuilder)
+                    ));
+                }
+
+                // ─── Keyword (name OR address only) ──────────────────
+                //
+                // Location-level fields only. The city is filtered
+                // separately by cityNameLike so the two concerns stay
+                // decoupled and the keyword search stays cheap.
+                if (request.getKeyword() != null && !request.getKeyword().isBlank()) {
+                    String keyword = "%" + request.getKeyword().toLowerCase().trim() + "%";
+                    predicates.add(criteriaBuilder.or(
+                            criteriaBuilder.like(
+                                    criteriaBuilder.lower(root.get("name")), keyword),
+                            criteriaBuilder.like(
+                                    criteriaBuilder.lower(root.get("address")), keyword)
+                    ));
+                }
             }
 
             // ─── Exact name ──────────────────────────────────────

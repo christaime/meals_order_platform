@@ -55,29 +55,34 @@ export class DeleteEntityDialogComponent {
     switch (kind) {
       case 'category':
         return {
-          title: 'Supprimer la catégorie ?',
+          title: `Supprimer la category '${ this.data.name }'?`,
           body: 'Vous êtes sur le point de supprimer',
           placeholder: 'Ex: Doublon avec "Cuisine Sawa"',
         };
       case 'ingredient':
         return {
-          title: 'Supprimer l\'ingrédient ?',
+          title: `Supprimer l'ingrédient '${ this.data.name }'?`,
           body: 'Vous êtes sur le point de supprimer',
           placeholder: 'Ex: Doublon avec "Arachide"',
         };
       case 'location':
         return {
-          title: 'Supprimer l\'emplacement ?',
+          title: `Supprimer l'emplacement '${ this.data.name }'?`,
           body: 'Vous êtes sur le point de supprimer',
           placeholder: 'Ex: Ancienne adresse, déménagement…',
         };
       case 'meal':
         return {
-          title: 'Supprimer le met ?',
+          title: `Supprimer le met '${ this.data.name }'?`,
           body: 'Vous êtes sur le point de supprimer',
           placeholder: 'Ex: Repas méconnu et non apprécié par le grand public…',
         };
-
+      default:
+        return {
+          title: 'Supprimer cet élément ?',
+          body: 'Vous êtes sur le point de supprimer',
+          placeholder: 'Raison de la suppression…',
+        };
     }
 
   }

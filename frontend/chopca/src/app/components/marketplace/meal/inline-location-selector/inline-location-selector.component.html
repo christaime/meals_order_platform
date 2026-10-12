@@ -1,0 +1,129 @@
+<!--
+  City + location chips.
+
+  Layout:
+    - phone / tablet : city select on its own row, chip input below
+    - laptop (lg+)   : city select and chip input on one row
+
+  Implemented with CSS Grid: `grid-cols-1` stacks vertically,
+  `lg:grid-cols-[auto_minmax(0,1fr)]` puts the city select at its
+  natural width and the chip input in the remaining space.
+-->
+<div
+  class="grid gap-2 w-full min-w-0
+         grid-cols-1
+         lg:grid-cols-[auto_minmax(0,1fr)]">
+
+  <!-- City select -->
+  <select
+    data-testid="inline-location-selector-city"
+    [value]="cityId() ?? ''"
+    (change)="onCityChange($event)"
+    [disabled]="citiesLoading()"
+    class="w-full lg:w-auto h-11 px-3 rounded-full bg-surface-container-lowest
+           border border-outline-variant text-on-surface
+           font-label-md text-xs font-semibold
+           focus:outline-none focus:ring-2 focus:ring-primary
+           disabled:opacity-60">
+    <option value="">Toutes les villes</option>
+    @for (city of cities(); track city.id) {
+    <option [value]="city.id">{{ city.name }}</option>
+    }
+  </select>
+
+  <!-- Location chip selector -->
+  <div class="relative min-w-0 w-full" data-testid="inline-location-selector-locations">
+
+    <div
+      class="location-chip-container
+            h-11 rounded-full border border-outline-variant bg-surface-container-lowest
+            px-3 flex items-center gap-1.5 overflow-x-auto
+            transition-shadow
+            focus-within:border-primary">
+
+      @for (loc of selectedLocations(); track loc.id) {
+      <span
+        [attr.data-testid]="'inline-location-selector-chip-' + loc.id"
+        [attr.data-location-id]="loc.id"
+        class="shrink-0 inline-flex items-center gap-1
+               px-2 h-8 py-0.5 rounded-full
+               bg-primary text-on-primary
+               font-label-md text-xs font-semibold">
+        <span class="truncate max-w-[130px]">{{ loc.name }}</span>
+        <button
+          type="button"
+          [attr.data-testid]="'inline-location-selector-remove-' + loc.id"
+          [attr.aria-label]="'Retirer ' + loc.name"
+          (click)="removeLocation(loc)"
+          class="border-0 bg-transparent p-0 cursor-pointer leading-none
+                 text-on-primary/80 hover:text-on-primary transition-colors">
+          <app-icon name="close" size="sm" />
+        </button>
+      </span>
+      }
+
+      @if (!atLimit()) {
+      <input
+        type="text"
+        #locInput
+        data-testid="inline-location-selector-input"
+        [value]="locationInput()"
+        (input)="onLocationInput($event)"
+        (focus)="onLocationFocus()"
+        (blur)="onLocationBlur()"
+        (keydown)="onLocationKeyDown($event)"
+        placeholder="Ajouter une zone…"
+        autocomplete="off"
+        class="inline-location-selector-input
+               flex-1 min-w-[80px] h-full px-1 bg-transparent border-0
+               font-body-md text-sm text-on-surface placeholder:text-outline" />
+      }
+    </div>
+
+    @if (locationDropdownOpen() && availableResults().length > 0) {
+    <div
+      data-testid="inline-location-selector-dropdown"
+      class="absolute left-0 right-0 mt-1 z-30
+             bg-surface-container-lowest rounded-xl shadow-xl
+             border border-outline-variant max-h-60 overflow-y-auto py-1">
+      @for (loc of availableResults(); track loc.id) {
+      <button
+        type="button"
+        [attr.data-testid]="'inline-location-selector-option-' + loc.id"
+        [attr.data-location-id]="loc.id"
+        (mousedown)="$event.preventDefault(); addLocation(loc)"
+        class="w-full text-left px-3 py-2 text-sm border-none
+               font-body-md text-on-surface
+               hover:bg-surface-container transition-colors
+               flex flex-col gap-0.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="truncate">{{ loc.name }}</span>
+          @if (loc.vendorBusinessName) {
+          <span class="text-[10px] text-on-surface-variant shrink-0">
+            {{ loc.vendorBusinessName }}
+          </span>
+          }
+        </div>
+        @if (loc.city) {
+        <div class="text-[10px] text-on-surface-variant truncate">
+          {{ loc.city.name }}@if (loc.city.region) {, {{ loc.city.region }}}
+        </div>
+        }
+      </button>
+      }
+    </div>
+    }
+    @if (locationDropdownOpen() && !locationIsSearching() && availableResults().length === 0 && locationInput().trim().length > 0) {
+    <div
+      data-testid="inline-location-selector-empty"
+      class="absolute left-0 right-0 mt-1 z-30
+         bg-surface-container-lowest rounded-xl shadow-xl
+         border border-outline-variant px-3 py-2
+         text-xs text-on-surface-variant">
+      Aucune zone ne correspond.
+    </div>
+    }
+
+  </div>
+
+</div>

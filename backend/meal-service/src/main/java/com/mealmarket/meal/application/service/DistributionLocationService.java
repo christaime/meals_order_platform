@@ -161,6 +161,8 @@ public class DistributionLocationService {
                         .vendorId(vendorId)                              // ← forced
                         .keyword(request.getKeyword())
                         .name(request.getName())
+                        .cityIds(request.getCityIds())
+                        .cityNameLike(request.getCityNameLike())
                         .moderationStatus(request.getModerationStatus())
                         .sort(request.getSort())
                         .page(request.getPageRequest().getPage(), request.getPageRequest().getSize())

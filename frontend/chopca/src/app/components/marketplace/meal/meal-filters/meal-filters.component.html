@@ -1,15 +1,34 @@
-<div class="flex flex-col gap-space-sm">
-  <!-- Row 1: name + status + city + sort + advanced trigger -->
-  <div class="flex flex-wrap items-center gap-2">
+<div class="flex flex-col gap-space-sm" data-testid="meal-filters">
 
-    <!-- Name search — flex-1 + min-w-0 so it can shrink; floor via min-w -->
-    <div class="flex-1 min-w-[140px] relative">
+  <!--
+    Filter controls.
+
+    Layout:
+      - phone / tablet  : three rows
+          (1) keyword + status
+          (2) location selector
+          (3) sort + advanced
+      - laptop (lg+)    : one row
+
+    Implemented with CSS Grid so each breakpoint declares its
+    columns explicitly. On phone/tablet, `grid-cols-2` with the
+    location on its own row via `col-span-2`.
+  -->
+  <div
+    data-testid="meal-filters-row"
+    class="grid gap-2
+           grid-cols-2
+           lg:grid-cols-[minmax(220px,2fr)_auto_minmax(280px,2fr)_auto_auto]">
+
+    <!-- Row 1 on phone/tablet, column 1 on laptop: keyword -->
+    <div class="relative col-span-1 lg:col-span-1">
       <app-icon
         name="search"
         size="sm"
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+        class="absolute left-2 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
       <input
         type="text"
+        data-testid="meal-filters-name-input"
         [value]="draftName()"
         (input)="onNameInput($event)"
         (keydown.enter)="onNameSubmit()"
@@ -21,11 +40,12 @@
                focus:outline-none focus:ring-2 focus:ring-primary" />
     </div>
 
-    <!-- Status — shrink-0 so it never gets squeezed -->
+    <!-- Row 1 on phone/tablet, column 2 on laptop: status -->
     <select
+      data-testid="meal-filters-status-select"
       [value]="moderationStatus()"
       (change)="onStatusChange($event)"
-      class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+      class="col-span-1 lg:col-span-1 w-full h-11 px-3 rounded-full bg-surface-container-lowest
              border border-outline-variant text-on-surface
              font-label-md text-xs font-semibold
              focus:outline-none focus:ring-2 focus:ring-primary">
@@ -34,27 +54,20 @@
       }
     </select>
 
-    <!-- City — shrink-0 -->
-    <select
-      [value]="cityId() ?? ''"
-      (change)="onCityChange($event)"
-      [disabled]="citiesLoading()"
-      class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
-             border border-outline-variant text-on-surface
-             font-label-md text-xs font-semibold
-             focus:outline-none focus:ring-2 focus:ring-primary
-             disabled:opacity-60">
-      <option value="">Toutes les villes</option>
-      @for (city of cities(); track city.id) {
-      <option [value]="city.id">{{ city.name }}</option>
-      }
-    </select>
+    <!-- Row 2 on phone/tablet, column 3 on laptop: location selector -->
+    <app-inline-location-selector
+      class="col-span-2 lg:col-span-1 min-w-0"
+      [vendorId]="vendorId()"
+      [selectedLocationIds]="distributionLocationIds()"
+      (citySelected)="onCitySelected($event)"
+      (locationsSelected)="onLocationsSelected($event)" />
 
-    <!-- Sort — shrink-0 -->
+    <!-- Row 3 on phone/tablet, column 4 on laptop: sort -->
     <select
+      data-testid="meal-filters-sort-select"
       [value]="sort()"
       (change)="onSortChange($event)"
-      class="shrink-0 h-11 px-3 rounded-full bg-surface-container-lowest
+      class="col-span-1 lg:col-span-1 w-full h-11 px-3 rounded-full bg-surface-container-lowest
              border border-outline-variant text-on-surface
              font-label-md text-xs font-semibold
              focus:outline-none focus:ring-2 focus:ring-primary">
@@ -63,13 +76,12 @@
       }
     </select>
 
-    <!-- Advanced drawer trigger — shrink-0 -->
+    <!-- Row 3 on phone/tablet, column 5 on laptop: advanced trigger -->
     <app-advanced-filter-drawer
-      class="shrink-0"
+      class="col-span-1 lg:col-span-1"
       [initialFilter]="advanced()"
       [initialSelection]="initialSelection()"
       (applyFilters)="onAdvancedChange($event)"
-      (applySelection)="onAdvancedSelectionChange($event)"
-      />
+      (applySelection)="onAdvancedSelectionChange($event)" />
   </div>
 </div>
