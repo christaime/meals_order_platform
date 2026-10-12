@@ -1,6 +1,9 @@
-<h2 mat-dialog-title class="flex items-center gap-2">
+<h2
+  mat-dialog-title
+  data-testid="new-ingredient-dialog"
+  class="flex items-center gap-2">
   <mat-icon class="text-primary">local_fire_department</mat-icon>
-  Nouvel ingrédient
+  {{ prefill ? 'Modifier l\'ingrédient' : 'Nouvel ingrédient' }}
 </h2>
 
 <mat-dialog-content>

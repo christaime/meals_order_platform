@@ -33,7 +33,7 @@ import {
  *
  * Fields:
  * - prepTimeMinutes (Material slider)
- * - ingredientIds (plain chip input + custom autocomplete + create dialog)
+ * - ingredientIds (chip input + custom autocomplete + create/edit dialog)
  *
  * Ingredient resolution:
  * - When `initialIngredients` is provided (editing an existing meal, whose
@@ -68,12 +68,6 @@ export class StepCompositionComponent implements OnInit {
 
   readonly form = input.required<FormGroup>();
 
-  /**
-   * Optional pre-supplied ingredient list. When provided, the component
-   * resolves `ingredientIds` against this list instead of calling the
-   * backend — used when editing an existing meal, whose `MealResponse`
-   * already carries the full ingredient summaries.
-   */
   readonly initialIngredients = input<IngredientSummary[] | null>(null);
 
   // ─── Ingredient state ─────────────────────────────────────
@@ -81,10 +75,7 @@ export class StepCompositionComponent implements OnInit {
   private readonly searchResults = signal<IngredientSummary[]>([]);
   readonly selectedIngredients = signal<IngredientSummary[]>([]);
 
-  /** Index of the highlighted option in the dropdown (-1 = none). */
   readonly highlightIndex = signal<number>(-1);
-
-  /** Dropdown visibility flag — separate from "has results". */
   readonly dropdownOpen = signal<boolean>(false);
 
   private readonly ingredientCache = signal<Map<string, IngredientSummary>>(new Map());
@@ -94,7 +85,6 @@ export class StepCompositionComponent implements OnInit {
     return this.searchResults().filter(i => !selected.has(i.id));
   });
 
-  /** True when the dropdown should actually render. */
   protected readonly showDropdown = computed(
     () => this.dropdownOpen() && this.filteredResults().length > 0,
   );
@@ -109,12 +99,11 @@ export class StepCompositionComponent implements OnInit {
     return this.form().controls['ingredientIds'] as FormControl<string[]>;
   }
 
+  private readonly lastSearchedTerm = signal<string>('');
+
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
-    // Seed the local cache from the caller-provided list, if any.
-    // This must happen before the valueChanges subscription fires so
-    // the first `syncSelected` resolves against a populated cache.
     const provided = this.initialIngredients();
     if (provided && provided.length > 0) {
       const next = new Map(this.ingredientCache());
@@ -150,10 +139,6 @@ export class StepCompositionComponent implements OnInit {
     const missing = ids.filter(id => !cache.has(id));
 
     if (missing.length) {
-      // When a caller-provided list is used, any id not present in it is
-      // either deleted or DISABLED (hidden by @SQLRestriction on the
-      // backend). Re-fetching won't find it — resolve what we have and
-      // log the rest.
       if (this.initialIngredients() !== null) {
         console.warn(
           '[StepComposition] ingredient ids not in the supplied list, skipping:',
@@ -163,7 +148,6 @@ export class StepCompositionComponent implements OnInit {
         return;
       }
 
-      // Fallback path (no initial list): fetch the missing ones.
       this.ingredientService
         .searchIngredients({} as IngredientSearchRequest)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -219,12 +203,14 @@ export class StepCompositionComponent implements OnInit {
       .subscribe({
         next: (page) => {
           this.searchResults.set(page.content);
+          this.lastSearchedTerm.set(keyword);
           this.dropdownOpen.set(true);
           this.highlightIndex.set(page.content.length > 0 ? 0 : -1);
         },
         error: (err) => {
           console.error('[StepComposition] search error', err);
           this.searchResults.set([]);
+          this.lastSearchedTerm.set(keyword);
           this.dropdownOpen.set(false);
         },
       });
@@ -252,11 +238,17 @@ export class StepCompositionComponent implements OnInit {
     }
 
     if (event.key === 'Enter') {
+      event.preventDefault();
+
       if (this.dropdownOpen() && this.highlightIndex() >= 0 && results[this.highlightIndex()]) {
-        event.preventDefault();
         this.addIngredient(results[this.highlightIndex()]);
+        return;
       }
-      return;
+
+      if (this.showCreateHint()) {
+        this.openCreateIngredientDialog();
+        return;
+      }
     }
 
     if (event.key === 'Escape') {
@@ -290,8 +282,53 @@ export class StepCompositionComponent implements OnInit {
     this.searchResults.set([]);
     this.dropdownOpen.set(false);
     this.highlightIndex.set(-1);
-    // Input reflects the signal via [value], so no manual DOM clear needed.
     this.ingredientInputRef?.nativeElement.focus();
+  }
+
+  // ─── Ingredients — edit (only when moderationStatus is PENDING) ───
+
+  /**
+   * Whether the given ingredient can be edited from the chip.
+   *
+   * The rule: only ingredients whose `moderationStatus` is `'PENDING'`.
+   * A missing `moderationStatus` blocks the edit — a chip with no status
+   * can't be trusted to be editable.
+   */
+  protected isEditable(ing: IngredientSummary): boolean {
+    return ing.moderationStatus === 'PENDING';
+  }
+
+  editIngredient(ing: IngredientSummary): void {
+    if (!this.isEditable(ing)) return;
+
+    const ref = this.dialog.open(NewIngredientDialogComponent, {
+      width: '480px',
+      maxHeight: '90vh',
+      data: { ...ing },
+    });
+
+    ref.afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((updated: Ingredient | undefined) => {
+        if (!updated) return;
+
+        // Replace the cached object so the chip re-renders with the new name.
+        this.ingredientCache.update((m) => {
+          const next = new Map(m);
+          next.set(updated.id, {
+            id: updated.id,
+            name: updated.name,
+            isAllergen: updated.isAllergen,
+            moderationStatus: updated.moderationStatus,
+          } as IngredientSummary);
+          return next;
+        });
+
+        // Re-resolve the chips from the cache.
+        this.updateSelectedFromCache(this.ingredientIds.value);
+
+        this.snackBar.open(`« ${updated.name} » mis à jour`, 'OK', { duration: 3000 });
+      });
   }
 
   // ─── Create dialog ────────────────────────────────────────
@@ -301,7 +338,7 @@ export class StepCompositionComponent implements OnInit {
     const ref = this.dialog.open(NewIngredientDialogComponent, {
       width: '480px',
       maxHeight: '90vh',
-      data: { initialName: name },
+      data: { name },
     });
 
     ref.afterClosed()
@@ -345,6 +382,9 @@ export class StepCompositionComponent implements OnInit {
   }
 
   protected showCreateHint(): boolean {
-    return this.ingredientFilter().trim().length >= 2;
+    const term = this.ingredientFilter().trim();
+    if (term.length < 2) return false;
+    if (this.lastSearchedTerm() !== term) return false;
+    return this.searchResults().length === 0;
   }
 }

@@ -1,5 +1,6 @@
 package com.mealmarket.meal.application.service;
 
+import com.mealmarket.common.exception.AccessDeniedException;
 import com.mealmarket.common.exception.ConflictException;
 import com.mealmarket.common.exception.ResourceNotFoundException;
 import com.mealmarket.common.pagination.DataPage;
@@ -196,6 +197,38 @@ public class IngredientService {
         return dtoMapper.toResponse(saved);
     }
 
+    @Transactional
+    public IngredientResponse updateSuggestedIngredient(
+            UUID ingredientId,
+            UpdateIngredientRequest request,
+            UUID vendorId
+    ) {
+        log.info("Updating ingredient: {} by vendor: {}", ingredientId, vendorId);
+
+        Ingredient existing = findIngredientOrThrow(ingredientId);
+        if(!existing.getCreatedById().equals(vendorId)){
+            throw new AccessDeniedException("You can't modify this ingredient");
+        }
+        // Uniqueness re-check if name is being changed
+        if (request.name() != null
+                && !request.name().equalsIgnoreCase(existing.getName())
+                && ingredientRepository.existsByName(request.name())) {
+            throw new ConflictException(
+                    "An ingredient named '" + request.name() + "' already exists"
+            );
+        }
+
+        Ingredient updated = existing.withUpdatedDetails(
+                request.name(),
+                request.isAllergen()
+        );
+
+        Ingredient saved = ingredientRepository.save(updated);
+        eventPublisher.publishEvent(new IngredientChangedEvent(saved.getId(),
+                IngredientChangedEvent.ChangeType.UPDATED));
+        log.info("Ingredient updated: {}", saved.getId());
+        return dtoMapper.toResponse(saved);
+    }
     // ═══════════════════════════════════════════════════════════
     //  Delete (Moderation-aware logic)
     // ═══════════════════════════════════════════════════════════

@@ -9,6 +9,7 @@
         Prix normal (FCFA) <span class="text-error">*</span>
       </label>
       <input
+        data-testid="step-pricing-price"
         id="meal-price"
         type="number"
         min="100"
@@ -19,7 +20,9 @@
                font-body-md text-sm placeholder:text-outline border border-outline-variant
                focus:outline-none focus:ring-2 focus:ring-primary" />
       @if (priceError()) {
-      <p class="text-xs text-error">{{ priceError() }}</p>
+      <p
+        data-testid="step-pricing-price-error"
+        class="text-xs text-error">{{ priceError() }}</p>
       }
     </div>
 
@@ -29,6 +32,7 @@
         Prix promo <span class="text-on-surface-variant font-normal">(optionnel)</span>
       </label>
       <input
+        data-testid="step-pricing-promo-price"
         id="meal-promo"
         type="number"
         min="100"
@@ -39,13 +43,18 @@
                font-body-md text-sm placeholder:text-outline border border-outline-variant
                focus:outline-none focus:ring-2 focus:ring-primary" />
       @if (promoPriceError()) {
-      <p class="text-xs text-error">{{ promoPriceError() }}</p>
+      <p
+        data-testid="step-pricing-promo-price-error"
+        class="text-xs text-error">{{ promoPriceError() }}</p>
       }
     </div>
   </div>
 
   <!-- ═════════ Commission preview ═════════ -->
-  <div class="p-4 rounded-lg bg-surface-container-low flex flex-col gap-2">
+  @if (commissionActive()) {
+  <div
+    data-testid="step-pricing-commission"
+    class="p-4 rounded-lg bg-surface-container-low flex flex-col gap-2">
     <div class="flex items-center gap-2">
       <app-icon name="receipt_long" size="sm" class="text-on-surface-variant" />
       <span class="text-sm font-semibold text-on-surface">Aperçu de la rémunération</span>
@@ -53,20 +62,30 @@
 
     <div class="flex items-center justify-between text-sm">
       <span class="text-on-surface-variant">Client paie</span>
-      <span class="font-bold text-on-surface">{{ formatPrice(effectivePrice()) }}</span>
+      <span
+        data-testid="step-pricing-effective-price"
+        [attr.data-amount]="effectivePrice()"
+        class="font-bold text-on-surface">{{ formatPrice(effectivePrice()) }}</span>
     </div>
     <div class="flex items-center justify-between text-sm">
       <span class="text-on-surface-variant">Commission plateforme ({{ commissionRate }}%)</span>
-      <span class="font-bold text-error">− {{ formatPrice(commissionAmount()) }}</span>
+      <span
+        data-testid="step-pricing-commission-amount"
+        [attr.data-amount]="commissionAmount()"
+        class="font-bold text-error">− {{ formatPrice(commissionAmount()) }}</span>
     </div>
     <div class="border-t border-outline-variant my-1"></div>
     <div class="flex items-center justify-between text-sm">
       <span class="font-semibold text-on-surface">Vous recevez</span>
-      <span class="font-bold text-secondary">{{ formatPrice(netPayout()) }}</span>
+      <span
+        data-testid="step-pricing-net-payout"
+        [attr.data-amount]="netPayout()"
+        class="font-bold text-secondary">{{ formatPrice(netPayout()) }}</span>
     </div>
   </div>
+  }
 
-  <!-- ═════════ Distribution locations (plain chip input + custom dropdown) ═════════ -->
+  <!-- ═════════ Distribution locations ═════════ -->
   <div class="flex flex-col gap-1">
     <label class="text-xs font-semibold text-on-surface">
       Zones de distribution
@@ -75,25 +94,45 @@
 
     <!-- Chip container -->
     <div
+      data-testid="step-pricing-location-chips"
       class="relative w-full rounded-lg border border-outline-variant bg-surface-container-low
              px-2 py-1.5 min-h-[44px]
              flex flex-wrap items-center gap-1.5
              transition-shadow
              focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
 
-      <!-- Selected chips -->
       @for (loc of selectedLocations(); track loc.id) {
       <span
-        class="inline-flex items-center gap-1.5
-               px-2.5 py-1 rounded-full
-               bg-surface-container text-on-surface
-               font-label text-xs font-semibold">
-        <span>{{ loc.name }}</span>
+        [attr.data-testid]="'location-chip-' + loc.id"
+        [attr.data-location-id]="loc.id"
+        [attr.data-location-name]="loc.name"
+        [attr.data-moderation-status]="loc.moderationStatus"
+        class="inline-flex items-center gap-2
+               pl-2 pr-1 py-1.5 rounded-full
+               bg-surface-container-lowest text-on-surface
+               border border-outline-variant
+               font-label text-sm font-semibold">
+
+        @if (isEditable(loc)) {
         <button
           type="button"
+          [attr.data-testid]="'edit-location-chip-' + loc.id"
+          [attr.aria-label]="'Modifier ' + loc.name"
+          (click)="editLocation(loc)"
+          class="border-0 bg-transparent p-0 cursor-pointer leading-none
+                 text-tertiary hover:text-error transition-colors">
+          <app-icon name="edit" size="sm" />
+        </button>
+        }
+
+        <span class="truncate max-w-[160px]">{{ loc.name }}</span>
+
+        <button
+          type="button"
+          [attr.data-testid]="'remove-location-chip-' + loc.id"
+          [attr.aria-label]="'Retirer ' + loc.name"
           (click)="removeLocation(loc)"
-          aria-label="Retirer"
-          class="border-0 bg-transparent p-0 cursor-pointer
+          class="border-0 bg-transparent p-0 cursor-pointer leading-none
                  text-on-surface-variant hover:text-error transition-colors">
           <app-icon name="close" size="sm" />
         </button>
@@ -103,6 +142,7 @@
       <!-- Input -->
       <input
         #locationInput
+        data-testid="step-pricing-location-input"
         type="text"
         [value]="locationFilter()"
         (input)="onLocationInput($event)"
@@ -120,12 +160,15 @@
     @if (showDropdown()) {
     <div class="relative z-20" role="listbox">
       <ul
+        data-testid="location-dropdown"
         class="absolute left-0 right-0 mt-1 max-h-64 overflow-y-auto
                rounded-lg border border-outline-variant bg-surface-container-lowest
                shadow-lg py-1">
         @for (loc of filteredLocations(); track loc.id; let i = $index) {
         <li
           role="option"
+          [attr.data-testid]="'location-option-' + loc.id"
+          [attr.data-location-id]="loc.id"
           [attr.aria-selected]="i === highlightIndex()"
           (mouseenter)="highlightIndex.set(i)"
           (click)="addLocation(loc)"
@@ -144,8 +187,10 @@
     }
 
     <!-- Create new location -->
+    @if (showCreateHint()) {
     <button
       type="button"
+      data-testid="location-create"
       (click)="openCreateLocationDialog()"
       class="self-start mt-1 inline-flex items-center gap-1.5
              px-3 py-2 rounded-lg
@@ -154,8 +199,9 @@
              font-label-md text-xs font-semibold
              transition-colors cursor-pointer">
       <app-icon name="add_location_alt" size="sm" />
-      Créer un nouvel emplacement
+      Créer « {{ locationFilter() }} »
     </button>
+    }
 
     <p class="text-[11px] text-on-surface-variant mt-0.5">
       Un plat peut exister sans zone de distribution pour le moment.

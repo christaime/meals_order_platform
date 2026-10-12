@@ -45,7 +45,7 @@ export class IngredientFormComponent {
   private readonly ingredientService = inject(INGREDIENT_SERVICE);
 
   /** Existing (edit) / partial prefill (create with defaults) / null (blank). */
-  readonly ingredient = input<Ingredient | Partial<Ingredient> | null>(null);
+  readonly ingredient = input<Ingredient | null>(null);
 
   /** When true (default), the form clears itself when `ingredient` becomes null. */
   readonly autoReset = input<boolean>(true);

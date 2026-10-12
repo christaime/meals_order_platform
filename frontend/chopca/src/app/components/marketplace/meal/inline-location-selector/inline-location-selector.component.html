@@ -49,7 +49,7 @@
                px-2 h-8 py-0.5 rounded-full
                bg-primary text-on-primary
                font-label-md text-xs font-semibold">
-        <span class="truncate max-w-[130px]">{{ loc.name }}</span>
+        <span class="truncate max-w-[150px]">{{ loc.name }}</span>
         <button
           type="button"
           [attr.data-testid]="'inline-location-selector-remove-' + loc.id"
@@ -72,7 +72,7 @@
         (focus)="onLocationFocus()"
         (blur)="onLocationBlur()"
         (keydown)="onLocationKeyDown($event)"
-        placeholder="Ajouter une zone…"
+        placeholder="Sélectionner une zone…"
         autocomplete="off"
         class="inline-location-selector-input
                flex-1 min-w-[80px] h-full px-1 bg-transparent border-0

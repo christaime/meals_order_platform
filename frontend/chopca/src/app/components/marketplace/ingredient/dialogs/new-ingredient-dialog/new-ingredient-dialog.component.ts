@@ -13,8 +13,7 @@ import { IngredientFormComponent } from '../../ingredient-form/ingredient-form.c
 import { Ingredient } from '@app/core/models/marketplace';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-export interface NewIngredientDialogData {
-  readonly initialName?: string;
+export interface NewIngredientDialogData extends Ingredient{
 }
 
 @Component({
@@ -43,13 +42,7 @@ export class NewIngredientDialogComponent {
    * A partial Ingredient passed via the existing `ingredient` input
    * just to prefill the form. No `id` means it's create mode.
    */
-  protected readonly prefill: Ingredient | null = this.data?.initialName
-    ? ({
-        id: '',
-        name: this.data.initialName,
-        isAllergen: false,
-      } as unknown as Ingredient)
-    : null;
+  protected readonly prefill: Ingredient | null = this.data? {...this.data} : null;
 
   onSaved(ingredient: Ingredient): void {
     this.dialogRef.close(ingredient);

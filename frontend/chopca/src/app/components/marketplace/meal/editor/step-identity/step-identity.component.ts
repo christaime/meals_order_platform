@@ -3,9 +3,13 @@ import {
   ChangeDetectionStrategy,
   input,
   output,
-  computed,
+  inject,
+  signal,
+  OnInit,
+  DestroyRef,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   CategoryPillsSelectorComponent,
@@ -36,7 +40,9 @@ import { MediaRef, MediaUploadResponse } from '@app/core/models/marketplace';
   styleUrl: './step-identity.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StepIdentityComponent {
+export class StepIdentityComponent implements OnInit {
+
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly form = input.required<FormGroup>();
 
@@ -46,6 +52,12 @@ export class StepIdentityComponent {
   readonly imageCleared = output<void>();
 
   // ─── Accessors ────────────────────────────────────────────
+  //
+  // Getters, not fields. `this.form()` reads an input, and inputs
+  // are only bound from `ngOnInit` onward. A getter evaluates when
+  // it's read (which is always after init, since the template and
+  // the methods run later). A field initializer would run at
+  // construction and throw NG0950.
   protected get name(): FormControl<string> {
     return this.form().controls['name'] as FormControl<string>;
   }
@@ -59,9 +71,19 @@ export class StepIdentityComponent {
     return this.form().controls['dishTypeIds'] as FormControl<string[]>;
   }
 
-  protected readonly descriptionLength = computed(
-    () => this.description.value?.length ?? 0
-  );
+  /** Mirrors the description value so the length can be reactive. */
+  protected readonly descriptionLength = signal(0);
+
+  // ─── Lifecycle ────────────────────────────────────────────
+
+  ngOnInit(): void {
+    // Seed once, then track changes.
+    this.descriptionLength.set(this.description.value?.length ?? 0);
+
+    this.description.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => this.descriptionLength.set((value ?? '').length));
+  }
 
   // ─── Errors ───────────────────────────────────────────────
 

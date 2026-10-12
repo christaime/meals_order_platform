@@ -34,7 +34,7 @@ import { Meal, MealRequest,MediaRef,
 
 import { MealCardComponent, MealCardSkeletonComponent } from '@components/marketplace/meal/view';
 import { MEDIA_SERVICE } from '@app/core/services/marketplace/media.service';
-
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 /**
  * Meal editor page.
  *
@@ -75,6 +75,7 @@ export class MealEditorPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly categoryService = inject(CATEGORY_SERVICE);
   private readonly mediaService = inject(MEDIA_SERVICE);
+  private readonly userContextService = inject(USER_CONTEXT_SERVICE);
 
   private readonly stepper = viewChild<import('@angular/material/stepper').MatStepper>('stepper');
 
@@ -86,7 +87,12 @@ export class MealEditorPageComponent implements OnInit {
   protected readonly isEditMode = signal<boolean>(false);
   protected readonly editingMeal = signal<Meal | null>(null);
 
-//  Image management
+  protected readonly vendorId = computed<string>(() => {
+      const context = this.userContextService.context();
+      return context?.vendor?.id ?? "";
+  });
+
+  //  Image management
   protected readonly imageMediaId = signal<string | null>(null);
   protected readonly imageUrl = signal<string | null>(null);
 
@@ -153,7 +159,7 @@ export class MealEditorPageComponent implements OnInit {
     const name = (v.name ?? '').trim();
     const price = v.price;
 
-    if (!name || price == null) return null;
+    if (!name) return null;
 
     return {
       id: '',                                       // not published yet
@@ -161,7 +167,7 @@ export class MealEditorPageComponent implements OnInit {
       vendorBusinessName: 'Ma cuisine',             // TODO: replace with vendor name from auth/context
       name,
       description: (v.description ?? '').trim() || null,
-      price,
+      price: price?? 0,
       imageUrl: this.imageUrl(),
       isAvailable: true,
       averageRating: 0,

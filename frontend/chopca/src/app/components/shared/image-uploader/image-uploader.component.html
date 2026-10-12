@@ -8,7 +8,7 @@
   }
 
   <!-- Preview or empty picker -->
-  <div
+  <div data-testid="image-uploader-picker"
     [class]="wrapperClasses()"
     (click)="picker.click()"
     (dragover)="onDragOver($event)"
@@ -18,6 +18,7 @@
     @if (hasPreview()) {
     <!-- Preview image -->
     <img
+      data-testid="image-uploader-img"
       [src]="previewUrl()!"
       alt="Aperçu"
       class="absolute inset-0 w-full h-full object-cover"
@@ -25,7 +26,7 @@
 
     <!-- Remove button -->
     @if (!disabled() && !isUploading()) {
-    <button
+    <button data-testid="clear-image-uploader"
       type="button"
       aria-label="Retirer l'image"
       class="absolute top-2 right-2 z-10
@@ -56,7 +57,7 @@
     }
     } @else {
     <!-- Empty state -->
-    <div class="flex flex-col items-center justify-center gap-2 p-4 text-center">
+    <div data-testid="image-uploader-empty" class="flex flex-col items-center justify-center gap-2 p-4 text-center">
       <app-icon
         [name]="isImageOnly() ? 'add_photo_alternate' : 'upload_file'"
         size="lg"
@@ -87,7 +88,9 @@
 
   <!-- File name -->
   @if (fileName()) {
-  <span class="text-[11px] text-on-surface-variant truncate">
+  <span
+    data-testid="image-uploader-fileName"
+    class="text-[11px] text-on-surface-variant truncate">
       {{ fileName() }}
     </span>
   }

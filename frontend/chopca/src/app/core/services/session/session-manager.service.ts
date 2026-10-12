@@ -48,7 +48,7 @@ export class SessionManager {
     effect(() => {
       if (this.keycloakUser.hasAnyRole()) this.start();
       else this.stop();
-    }, { allowSignalWrites: true });
+    });
 
     // Shutdown on logout request, before keycloak.logout() runs.
     effect(() => {

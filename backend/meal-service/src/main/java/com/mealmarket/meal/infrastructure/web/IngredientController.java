@@ -1,5 +1,6 @@
 package com.mealmarket.meal.infrastructure.web;
 
+import com.mealmarket.common.exception.AccessDeniedException;
 import com.mealmarket.common.pagination.DataPage;
 import com.mealmarket.meal.application.dto.CreateIngredientRequest;
 import com.mealmarket.meal.application.dto.IngredientResponse;
@@ -106,6 +107,44 @@ public class IngredientController {
             @Valid @RequestBody CreateIngredientRequest request
     ) {
         return createIngredient(request, UserType.VENDOR);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  VENDOR — Update ingredients he suggested
+    // ═══════════════════════════════════════════════════════════
+
+    @PutMapping("/vendor/ingredients/{id}")
+    @PreAuthorize("hasRole('VENDOR')")
+    @SecurityRequirement(name = "bearer-jwt")
+    @Operation(
+            summary = "Update an ingredient suggested",
+            description = """
+            Updates the descriptive fields of an ingredient.
+            Moderation status is not affected by this operation.
+            Use the moderation endpoints to change status.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Ingredient updated",
+                    content = @Content(schema = @Schema(implementation = IngredientResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Ingredient not found"),
+            @ApiResponse(responseCode = "409", description = "Name conflict"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    public ResponseEntity<IngredientResponse> updateSuggestedIngredient(
+            @Parameter(description = "Ingredient ID", required = true)
+            @PathVariable UUID id,
+
+            @Valid @RequestBody UpdateIngredientRequest request
+    ) {
+        IngredientResponse response = ingredientService.updateSuggestedIngredient(
+                id, request, currentUser.getUserId()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/vendor/ingredients")

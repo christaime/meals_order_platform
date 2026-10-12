@@ -13,8 +13,8 @@ import { LocationFormComponent } from '../../location-form/location-form.compone
 import { Location } from '@app/core/models/marketplace';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-export interface NewLocationDialogData {
-  readonly initialName?: string;
+export interface NewLocationDialogData extends Location {
+
 }
 /**
  * Dialog wrapper for creating a new distribution location.
@@ -41,12 +41,7 @@ export class NewLocationDialogComponent {
     { optional: true },
   );
 
-  protected readonly prefill: Location | null = this.data?.initialName
-      ? ({
-          id: '',
-          name: this.data.initialName,
-        } as unknown as Location)
-      : null;
+  protected readonly prefill: Location | null = this.data ? {...this.data} : null;
 
   private readonly dialogRef = inject(
     MatDialogRef<NewLocationDialogComponent, Location>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { DataPage } from '@app/core/models/shared/data-page.model';
 import {
   City,
@@ -7,24 +8,27 @@ import {
   CitySearchRequest,
 } from '@app/core/models/marketplace';
 import { CityService } from '@app/core/services/marketplace/city.service';
+import citiesData from '@app/mock/data/cities.json';
 
 @Injectable()
 export class CityMockService implements CityService {
 
-  private cities: City[] = [
+ /* private cities: City[] = [
     { id: 'c17a0000-0000-4000-8000-000000000001', name: 'Douala',    region: 'Littoral', countryCode: 'CM' },
     { id: 'c17a0000-0000-4000-8000-000000000002', name: 'Yaoundé',   region: 'Centre',   countryCode: 'CM' },
     { id: 'c17a0000-0000-4000-8000-000000000003', name: 'Bafoussam', region: 'Ouest',    countryCode: 'CM' },
     // …
-  ];
+  ];*/
+  private cities: City[] = citiesData as City[];
+  private readonly latency = 300;
 
   getCities(): Observable<City[]> {
-    return of(this.cities);
+    return of(this.cities).pipe(delay(this.latency));
   }
 
   getCityById(id: string): Observable<City> {
     const found = this.cities.find(c => c.id === id);
-    return found ? of(found) : throwError(() => new Error('City not found'));
+    return found ? of(found).pipe(delay(this.latency)) : throwError(() => new Error('City not found'));
   }
 
   searchCities(request: CitySearchRequest): Observable<DataPage<City>> {
@@ -51,7 +55,7 @@ export class CityMockService implements CityService {
       size,
       totalElements,
       totalPages: Math.ceil(totalElements / size),
-    } as DataPage<City>);
+    } as DataPage<City>).pipe(delay(this.latency));
   }
 
   createCity(request: CityRequest): Observable<City> {
@@ -62,7 +66,7 @@ export class CityMockService implements CityService {
       countryCode: request.countryCode,
     };
     this.cities = [...this.cities, city];
-    return of(city);
+    return of(city).pipe(delay(this.latency));
   }
 
   updateCity(id: string, request: CityRequest): Observable<City> {
@@ -75,6 +79,6 @@ export class CityMockService implements CityService {
 
   deleteCity(id: string): Observable<void> {
     this.cities = this.cities.filter(c => c.id !== id);
-    return of(void 0);
+    return of(void 0).pipe(delay(this.latency));
   }
 }

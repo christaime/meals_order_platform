@@ -103,7 +103,7 @@ export class LocationApiService implements LocationService {
     id: string,
     request: Partial<LocationRequest>
   ): Observable<Location> {
-    return this.http.patch<Location>(`${this.vendorUrl}/${id}`, request);
+    return this.http.put<Location>(`${this.vendorUrl}/${id}`, request);
   }
 
   deleteLocation(id: string): Observable<void> {

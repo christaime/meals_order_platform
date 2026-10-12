@@ -64,10 +64,12 @@ export class StepPricingComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly commissionActive = signal<boolean>(false)
   @ViewChild('locationInput')
   private locationInputRef?: ElementRef<HTMLInputElement>;
 
   readonly form = input.required<FormGroup>();
+  readonly vendorId = input.required<string>();
 
   /**
    * Optional pre-supplied distribution-location list. When provided, the
@@ -121,6 +123,19 @@ export class StepPricingComponent implements OnInit {
   protected readonly netPayout = computed(
     () => this.effectivePrice() - this.commissionAmount(),
   );
+
+  /**
+   * Whether the given location can be edited from the chip.
+   *
+   * The rule: only locations whose `moderationStatus` is `'PENDING'`.
+   * A missing `moderationStatus` blocks the edit — a chip with no status
+   * can't be trusted to be editable.
+   */
+  protected isEditable(loc: LocationSummary): boolean {
+    return loc.moderationStatus === 'PENDING';
+  }
+
+  private readonly lastSearchedTerm = signal<string>('');
 
   // ─── Lifecycle ────────────────────────────────────────────
 
@@ -238,17 +253,19 @@ export class StepPricingComponent implements OnInit {
 
   private performSearch(keyword: string): void {
     this.locationService
-      .searchLocations({ keyword, size: 10 } as LocationSearchRequest)
+      .searchLocations({ keyword, size: 10, vendorId: this.vendorId()} as LocationSearchRequest)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (page) => {
           this.searchResults.set(page.content);
+          this.lastSearchedTerm.set(keyword);
           this.dropdownOpen.set(true);
           this.highlightIndex.set(page.content.length > 0 ? 0 : -1);
         },
         error: (err) => {
           console.error('[StepPricing] search error', err);
           this.searchResults.set([]);
+          this.lastSearchedTerm.set(keyword);
           this.dropdownOpen.set(false);
         },
       });
@@ -276,11 +293,17 @@ export class StepPricingComponent implements OnInit {
     }
 
     if (event.key === 'Enter') {
+      event.preventDefault();
+
       if (this.dropdownOpen() && this.highlightIndex() >= 0 && results[this.highlightIndex()]) {
-        event.preventDefault();
         this.addLocation(results[this.highlightIndex()]);
+        return;
       }
-      return;
+
+      if (this.showCreateHint()) {
+        this.openCreateLocationDialog();
+        return;
+      }
     }
 
     if (event.key === 'Escape') {
@@ -320,25 +343,50 @@ export class StepPricingComponent implements OnInit {
   // ─── Create dialog ────────────────────────────────────────
 
   openCreateLocationDialog(): void {
+    const name = this.locationFilter().trim();
     const ref = this.dialog.open(NewLocationDialogComponent, {
       width: '640px',
       maxHeight: '90vh',
+      data: { name },
     });
 
     ref.afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((created: Location | undefined) => {
         if (!created) return;
-        this.addLocation({
-          id: created.id,
-          name: created.name,
-          address: created.address,
-          moderationStatus: created.moderationStatus,
-        } as LocationSummary);
+        const beingCreated = {...created , ...(!created.city ? {id: created.cityId} : {}) } as LocationSummary;
+        this.addLocation(beingCreated);
         this.snackBar.open(`« ${created.name} » ajouté`, 'OK', { duration: 3000 });
       });
   }
 
+  editLocation(loc: LocationSummary): void {
+    if (!this.isEditable(loc)) return;
+
+    const ref = this.dialog.open(NewLocationDialogComponent, {
+      width: '640px',
+      maxHeight: '90vh',
+      data: { ...loc },
+    });
+
+    ref.afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((updated: Location | undefined) => {
+        if (!updated) return;
+
+        this.locationCache.update((m) => {
+          const next = new Map(m);
+          const beingUpdated = {...loc,...updated} as LocationSummary;
+          console.log({beingUpdated});
+          next.set(updated.id, beingUpdated);
+          return next;
+        });
+
+        this.updateSelectedFromCache(this.locationIds.value);
+
+        this.snackBar.open(`« ${updated.name} » mis à jour`, 'OK', { duration: 3000 });
+      });
+  }
   // ─── Outside-click closes dropdown ────────────────────────
 
   @HostListener('document:click', ['$event'])
@@ -371,7 +419,10 @@ export class StepPricingComponent implements OnInit {
   }
 
   protected showCreateHint(): boolean {
-    return this.locationFilter().trim().length >= 2;
+    const term = this.locationFilter().trim();
+    if (term.length < 2) return false;
+    if (this.lastSearchedTerm() !== term) return false;
+    return this.searchResults().length === 0;
   }
 
   protected formatPrice(v: number): string {
