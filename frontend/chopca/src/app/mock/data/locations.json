@@ -10,5 +10,22 @@
   { "id": "loc-marche",      "vendorId": "vendor-pizza",      "vendorBusinessName": "Bella Italia",            "name": "Marché Central", "address": "Marché Central, Garoua",    "phone": "+237690000009", "latitude": 9.3017, "longitude": 13.3921, "deliveryRadius": 6, "cityId": "city-garoua",     "city": { "id": "city-garoua",     "name": "Garoua",     "region": "Nord",         "countryCode": "CM" }, "moderationStatus": "APPROVED", "isActive": true, "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
   { "id": "loc-port",        "vendorId": "vendor-sea",        "vendorBusinessName": "Saveurs Marines",         "name": "Port de Kribi", "address": "Avenue du Port, Kribi",    "phone": "+237690000010", "latitude": 2.9372, "longitude": 9.9100, "deliveryRadius": 5, "cityId": "city-kribi",      "city": { "id": "city-kribi",      "name": "Kribi",      "region": "Sud",          "countryCode": "CM" }, "moderationStatus": "APPROVED", "isActive": true, "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
   { "id": "loc-buea-town",   "vendorId": "vendor-sea",        "vendorBusinessName": "Saveurs Marines",         "name": "Buea Town",    "address": "Main Road, Buea Town",    "phone": "+237690000011", "latitude": 4.1559, "longitude": 9.2410, "deliveryRadius": 4, "cityId": "city-buea",       "city": { "id": "city-buea",       "name": "Buea",       "region": "Sud-Ouest",    "countryCode": "CM" }, "moderationStatus": "APPROVED", "isActive": true, "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
-  { "id": "loc-plateau",     "vendorId": "vendor-chaudron",   "vendorBusinessName": "Le Chaudron du bon gout", "name": "Plateau",     "address": "Quartier Plateau, Douala", "phone": "+237690000012", "latitude": 4.0550, "longitude": 9.7100, "deliveryRadius": 7,  "cityId": "city-douala",     "city": { "id": "city-douala",     "name": "Douala",     "region": "Littoral",     "countryCode": "CM" }, "moderationStatus": "APPROVED", "isActive": true, "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" }
+  { "id": "loc-plateau",     "vendorId": "vendor-chaudron",   "vendorBusinessName": "Le Chaudron du bon gout", "name": "Plateau",     "address": "Quartier Plateau, Douala", "phone": "+237690000012", "latitude": 4.0550, "longitude": 9.7100, "deliveryRadius": 7,  "cityId": "city-douala",     "city": { "id": "city-douala",     "name": "Douala",     "region": "Littoral",     "countryCode": "CM" }, "moderationStatus": "APPROVED", "isActive": true, "createdAt": "2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" },
+  {
+    "id": "loc-mboppi",
+    "vendorId": "vendor-chaudron",
+    "vendorBusinessName": "Le Chaudron du bon gout",
+    "name": "Mboppi",
+    "address": "Marché Mboppi, Douala",
+    "phone": "+237690000099",
+    "latitude": 4.0570,
+    "longitude": 9.6920,
+    "deliveryRadius": 5,
+    "cityId": "city-douala",
+    "city": { "id": "city-douala", "name": "Douala", "region": "Littoral", "countryCode": "CM" },
+    "moderationStatus": "PENDING",
+    "isActive": false,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  }
 ]

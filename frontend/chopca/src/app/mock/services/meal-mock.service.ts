@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , inject} from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import {
@@ -10,6 +10,7 @@ import {
 import { DataPage } from '@app/core/models/shared';
 import { MealService } from '@app/core/services/marketplace/meal.service';
 import mealsData from '@app/mock/data/meals.json';
+import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 
 @Injectable()
 export class MealMockService implements MealService {
@@ -23,6 +24,9 @@ export class MealMockService implements MealService {
   }));
   private readonly latency = 300;
 
+  // Get the vendorId
+  private readonly userContextService = inject(USER_CONTEXT_SERVICE);
+  private readonly context = this.userContextService.context();
   // ─── Reads ────────────────────────────────────────────────
 
   getMeals(): Observable<MealSummary[]> {
@@ -33,7 +37,7 @@ export class MealMockService implements MealService {
   search(request: MealSearchRequest): Observable<DataPage<MealSummary>> {
     let result = [...this.meals];
 
-    console.log("MealMockService",{request});
+    console.log("MealMockService",{request}," search on ",{mealsLength:this.meals.length});
     // ─── Filters ────────────────────────────────────────────
     if (request.keyword) {
       const needle = request.keyword.toLowerCase();
@@ -135,8 +139,8 @@ export class MealMockService implements MealService {
   createMeal(request: MealRequest): Observable<Meal> {
     const newMeal: Meal = {
       id: crypto.randomUUID(),
-      vendorId: 'mock-vendor',
-      vendorBusinessName: 'Mock Vendor',
+      vendorId: this.context?.vendor?.id?? 'mock-vendor',
+      vendorBusinessName: this.context?.vendor?.businessName ?? 'Mock vendor',
       name: request.name,
       description: request.description ?? null,
       price: request.price,
@@ -156,7 +160,9 @@ export class MealMockService implements MealService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+    const initialSize = this.meals.length;
     this.meals = [...this.meals, newMeal];
+    console.log("Stats after create ",{initialSize, afterCreateSize:this.meals.length})
     return of(newMeal).pipe(delay(this.latency));
   }
 

@@ -139,7 +139,6 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   }
 
   async ngAfterViewInit(): Promise<void> {
-    await this.mapsLoader.load();
 
     this.mapOptions.set({
       mapTypeControl: false,
@@ -147,6 +146,8 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
       fullscreenControl: true,
       zoomControl: true,
     });
+
+    if (typeof google === 'undefined' || !google.maps) return;
 
     this.markerOptions.set({
       draggable: true,

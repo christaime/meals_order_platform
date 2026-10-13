@@ -110,6 +110,7 @@ describe('IngredientAutocompleteComponent', () => {
     }));
 
     it('shows an empty dropdown when the service errors', fakeAsync(() => {
+      const consoleSpy = spyOn(console, 'error');
       ingredientServiceMock.searchIngredientsFlat.and.returnValue(
         throwError(() => new Error('boom')),
       );
@@ -119,7 +120,9 @@ describe('IngredientAutocompleteComponent', () => {
       input.dispatchEvent(new Event('input'));
       tick(300);
 
+      expect(consoleSpy).toHaveBeenCalled();
       expect(query('[data-testid=ingredient-autocomplete-dropdown]')).toBeFalsy();
+      expect(consoleSpy).toHaveBeenCalled();
     }));
   });
 

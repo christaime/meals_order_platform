@@ -1,8 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
-
 import { LocationFormComponent } from './location-form.component';
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { LOCATION_SERVICE } from '@app/core/services/marketplace/location.service';
@@ -38,6 +36,7 @@ describe('LocationFormComponent', () => {
   let locationServiceMock: jasmine.SpyObj<any>;
 
   beforeEach(async () => {
+
     cityServiceMock = jasmine.createSpyObj('CityService', ['getCities']);
     cityServiceMock.getCities.and.returnValue(of(CITIES));
 
@@ -48,7 +47,7 @@ describe('LocationFormComponent', () => {
     locationServiceMock.updateLocation.and.returnValue(of(EXISTING_LOCATION));
 
     await TestBed.configureTestingModule({
-      imports: [LocationFormComponent, ReactiveFormsModule, NoopAnimationsModule],
+      imports: [LocationFormComponent, ReactiveFormsModule],
       providers: [
         FormBuilder,
         { provide: CITY_SERVICE, useValue: cityServiceMock },

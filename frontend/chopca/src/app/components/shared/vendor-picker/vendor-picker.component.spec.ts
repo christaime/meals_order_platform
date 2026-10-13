@@ -220,6 +220,7 @@ describe('VendorPickerComponent', () => {
 
     it('does not open the dropdown when the service errors', fakeAsync(() => {
       setup();
+      const consoleSpy = spyOn(console, 'error');
       vendorServiceMock.searchVendors.and.returnValue(
         throwError(() => new Error('boom')),
       );
@@ -230,6 +231,7 @@ describe('VendorPickerComponent', () => {
       fixture.detectChanges();
 
       expect(query('[data-testid=vendor-picker-dropdown]')).toBeFalsy();
+      expect(consoleSpy).toHaveBeenCalled();
     }));
   });
 

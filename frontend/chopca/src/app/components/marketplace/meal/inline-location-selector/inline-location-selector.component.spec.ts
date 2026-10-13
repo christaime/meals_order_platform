@@ -379,6 +379,7 @@ describe('InlineLocationSelectorComponent', () => {
   describe('error handling', () => {
     it('shows no dropdown when the service errors', fakeAsync(() => {
       setup();
+      const consoleSpy = spyOn(console, 'error');
       locationServiceMock.searchLocationsFlat.and.returnValue(
         throwError(() => new Error('boom')),
       );

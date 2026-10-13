@@ -24,5 +24,7 @@
   { "id": "ing-boulgour",    "name": "Boulgour",        "isAllergen": true  },
   { "id": "ing-hibiscus",    "name": "Hibiscus",        "isAllergen": false },
   { "id": "ing-pistache",    "name": "Pistache",        "isAllergen": true  },
-  { "id": "ing-legumes",     "name": "Légumes",         "isAllergen": false }
+  { "id": "ing-legumes",     "name": "Légumes",         "isAllergen": false },
+  { "id": "ing-piment",   "name": "Piment",   "isAllergen": false, "moderationStatus": "PENDING" },
+  { "id": "ing-gingembre", "name": "Gingembre", "isAllergen": false, "moderationStatus": "APPROVED" }
 ]

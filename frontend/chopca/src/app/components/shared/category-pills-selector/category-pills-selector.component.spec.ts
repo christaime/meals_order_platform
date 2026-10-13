@@ -64,6 +64,7 @@ describe('CategoryPillsSelectorComponent', () => {
     });
 
     it('shows an error when the service fails', () => {
+      const consoleSpy = spyOn(console, 'error');
       categoryServiceMock.searchCategories.and.returnValue(
         throwError(() => new Error('boom')),
       );
@@ -78,6 +79,7 @@ describe('CategoryPillsSelectorComponent', () => {
       // The component renders the error through <app-form-error>. Check
       // that the fetch failed and the error was recorded.
       expect(component['fetchError']()).toBeTruthy();
+      expect(consoleSpy).toHaveBeenCalled();
     });
   });
 
