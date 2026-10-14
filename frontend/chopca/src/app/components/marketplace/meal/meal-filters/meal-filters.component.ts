@@ -8,7 +8,7 @@ import {
   effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import {
   AdvancedFilterDrawerComponent,
@@ -60,6 +60,7 @@ export interface MealFiltersValue {
   selector: 'app-meal-filters',
   standalone: true,
   imports: [
+    TranslatePipe,
     FormsModule,
     IconComponent,
     AdvancedFilterDrawerComponent,
@@ -96,20 +97,20 @@ export class MealFiltersComponent implements OnInit {
   // ─── Draft for the text field (committed on Enter / blur) ─
   protected readonly draftName = signal<string>('');
 
-  protected readonly statusOptions: { value: ModerationStatusFilter; label: string }[] = [
-    { value: 'ALL', label: 'Tous les statuts' },
-    { value: 'PENDING', label: 'En attente' },
-    { value: 'APPROVED', label: 'Approuvé' },
-    { value: 'REJECTED', label: 'Rejeté' },
-    { value: 'DISABLED', label: 'Désactivé' },
+  protected readonly statusOptions: { value: ModerationStatusFilter; labelKey: string }[] = [
+    { value: 'ALL',      labelKey: 'mealFilters.status.ALL' },
+    { value: 'PENDING',  labelKey: 'mealFilters.status.PENDING' },
+    { value: 'APPROVED', labelKey: 'mealFilters.status.APPROVED' },
+    { value: 'REJECTED', labelKey: 'mealFilters.status.REJECTED' },
+    { value: 'DISABLED', labelKey: 'mealFilters.status.DISABLED' },
   ];
 
-  protected readonly sortOptions: { value: MealSort; label: string }[] = [
-    { value: 'name-asc', label: 'Nom (A → Z)' },
-    { value: 'name-desc', label: 'Nom (Z → A)' },
-    { value: 'price-asc', label: 'Prix croissant' },
-    { value: 'price-desc', label: 'Prix décroissant' },
-    { value: 'recent', label: 'Plus récents' },
+  protected readonly sortOptions: { value: MealSort; labelKey: string }[] = [
+    { value: 'name-asc',   labelKey: 'mealFilters.sort.nameAsc' },
+    { value: 'name-desc',  labelKey: 'mealFilters.sort.nameDesc' },
+    { value: 'price-asc',  labelKey: 'mealFilters.sort.priceAsc' },
+    { value: 'price-desc', labelKey: 'mealFilters.sort.priceDesc' },
+    { value: 'recent',     labelKey: 'mealFilters.sort.recent' },
   ];
 
   constructor() {

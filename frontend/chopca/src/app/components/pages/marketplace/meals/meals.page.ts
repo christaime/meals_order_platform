@@ -26,7 +26,7 @@ import {
 import {
   DeleteEntityDialogComponent,
 } from '@components/shared/delete-entity-dialog/delete-entity-dialog.component';
-
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
 import { USER_CONTEXT_SERVICE } from '@core/services/auth';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
@@ -60,6 +60,7 @@ const DEFAULT_ADVANCED: FilterState = {
     MealFiltersComponent,
     MealTableComponent,
     MealReferencesPanelComponent,
+    TranslatePipe,
   ],
   templateUrl: './meals.page.html',
   styleUrl: './meals.page.scss',
@@ -75,7 +76,7 @@ export class MealsPageComponent {
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
-
+  private readonly translate = inject(TranslateService);
   /** Route-data driven: 'vendor' | 'admin'. */
   protected readonly scope = signal<Scope>(
     (this.route.snapshot.data['scope'] as Scope) ?? 'vendor',
@@ -177,7 +178,7 @@ export class MealsPageComponent {
         next: page => { this.result.set(page); this.loading.set(false); },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des plats', 'error');
+          this.toast.show(this.translate.instant('mealsPage.toast.loadFailed'), 'error');
           console.error(err);
         },
       });
@@ -232,11 +233,11 @@ export class MealsPageComponent {
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => {
-              this.toast.show('Plat supprimé', 'success');
+              this.toast.show(this.translate.instant('mealsPage.toast.deleted'), 'success');
               if (this.editing()?.id === meal.id) this.editing.set(null);
               this.refresh();
             },
-            error: () => this.toast.show('Échec de la suppression', 'error'),
+            error: () => this.toast.show(this.translate.instant('mealsPage.toast.deleteFailed'), 'error'),
           });
       });
   }

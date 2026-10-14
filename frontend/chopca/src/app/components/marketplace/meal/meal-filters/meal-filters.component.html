@@ -1,19 +1,6 @@
 <div class="flex flex-col gap-space-sm" data-testid="meal-filters">
 
-  <!--
-    Filter controls.
-
-    Layout:
-      - phone / tablet  : three rows
-          (1) keyword + status
-          (2) location selector
-          (3) sort + advanced
-      - laptop (lg+)    : one row
-
-    Implemented with CSS Grid so each breakpoint declares its
-    columns explicitly. On phone/tablet, `grid-cols-2` with the
-    location on its own row via `col-span-2`.
-  -->
+  <!-- (comment unchanged) -->
   <div
     data-testid="meal-filters-row"
     class="grid gap-2
@@ -33,7 +20,7 @@
         (input)="onNameInput($event)"
         (keydown.enter)="onNameSubmit()"
         (blur)="onNameSubmit()"
-        placeholder="Rechercher un plat…"
+        [placeholder]="'mealFilters.namePlaceholder' | translate"
         class="w-full min-w-0 h-11 pl-9 pr-3 rounded-full bg-surface-container-lowest
                border border-outline-variant text-on-surface
                font-body-md text-sm placeholder:text-outline
@@ -50,7 +37,7 @@
              font-label-md text-xs font-semibold
              focus:outline-none focus:ring-2 focus:ring-primary">
       @for (opt of statusOptions; track opt.value) {
-      <option [value]="opt.value">{{ opt.label }}</option>
+      <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
       }
     </select>
 
@@ -72,7 +59,7 @@
              font-label-md text-xs font-semibold
              focus:outline-none focus:ring-2 focus:ring-primary">
       @for (opt of sortOptions; track opt.value) {
-      <option [value]="opt.value">{{ opt.label }}</option>
+      <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
       }
     </select>
 

@@ -38,17 +38,17 @@
        Load error
        ═══════════════════════════════════════════════════════ -->
   @else if (loadError()) {
-  <div
-    data-testid="meal-editor-load-error"
-    class="flex flex-col items-center gap-3 py-16 text-center">
-    <mat-icon class="!text-5xl !w-12 !h-12 text-red-500">error</mat-icon>
-    <h2 class="text-lg font-bold m-0">Impossible de charger ce plat</h2>
-    <p class="text-sm text-gray-600 m-0">{{ loadError() }}</p>
-    <a mat-flat-button color="primary" routerLink="/vendor/meals" class="mt-2">
-      <mat-icon>arrow_back</mat-icon>
-      Retour à la liste
-    </a>
-  </div>
+    <div
+      data-testid="meal-editor-load-error"
+      class="flex flex-col items-center gap-3 py-16 text-center">
+      <mat-icon class="!text-5xl !w-12 !h-12 text-red-500">error</mat-icon>
+      <h2 class="text-lg font-bold m-0">Impossible de charger ce plat</h2>
+      <p class="text-sm text-gray-600 m-0">{{ loadError() }}</p>
+      <a mat-flat-button color="primary" routerLink="/vendor/meals" class="mt-2">
+        <mat-icon>arrow_back</mat-icon>
+        Retour à la liste
+      </a>
+    </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════
@@ -173,8 +173,10 @@
                   <mat-spinner diameter="18" class="inline-block mr-2" />
                   <span>Publication…</span>
                   } @else {
+                  <ng-container>
                   <mat-icon>check_circle</mat-icon>
                   <span>{{ isEditMode() ? 'Enregistrer' : 'Valider et publier' }}</span>
+                  </ng-container>
                   }
                 </button>
               </div>

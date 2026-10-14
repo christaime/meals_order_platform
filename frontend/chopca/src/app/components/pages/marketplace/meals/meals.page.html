@@ -7,25 +7,23 @@
                      bg-primary-fixed text-on-primary-fixed
                      font-label-sm text-label-sm uppercase tracking-wide">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-          Plats
+          {{ 'mealsPage.badge' | translate }}
         </span>
         <span class="text-outline-variant">•</span>
         <span
           data-testid="meals-page-scope"
           [attr.data-scope]="scope()"
           class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-          {{ scope() === 'admin' ? 'Modération' : 'Mon menu' }}
+          {{ (scope() === 'admin' ? 'mealsPage.scope.admin' : 'mealsPage.scope.vendor') | translate }}
         </span>
       </div>
       <h1
         data-testid="meals-page-title"
         class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-        {{ scope() === 'admin' ? 'Modération des Plats' : 'Mes Plats' }}
+        {{ (scope() === 'admin' ? 'mealsPage.title.admin' : 'mealsPage.title.vendor') | translate }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        {{ scope() === 'admin'
-        ? 'Examinez et modérez les plats soumis par les vendeurs.'
-        : 'Gérez votre menu et vos plats pour vos clients Chop ça!.' }}
+        {{ (scope() === 'admin' ? 'mealsPage.subtitle.admin' : 'mealsPage.subtitle.vendor') | translate }}
       </p>
     </div>
 
@@ -39,7 +37,7 @@
                  text-on-primary font-label-lg text-label-lg shadow-md transition-all
                  duration-200 flex items-center gap-2 active:scale-95">
         <app-icon name="add_circle" size="md" />
-        <span>+ Nouveau Plat</span>
+        <span>+ {{ 'mealsPage.newButton' | translate }}</span>
       </button>
     </div>
     }
@@ -61,10 +59,10 @@
         <app-icon name="restaurant_menu" size="xl" />
       </div>
       <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-        Aucun vendeur associé
+        {{ 'mealsPage.noVendor.title' | translate }}
       </h3>
       <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
-        Votre compte n'est pas encore relié à un profil vendeur.
+        {{ 'mealsPage.noVendor.description' | translate }}
       </p>
     </div>
     } @else {
@@ -128,7 +126,7 @@
                     flex items-start gap-3">
         <app-icon name="info" size="lg" class="text-outline shrink-0 mt-0.5" />
         <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Sélectionnez un plat dans la liste pour le modérer.
+          {{ 'mealsPage.adminHint' | translate }}
         </p>
       </div>
       }
@@ -147,10 +145,10 @@
           <app-icon name="person_search" size="xl" />
         </div>
         <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-          Sélectionnez un vendeur
+          {{ 'mealsPage.adminNoVendor.title' | translate }}
         </h3>
         <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
-          Utilisez le panneau de gauche pour choisir un vendeur et afficher ses plats.
+          {{ 'mealsPage.adminNoVendor.description' | translate }}
         </p>
       </div>
       } @else {
