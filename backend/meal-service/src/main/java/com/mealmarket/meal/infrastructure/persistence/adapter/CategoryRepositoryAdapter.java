@@ -5,7 +5,9 @@ import com.mealmarket.meal.domain.model.Category;
 import com.mealmarket.meal.domain.model.CategoryType;
 import com.mealmarket.meal.domain.repository.CategoryRepository;
 import com.mealmarket.meal.domain.repository.criteria.CategorySearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.adapter.utils.SortConverter;
 import com.mealmarket.meal.infrastructure.persistence.entity.CategoryEntity;
+import com.mealmarket.meal.infrastructure.persistence.entity.MealEntity;
 import com.mealmarket.meal.infrastructure.persistence.mapper.CategoryPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.repository.CategoryJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.specification.CategorySpecification;
@@ -93,9 +95,13 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
     @Override
     public DataPage<Category> search(CategorySearchRequest request) {
         Specification<CategoryEntity> spec = CategorySpecification.build(request);
+
+        var springSort = SortConverter.toSpringSort(request.validSortOrders());
+
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
-                request.getPageRequest().getSize()
+                request.getPageRequest().getSize(),
+                springSort
         );
         Page<CategoryEntity> page = jpaRepository.findAll(spec, pageable);
         return toDataPage(page);

@@ -127,6 +127,10 @@ public class Category {
         return baseBuilder().moderationStatus(newStatus).build();
     }
 
+    public Category withName(String name) {
+        return baseBuilder().name(name).build();
+    }
+
     public Category withUpdatedDetails(String name, String description, String iconUrl) {
         return baseBuilder()
                 .name(name != null ? name : this.name)

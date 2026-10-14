@@ -1,21 +1,35 @@
 package com.mealmarket.meal.infrastructure.persistence.adapter;
 
 import com.mealmarket.AbstractIntegrationTest;
+import com.mealmarket.common.exception.ResourceNotFoundException;
 import com.mealmarket.common.pagination.DataPage;
 import com.mealmarket.common.pagination.PageRequest;
-import com.mealmarket.meal.domain.model.*;
-import com.mealmarket.meal.domain.repository.CityRepository;
+import com.mealmarket.common.pagination.Sort;
+import com.mealmarket.meal.application.mapper.CityDtoMapper;
+import com.mealmarket.meal.domain.model.City;
+import com.mealmarket.meal.domain.model.DistributionLocation;
+import com.mealmarket.meal.domain.model.ModerationStatus;
+import com.mealmarket.meal.domain.model.SubscriptionTier;
+import com.mealmarket.meal.domain.model.Vendor;
+import com.mealmarket.meal.domain.model.VendorState;
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
-import com.mealmarket.meal.domain.repository.VendorRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
+import com.mealmarket.meal.domain.repository.criteria.LocationProximity;
+import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
+import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
+import com.mealmarket.meal.infrastructure.persistence.mapper.CityPersistenceMapper;
+import com.mealmarket.meal.infrastructure.persistence.mapper.VendorPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.repository.CityJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.DistributionLocationJpaRepository;
 import com.mealmarket.meal.infrastructure.persistence.repository.VendorJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,349 +37,682 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/**
- * Integration tests for {@link DistributionLocationRepositoryAdapter}.
- *
- * <p>All {@link DistributionLocation} instances are built through the
- * domain factory methods ({@code create}, {@code withModerationStatus},
- * {@code withUpdatedDetails}) — never through the raw builder. This way the
- * tests also exercise the domain invariants (default PENDING, default radius,
- * non-null timestamps).</p>
- */
 @DisplayName("DistributionLocationRepositoryAdapter (integration)")
 class DistributionLocationRepositoryAdapterIntegrationTest extends AbstractIntegrationTest {
 
-    private static final UUID ADMIN_ID =
-            UUID.fromString("22222222-2222-2222-2222-222222222222");
+    private static final UUID OWNER_ID =
+            UUID.fromString("44444444-4444-4444-4444-444444444444");
 
-    private static final double YAOUNDE_LAT = 3.8480;
-    private static final double YAOUNDE_LNG = 11.5021;
-    private static final double DOUALA_LAT = 4.0511;
-    private static final double DOUALA_LNG = 9.7679;
-    private City yaounde;
+    @Autowired private DistributionLocationRepository locationRepository;
+    @Autowired private DistributionLocationJpaRepository locationJpaRepository;
+    @Autowired private VendorJpaRepository vendorJpaRepository;
+    @Autowired private CityJpaRepository cityJpaRepository;
+    @Autowired private CityPersistenceMapper cityPersistenceMapper;
+    @Autowired private VendorPersistenceMapper vendorPersistenceMapper;
 
-    @Autowired
-    private DistributionLocationRepository locationRepository;
-
-    @Autowired
-    private DistributionLocationJpaRepository locationJpaRepository;
-
-    @Autowired
-    private VendorRepository vendorRepository;
-
-    @Autowired
-    private VendorJpaRepository vendorJpaRepository;
-
-    @Autowired
-    private CityJpaRepository cityJpaRepository;
-
-    @Autowired
-    private CityRepository cityRepository;
+    private Vendor vendor;
+    private City city;
+    private CityEntity cityEntity;
 
     @BeforeEach
     void cleanUp() {
-        // FK order: locations first, then vendors.
         locationJpaRepository.deleteAll();
         vendorJpaRepository.deleteAll();
         cityJpaRepository.deleteAll();
-        yaounde = persistCity("Yaoundé","Centre","CM");
+
+        // Reference rows every test can rely on.
+        cityEntity = seedCity("Douala", "Littoral", "CM");
+        city = cityPersistenceMapper.toDomain(cityEntity);
+        vendor = vendorPersistenceMapper.toDomain(seedVendor("Vendor One", "vendor1@test.com", city.getId()), cityEntity);
     }
 
     // ------------------------------------------------------------------
-    // Helpers — all go through the domain API
+    // Fixtures — seed through JPA repositories so adapters' read paths
+    // (which resolve the vendor and city by id) have valid rows.
     // ------------------------------------------------------------------
 
-    private Vendor persistVendor(String businessName, String email) {
-        return vendorRepository.save(Vendor.builder()
+    private CityEntity seedCity(String name, String region, String countryCode) {
+        CityEntity entity = CityEntity.builder()
+                .id(UUID.randomUUID())
+                .name(name)
+                .region(region)
+                .countryCode(countryCode)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+        return cityJpaRepository.save(entity);
+    }
+
+    private VendorEntity seedVendor(String businessName, String email,UUID cityId) {
+        VendorEntity entity = VendorEntity.builder()
+                .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
                 .businessName(businessName)
-                .city(yaounde)
-                .ownerName("owner")
-                .description("Description for " + businessName)
-                .address("123 Main Street, Yaoundé")
+                .ownerName("Owner")
+                .address("1 Main St")
+                .cityId(cityId)
                 .email(email)
-                .phone("+237612345678")
-                .state(VendorState.active(ADMIN_ID))
-                .build());
+                .phone("+237600000000")
+                .subscriptionTier(SubscriptionTier.FREE)
+                .ratingAvg(BigDecimal.ZERO)
+                .totalRatings(0)
+                .status(VendorState.VendorStatus.ACTIVE)
+                .deliveryRadius(10)
+                .build();
+        return vendorJpaRepository.save(entity);
     }
 
-    private City persistCity(String name, String region, String countryCode) {
-        return cityRepository.save(City.create(name, region,countryCode));
-    }
-
-    /** Factory-built location — always starts as PENDING with radius 10. */
-    private DistributionLocation newPendingLocation(
-            Vendor vendor,
+    private DistributionLocation location(
             String name,
-            double lat,
-            double lng
-    ) {
-        return DistributionLocation.create(
-                vendor,
-                name,
-                yaounde,
-                "Address for " + name,
-                "+237699999999",
-                lat,
-                lng,
-                10
-        );
-    }
-
-    /** Factory-built location moved to a specific status via the domain API. */
-    private DistributionLocation newLocationInStatus(
             Vendor vendor,
-            String name,
+            City city,
             double lat,
             double lng,
-            ModerationStatus status
-    ) {
-        DistributionLocation pending = newPendingLocation(vendor, name, lat, lng);
-        return status == ModerationStatus.PENDING
-                ? pending
-                : pending.withModerationStatus(status);
+            ModerationStatus status) {
+        return DistributionLocation.builder()
+                .vendor(vendor)
+                .name(name)
+                .address("Address for " + name)
+                .phone("+237600000000")
+                .city(city)
+                .latitude(lat)
+                .longitude(lng)
+                .deliveryRadius(10)
+                .moderationStatus(status)
+                .build();
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 1. save() — round-trip through the domain factory
-    // ══════════════════════════════════════════════════════════════════
-
-    @Test
-    @DisplayName("save() persists a location created via the domain factory")
-    void save_persistsLocationCreatedViaFactory() {
-        // Given
-        final Vendor vendor = persistVendor("Delicious Bites", "vendor@db.com");
-        final DistributionLocation location = newPendingLocation(
-                vendor, "Main Branch", YAOUNDE_LAT, YAOUNDE_LNG
-        );
-
-        // Sanity check on the factory
-        assertThat(location.getModerationStatus()).isEqualTo(ModerationStatus.PENDING);
-        assertThat(location.getDeliveryRadius()).isEqualTo(10);
-
-        // When
-        final DistributionLocation saved = locationRepository.save(location);
-
-        // Then
-        assertThat(saved).isNotNull();
-        assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getName()).isEqualTo("Main Branch");
-        assertThat(saved.getModerationStatus()).isEqualTo(ModerationStatus.PENDING);
-        assertThat(locationJpaRepository.count()).isEqualTo(1);
+    private DistributionLocationSearchRequest.Builder requestBuilder() {
+        return DistributionLocationSearchRequest.builder();
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 2. findById() — vendor assembly
-    // ══════════════════════════════════════════════════════════════════
-
-    @Test
-    @DisplayName("findById() returns the location with the Vendor assembled")
-    void findById_returnsLocationWithVendorAssembled() {
-        // Given — create, persist, then transition via the domain API
-        final Vendor vendor = persistVendor("Delicious Bites", "vendor@db.com");
-        final DistributionLocation approved = newPendingLocation(
-                vendor, "Main Branch", YAOUNDE_LAT, YAOUNDE_LNG
-        ).withModerationStatus(ModerationStatus.APPROVED);
-
-        final DistributionLocation saved = locationRepository.save(approved);
-
-        // When
-        final Optional<DistributionLocation> found = locationRepository.findById(saved.getId());
-
-        // Then
-        assertThat(found).isPresent();
-        assertThat(found.get().getId()).isEqualTo(saved.getId());
-        assertThat(found.get().getVendor()).isNotNull();
-        assertThat(found.get().getVendor().getId()).isEqualTo(vendor.getId());
-        assertThat(found.get().getVendor().getBusinessName()).isEqualTo("Delicious Bites");
-        assertThat(found.get().getModerationStatus()).isEqualTo(ModerationStatus.APPROVED);
+    private void sleepMillis(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        }
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 3. existsByVendorIdAndName() — uniqueness per vendor
-    // ══════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
+    //  CRUD
+    // ═══════════════════════════════════════════════════════════
 
-    @Test
-    @DisplayName("existsByVendorIdAndName() is scoped to the vendor")
-    void existsByVendorIdAndName_isScopedToVendor() {
-        // Given — two vendors, same location name
-        final Vendor vendorA = persistVendor("Vendor A", "a@db.com");
-        final Vendor vendorB = persistVendor("Vendor B", "b@db.com");
+    @Nested
+    @DisplayName("CRUD")
+    class CrudTests {
 
-        locationRepository.save(newLocationInStatus(
-                vendorA, "Main Branch", YAOUNDE_LAT, YAOUNDE_LNG,
-                ModerationStatus.APPROVED
-        ));
+        @Test
+        @DisplayName("save() persists a new location and rehydrates vendor + city")
+        void save_persistsNewLocation() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Main", vendor, city, 4.05, 9.70, ModerationStatus.APPROVED));
 
-        // When / Then — exists under A, not under B
-        assertThat(locationRepository.existsByVendorIdAndName(vendorA.getId(), "Main Branch"))
-                .isTrue();
-        assertThat(locationRepository.existsByVendorIdAndName(vendorB.getId(), "Main Branch"))
-                .isFalse();
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // 4. findByVendorId() — scoping
-    // ══════════════════════════════════════════════════════════════════
-
-    @Test
-    @DisplayName("findByVendorId() returns only that vendor's locations")
-    void findByVendorId_returnsOnlyThatVendorsLocations() {
-        // Given
-        final Vendor vendorA = persistVendor("Vendor A", "a@db.com");
-        final Vendor vendorB = persistVendor("Vendor B", "b@db.com");
-
-        locationRepository.save(newLocationInStatus(
-                vendorA, "A - Main", YAOUNDE_LAT, YAOUNDE_LNG,
-                ModerationStatus.APPROVED));
-        locationRepository.save(newPendingLocation(
-                vendorA, "A - Annex", YAOUNDE_LAT, YAOUNDE_LNG));
-        locationRepository.save(newLocationInStatus(
-                vendorB, "B - Main", DOUALA_LAT, DOUALA_LNG,
-                ModerationStatus.APPROVED));
-
-        // When
-        final List<DistributionLocation> aLocations =
-                locationRepository.findByVendorId(vendorA.getId());
-
-        // Then
-        assertThat(aLocations).hasSize(2);
-        assertThat(aLocations)
-                .extracting(DistributionLocation::getName)
-                .containsExactlyInAnyOrder("A - Main", "A - Annex");
-        assertThat(locationRepository.countByVendorId(vendorA.getId())).isEqualTo(2);
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // 5. findByModerationStatus() — admin queue
-    // ══════════════════════════════════════════════════════════════════
-
-    @Test
-    @DisplayName("findByModerationStatus() returns only matching locations across vendors")
-    void findByModerationStatus_returnsMatchingAcrossVendors() {
-        // Given
-        final Vendor vendorA = persistVendor("Vendor A", "a@db.com");
-        final Vendor vendorB = persistVendor("Vendor B", "b@db.com");
-
-        locationRepository.save(newPendingLocation(
-                vendorA, "A1", YAOUNDE_LAT, YAOUNDE_LNG));
-        locationRepository.save(newLocationInStatus(
-                vendorA, "A2", YAOUNDE_LAT, YAOUNDE_LNG,
-                ModerationStatus.APPROVED));
-        locationRepository.save(newPendingLocation(
-                vendorB, "B1", DOUALA_LAT, DOUALA_LNG));
-
-        // When
-        final List<DistributionLocation> pending =
-                locationRepository.findByModerationStatus(ModerationStatus.PENDING);
-
-        // Then
-        assertThat(pending).hasSize(2);
-        assertThat(pending)
-                .extracting(DistributionLocation::getName)
-                .containsExactlyInAnyOrder("A1", "B1");
-        assertThat(pending)
-                .extracting(DistributionLocation::getModerationStatus)
-                .containsOnly(ModerationStatus.PENDING);
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // 6. search() — pagination
-    // ══════════════════════════════════════════════════════════════════
-
-    @Test
-    @DisplayName("search() with pagination respects the page size")
-    void search_withPagination_respectsPageSize() {
-        // Given
-        final Vendor vendor = persistVendor("Delicious Bites", "vendor@db.com");
-        for (int i = 1; i <= 5; i++) {
-            locationRepository.save(newLocationInStatus(
-                    vendor, "Branch " + i, YAOUNDE_LAT, YAOUNDE_LNG,
-                    ModerationStatus.APPROVED));
+            assertThat(saved.getId()).isNotNull();
+            assertThat(saved.getName()).isEqualTo("Main");
+            assertThat(saved.getVendor()).isNotNull();
+            assertThat(saved.getCity()).isNotNull();
+            assertThat(locationJpaRepository.count()).isEqualTo(1);
         }
 
-        final DistributionLocationSearchRequest request =
-                DistributionLocationSearchRequest.builder()
-                        .vendorId(vendor.getId())
-                        .pageRequest(PageRequest.of(0, 2))
-                        .build();
+        @Test
+        @DisplayName("save() updates an existing location")
+        void save_updatesExistingLocation() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Old", vendor, city, 4.05, 9.70, ModerationStatus.APPROVED));
 
-        // When
-        final DataPage<DistributionLocation> page = locationRepository.search(request);
+            saved = saved.withName("New");
+            DistributionLocation updated = locationRepository.save(saved);
 
-        // Then
-        assertThat(page.getContent()).hasSize(2);
-        assertThat(page.getTotalElements()).isEqualTo(5);
-        assertThat(page.getPage()).isEqualTo(0);
-        assertThat(page.getSize()).isEqualTo(2);
+            assertThat(updated.getId()).isEqualTo(saved.getId());
+            assertThat(updated.getName()).isEqualTo("New");
+            assertThat(locationJpaRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("findById() returns the location with vendor and city")
+        void findById_returnsLocationWithRelations() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Main", vendor, city, 4.05, 9.70, ModerationStatus.APPROVED));
+
+            Optional<DistributionLocation> found = locationRepository.findById(saved.getId());
+
+            assertThat(found).isPresent();
+            assertThat(found.get().getVendor()).isNotNull();
+            assertThat(found.get().getVendor().getId()).isEqualTo(vendor.getId());
+            assertThat(found.get().getCity()).isNotNull();
+            assertThat(found.get().getCity().getId()).isEqualTo(city.getId());
+        }
+
+        @Test
+        @DisplayName("findById() returns empty for an unknown id")
+        void findById_returnsEmptyForUnknownId() {
+            assertThat(locationRepository.findById(UUID.randomUUID())).isEmpty();
+        }
+
+        @Test
+        @DisplayName("existsById() reflects the row's presence")
+        void existsById_reflectsPresence() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Main", vendor, city, 4.05, 9.70, ModerationStatus.APPROVED));
+
+            assertThat(locationRepository.existsById(saved.getId())).isTrue();
+            assertThat(locationRepository.existsById(UUID.randomUUID())).isFalse();
+        }
+
+        @Test
+        @DisplayName("deleteById() removes the row")
+        void deleteById_removesRow() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Main", vendor, city, 4.05, 9.70, ModerationStatus.APPROVED));
+
+            locationRepository.deleteById(saved.getId());
+
+            assertThat(locationJpaRepository.findById(saved.getId())).isEmpty();
+        }
+
+        @Test
+        @DisplayName("delete() removes the row")
+        void delete_removesRow() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Main", vendor, city, 4.05, 9.70, ModerationStatus.APPROVED));
+
+            locationRepository.delete(saved);
+
+            assertThat(locationJpaRepository.findById(saved.getId())).isEmpty();
+        }
+
+        @Test
+        @DisplayName("findByVendorId() returns only that vendor's rows")
+        void findByVendorId_returnsOnlyThatVendor() {
+            VendorEntity otherVendor = seedVendor("Vendor Two", "vendor2@test.com", city.getId());
+
+            locationRepository.save(location("V1-A", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V1-B", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V2-A", vendorPersistenceMapper.toDomain(otherVendor,cityEntity), city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            List<DistributionLocation> result = locationRepository.findByVendorId(vendor.getId());
+
+            assertThat(result).hasSize(2);
+            assertThat(result).extracting(DistributionLocation::getName)
+                    .containsExactlyInAnyOrder("V1-A", "V1-B");
+        }
+
+        @Test
+        @DisplayName("countByVendorId() counts only that vendor's rows")
+        void countByVendorId_countsOnlyThatVendor() {
+            VendorEntity otherVendor = seedVendor("Vendor Two", "vendor2@test.com", city.getId());
+
+            locationRepository.save(location("V1-A", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V1-B", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V2-A", vendorPersistenceMapper.toDomain(otherVendor,cityEntity), city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            assertThat(locationRepository.countByVendorId(vendor.getId())).isEqualTo(2);
+            assertThat(locationRepository.countByVendorId(otherVendor.getId())).isEqualTo(1);
+        }
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 7. findNearbyByVendorId() — proximity
-    // ══════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
+    //  Uniqueness
+    // ═══════════════════════════════════════════════════════════
 
-    @Test
-    @DisplayName("findNearbyByVendorId() returns only locations within the radius")
-    void findNearbyByVendorId_returnsOnlyLocationsWithinRadius() {
-        // Given
-        final Vendor vendor = persistVendor("Delicious Bites", "vendor@db.com");
+    @Nested
+    @DisplayName("Uniqueness")
+    class UniquenessTests {
 
-        locationRepository.save(newLocationInStatus(
-                vendor, "Near Yaoundé",
-                YAOUNDE_LAT + 0.01, YAOUNDE_LNG + 0.01,
-                ModerationStatus.APPROVED));
-        locationRepository.save(newLocationInStatus(
-                vendor, "Douala",
-                DOUALA_LAT, DOUALA_LNG,
-                ModerationStatus.APPROVED));
+        @Test
+        @DisplayName("existsByVendorIdAndName() is true for a duplicate")
+        void existsByVendorIdAndName_trueForDuplicate() {
+            locationRepository.save(location("Main", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
 
-        // When — 20 km around Yaoundé center
-        final List<DistributionLocation> nearby = locationRepository.findNearbyByVendorId(
-                vendor.getId(), YAOUNDE_LAT, YAOUNDE_LNG, 20
-        );
+            assertThat(locationRepository.existsByVendorIdAndName(vendor.getId(), "Main")).isTrue();
+        }
 
-        // Then
-        assertThat(nearby).hasSize(1);
-        assertThat(nearby.get(0).getName()).isEqualTo("Near Yaoundé");
+        @Test
+        @DisplayName("existsByVendorIdAndName() is false for a different vendor")
+        void existsByVendorIdAndName_falseForDifferentVendor() {
+            VendorEntity otherVendor = seedVendor("Vendor Two", "vendor2@test.com",city.getId());
+            locationRepository.save(location("Main", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+
+            assertThat(locationRepository.existsByVendorIdAndName(otherVendor.getId(), "Main")).isFalse();
+        }
+
+        @Test
+        @DisplayName("findByVendorIdAndName() returns the match")
+        void findByVendorIdAndName_returnsMatch() {
+            DistributionLocation saved = locationRepository.save(
+                    location("Main", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+
+            Optional<DistributionLocation> found =
+                    locationRepository.findByVendorIdAndName(vendor.getId(), "Main");
+
+            assertThat(found).isPresent();
+            assertThat(found.get().getId()).isEqualTo(saved.getId());
+        }
+
+        @Test
+        @DisplayName("findByVendorIdAndName() returns empty for a miss")
+        void findByVendorIdAndName_returnsEmptyForMiss() {
+            assertThat(locationRepository.findByVendorIdAndName(vendor.getId(), "Unknown")).isEmpty();
+        }
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 8. withUpdatedDetails() persists through the adapter
-    // ══════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
+    //  Bulk lookup
+    // ═══════════════════════════════════════════════════════════
 
-    @Test
-    @DisplayName("withUpdatedDetails() produces a location that saves correctly")
-    void withUpdatedDetails_persistsThroughAdapter() {
-        // Given — factory-built and saved
-        final Vendor vendor = persistVendor("Delicious Bites", "vendor@db.com");
-        final DistributionLocation saved = locationRepository.save(
-                newLocationInStatus(vendor, "Old Name",
-                        YAOUNDE_LAT, YAOUNDE_LNG, ModerationStatus.APPROVED)
-        );
+    @Nested
+    @DisplayName("Bulk lookup")
+    class BulkLookupTests {
 
-        // When — domain-level update via the copy helper
-        final DistributionLocation updated = saved.withUpdatedDetails(
-                "New Name",
-                yaounde,
-                "New Address",
-                "+237611111111",
-                YAOUNDE_LAT + 0.01,
-                YAOUNDE_LNG + 0.01,
-                25
-        );
-        final DistributionLocation resaved = locationRepository.save(updated);
+        @Test
+        @DisplayName("findAllById() returns every matching row")
+        void findAllById_returnsEveryMatch() {
+            DistributionLocation a = locationRepository.save(
+                    location("Alma", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            DistributionLocation b = locationRepository.save(
+                    location("Balm", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Calm", vendor, city, 4.2, 9.7, ModerationStatus.APPROVED));
 
-        // Then
-        assertThat(resaved.getId()).isEqualTo(saved.getId());
-        assertThat(resaved.getName()).isEqualTo("New Name");
-        assertThat(resaved.getAddress()).isEqualTo("New Address");
-        assertThat(resaved.getDeliveryRadius()).isEqualTo(25);
+            List<DistributionLocation> found =
+                    locationRepository.findAllById(List.of(a.getId(), b.getId()));
 
-        final Optional<DistributionLocation> reloaded =
-                locationRepository.findById(saved.getId());
-        assertThat(reloaded).isPresent();
-        assertThat(reloaded.get().getName()).isEqualTo("New Name");
-        assertThat(reloaded.get().getDeliveryRadius()).isEqualTo(25);
+            assertThat(found).hasSize(2);
+            assertThat(found).extracting(DistributionLocation::getName)
+                    .containsExactlyInAnyOrder("Alma", "Balm");
+        }
+
+        @Test
+        @DisplayName("findAllById() short-circuits on an empty list")
+        void findAllById_handlesEmptyList() {
+            assertThat(locationRepository.findAllById(List.of())).isEmpty();
+            assertThat(locationRepository.findAllById(null)).isEmpty();
+        }
     }
 
+    // ═══════════════════════════════════════════════════════════
+    //  Filtering (Criteria path)
+    // ═══════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Filtering (Criteria path)")
+    class FilteringTests {
+
+        @Test
+        @DisplayName("search() filters by moderationStatus")
+        void search_filtersByModerationStatus() {
+            locationRepository.save(location("Alma", vendor, city, 4.0, 9.7, ModerationStatus.PENDING));
+            locationRepository.save(location("Balm", vendor, city, 4.1, 9.7, ModerationStatus.PENDING));
+            locationRepository.save(location("Calm", vendor, city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .moderationStatus(ModerationStatus.PENDING)
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(2);
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getModerationStatus)
+                    .containsOnly(ModerationStatus.PENDING);
+        }
+
+        @Test
+        @DisplayName("search() filters by vendorId")
+        void search_filtersByVendorId() {
+            VendorEntity otherVendor = seedVendor("Vendor Two", "vendor2@test.com",city.getId());
+            locationRepository.save(location("V1-A", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V1-B", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V2-A", vendorPersistenceMapper.toDomain(otherVendor, cityEntity), city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .vendorId(vendor.getId())
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(2);
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getName)
+                    .containsExactlyInAnyOrder("V1-A", "V1-B");
+        }
+
+        @Test
+        @DisplayName("search() filters by cityIds")
+        void search_filtersByCityIds() {
+            CityEntity otherCity = seedCity("Yaoundé", "Centre", "CM");
+            locationRepository.save(location("InDouala", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("InYaounde", vendor, cityPersistenceMapper.toDomain(otherCity), 3.8, 11.5, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .cityIds(List.of(city.getId()))
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(1);
+            assertThat(page.getContent().get(0).getName()).isEqualTo("InDouala");
+        }
+
+        @Test
+        @DisplayName("search() keyword matches name")
+        void search_keywordMatchesName() {
+            locationRepository.save(location("Marché Central", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Marché Mokolo", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Akwa", vendor, city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .keyword("marché")
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("search() combines moderationStatus and vendorId")
+        void search_combinesStatusAndVendor() {
+            VendorEntity otherVendor = seedVendor("Vendor Two", "vendor2@test.com", city.getId());
+            locationRepository.save(location("V1-Pending", vendor, city, 4.0, 9.7, ModerationStatus.PENDING));
+            locationRepository.save(location("V1-Approved", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("V2-Pending", vendorPersistenceMapper.toDomain(otherVendor,cityEntity), city, 4.2, 9.7, ModerationStatus.PENDING));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .vendorId(vendor.getId())
+                    .moderationStatus(ModerationStatus.PENDING)
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(1);
+            assertThat(page.getContent().get(0).getName()).isEqualTo("V1-Pending");
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Sorting (Criteria path)
+    // ═══════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Sorting (Criteria path)")
+    class SortingTests {
+
+        @Test
+        @DisplayName("search() sorts by name ascending")
+        void search_sortsByNameAscending() {
+            locationRepository.save(location("Zebra", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Apple", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Mango", vendor, city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .sortBy("name", Sort.Direction.ASC)
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getName)
+                    .containsExactly("Apple", "Mango", "Zebra");
+        }
+
+        @Test
+        @DisplayName("search() sorts by name descending")
+        void search_sortsByNameDescending() {
+            locationRepository.save(location("Zebra", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Apple", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+            locationRepository.save(location("Mango", vendor, city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .sortBy("name", Sort.Direction.DESC)
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getName)
+                    .containsExactly("Zebra", "Mango", "Apple");
+        }
+
+        @Test
+        @DisplayName("search() sorts by createdAt descending")
+        void search_sortsByCreatedAtDescending() {
+            DistributionLocation first = locationRepository.save(
+                    location("First", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED));
+            sleepMillis(5);
+            DistributionLocation second = locationRepository.save(
+                    location("Second", vendor, city, 4.1, 9.7, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .sortBy("createdAt", Sort.Direction.DESC)
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getId)
+                    .containsExactly(second.getId(), first.getId());
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Proximity path
+    // ═══════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Proximity path")
+    class ProximityTests {
+
+        // Douala is roughly 4.05 / 9.70.
+        private static final double CENTER_LAT = 4.05;
+        private static final double CENTER_LNG = 9.70;
+
+        @Test
+        @DisplayName("inside-radius location is returned")
+        void insideRadius_isReturned() {
+            locationRepository.save(location("Near", vendor, city, 4.051, 9.701, ModerationStatus.APPROVED));
+            locationRepository.save(location("Far", vendor, city, 40.7128, -74.0060, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .locationProximity(LocationProximity.of(CENTER_LAT, CENTER_LNG, 5))
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getName)
+                    .containsExactly("Near");
+        }
+
+        @Test
+        @DisplayName("outside-radius location is excluded")
+        void outsideRadius_isExcluded() {
+            locationRepository.save(location("Far", vendor, city, 40.7128, -74.0060, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .locationProximity(LocationProximity.of(CENTER_LAT, CENTER_LNG, 5))
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("proximity path sorts by default by name ascending")
+        void proximityPath_sortsByNameAscending() {
+            locationRepository.save(location("Zebra", vendor, city, 4.051, 9.701, ModerationStatus.APPROVED));
+            locationRepository.save(location("Apple", vendor, city, 4.052, 9.702, ModerationStatus.APPROVED));
+            locationRepository.save(location("Mango", vendor, city, 4.053, 9.703, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .locationProximity(LocationProximity.of(4.05, 9.70, 5))
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent())
+                    .extracting(DistributionLocation::getName)
+                    .containsExactly("Apple", "Mango", "Zebra");
+        }
+
+
+        @Test
+        @DisplayName("empty cityIds disables the city filter on the proximity path")
+        void proximityPath_emptyCityIdsDisablesFilter() {
+            CityEntity otherCity = seedCity("Yaoundé", "Centre", "CM");
+            locationRepository.save(location("InDouala", vendor, city, 4.051, 9.701, ModerationStatus.APPROVED));
+            locationRepository.save(location("InYaounde", vendor, cityPersistenceMapper.toDomain(otherCity), 4.052, 9.702, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .locationProximity(LocationProximity.of(4.05, 9.70, 500))
+                    .cityIds(List.of())
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("non-empty cityIds filters on the proximity path")
+        void proximityPath_nonEmptyCityIdsFilters() {
+            CityEntity otherCity = seedCity("Yaoundé", "Centre", "CM");
+            locationRepository.save(location("InDouala", vendor, city, 4.051, 9.701, ModerationStatus.APPROVED));
+            locationRepository.save(location("InYaounde", vendor, cityPersistenceMapper.toDomain(otherCity), 4.052, 9.702, ModerationStatus.APPROVED));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .locationProximity(LocationProximity.of(4.05, 9.70, 500))
+                    .cityIds(List.of(city.getId()))
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(1);
+            assertThat(page.getContent().get(0).getName()).isEqualTo("InDouala");
+        }
+
+        @Test
+        @DisplayName("proximity path filters by moderationStatus")
+        void proximityPath_filtersByModerationStatus() {
+            locationRepository.save(location("Approved", vendor, city, 4.051, 9.701, ModerationStatus.APPROVED));
+            locationRepository.save(location("Pending", vendor, city, 4.052, 9.702, ModerationStatus.PENDING));
+
+            DistributionLocationSearchRequest request = requestBuilder()
+                    .pageRequest(PageRequest.of(0, 20))
+                    .locationProximity(LocationProximity.of(4.05, 9.70, 5))
+                    .moderationStatus(ModerationStatus.PENDING)
+                    .build();
+
+            DataPage<DistributionLocation> page = locationRepository.search(request);
+
+            assertThat(page.getContent()).hasSize(1);
+            assertThat(page.getContent().get(0).getName()).isEqualTo("Pending");
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Dedicated JPA methods
+    // ═══════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Dedicated JPA methods")
+    class DedicatedMethodTests {
+
+        @Test
+        @DisplayName("findNearbyByVendorId() returns only that vendor's near rows")
+        void findNearbyByVendorId_returnsOnlyThatVendor() {
+            VendorEntity otherVendor = seedVendor("Vendor Two", "vendor2@test.com", city.getId());
+            locationRepository.save(location("NearV1", vendor, city, 4.051, 9.701, ModerationStatus.APPROVED));
+            locationRepository.save(location("NearV2", vendorPersistenceMapper.toDomain(otherVendor, cityEntity), city, 4.052, 9.702, ModerationStatus.APPROVED));
+
+            List<DistributionLocation> result = locationRepository
+                    .findNearbyByVendorId(vendor.getId(), 4.05, 9.70, 5);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getName()).isEqualTo("NearV1");
+        }
+
+        @Test
+        @DisplayName("findByModerationStatus() returns rows in createdAt ASC order")
+        void findByModerationStatus_returnsInCreatedAtAscOrder() {
+            DistributionLocation first = locationRepository.save(
+                    location("First", vendor, city, 4.0, 9.7, ModerationStatus.PENDING));
+            sleepMillis(5);
+            DistributionLocation second = locationRepository.save(
+                    location("Second", vendor, city, 4.1, 9.7, ModerationStatus.PENDING));
+            locationRepository.save(location("Approved", vendor, city, 4.2, 9.7, ModerationStatus.APPROVED));
+
+            List<DistributionLocation> pending =
+                    locationRepository.findByModerationStatus(ModerationStatus.PENDING);
+
+            assertThat(pending)
+                    .extracting(DistributionLocation::getId)
+                    .containsExactly(first.getId(), second.getId());
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Error paths
+    // ═══════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Error paths")
+    class ErrorPathTests {
+
+        @Test
+        @DisplayName("a missing vendor row throws ResourceNotFoundException")
+        void missingVendor_throws() {
+            Vendor vendor = Vendor.builder()
+                    .id(UUID.randomUUID())
+                    .businessName("The vendor")
+                    .ownerName("Owner")
+                    .userId(UUID.randomUUID())
+                    .address("1 Main St")
+                    .city(city)
+                    .email("test@test.com")
+                    .phone("+237600000000")
+                    .subscriptionTier(SubscriptionTier.FREE)
+                    .ratingAvg(BigDecimal.ZERO)
+                    .totalRatings(0)
+                    .state(VendorState.pending())
+                    .deliveryRadius(10)
+                    .build();
+
+            assertThatThrownBy(() -> locationRepository.save(
+                    location("OrphanVendor", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED)))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessageContaining("Vendor not found");
+        }
+
+        @Test
+        @DisplayName("a missing city row throws ResourceNotFoundException")
+        void missingCity_throws() {
+            City city = City.builder()
+                    .id(UUID.randomUUID())
+                    .name("The city")
+                    .region("Region")
+                    .countryCode("CM")
+                    .createdAt(Instant.now())
+                    .updatedAt(Instant.now())
+                    .build();
+            assertThatThrownBy(() -> locationRepository.save(
+                    location("OrphanCity", vendor, city, 4.0, 9.7, ModerationStatus.APPROVED)))
+                    .isInstanceOf(ResourceNotFoundException.class);
+        }
+    }
 }

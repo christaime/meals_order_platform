@@ -7,6 +7,7 @@ import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.model.ModerationTargetType;
 import com.mealmarket.meal.domain.repository.ModerationDataRepository;
 import com.mealmarket.meal.domain.repository.criteria.ModerationDataSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.adapter.utils.SortConverter;
 import com.mealmarket.meal.infrastructure.persistence.entity.ModerationDataEntity;
 import com.mealmarket.meal.infrastructure.persistence.mapper.ModerationDataPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.repository.ModerationDataJpaRepository;
@@ -90,9 +91,12 @@ public class ModerationDataRepositoryAdapter implements ModerationDataRepository
     @Override
     public DataPage<ModerationData> search(ModerationDataSearchRequest request) {
         Specification<ModerationDataEntity> spec = ModerationDataSpecification.build(request);
+        var springSort = SortConverter.toSpringSort(request.validSortOrders());
+
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
-                request.getPageRequest().getSize()
+                request.getPageRequest().getSize(),
+                springSort
         );
         Page<ModerationDataEntity> page = jpaRepository.findAll(spec, pageable);
         return toDataPage(page);

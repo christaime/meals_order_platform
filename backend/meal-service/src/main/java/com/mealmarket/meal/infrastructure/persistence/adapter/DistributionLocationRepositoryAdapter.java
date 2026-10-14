@@ -8,6 +8,7 @@ import com.mealmarket.meal.domain.model.Vendor;
 import com.mealmarket.meal.domain.repository.DistributionLocationRepository;
 import com.mealmarket.meal.domain.repository.criteria.DistributionLocationSearchRequest;
 import com.mealmarket.meal.domain.repository.criteria.LocationProximity;
+import com.mealmarket.meal.infrastructure.persistence.adapter.utils.SortConverter;
 import com.mealmarket.meal.infrastructure.persistence.entity.CityEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.DistributionLocationEntity;
 import com.mealmarket.meal.infrastructure.persistence.entity.VendorEntity;
@@ -47,7 +48,14 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
 
     @Override
     public DistributionLocation save(DistributionLocation location) {
+
         DistributionLocationEntity entity = mapper.toEntity(location);
+        if(!cityJpaRepository.existsById(entity.getCityId())) {
+            throw new ResourceNotFoundException("City not found: " + entity.getCityId());
+        }
+        if(!vendorJpaRepository.existsById(entity.getVendorId())) {
+            throw new ResourceNotFoundException("Vendor not found: " + entity.getVendorId());
+        }
         DistributionLocationEntity saved = jpaRepository.save(entity);
         return toFullDomain(saved);
     }
@@ -127,9 +135,12 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
 
         Specification<DistributionLocationEntity> spec =
                 DistributionLocationSpecification.build(request);
+        var springSort = SortConverter.toSpringSort(request.validSortOrders());
+
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
-                request.getPageRequest().getSize()
+                request.getPageRequest().getSize(),
+                springSort
         );
         Page<DistributionLocationEntity> page = jpaRepository.findAll(spec, pageable);
         return toDataPage(page);
@@ -155,15 +166,17 @@ public class DistributionLocationRepositoryAdapter implements DistributionLocati
                 ? null
                 : request.getCityIds().toArray(UUID[]::new);
 
-        Pageable pageable = PageRequest.of(
+        var springSort = SortConverter.toSpringSort(request.validSortOrders());
+
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
-                request.getPageRequest().getSize()
+                request.getPageRequest().getSize(),
+                springSort
         );
+        String moderationStatus = request.getModerationStatus() != null ? request.getModerationStatus().name() : null;
 
         Page<DistributionLocationEntity> page = jpaRepository.searchWithinRadius(
-                request.getModerationStatus() != null
-                        ? request.getModerationStatus().name()
-                        : null,
+                moderationStatus,
                 request.getVendorId(),
                 cityIds,
                 keyword,

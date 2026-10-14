@@ -115,6 +115,10 @@ public class DistributionLocation {
         return baseBuilder().moderationStatus(newStatus).build();
     }
 
+    public DistributionLocation withName(String name) {
+        return baseBuilder().name(name).build();
+    }
+
     public DistributionLocation withUpdatedDetails(
             String name, City city, String address, String phone,
             Double latitude, Double longitude, Integer deliveryRadius

@@ -118,6 +118,19 @@ public class Ingredient {
                 .build();
     }
 
+    public Ingredient withName(String name) {
+        return Ingredient.builder()
+                .id(this.id)
+                .name(name)
+                .isAllergen(this.isAllergen)
+                .createdByType(this.createdByType)
+                .createdById(this.createdById)
+                .moderationStatus(this.moderationStatus)
+                .createdAt(this.createdAt)
+                .updatedAt(Instant.now())
+                .build();
+    }
+
     public Ingredient withUpdatedDetails(String name, Boolean isAllergen) {
         return Ingredient.builder()
                 .id(this.id)

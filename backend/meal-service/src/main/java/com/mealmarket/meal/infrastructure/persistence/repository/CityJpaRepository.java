@@ -10,4 +10,5 @@ public interface CityJpaRepository
         extends JpaRepository<CityEntity, UUID>, JpaSpecificationExecutor<CityEntity> {
 
     boolean existsByNameIgnoreCaseAndCountryCode(String name, String countryCode);
+    boolean existsById(UUID id);
 }

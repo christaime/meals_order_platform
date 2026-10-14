@@ -78,7 +78,7 @@ public interface DistributionLocationJpaRepository
     @Query(value = """
     SELECT dl.*
     FROM distribution_locations dl
-    WHERE dl.moderation_status = :moderationStatus
+    WHERE (CAST(:moderationStatus AS text) IS NULL OR dl.moderation_status = CAST(:moderationStatus AS text))
       AND (CAST(:vendorId AS uuid) IS NULL OR dl.vendor_id = CAST(:vendorId AS uuid))
       AND (CAST(:cityIds AS uuid[]) IS NULL OR dl.city_id = ANY(CAST(:cityIds AS uuid[])))
       AND (CAST(:keyword AS text) IS NULL OR (
@@ -96,12 +96,12 @@ public interface DistributionLocationJpaRepository
                 * power(sin(radians(dl.longitude - :lng) / 2), 2)
           ))
       ) <= :radiusKm
-    ORDER BY dl.created_at DESC
+    ORDER BY dl.name ASC
     """,
             countQuery = """
     SELECT COUNT(*)
     FROM distribution_locations dl
-    WHERE dl.moderation_status = :moderationStatus
+    WHERE (CAST(:moderationStatus AS text) IS NULL OR dl.moderation_status = CAST(:moderationStatus AS text))
       AND (CAST(:vendorId AS uuid) IS NULL OR dl.vendor_id = CAST(:vendorId AS uuid))
       AND (CAST(:cityIds AS uuid[]) IS NULL OR dl.city_id = ANY(CAST(:cityIds AS uuid[])))
       AND (CAST(:keyword AS text) IS NULL OR (

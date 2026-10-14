@@ -5,6 +5,7 @@ import com.mealmarket.meal.domain.model.Ingredient;
 import com.mealmarket.meal.domain.model.ModerationStatus;
 import com.mealmarket.meal.domain.repository.IngredientRepository;
 import com.mealmarket.meal.domain.repository.criteria.IngredientSearchRequest;
+import com.mealmarket.meal.infrastructure.persistence.adapter.utils.SortConverter;
 import com.mealmarket.meal.infrastructure.persistence.entity.IngredientEntity;
 import com.mealmarket.meal.infrastructure.persistence.mapper.IngredientPersistenceMapper;
 import com.mealmarket.meal.infrastructure.persistence.repository.IngredientJpaRepository;
@@ -109,9 +110,12 @@ public class IngredientRepositoryAdapter implements IngredientRepository {
     @Override
     public DataPage<Ingredient> search(IngredientSearchRequest request) {
         Specification<IngredientEntity> spec = IngredientSpecification.build(request);
+        var springSort = SortConverter.toSpringSort(request.validSortOrders());
+
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.getPageRequest().getPage(),
-                request.getPageRequest().getSize()
+                request.getPageRequest().getSize(),
+                springSort
         );
         Page<IngredientEntity> page = jpaRepository.findAll(spec, pageable);
         return toDataPage(page);

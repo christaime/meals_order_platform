@@ -92,6 +92,12 @@ public class City {
                 .build();
     }
 
+    public City withName(String name) {
+        return baseBuilder()
+                .name(name != null ? name : this.name)
+                .build();
+    }
+
     private Builder baseBuilder() {
         return City.builder()
                 .id(this.id)

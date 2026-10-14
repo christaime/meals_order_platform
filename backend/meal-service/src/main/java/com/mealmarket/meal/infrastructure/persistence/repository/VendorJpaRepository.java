@@ -26,6 +26,8 @@ public interface VendorJpaRepository
     boolean existsByEmail(String email);
 
     boolean existsByUserId(UUID userId);
+
+    boolean existsById(UUID id);
     /**
      * Case-insensitive check for business name uniqueness.
      * Uses lower-case comparison to prevent "Delicious Bites" vs "delicious bites".

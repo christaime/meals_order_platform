@@ -147,7 +147,7 @@ logging:
     com.mealmarket: INFO
     org.springframework.security: WARN
     org.springframework.web: WARN
-    org.hibernate.SQL: WARN
+    org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: WARN
     org.testcontainers: INFO
     com.github.dockerjava: WARN
