@@ -14,10 +14,10 @@
       </span>
       <div>
         <h2 class="font-headline-sm text-headline-sm text-on-surface">
-          Spécialités &amp; Terroirs Culinaires
+          {{ 'vendorCuisine.title' | translate }}
         </h2>
         <p class="font-body-sm text-body-sm text-on-surface-variant">
-          (Sélectionnez au moins 1 spécialité)
+          {{ 'vendorCuisine.subtitle' | translate }}
         </p>
       </div>
     </div>
@@ -29,11 +29,11 @@
   <app-category-pills-selector
     categoryType="CUISINE"
     [control]="cuisineControl()"
-    [label]="'Spécialités culinaires'"
-    [hint]="'Cliquez sur les tags correspondant à l\'ADN gastronomique de votre enseigne pour optimiser votre visibilité dans le filtre de recherche de l\'application.'"
+    [labelKey]="'vendorCuisine.label'"
+    [hintKey]="'vendorCuisine.hint'"
     [maxSelection]="maxSelection()"
     [minSelection]="1"
     [error]="error()"
-    [emptyMessage]="'Aucune spécialité disponible pour le moment.'"
+    [emptyMessageKey]="'vendorCuisine.empty'"
     (categoriesSelected)="categoriesSelected.emit($event)" />
 </div>

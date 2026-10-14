@@ -8,6 +8,7 @@ import { FormControl ,FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { CategoryPillsSelectorComponent } from '@components/shared/category-pills-selector/category-pills-selector.component';
 import { Category } from '@app/core/models/marketplace';
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Section B — Spécialités & Terroirs Culinaires.
  *
@@ -26,7 +27,7 @@ import { Category } from '@app/core/models/marketplace';
 @Component({
   selector: 'app-cuisine',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, CategoryPillsSelectorComponent],
+  imports: [ReactiveFormsModule, IconComponent, CategoryPillsSelectorComponent, TranslatePipe],
   templateUrl: './cuisine.component.html',
   styleUrl: './cuisine.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
