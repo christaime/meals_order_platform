@@ -9,13 +9,13 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { BadgeComponent } from '@components/shared/badge/badge.component';
 import {
   isUnapproved,
   moderationIcon,
-  moderationLabel,
+  moderationLabelKey,
   moderationVariant,
 } from '@components/shared/moderation-status/moderation-status.util';
 
@@ -43,7 +43,7 @@ import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
 @Component({
   selector: 'app-meal-references-panel',
   standalone: true,
-  imports: [IconComponent, BadgeComponent],
+  imports: [IconComponent, BadgeComponent, TranslatePipe],
   templateUrl: './meal-references-panel.component.html',
   styleUrl: './meal-references-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -76,7 +76,7 @@ export class MealReferencesPanelComponent {
 
   // ─── Expose helpers to the template ───────────────────────
   protected readonly statusVariant  = moderationVariant;
-  protected readonly statusLabel    = moderationLabel;
+  protected readonly statusLabel    = moderationLabelKey;
   protected readonly isUnapproved   = isUnapproved;
   protected readonly statusIconOrNull =
     (s: ModerationStatus): string | null => isUnapproved(s) ? moderationIcon(s) : null;

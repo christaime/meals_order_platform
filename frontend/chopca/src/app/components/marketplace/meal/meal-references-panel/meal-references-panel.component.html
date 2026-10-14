@@ -6,11 +6,11 @@
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
         <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-          Références du plat
+          {{ 'mealReferencesPanel.title' | translate }}
         </h2>
       </div>
       <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-        Ingrédients et points de distribution liés à ce plat.
+        {{ 'mealReferencesPanel.subtitle' | translate }}
       </p>
     </div>
     @if (unapprovedCount() > 0) {
@@ -19,7 +19,7 @@
       [attr.data-count]="unapprovedCount()"
       class="px-2 py-1 rounded-full bg-error-container text-on-error-container
              font-label-sm text-label-sm font-semibold">
-      {{ unapprovedCount() }} à valider
+      {{ 'mealReferencesPanel.unapprovedCount' | translate: { count: unapprovedCount() } }}
     </span>
     }
   </div>
@@ -37,7 +37,7 @@
       class="flex items-start gap-2 text-error">
       <app-icon name="error" size="md" class="shrink-0 mt-0.5" />
       <p class="font-body-sm text-body-sm">
-        Impossible de charger les références de ce plat.
+        {{ 'mealReferencesPanel.error' | translate }}
       </p>
     </div>
     } @else if (!mealId()) {
@@ -46,7 +46,7 @@
       class="flex items-start gap-2 text-on-surface-variant py-4">
       <app-icon name="info" size="md" class="shrink-0 mt-0.5" />
       <p class="font-body-sm text-body-sm">
-        Sélectionnez un plat dans la liste pour voir ses références.
+        {{ 'mealReferencesPanel.noSelection' | translate }}
       </p>
     </div>
     } @else {
@@ -54,7 +54,7 @@
     <div data-testid="meal-references-ingredients" class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <span class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-          Ingrédients
+          {{ 'mealReferencesPanel.ingredientsLabel' | translate }}
         </span>
         <span
           data-testid="meal-references-ingredients-count"
@@ -67,7 +67,7 @@
       <p
         data-testid="meal-references-ingredients-empty"
         class="font-body-sm text-body-sm text-on-surface-variant">
-        Aucun ingrédient.
+        {{ 'mealReferencesPanel.ingredientsEmpty' | translate }}
       </p>
       } @else {
       <div class="flex flex-wrap gap-2">
@@ -94,7 +94,7 @@
     <div data-testid="meal-references-locations" class="flex flex-col gap-2 mt-space-md">
       <div class="flex items-center justify-between">
         <span class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-          Points de distribution
+          {{ 'mealReferencesPanel.locationsLabel' | translate }}
         </span>
         <span
           data-testid="meal-references-locations-count"
@@ -107,7 +107,7 @@
       <p
         data-testid="meal-references-locations-empty"
         class="font-body-sm text-body-sm text-on-surface-variant">
-        Aucun point de distribution.
+        {{ 'mealReferencesPanel.locationsEmpty' | translate }}
       </p>
       } @else {
       <div class="flex flex-wrap gap-2">

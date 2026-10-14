@@ -6,18 +6,18 @@
       <div class="flex items-center gap-2">
         <app-icon name="shield_person" size="md" class="text-primary" />
         <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-          Modération
+          {{ 'moderationPanel.title' | translate }}
         </h2>
       </div>
       <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-        Statut actuel et actions disponibles selon votre rôle.
+        {{ 'moderationPanel.subtitle' | translate }}
       </p>
     </div>
     <span
       data-testid="moderation-panel-status"
       [attr.data-status]="currentStatus()">
       <app-badge [variant]="statusVariant()" size="sm">
-        {{ statusLabel() }}
+        {{ statusLabelKey() | translate }}
       </app-badge>
     </span>
   </div>
@@ -28,7 +28,7 @@
     @if (reasonRequired()) {
     <div class="space-y-1">
       <label class="block font-label-md text-label-md text-on-surface font-semibold">
-        Motif
+        {{ 'moderationPanel.reasonLabel' | translate }}
       </label>
       <textarea
         rows="3"
@@ -36,7 +36,7 @@
         [value]="reason()"
         (input)="reason.set($any($event.target).value)"
         [disabled]="busy()"
-        placeholder="Expliquez la raison de la décision…"
+        [placeholder]="'moderationPanel.reasonPlaceholder' | translate"
         class="w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
                    font-body-md text-body-md placeholder:text-outline
                    focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
@@ -53,7 +53,7 @@
         [attr.data-decision]="d.value"
         [disabled]="busy() || disabled()"
         (click)="submit(d)"
-        [title]="d.confirmText"
+        [attr.title]="d.confirmTextKey | translate"
         class="h-10 rounded-lg font-label-md text-label-md font-semibold
                    flex items-center justify-center gap-2 transition-all active:scale-95
                    disabled:opacity-60 disabled:cursor-not-allowed"
@@ -64,17 +64,17 @@
                                           'bg-surface-container text-on-surface hover:bg-surface-container-high'
             ">
         <app-icon [name]="d.icon" size="sm" />
-        {{ d.label }}
+        {{ d.labelKey | translate }}
       </button>
       }
     </div>
 
-    @if (error(); as e) {
+    @if (errorKey(); as k) {
     <p
       data-testid="moderation-panel-error"
       class="font-body-sm text-body-sm text-error flex items-center gap-1.5">
       <app-icon name="error" size="sm" />
-      {{ e }}
+      {{ k | translate }}
     </p>
     }
   </div>
@@ -87,11 +87,10 @@
     <p class="font-body-sm text-body-sm text-on-surface-variant">
       @switch (currentStatus()) {
       @case ('REJECTED') {
-      Cette catégorie a été rejetée. Corrigez le contenu puis contactez un administrateur
-      pour la remettre en revue.
+      {{ 'moderationPanel.noDecisionRejected' | translate }}
       }
       @default {
-      Aucune action de modération n'est disponible pour ce statut.
+      {{ 'moderationPanel.noDecisionDefault' | translate }}
       }
       }
     </p>
@@ -106,19 +105,19 @@
                 font-body-sm text-body-sm text-on-surface-variant">
       <span class="flex items-center gap-1.5">
         <app-icon name="history" size="sm" />
-        Dernière action&nbsp;:
+        {{ 'moderationPanel.latestAction' | translate }}
         <strong class="text-on-surface">
           {{ last.fromStatus ?? '—' }} → {{ last.toStatus }}
         </strong>
       </span>
     <span>
-        par <strong class="text-on-surface">{{ actorLabel(last.performedByType) }}</strong>
+        {{ 'moderationPanel.by' | translate }} <strong class="text-on-surface">{{ actorLabelKey(last.performedByType) | translate }}</strong>
         <span class="text-outline">({{ shortId(last.performedById) }})</span>
       </span>
     <span>{{ formatDate(last.performedAt) }}</span>
     @if (last.reason) {
     <span data-testid="moderation-panel-latest-reason" class="w-full">
-      Motif&nbsp;: <em>{{ last.reason }}</em>
+      {{ 'moderationPanel.reasonPrefix' | translate }} <em>{{ last.reason }}</em>
     </span>
     }
   </div>

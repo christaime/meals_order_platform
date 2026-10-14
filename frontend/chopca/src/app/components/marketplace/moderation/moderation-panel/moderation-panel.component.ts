@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, Component, computed, inject, input, output, signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { BadgeComponent, BadgeVariant } from '@components/shared/badge/badge.component';
 import { MODERATION_SERVICE } from '@app/core/services/marketplace/moderation.service';
@@ -14,17 +15,17 @@ import {
 
 interface DecisionDef {
   readonly value: ModerationDecision;
-  readonly label: string;
+  readonly labelKey: string;
   readonly icon: string;
   readonly variant: 'primary' | 'secondary' | 'danger' | 'neutral';
   readonly requiresReason: boolean;
-  readonly confirmText: string;
+  readonly confirmTextKey: string;
 }
 
 @Component({
   selector: 'app-moderation-panel',
   standalone: true,
-  imports: [FormsModule, IconComponent, BadgeComponent],
+  imports: [FormsModule, IconComponent, BadgeComponent, TranslatePipe],
   templateUrl: './moderation-panel.component.html',
   styleUrl: './moderation-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,28 +44,27 @@ export class ModerationPanelComponent {
   /** Emitted with the fresh outcome after a successful moderation. */
   readonly moderated = output<ModerationDataResponse | null>();
 
-  // ─── Local state ───────────────────────────────────────────
   protected readonly reason = signal<string>('');
   protected readonly busy = signal<boolean>(false);
-  protected readonly error = signal<string | null>(null);
+  /** Key, not a resolved string. Piped in the template. */
+  protected readonly errorKey = signal<string | null>(null);
   protected readonly latest = signal<ModerationDataResponse | null>(null);
 
-  /** Decisions allowed from the current status, per backend rules. */
   protected readonly decisions = computed<readonly DecisionDef[]>(() => {
     switch (this.currentStatus()) {
       case 'PENDING':
         return [
-          { value: 'APPROVE',    label: 'Approuver',  icon: 'check_circle',      variant: 'secondary', requiresReason: false, confirmText: 'Approuver cette catégorie ?' },
-          { value: 'REJECT',     label: 'Rejeter',    icon: 'cancel',            variant: 'danger',    requiresReason: true,  confirmText: 'Rejeter cette catégorie ?' },
+          { value: 'APPROVE', labelKey: 'moderationPanel.decision.APPROVE.label', icon: 'check_circle', variant: 'secondary', requiresReason: false, confirmTextKey: 'moderationPanel.decision.APPROVE.confirm' },
+          { value: 'REJECT',  labelKey: 'moderationPanel.decision.REJECT.label',  icon: 'cancel',       variant: 'danger',    requiresReason: true,  confirmTextKey: 'moderationPanel.decision.REJECT.confirm' },
         ];
       case 'APPROVED':
         return [
-          { value: 'DISABLE',    label: 'Désactiver', icon: 'visibility_off',    variant: 'neutral',   requiresReason: true,  confirmText: 'Désactiver cette catégorie ?' },
-          { value: 'REVOKE',     label: 'Réviser',    icon: 'undo',              variant: 'primary',   requiresReason: true,  confirmText: 'Renvoyer cette catégorie en revue ?' },
+          { value: 'DISABLE', labelKey: 'moderationPanel.decision.DISABLE.label', icon: 'visibility_off', variant: 'neutral',   requiresReason: true, confirmTextKey: 'moderationPanel.decision.DISABLE.confirm' },
+          { value: 'REVOKE',  labelKey: 'moderationPanel.decision.REVOKE.label',  icon: 'undo',           variant: 'primary',   requiresReason: true, confirmTextKey: 'moderationPanel.decision.REVOKE.confirm' },
         ];
       case 'DISABLED':
         return [
-          { value: 'REACTIVATE', label: 'Réactiver',  icon: 'visibility',        variant: 'secondary', requiresReason: false, confirmText: 'Réactiver cette catégorie ?' },
+          { value: 'REACTIVATE', labelKey: 'moderationPanel.decision.REACTIVATE.label', icon: 'visibility', variant: 'secondary', requiresReason: false, confirmTextKey: 'moderationPanel.decision.REACTIVATE.confirm' },
         ];
       case 'REJECTED':
       default:
@@ -83,31 +83,29 @@ export class ModerationPanelComponent {
     }
   });
 
-  protected readonly statusLabel = computed(() => {
+  protected readonly statusLabelKey = computed(() => {
     switch (this.currentStatus()) {
-      case 'APPROVED': return 'Approuvé';
-      case 'PENDING':  return 'En attente';
-      case 'REJECTED': return 'Rejeté';
-      case 'DISABLED': return 'Désactivé';
+      case 'APPROVED': return 'moderationStatus.approved';
+      case 'PENDING':  return 'moderationStatus.pending';
+      case 'REJECTED': return 'moderationStatus.rejected';
+      case 'DISABLED': return 'moderationStatus.disabled';
     }
   });
 
-  /** True if *any* allowed decision requires a reason. */
   protected readonly reasonRequired = computed(() =>
     this.decisions().some(d => d.requiresReason),
   );
 
-  // ─── Actions ───────────────────────────────────────────────
   protected submit(decision: DecisionDef): void {
     if (this.busy() || this.disabled()) return;
 
     if (decision.requiresReason && !this.reason().trim()) {
-      this.error.set('Un motif est requis pour cette action.');
+      this.errorKey.set('moderationPanel.reasonRequired');
       return;
     }
 
     this.busy.set(true);
-    this.error.set(null);
+    this.errorKey.set(null);
 
     const payload: ModerationRequest = {
       decision: decision.value,
@@ -124,10 +122,10 @@ export class ModerationPanelComponent {
         },
         error: err => {
           this.busy.set(false);
-          this.error.set(
+          this.errorKey.set(
             err?.status === 409
-              ? 'Transition invalide depuis le statut actuel.'
-              : 'Échec de la modération. Réessayez.',
+              ? 'moderationPanel.invalidTransition'
+              : 'moderationPanel.moderationFailed',
           );
         },
       });
@@ -142,19 +140,18 @@ export class ModerationPanelComponent {
           this.moderated.emit(data);
         },
         error: () => {
-          // No history — first action just happened, nothing else to fetch.
           this.latest.set(null);
           this.moderated.emit(null);
         },
       });
   }
 
-  protected actorLabel(type: UserType): string {
+  protected actorLabelKey(type: UserType): string {
     switch (type) {
-      case 'ADMIN': return 'Admin';
-      case 'SYSTEM': return 'Système';
-      case 'VENDOR': return 'Vendeur';
-      case 'CUSTOMER': return 'Client';
+      case 'ADMIN':    return 'moderationPanel.actor.ADMIN';
+      case 'SYSTEM':   return 'moderationPanel.actor.SYSTEM';
+      case 'VENDOR':   return 'moderationPanel.actor.VENDOR';
+      case 'CUSTOMER': return 'moderationPanel.actor.CUSTOMER';
     }
   }
 
