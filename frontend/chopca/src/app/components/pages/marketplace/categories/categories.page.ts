@@ -26,6 +26,7 @@ import { ModerationDataResponse } from '@app/core/models/marketplace/moderation.
 import {
   DeleteEntityDialogComponent,
 } from '@components/shared/delete-entity-dialog/delete-entity-dialog.component';
+import { TranslateService , TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-categories-page',
@@ -37,6 +38,7 @@ import {
     CategoryFiltersComponent,
     CategoryTableComponent,
     ModerationPanelComponent,
+    TranslatePipe,
   ],
   templateUrl: './categories.page.html',
   styleUrl: './categories.page.scss',
@@ -49,6 +51,7 @@ export class CategoriesPageComponent {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly roleContext = inject(KEYCLOAK_SERVICE);
+  private readonly translate = inject(TranslateService);
 
   // ─── Filter state ──────────────────────────────────────────
   protected readonly name = signal<string>('');
@@ -130,7 +133,9 @@ export class CategoriesPageComponent {
         this.submitting.set(false);
         this.editing.set(saved);
         this.toast.show(
-          current ? 'Catégorie mise à jour' : 'Catégorie créée',
+         this.translate.instant(
+           current ? 'categoriesPage.toast.updated' : 'categoriesPage.toast.created',
+         ),
           'success',
         );
         this.refresh();
@@ -138,7 +143,9 @@ export class CategoriesPageComponent {
       error: err => {
         this.submitting.set(false);
         this.toast.show(
-          current ? 'Échec de la mise à jour' : 'Échec de la création',
+          this.translate.instant(
+            current ? 'categoriesPage.toast.updateFailed' : 'categoriesPage.toast.createFailed',
+          ),
           'error',
         );
         console.error(err);
@@ -153,12 +160,17 @@ export class CategoriesPageComponent {
       .subscribe({
         next: () => {
           this.toast.show(
-            next === 'APPROVED' ? 'Catégorie activée' : 'Catégorie désactivée',
+            this.translate.instant(
+              next === 'APPROVED' ? 'categoriesPage.toast.activated' : 'categoriesPage.toast.deactivated',
+            ),
             'success',
           );
           this.refresh();
         },
-        error: () => this.toast.show('Échec du changement de statut', 'error'),
+        error: () => this.toast.show(
+            this.translate.instant('categoriesPage.toast.toggleFailed'),
+            'error',
+          ),
       });
   }
 
@@ -177,10 +189,10 @@ export class CategoriesPageComponent {
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => {
-              this.toast.show('Catégorie supprimée', 'success');
+              this.toast.show(this.translate.instant('categoriesPage.toast.deleted'), 'success');
               this.refresh();
             },
-            error: () => this.toast.show('Échec de la suppression', 'error'),
+            error: () => this.toast.show(this.translate.instant('categoriesPage.toast.deleteFailed'), 'error'),
           });
       });
   }
@@ -188,12 +200,12 @@ export class CategoriesPageComponent {
   // ─── CSV stubs ─────────────────────────────────────────────
   protected onImportCsv(): void {
     // TODO: wire to backend — open a file picker, POST multipart, refresh.
-    this.toast.show('Import CSV — fonctionnalité à venir', 'info');
+    this.toast.show(this.translate.instant('categoriesPage.toast.importNotReady'), 'info');
   }
 
   protected onExportCsv(): void {
     // TODO: wire to backend — call export endpoint, trigger download.
-    this.toast.show('Export CSV — fonctionnalité à venir', 'info');
+    this.toast.show(this.translate.instant('categoriesPage.toast.exportNotReady'), 'info');
   }
 
   protected onQuickNew(): void {
@@ -216,7 +228,7 @@ export class CategoriesPageComponent {
         },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des catégories', 'error');
+          this.toast.show(this.translate.instant('categoriesPage.toast.loadFailed'), 'error');
           console.error(err);
         },
       });

@@ -4,13 +4,13 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { CategoryType, ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
-
+import { TranslatePipe } from '@ngx-translate/core';
 export type CategorySort = 'name-asc' | 'name-desc' | 'status-asc';
 
 @Component({
   selector: 'app-category-filters',
   standalone: true,
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent, TranslatePipe],
   templateUrl: './category-filters.component.html',
   styleUrl: './category-filters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,22 +31,22 @@ export class CategoryFiltersComponent {
   protected readonly draft = signal<string>('');
 
   protected readonly typeOptions = [
-    { value: 'ALL', label: 'Tous les types' },
-    { value: 'CUISINE', label: 'Cuisine' },
-    { value: 'DISH_TYPE', label: 'Type de plat' },
+    { value: 'ALL',      labelKey: 'categoryFilters.type.ALL' },
+    { value: 'CUISINE',  labelKey: 'categoryFilters.type.CUISINE' },
+    { value: 'DISH_TYPE', labelKey: 'categoryFilters.type.DISH_TYPE' },
   ] as const;
 
   protected readonly statusOptions = [
-    { value: 'ALL', label: 'Tous les statuts' },
-    { value: 'APPROVED', label: 'Approuvé' },
-    { value: 'PENDING', label: 'En attente' },
-    { value: 'REJECTED', label: 'Rejeté' },
+    { value: 'ALL',      labelKey: 'categoryFilters.status.ALL' },
+    { value: 'APPROVED', labelKey: 'categoryFilters.status.APPROVED' },
+    { value: 'PENDING',  labelKey: 'categoryFilters.status.PENDING' },
+    { value: 'REJECTED', labelKey: 'categoryFilters.status.REJECTED' },
   ] as const;
 
   protected readonly sortOptions = [
-    { value: 'name-asc', label: 'Nom (A-Z)' },
-    { value: 'name-desc', label: 'Nom (Z-A)' },
-    { value: 'recent', label: 'Most recent' },
+    { value: 'name-asc',   labelKey: 'categoryFilters.sort.nameAsc' },
+    { value: 'name-desc',  labelKey: 'categoryFilters.sort.nameDesc' },
+    { value: 'status-asc', labelKey: 'categoryFilters.sort.statusAsc' },
   ] as const;
 
   /** Show the clear button when the local draft differs from the applied value. */

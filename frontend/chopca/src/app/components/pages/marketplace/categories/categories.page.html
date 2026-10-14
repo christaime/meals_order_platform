@@ -7,15 +7,14 @@
                  bg-primary-fixed text-on-primary-fixed
                  font-label-sm text-label-sm uppercase tracking-wide">
       <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-      Meals e-commerce taxonomie
+      {{ 'categoriesPage.badge' | translate }}
     </span>
       </div>
       <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-        Gestion des catégories
+        {{ 'categoriesPage.title' | translate }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        Structurez les catégories et les types de plats qui alimentent les filtres
-        du catalogue client.
+        {{ 'categoriesPage.subtitle' | translate }}
       </p>
     </div>
 
@@ -27,7 +26,7 @@
                text-on-surface transition-all duration-200 flex items-center gap-2
                font-label-lg text-label-lg active:scale-95 shadow-sm">
         <app-icon name="upload_file" size="md" class="text-primary" />
-        <span>Importer CSV</span>
+        <span>{{ 'categoriesPage.importCsv' | translate }}</span>
       </button>
       <button
         type="button"
@@ -36,7 +35,7 @@
                text-on-surface transition-all duration-200 flex items-center gap-2
                font-label-lg text-label-lg active:scale-95 shadow-sm">
         <app-icon name="download" size="md" class="text-on-surface-variant" />
-        <span>Exporter CSV</span>
+        <span>{{ 'categoriesPage.exportCsv' | translate }}</span>
       </button>
       <button
         type="button"
@@ -45,7 +44,7 @@
                text-on-primary font-label-lg text-label-lg shadow-md transition-all
                duration-200 flex items-center gap-2 active:scale-95">
         <app-icon name="add_circle" size="md" />
-        <span>+ Nouvelle Catégorie</span>
+        <span>+ {{ 'categoriesPage.newCategory' | translate }}</span>
       </button>
     </div>
   </div>

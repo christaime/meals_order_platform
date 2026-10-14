@@ -2,8 +2,8 @@
   @for (preset of presets; track preset.glyph) {
   <button
     type="button"
-    [title]="preset.label"
-    [attr.aria-label]="preset.label"
+    [attr.title]="preset.labelKey | translate"
+    [attr.aria-label]="preset.labelKey | translate"
     [attr.aria-pressed]="selected() === preset.glyph"
     (click)="pick(preset.glyph)"
     class="icon-scroller__item"

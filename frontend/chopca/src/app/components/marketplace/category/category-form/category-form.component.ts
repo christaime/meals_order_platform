@@ -6,18 +6,19 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 import { CategoryIconPickerComponent } from '../category-icon-picker/category-icon-picker.component';
 import { Category, CategoryRequest } from '@app/core/models/marketplace';
 import { CategoryType } from '@app/core/models/marketplace/enum-type.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface TypeTab {
   readonly value: CategoryType;
-  readonly label: string;
+  readonly labelKey: string;
   readonly icon: string;
-  readonly caption: string;
+  readonly captionKey: string;
 }
 
 @Component({
   selector: 'app-category-form',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, CategoryIconPickerComponent],
+  imports: [ReactiveFormsModule, IconComponent, CategoryIconPickerComponent, TranslatePipe],
   templateUrl: './category-form.component.html',
   styleUrl: './category-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,15 +37,15 @@ export class CategoryFormComponent {
   protected readonly types: readonly TypeTab[] = [
     {
       value: 'CUISINE',
-      label: 'Cuisine',
+      labelKey: 'categoryForm.type.CUISINE.label',
       icon: 'soup_kitchen',
-      caption: 'Région, terroir ou tradition culinaire (ex: Sawa, Grassfields).',
+      captionKey: 'categoryForm.type.CUISINE.caption',
     },
     {
       value: 'DISH_TYPE',
-      label: 'Type de plat',
+      labelKey: 'categoryForm.type.DISH_TYPE.label',
       icon: 'dinner_dining',
-      caption: 'Rôle structurel du plat (ex: Entrée, Plat principal, Dessert).',
+      captionKey: 'categoryForm.type.DISH_TYPE.caption',
     },
   ];
 

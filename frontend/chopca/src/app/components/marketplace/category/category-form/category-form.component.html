@@ -4,16 +4,16 @@
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
         <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-          {{ editing() ? 'Modifier la catégorie' : 'Ajouter une catégorie' }}
+          {{ (editing() ? 'categoryForm.title.edit' : 'categoryForm.title.create') | translate }}
         </h2>
       </div>
       <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-        Définir une taxonomie pour les plats et les cuisines partenaires Chop ça!.
+        {{ 'categoryForm.subtitle' | translate }}
       </p>
     </div>
     <span class="px-2 py-1 rounded bg-surface-container-low text-on-surface-variant
                  font-label-sm text-label-sm uppercase font-semibold">
-      {{ editing() ? 'Édition' : 'Brouillon' }}
+      {{ (editing() ? 'categoryForm.statusBadge.editing' : 'categoryForm.statusBadge.draft') | translate }}
     </span>
   </div>
 
@@ -22,24 +22,24 @@
     <!-- Nom -->
     <div class="space-y-1">
       <label class="block font-label-md text-label-md text-on-surface font-semibold" for="cat-name">
-        Nom de la catégorie <span class="text-error">*</span>
+        {{ 'categoryForm.name.label' | translate }} <span class="text-error">*</span>
       </label>
       <input
         id="cat-name"
         type="text"
         formControlName="name"
-        placeholder="Ex: Cuisine Sawa (Littoral), Street Food..."
+        [placeholder]="'categoryForm.name.placeholder' | translate"
         class="w-full h-11 px-space-md rounded-lg bg-surface-container-low text-on-surface
                font-body-md text-body-md placeholder:text-outline
                focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
                transition-colors" />
       @if (form.controls.name.touched && form.controls.name.invalid) {
       <p class="font-body-sm text-body-sm text-error text-[11px] leading-tight">
-        Nom requis (2 à 100 caractères).
+        {{ 'categoryForm.name.error' | translate }}
       </p>
       } @else {
       <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
-        Nom clair affiché aux utilisateurs et dans les cartes de livraison.
+        {{ 'categoryForm.name.hint' | translate }}
       </p>
       }
     </div>
@@ -47,7 +47,7 @@
     <!-- Type tabs -->
     <div class="space-y-1.5">
       <label class="block font-label-md text-label-md text-on-surface font-semibold">
-        Type de catégorie <span class="text-error">*</span>
+        {{ 'categoryForm.type.label' | translate }} <span class="text-error">*</span>
       </label>
       <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-surface-container-low">
         @for (tab of types; track tab.value) {
@@ -60,13 +60,13 @@
               ? 'bg-surface-container-lowest text-primary shadow-sm'
               : 'text-on-surface-variant hover:text-on-surface'">
           <app-icon [name]="tab.icon" size="sm" />
-          {{ tab.label }}
+          {{ tab.labelKey | translate }}
         </button>
         }
       </div>
       <div class="px-2 py-1 bg-surface-container-low rounded font-body-sm text-body-sm
                   text-on-surface-variant text-[11px]">
-        💡 <strong>{{ currentType().label }} :</strong> {{ currentType().caption }}
+        💡 <strong>{{ currentType().labelKey | translate }} :</strong> {{ currentType().captionKey | translate }}
       </div>
     </div>
 
@@ -74,7 +74,7 @@
     <div class="space-y-1">
       <div class="flex justify-between items-center">
         <label class="block font-label-md text-label-md text-on-surface font-semibold" for="cat-desc">
-          Description d'accroche &amp; Mots-clés
+          {{ 'categoryForm.description.label' | translate }}
         </label>
         <span class="font-label-sm text-label-sm text-outline">{{ charCount() }} / 250</span>
       </div>
@@ -83,7 +83,7 @@
         rows="3"
         formControlName="description"
         maxlength="250"
-        placeholder="Décrivez les ingrédients phares, saveurs et particularités pour le moteur de recherche..."
+        [placeholder]="'categoryForm.description.placeholder' | translate"
         class="w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
                font-body-md text-body-md placeholder:text-outline
                focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
@@ -94,13 +94,13 @@
     <!-- Icon picker -->
     <div class="space-y-2">
       <label class="block font-label-md text-label-md text-on-surface font-semibold">
-        Icône de la catégorie
+        {{ 'categoryForm.icon.label' | translate }}
       </label>
       <app-category-icon-picker
         [value]="form.controls.iconUrl.value"
         (valueChange)="onIconChange($event)" />
       <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
-        Choisissez une icône parmi les suggestions. Recliquez pour désélectionner.
+        {{ 'categoryForm.icon.hint' | translate }}
       </p>
     </div>
 
@@ -115,9 +115,9 @@
                disabled:opacity-60 disabled:cursor-not-allowed">
         <app-icon name="save" size="md" />
         <span>
-          {{ submitting()
-            ? 'Enregistrement…'
-            : (editing() ? 'Mettre à jour' : 'Enregistrer la catégorie') }}
+          {{ (submitting()
+              ? 'categoryForm.submit.saving'
+              : (editing() ? 'categoryForm.submit.update' : 'categoryForm.submit.create')) | translate }}
         </span>
       </button>
       <button
@@ -126,7 +126,7 @@
         class="px-space-md h-12 bg-surface-container hover:bg-surface-container-high
                text-on-surface rounded-lg font-label-md text-label-md font-semibold
                transition-colors">
-        {{ editing() ? 'Annuler' : 'Réinitialiser' }}
+        {{ (editing() ? 'categoryForm.cancel' : 'categoryForm.reset') | translate }}
       </button>
     </div>
   </form>
