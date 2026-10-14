@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map } from 'rxjs';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
@@ -8,10 +9,16 @@ import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
 type DeniedRole = 'ADMIN' | 'VENDOR' | 'CUSTOMER';
 type DeniedReason = 'role-missing' | 'context-missing';
 
+/** What the template interpolates into the message pipe. */
+interface MessageDescriptor {
+  readonly key: string;
+  readonly params: Record<string, string>;
+}
+
 @Component({
   selector: 'app-user-access-denied-page',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   templateUrl: './user-access-denied.page.html',
   styleUrl: './user-access-denied.page.scss',
 })
@@ -19,6 +26,7 @@ export class UserAccessDeniedPage {
   private readonly route    = inject(ActivatedRoute);
   private readonly router   = inject(Router);
   private readonly keycloak = inject(KEYCLOAK_SERVICE);
+  private readonly translate = inject(TranslateService);
 
   /** Live view of the query params. */
   private readonly queryParams = toSignal(
@@ -32,41 +40,74 @@ export class UserAccessDeniedPage {
 
   protected readonly role = computed(() => this.queryParams().role);
 
+  /**
+   * The email, or the translated fallback. Uses instant() because this
+   * computed can't return a key (the template interpolates the value
+   * into a piped message). Safe: the page renders only after the app
+   * has bootstrapped, so the store is loaded.
+   */
   protected readonly userEmail = computed(
-    () => this.keycloak.getUserEmail() ?? 'Utilisateur',
+    () => this.keycloak.getUserEmail()
+       ?? this.translate.instant('userAccessDenied.fallbackUser'),
   );
 
-  /** Human-readable role label, used in the message. */
-  protected readonly roleLabel = computed(() => {
+  /** Translation key for the role label. */
+  private readonly roleLabelKey = computed(() => {
     switch (this.role()) {
-      case 'ADMIN':    return 'administrateur';
-      case 'VENDOR':   return 'vendeur';
-      case 'CUSTOMER': return 'client';
-      default:         return 'cette section';
+      case 'ADMIN':    return 'userAccessDenied.role.ADMIN';
+      case 'VENDOR':   return 'userAccessDenied.role.VENDOR';
+      case 'CUSTOMER': return 'userAccessDenied.role.CUSTOMER';
+      default:         return 'userAccessDenied.role.unknown';
     }
   });
 
-  /** Full sentence, built from the params. */
-  protected readonly message = computed(() => {
+  /**
+   * The role label, resolved. Used as a param for the message pipe —
+   * the pipe can't resolve a nested key, so we resolve here.
+   */
+  protected readonly roleLabel = computed(
+    () => this.translate.instant(this.roleLabelKey()),
+  );
+
+  /**
+   * Key + params for the message. The template pipes:
+   *   {{ message().key | translate: message().params }}
+   */
+  protected readonly message = computed<MessageDescriptor>(() => {
     const email = this.userEmail();
     const reason = this.queryParams().reason;
+    const hasRole = this.role() != null;
 
-    switch (reason) {
-      case 'role-missing':
-        if (this.role()) {
-          return `${email} n'a pas accès aux pages ${this.roleLabel()}.`;
-        }
-        return `${email} n'a pas les permissions requises pour accéder à cette page.`;
-
-      case 'context-missing':
-        if (this.role()) {
-          return `Aucun profil ${this.roleLabel()} n'est associé à ${email}.`;
-        }
-        return `Aucun profil n'est associé à ${email}.`;
-
-      default:
-        return `${email} n'a pas accès à cette page.`;
+    if (reason === 'role-missing') {
+      if (hasRole) {
+        return {
+          key: 'userAccessDenied.message.roleMissingWithRole',
+          params: { email, role: this.roleLabel() } as Record<string, string>,
+        };
+      }
+      return {
+        key: 'userAccessDenied.message.roleMissing',
+        params: { email } as Record<string, string>,
+      };
     }
+
+    if (reason === 'context-missing') {
+      if (hasRole) {
+        return {
+          key: 'userAccessDenied.message.contextMissingWithRole',
+          params: { email, role: this.roleLabel() } as Record<string, string>,
+        };
+      }
+      return {
+        key: 'userAccessDenied.message.contextMissing',
+        params: { email } as Record<string, string>,
+      };
+    }
+
+    return {
+      key: 'userAccessDenied.message.default',
+      params: { email } as Record<string, string>,
+    };
   });
 
   goHome(): void {
