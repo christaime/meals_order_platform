@@ -7,20 +7,20 @@
                      bg-primary-fixed text-on-primary-fixed
                      font-label-sm text-label-sm uppercase tracking-wide">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-          Emplacements de distribution
+          Points de distribution
         </span>
         <span class="text-outline-variant">•</span>
         <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-          {{ scope() === 'admin' ? 'Modération' : 'Mes points de retrait' }}
+          {{ scope() === 'admin' ? 'Modération' : 'Mes points de présence' }}
         </span>
       </div>
       <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-        {{ scope() === 'admin' ? 'Modération des Emplacements' : 'Mes Emplacements' }}
+        {{ scope() === 'admin' ? 'Modération des zones de présence' : 'Mes zones de présence' }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
         {{ scope() === 'admin'
         ? 'Examinez et modérez les emplacements de distribution soumis par les vendeurs.'
-        : 'Gérez vos points de retrait et de livraison pour vos clients Chop ça!.' }}
+        : 'Gérez vos points de présence pour vos clients Chop ça!.' }}
       </p>
     </div>
 

@@ -175,6 +175,7 @@ export class LocationsPageComponent {
   // ─── Row actions ──────────────────────────────────────────
   protected onEdit(loc: Location): void {
     this.editing.set(loc);
+
     document.getElementById('location-form-container')
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

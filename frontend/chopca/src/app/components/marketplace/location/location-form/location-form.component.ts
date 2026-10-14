@@ -10,6 +10,7 @@ import {
   ViewChild,
   ElementRef,
   NgZone,
+  effect
 } from '@angular/core';
 import {
   FormBuilder,
@@ -107,6 +108,26 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   protected get latitude() { return this.form.controls.latitude; }
   protected get longitude() { return this.form.controls.longitude; }
   protected get deliveryRadius() { return this.form.controls.deliveryRadius; }
+
+  constructor() {
+    effect(() => {
+      const location = this.location();
+
+      if (location) {
+        this.form.reset({
+          name: location.name,
+          cityId: location.city?.id,
+          address: location.address,
+          phone: location.phone?? undefined,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          deliveryRadius: location.deliveryRadius?? undefined
+        });
+      } else {
+        this.form.reset({ });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.cityService.getCities().subscribe({
