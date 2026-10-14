@@ -41,13 +41,12 @@ export class CategoryFiltersComponent {
     { value: 'APPROVED', label: 'Approuvé' },
     { value: 'PENDING', label: 'En attente' },
     { value: 'REJECTED', label: 'Rejeté' },
-    { value: 'DISABLED', label: 'Désactivé' },
   ] as const;
 
   protected readonly sortOptions = [
     { value: 'name-asc', label: 'Nom (A-Z)' },
     { value: 'name-desc', label: 'Nom (Z-A)' },
-    { value: 'status-asc', label: 'Statut' },
+    { value: 'recent', label: 'Most recent' },
   ] as const;
 
   /** Show the clear button when the local draft differs from the applied value. */

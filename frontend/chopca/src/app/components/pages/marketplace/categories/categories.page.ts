@@ -74,8 +74,8 @@ export class CategoriesPageComponent {
       size: this.size(),
       ...(this.name() ? { keyword: this.name() } : {}),
       ...(this.type() !== 'ALL' ? { type: this.type() as CategoryType } : {}),
-      ...(this.status() !== 'ALL' ? { status: this.status() as ModerationStatus } : {}),
-      ...(this.sort() ? { sort: this.sort() } : {}),
+      ...(this.status() !== 'ALL' ? { moderationStatus: this.status() as ModerationStatus } : {}),
+      ...(this.sort() ? { sortBy: ['name-asc', 'name-desc'].includes(this.sort())? 'name': 'createdAt' , sortDirection: this.sort() === 'name-asc' ? 'ASC':'DESC' } : {}),
     } as CategorySearchRequest));
 
   /** Panel renders only when a category is selected AND the user is ADMIN. */
