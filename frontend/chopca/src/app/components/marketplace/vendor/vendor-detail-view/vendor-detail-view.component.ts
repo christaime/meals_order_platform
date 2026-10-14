@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
 import { ToastService } from '@components/shared/toast/toast.service';
 import { MealCardSkeletonComponent,MealCatalogViewComponent, FloatingCartSummaryComponent , FilterState, StatItem} from '@components/marketplace/meal/view';
 import { MEAL_SERVICE } from '@core/services/marketplace/meal.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface VendorMenuCategory {
   readonly id: string;
@@ -36,7 +37,8 @@ export interface VendorMenuCategory {
     RatingStarsComponent,
     MealCatalogViewComponent,
     FloatingCartSummaryComponent,
-    MealCardSkeletonComponent
+    MealCardSkeletonComponent,
+    TranslatePipe
   ],
   templateUrl: './vendor-detail-view.component.html',
   styleUrl: './vendor-detail-view.component.scss',

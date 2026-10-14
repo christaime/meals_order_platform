@@ -13,9 +13,9 @@
     <!-- Status Badge -->
     <div class="absolute top-3 right-3">
       @if (isOpen()) {
-      <app-badge data-testid="vendor-card-status" variant="secondary" icon="check_circle">Ouvert</app-badge>
+      <app-badge data-testid="vendor-card-status" variant="secondary" icon="check_circle">{{ 'vendorCard.open' | translate }}</app-badge>
       } @else {
-      <app-badge data-testid="vendor-card-status" variant="danger" icon="schedule">Fermé</app-badge>
+      <app-badge data-testid="vendor-card-status" variant="danger" icon="schedule">{{ 'vendorCard.closed' | translate }}</app-badge>
       }
     </div>
   </div>
@@ -24,7 +24,7 @@
   <div class="p-4 flex flex-col flex-1 justify-between gap-3 relative pt-7">
     <!-- Floating Avatar Profile Image -->
     <div data-testid="vendor-card-avatar"
-      class="absolute -top-7 left-4 w-14 h-14 rounded-2xl bg-surface-container-lowest border-2 border-surface-container-lowest shadow-md overflow-hidden flex items-center justify-center shrink-0"
+         class="absolute -top-7 left-4 w-14 h-14 rounded-2xl bg-surface-container-lowest border-2 border-surface-container-lowest shadow-md overflow-hidden flex items-center justify-center shrink-0"
     >
       @if (vendor().profileImageUrl) {
       <img
@@ -81,7 +81,7 @@
           [attr.data-rating]="vendor().ratingAvg"
           class="font-semibold text-on-surface">{{ vendor().ratingAvg | number:'1.1-1' }}</span>
         <span data-testid="vendor-card-totalRatings"
-          [attr.data-totalRatings]="vendor().totalRatings">({{ vendor().totalRatings }})</span>
+              [attr.data-totalRatings]="vendor().totalRatings">({{ vendor().totalRatings }})</span>
       </div>
       }
 
@@ -89,7 +89,7 @@
         <app-icon name="location_on" size="sm" class="text-primary shrink-0" />
         <span data-testid="vendor-card-address" class="truncate">{{ vendor().address }}</span>
         @if (vendor().city?.name) {
-          <span data-testid="vendor-card-city" [attr.data-city-id]="vendor().city?.id" class="shrink-0">
+        <span data-testid="vendor-card-city" [attr.data-city-id]="vendor().city?.id" class="shrink-0">
             · {{ vendor().city!.name }}
           </span>
         }

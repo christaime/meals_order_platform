@@ -2,10 +2,10 @@
   <!-- Top Hero Header -->
   <div class="flex flex-col gap-1">
     <h3 class="font-headline-lg text-xl sm:text-2xl font-bold leading-tight m-0 text-on-surface">
-      Restaurants & Restaurateurs Partenaires
+      {{ 'vendorDirectory.title' | translate }}
     </h3>
     <p class="text-sm text-on-surface-variant max-w-2xl m-0">
-      Découvrez les meilleurs établissements et traiteurs locaux livrant dans votre zone.
+      {{ 'vendorDirectory.subtitle' | translate }}
     </p>
   </div>
 
@@ -16,16 +16,16 @@
       (locationsChange)="onLocationsChange($event)"
       (criteriaChange)="onCriteriaChange($event)"
     />
-      <app-search-bar
-        [query]="searchQuery()"
-        placeholder="Rechercher un restaurant, un établissement..."
-        (search)="onSearchChange($event)"
-      />
-      <app-sort-dropdown
-        [options]="sortOptions"
-        [selectedSortId]="selectedSort()"
-        (sortChange)="onSortChange($event)"
-      />
+    <app-search-bar
+      [query]="searchQuery()"
+      [placeholderKey]="'vendorDirectory.searchPlaceholder'"
+      (search)="onSearchChange($event)"
+    />
+    <app-sort-dropdown
+      [options]="sortOptions"
+      [selectedSortId]="selectedSort()"
+      (sortChange)="onSortChange($event)"
+    />
   </div>
 
   <!-- Sub-Category Quick Chips Filter -->
@@ -68,16 +68,16 @@
       <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/50 mb-4">
         <app-icon name="storefront" size="xl" />
       </div>
-      <h3 class="font-bold text-lg text-on-surface mb-1">Aucun restaurant trouvé</h3>
+      <h3 class="font-bold text-lg text-on-surface mb-1">{{ 'vendorDirectory.emptyTitle' | translate }}</h3>
       <p class="text-xs text-on-surface-variant max-w-md mb-6">
-        Nous n'avons trouvé aucun restaurant correspondant à vos critères dans cette zone.
+        {{ 'vendorDirectory.emptyDescription' | translate }}
       </p>
       <button
         type="button"
         (click)="onResetFilters()"
         class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-colors shadow-xs"
       >
-        Réinitialiser la recherche
+        {{ 'vendorDirectory.emptyReset' | translate }}
       </button>
     </div>
     }

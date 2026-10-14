@@ -35,7 +35,7 @@
             class="px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5"
           >
             <span class="w-2 h-2 rounded-full bg-current animate-pulse"></span>
-            {{ isVendorOpen() ? 'Ouvert' : 'Fermé' }}
+            {{ (isVendorOpen() ? 'vendorDetail.open' : 'vendorDetail.closed') | translate }}
           </span>
       </div>
     </div>
@@ -67,7 +67,7 @@
           <app-icon name="schedule" size="sm" class="text-primary" />
           <span data-testid="vendor-detail-view-delivery-time"
                 [attr.data-estimatedDeliveryTimeMinutes]="vendor()!.estimatedDeliveryTimeMinutes"
-          >{{ vendor()!.estimatedDeliveryTimeMinutes }} min</span>
+          >{{ 'vendorDetail.deliveryTime' | translate: { minutes: vendor()!.estimatedDeliveryTimeMinutes } }}</span>
         </div>
         <span class="text-outline-variant">•</span>
         }
@@ -76,7 +76,7 @@
           <app-icon name="payments" size="sm" class="text-primary" />
           <span data-testid="vendor-detail-view-min-expense"
                 [attr.data-minExpense]="vendor()!.minimumOrderAmount"
-          >Min. {{ vendor()!.minimumOrderAmount }} FCFA</span>
+          >{{ 'vendorDetail.minOrder' | translate: { amount: vendor()!.minimumOrderAmount } }}</span>
         </div>
         <span class="text-outline-variant">•</span>
         }
@@ -99,6 +99,7 @@
   (viewMealDetails)="onViewMealDetails($event)"
   (filterChange)="onFilterChange($event)" />
 }
+<!-- Floating cart summary -->
 <!-- Floating cart summary -->
 <app-floating-cart-summary
   [itemCount]="cartItemCount()"

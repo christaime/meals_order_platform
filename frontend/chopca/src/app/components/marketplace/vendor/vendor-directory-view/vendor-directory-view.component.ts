@@ -24,10 +24,11 @@ import { SubCategoryFilterChipsComponent , SubCategoryChip} from '@components/ma
 import { CATEGORY_SERVICE } from '@core/services/marketplace';
 import { VendorCardComponent } from '../vendor-card/vendor-card.component';
 import { VendorCardSkeletonComponent } from '../vendor-card-skeleton/vendor-card-skeleton.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 const DEFAULT_CHIP: SubCategoryChip = {
   id: 'all',
-  name: 'Toutes les categories',
+  name: 'vendorDirectory.defaultChipLabel',
   kind: 'ALL',
 };
 
@@ -35,6 +36,7 @@ const DEFAULT_CHIP: SubCategoryChip = {
   selector: 'app-vendor-directory-view',
   standalone: true,
   imports: [
+    TranslatePipe,
     CommonModule,
     IconComponent,
     SearchBarComponent,
@@ -52,6 +54,7 @@ const DEFAULT_CHIP: SubCategoryChip = {
 export class VendorDirectoryViewComponent {
     private readonly categoryService = inject(CATEGORY_SERVICE);
     private readonly destroyRef = inject(DestroyRef);
+    private readonly translate = inject(TranslateService);
   // ─── Inputs & Outputs ──────────────────────────────────────────────
   readonly vendors = input<VendorSummary[] | null>(null);
   readonly isLoading = input<boolean>(false);
@@ -80,6 +83,7 @@ export class VendorDirectoryViewComponent {
   readonly selectedLocations = signal<LocationSummary[] | null>(null);
   readonly selectedCategory = signal<string>('all');
   protected readonly subCategoryOptions = signal<SubCategoryChip[]>([DEFAULT_CHIP]);
+  private lastCategories: Category[] = [];
   /** Ids of the currently selected chips — bound to the chips component. */
   readonly selectedSubCategories = signal<SubCategoryChip[]>([]);
   protected readonly selectedSubCategoryIds = computed(() => this.selectedSubCategories().map((c) => c.id));
@@ -90,8 +94,8 @@ export class VendorDirectoryViewComponent {
 
   readonly selectedSort = signal<string>('businessName');
   readonly sortOptions:SortOption[] = [
-    { id: 'ratingAvg', label: 'Mieux notés', icon: 'star' },
-    { id: 'businessName', label: 'Nom des plats alphabetiquement', icon: 'sort_by_alpha' },
+      { id: 'ratingAvg',    labelKey: 'vendorDirectory.sortByRating',       icon: 'star' },
+      { id: 'businessName', labelKey: 'vendorDirectory.sortByBusinessName', icon: 'sort_by_alpha' },
   ];
 
   ngOnInit(): void {
@@ -103,30 +107,52 @@ export class VendorDirectoryViewComponent {
           sortDirection:'ASC',
         }).subscribe({
           next: (page) => {
-            this.subCategoryOptions.set(this.toChips(page.content));
+            this.lastCategories = page.content;
+            this.buildChips(page.content);
+
           },
           error: (err) => {
             console.error('[VendorDirectoryViewComponent] fetch error', err);
           },
         });
+
+      this.translate.onLangChange
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+              if (this.lastCategories.length > 0) {
+                this.buildChips(this.lastCategories);
+              }
+            });
   }
 
-// ═════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════
   //  Chip building
   // ═════════════════════════════════════════════════════════════
 
-  private toChips(categories: Category[]): SubCategoryChip[] {
-      const chips: SubCategoryChip[] = [DEFAULT_CHIP];
+  private buildChips(categories: Category[]): void {
+      this.translate
+        .get('vendorDirectory.defaultChipLabel')
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((defaultChipLabel) => {
+          const chips: SubCategoryChip[] = [
+            {
+              id: 'all',
+              name: defaultChipLabel,
+              kind: 'ALL',
+            },
+          ];
 
-      for (const cuisine of categories) {
-        chips.push({
-          id: cuisine.id,
-          name: cuisine.name,
-          iconUrl: cuisine.iconUrl?? '',
-          kind: 'CUISINE',
+          for (const cuisine of categories) {
+            chips.push({
+              id: cuisine.id,
+              name: cuisine.name,          // API data — not translated
+              iconUrl: cuisine.iconUrl ?? '',
+              kind: 'CUISINE',
+            });
+          }
+
+          this.subCategoryOptions.set(chips);
         });
-      }
-      return chips;
     }
   // ─── Event Triggers ───────────────────────────────────────────────
   onLocationsChange(locations: LocationSummary[]): void {

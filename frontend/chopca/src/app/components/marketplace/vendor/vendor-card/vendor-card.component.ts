@@ -12,7 +12,7 @@ import {
   BadgeComponent,
   RatingStarsComponent,
 } from '@components/shared';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * VendorCardComponent — Standard grid card displaying restaurant/vendor overview.
  * Compliant with lightweight VendorSummary domain model.
@@ -25,6 +25,7 @@ import {
     IconComponent,
     BadgeComponent,
     RatingStarsComponent,
+    TranslatePipe,
   ],
   templateUrl: './vendor-card.component.html',
   styleUrl: './vendor-card.component.scss',
