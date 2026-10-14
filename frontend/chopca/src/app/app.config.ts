@@ -5,7 +5,7 @@ import {
   LOCALE_ID
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling , TitleStrategy} from '@angular/router';
 import { routes } from './app.routes';
 import { SERVICE_PROVIDERS } from './core/services/service.providers';
 import { authProvider } from './core/services/auth.provider';
@@ -14,6 +14,14 @@ import { initializeApp } from './core/initializers/app.initializer';
 import { authInterceptor } from './core/interceptor/auth.interceptor';
 import { languageInterceptor } from './core/interceptor/language.interceptor';
 import { provideKeycloak } from 'keycloak-angular';
+import { provideMarkdown } from 'ngx-markdown';
+import { TranslatedTitleStrategy } from '@core/services/i18n/translated-title.strategy';
+import {
+  provideTranslateService,
+} from '@ngx-translate/core';
+import {
+  provideTranslateHttpLoader,
+} from '@ngx-translate/http-loader';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import localeFrExtra from '@angular/common/locales/extra/fr';
@@ -26,7 +34,7 @@ registerLocaleData(localeEn, 'en', localeEnExtra);
 export const appConfig: ApplicationConfig = {
   providers: [
 
-    { provide: LOCALE_ID, useValue: 'fr' },
+    //{ provide: LOCALE_ID, useValue: 'en' },
     provideRouter(routes,
       withComponentInputBinding(),
        withInMemoryScrolling({
@@ -36,6 +44,16 @@ export const appConfig: ApplicationConfig = {
     ),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
+    provideTranslateService({
+        loader: provideTranslateHttpLoader({
+          prefix: '/assets/i18n/',
+          suffix: '.json',
+        })
+        // Deliberately NOT setting `lang` here — we set it explicitly
+        // from AppComponent so the browser's stored preference wins over
+        // the hardcoded default.
+    }),
+    { provide: TitleStrategy, useClass: TranslatedTitleStrategy },
     // ─── HTTP interceptors ────────────────────────────────────
     //
     // Order matters — interceptors run in registration order on the
@@ -69,5 +87,6 @@ export const appConfig: ApplicationConfig = {
     },
 
     ...SERVICE_PROVIDERS,
+    provideMarkdown(),
   ],
 };
