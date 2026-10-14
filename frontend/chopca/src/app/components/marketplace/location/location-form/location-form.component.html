@@ -182,8 +182,10 @@
       <mat-spinner diameter="18" class="inline-block mr-2" />
       <span>Enregistrement…</span>
       } @else {
-      <mat-icon>check</mat-icon>
-      <span>{{ isEditMode() ? 'Enregistrer' : 'Créer' }}</span>
+      <ng-container>
+        <mat-icon>check</mat-icon>
+        <span>{{ isEditMode() ? 'Enregistrer' : 'Créer' }}</span>
+      </ng-container>
       }
     </button>
   </div>
