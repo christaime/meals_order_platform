@@ -17,6 +17,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { City } from '@app/core/models/marketplace';
 import { map } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * Section D — Géolocalisation & Logistique Flotte.
@@ -50,6 +51,7 @@ import { map } from 'rxjs';
     MatCheckboxModule,
     MatSliderModule,
     IconComponent,
+    TranslatePipe,
   ],
   templateUrl: './logistics.component.html',
   styleUrl: './logistics.component.scss',

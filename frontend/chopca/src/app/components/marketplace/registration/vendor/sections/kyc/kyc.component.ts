@@ -10,7 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { ImageUploaderComponent } from '@components/shared/image-uploader/image-uploader.component';
 import { MediaRef, MediaUploadResponse } from '@app/core/models/marketplace';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Section E — Modération Réglementaire & Documents KYC.
  *
@@ -34,6 +34,7 @@ import { MediaRef, MediaUploadResponse } from '@app/core/models/marketplace';
     MatCheckboxModule,
     IconComponent,
     ImageUploaderComponent,
+    TranslatePipe,
   ],
   templateUrl: './kyc.component.html',
   styleUrl: './kyc.component.scss',

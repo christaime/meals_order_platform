@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DataPage } from '@app/core/models/shared';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-paginator',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './paginator.component.html',
   styleUrl: './paginator.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

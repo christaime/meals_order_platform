@@ -2,9 +2,7 @@
   class="w-full bg-surface-container-low rounded-xl p-space-md md:p-space-lg
          mb-space-lg shadow-sm">
 
-  <!-- ═══════════════════════════════════════════════════════
-       Header: title block + free/24h badge
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Header: title block + free/24h badge -->
   <div
     class="flex flex-col md:flex-row items-start md:items-center justify-between
            gap-space-md mb-space-lg pb-space-md">
@@ -14,16 +12,15 @@
         class="flex items-center gap-space-xs text-primary
                font-label-sm text-label-sm uppercase tracking-wider mb-1">
         <app-icon name="restaurant_menu" size="sm" />
-        <span>Portail Partenaire Culinaire • Cameroun &amp; Sous-région</span>
+        <span>{{ 'stepperHeader.eyebrow' | translate }}</span>
       </div>
 
       <h1 class="font-headline-lg text-headline-lg text-on-surface">
-        Demande d'Adhésion Restaurant &amp; Artisan
+        {{ 'stepperHeader.title' | translate }}
       </h1>
 
       <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-        Créez votre vitrine gastronomique ChopÇa! et touchez des dizaines
-        de milliers de gourmets passionnés.
+        {{ 'stepperHeader.subtitle' | translate }}
       </p>
     </div>
 
@@ -32,13 +29,11 @@
              bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md
              whitespace-nowrap">
       <app-icon name="verified_user" size="sm" />
-      <span>Inscription 100% Gratuite • Validation sous 24h</span>
+      <span>{{ 'stepperHeader.badge' | translate }}</span>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Stepper strip
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Stepper strip -->
   <div class="w-full grid grid-cols-2 md:grid-cols-4 gap-space-sm relative">
     @for (step of steps(); track step.index) {
     <div [class]="stepWrapClass(step)">
@@ -54,15 +49,15 @@
 
       <!-- Label + sub-label -->
       <div class="min-w-0">
-        <p [class]="stepLabelClass(step)">{{ step.label }}</p>
+        <p [class]="stepLabelClass(step)">{{ step.labelKey | translate }}</p>
 
         @if (isActive(step)) {
         <p [class]="stepSubLabelClass(step)">
           <app-icon name="check" size="sm" />
-          {{ step.subLabel }}
+          {{ step.subLabelKey | translate }}
         </p>
         } @else {
-        <p [class]="stepSubLabelClass(step)">{{ step.subLabel }}</p>
+        <p [class]="stepSubLabelClass(step)">{{ step.subLabelKey | translate }}</p>
         }
       </div>
     </div>

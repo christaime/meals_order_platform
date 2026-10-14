@@ -5,11 +5,11 @@
     <label
       [attr.for]="'ingredient-autocomplete-input'"
       class="font-label text-xs font-semibold text-on-surface">
-      {{ label() }}
+      {{ labelKey() | translate }}
     </label>
-    @if (hint()) {
+    @if (hintKey()) {
     <span class="font-label text-[11px] font-normal text-on-surface-variant">
-      {{ hint() }}
+      {{ hintKey() | translate }}
     </span>
     }
   </div>
@@ -30,7 +30,7 @@
       <button
         type="button"
         [attr.data-testid]="'ingredient-chip-remove-' + ing.id"
-        [attr.aria-label]="'Retirer ' + ing.name"
+        [attr.aria-label]="'ingredientAutocomplete.removeAriaLabel' | translate: { name: ing.name }"
         (click)="remove(ing)"
         class="w-4 h-4 rounded-full inline-flex items-center justify-center
                hover:bg-error hover:text-on-error transition-colors cursor-pointer">
@@ -53,7 +53,7 @@
         type="text"
         data-testid="ingredient-autocomplete-input"
         [formControl]="searchControl"
-        [placeholder]="placeholder()"
+        [placeholder]="placeholderKey() | translate"
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
         (keydown)="onKeyDown($event)"
@@ -95,7 +95,7 @@
         <span>{{ ing.name }}</span>
         @if (ing.isAllergen) {
         <span class="text-[10px] font-bold uppercase tracking-wider text-error">
-          Allergène
+          {{ 'ingredientAutocomplete.allergenTag' | translate }}
         </span>
         }
       </button>
@@ -111,7 +111,7 @@
              bg-surface-container-lowest rounded-lg shadow-xl
              border border-outline-variant px-3 py-2
              text-xs text-on-surface-variant">
-      Aucun ingrédient ne correspond.
+      {{ 'ingredientAutocomplete.noMatch' | translate }}
     </div>
     }
 
@@ -120,7 +120,7 @@
     <span
       data-testid="ingredient-autocomplete-limit-hint"
       class="block mt-1 text-[11px] font-label text-error">
-      Maximum {{ maxSelection() }} ingrédients exclus.
+      {{ 'ingredientAutocomplete.limitHint' | translate: { count: maxSelection() } }}
     </span>
     }
   </div>

@@ -4,16 +4,16 @@
               font-label-md text-label-md">
 
   <div class="text-on-surface-variant font-body-sm text-body-sm">
-    Affichage de
+    {{ 'paginator.showing' | translate }}
     <span class="font-bold text-on-surface">{{ p.content.length }}</span>
-    sur
+    {{ 'paginator.of' | translate }}
     <span class="font-bold text-on-surface">{{ p.totalElements }}</span>
-    éléments
+    {{ 'paginator.items' | translate }}
   </div>
 
   <div class="flex items-center gap-3">
     <label class="flex items-center gap-2 text-on-surface-variant text-body-sm">
-      <span>Par page</span>
+      <span>{{ 'paginator.perPage' | translate }}</span>
       <select
         class="h-8 px-2 bg-surface-container-lowest rounded text-on-surface
                  border border-outline-variant/40
@@ -35,7 +35,7 @@
                  disabled:opacity-40 disabled:cursor-not-allowed"
         [disabled]="disabled() || p.first"
         (click)="go(p.page - 1)">
-        Précédent
+        {{ 'paginator.previous' | translate }}
       </button>
 
       @for (n of pages(); track n) {
@@ -58,7 +58,7 @@
                  disabled:opacity-40 disabled:cursor-not-allowed"
         [disabled]="disabled() || p.last"
         (click)="go(p.page + 1)">
-        Suivant
+        {{ 'paginator.next' | translate }}
       </button>
     </div>
   </div>

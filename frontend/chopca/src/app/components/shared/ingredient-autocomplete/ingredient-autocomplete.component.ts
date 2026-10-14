@@ -23,6 +23,7 @@ import {
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { INGREDIENT_SERVICE } from '@app/core/services/marketplace/ingredient.service';
 import { IngredientSummary } from '@app/core/models/marketplace';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const SEARCH_DEBOUNCE_MS = 200;
 const SEARCH_RESULT_LIMIT = 10;
@@ -49,7 +50,7 @@ const SEARCH_RESULT_LIMIT = 10;
 @Component({
   selector: 'app-ingredient-autocomplete',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IconComponent],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, TranslatePipe],
   templateUrl: './ingredient-autocomplete.component.html',
   styleUrl: './ingredient-autocomplete.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,14 +61,14 @@ export class IngredientAutocompleteComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   // ─── Inputs ──────────────────────────────────────────────────
-  /** Label above the search input. */
-  readonly label = input<string>('Ingrédients');
+  /** Translation key for the label above the search input. */
+  readonly labelKey = input<string>('ingredientAutocomplete.defaultLabel');
 
-  /** Optional hint text under the label. */
-  readonly hint = input<string | null>(null);
+  /** Translation key for the optional hint under the label, or null. */
+  readonly hintKey = input<string | null>(null);
 
-  /** Placeholder for the search input. */
-  readonly placeholder = input<string>('Rechercher un ingrédient…');
+  /** Translation key for the search input placeholder. */
+  readonly placeholderKey = input<string>('ingredientAutocomplete.defaultPlaceholder');
 
   /** Initial selection, set by the parent on drawer open/reset. */
   readonly initialSelection = input<IngredientSummary[]>([]);

@@ -4,10 +4,10 @@
       <thead>
       <tr class="bg-surface-container-low text-on-surface-variant
                    font-label-sm text-label-sm uppercase tracking-wider">
-        <th class="py-3 px-space-md font-bold">Ingrédient</th>
-        <th class="py-3 px-space-md font-bold">Origine</th>
-        <th class="py-3 px-space-md font-bold">Statut</th>
-        <th class="py-3 px-space-md font-bold text-right">Actions</th>
+        <th class="py-3 px-space-md font-bold">{{ 'ingredientTable.headers.ingredient' | translate }}</th>
+        <th class="py-3 px-space-md font-bold">{{ 'ingredientTable.headers.origin' | translate }}</th>
+        <th class="py-3 px-space-md font-bold">{{ 'ingredientTable.headers.status' | translate }}</th>
+        <th class="py-3 px-space-md font-bold text-right">{{ 'ingredientTable.headers.actions' | translate }}</th>
       </tr>
       </thead>
       <tbody class="divide-y divide-outline-variant/30">
@@ -16,7 +16,7 @@
       <tr>
         <td colspan="4" class="py-12 px-space-md text-center text-on-surface-variant">
           <app-icon name="progress_activity" size="xl" class="animate-spin" />
-          <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
+          <p class="mt-2 font-body-sm text-body-sm">{{ 'ingredientTable.loading' | translate }}</p>
         </td>
       </tr>
       } @else if (ingredients().length === 0) {
@@ -27,10 +27,10 @@
             <app-icon name="manage_search" size="xl" />
           </div>
           <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-            Aucun ingrédient trouvé
+            {{ 'ingredientTable.emptyTitle' | translate }}
           </h3>
           <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
-            Aucun élément ne correspond aux filtres actifs.
+            {{ 'ingredientTable.emptyDescription' | translate }}
           </p>
         </td>
       </tr>
@@ -54,11 +54,11 @@
               </div>
               @if (ing.isAllergen) {
               <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">
-                Allergène
+                {{ 'ingredientTable.allergen' | translate }}
               </span>
               } @else {
               <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">
-                        Non allergène
+                        {{ 'ingredientTable.nonAllergen' | translate }}
                       </span>
               }
             </div>
@@ -69,7 +69,7 @@
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full
                              bg-surface-container text-on-surface-variant
                              font-label-sm text-label-sm font-semibold">
-                  {{ creatorLabel(ing.createdByType) }}
+                  {{ creatorLabelKey(ing.createdByType) | translate }}
                 </span>
         </td>
 
@@ -78,7 +78,7 @@
             [variant]="statusVariant(ing.moderationStatus)"
             [icon]="statusIcon(ing.moderationStatus)"
             size="sm">
-            {{ statusLabel(ing.moderationStatus) }}
+            {{ statusLabelKey(ing.moderationStatus) | translate }}
           </app-badge>
         </td>
 
@@ -88,12 +88,12 @@
               type="button"
               (click)="edit.emit(ing)"
               [disabled]="isEditing(ing)"
-              [title]="isEditing(ing) ? 'En cours d\'édition' : 'Modifier'"
+              [attr.title]="(isEditing(ing) ? 'ingredientTable.actions.editing' : 'ingredientTable.actions.edit') | translate"
               class="p-1.5 rounded-lg
                      bg-transparent border-0 cursor-pointer
                      transition-colors
                      disabled:cursor-default"
-                          [class]="isEditing(ing)
+              [class]="isEditing(ing)
                 ? 'text-primary bg-primary-fixed/40'
                 : 'text-on-surface-variant hover:text-primary hover:bg-surface-container'">
               <app-icon [name]="isEditing(ing) ? 'edit' : 'edit'" size="sm" />
@@ -102,7 +102,7 @@
             <button
               type="button"
               (click)="delete.emit(ing)"
-              title="Supprimer"
+              [attr.title]="'ingredientTable.actions.delete' | translate"
               class="p-1.5 rounded-lg text-on-surface-variant
                            hover:text-error hover:bg-error-container/40 transition-colors
                            bg-transparent border-0 cursor-pointer">

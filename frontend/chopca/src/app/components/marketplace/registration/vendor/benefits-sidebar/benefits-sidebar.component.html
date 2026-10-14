@@ -1,11 +1,11 @@
 <div class="flex flex-col gap-space-lg">
 
-  <!-- ── Benefits ───────────────────────────────────────── -->
+  <!-- Benefits -->
   <div class="bg-surface-container-low rounded-xl p-space-lg flex flex-col gap-space-md">
     <h3 class="font-headline-sm text-headline-sm text-on-surface
                flex items-center gap-space-xs">
       <app-icon name="workspace_premium" size="md" class="text-primary" />
-      Pourquoi rejoindre Chop ça!
+      {{ 'vendorBenefits.title' | translate }}
     </h3>
 
     <ul class="flex flex-col gap-space-sm font-body-md text-body-md text-on-surface">
@@ -15,10 +15,9 @@
           <app-icon name="money_off" size="sm" />
         </span>
         <div>
-          <span class="font-label-md text-label-md">0 FCFA de frais d'activation</span>
+          <span class="font-label-md text-label-md">{{ 'vendorBenefits.zeroFees.label' | translate }}</span>
           <p class="font-body-sm text-body-sm text-on-surface-variant">
-            Aucun abonnement mensuel caché. Commission prélevée uniquement sur
-            les ventes livrées.
+            {{ 'vendorBenefits.zeroFees.description' | translate }}
           </p>
         </div>
       </li>
@@ -29,10 +28,9 @@
           <app-icon name="account_balance_wallet" size="sm" />
         </span>
         <div>
-          <span class="font-label-md text-label-md">Paiements Hebdomadaires MoMo / OM</span>
+          <span class="font-label-md text-label-md">{{ 'vendorBenefits.weeklyPayments.label' | translate }}</span>
           <p class="font-body-sm text-body-sm text-on-surface-variant">
-            Reversements automatiques sur votre compte Orange Money, MTN MoMo
-            ou virement bancaire UBA/Ecobank.
+            {{ 'vendorBenefits.weeklyPayments.description' | translate }}
           </p>
         </div>
       </li>
@@ -43,37 +41,34 @@
           <app-icon name="groups" size="sm" />
         </span>
         <div>
-          <span class="font-label-md text-label-md">+50 000 gourmets actifs</span>
+          <span class="font-label-md text-label-md">{{ 'vendorBenefits.audience.label' | translate }}</span>
           <p class="font-body-sm text-body-sm text-on-surface-variant">
-            Accédez instantanément à un vivier qualifié de passionnés de bonne
-            cuisine et de cuisine de terroir.
+            {{ 'vendorBenefits.audience.description' | translate }}
           </p>
         </div>
       </li>
     </ul>
   </div>
 
-  <!-- ── Testimonial ────────────────────────────────────── -->
+  <!-- Testimonial -->
   <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm
               flex flex-col gap-space-sm">
     <div class="flex items-center gap-space-sm">
       <img class="w-12 h-12 rounded-full object-cover"
-           alt="Portrait cheffe partenaire"
+           [alt]="'vendorBenefits.testimonial.portraitAlt' | translate"
            src="assets/testimonials/cheffe-christiane.jpg" />
       <div>
         <h4 class="font-label-lg text-label-lg text-on-surface">
-          Cheffe Christiane Ebodé
+          {{ 'vendorBenefits.testimonial.name' | translate }}
         </h4>
         <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Fondatrice • Le Comptoir de Yaoundé
+          {{ 'vendorBenefits.testimonial.role' | translate }}
         </p>
       </div>
     </div>
 
     <p class="font-body-sm text-body-sm text-on-surface italic">
-      « En 3 mois sur ChopÇa!, nous avons doublé notre débit sur les commandes
-      du midi sans embaucher de livreurs supplémentaires. La flotte de coursiers
-      est ultra ponctuelle ! »
+      {{ 'vendorBenefits.testimonial.quote' | translate }}
     </p>
 
     <div class="flex items-center justify-between pt-1">
@@ -83,7 +78,7 @@
         }
       </div>
       <span class="font-label-sm text-label-sm text-secondary">
-        Partenaire depuis 2024
+        {{ 'vendorBenefits.testimonial.partnerSince' | translate }}
       </span>
     </div>
   </div>

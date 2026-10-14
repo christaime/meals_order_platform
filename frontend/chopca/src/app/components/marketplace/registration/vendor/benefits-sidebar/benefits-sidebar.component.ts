@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Marketing sidebar shown next to the vendor registration form:
  * - "Pourquoi rejoindre Chop ça!" benefit list
@@ -12,7 +12,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 @Component({
   selector: 'app-benefits-sidebar',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   templateUrl: './benefits-sidebar.component.html',
   styleUrl: './benefits-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

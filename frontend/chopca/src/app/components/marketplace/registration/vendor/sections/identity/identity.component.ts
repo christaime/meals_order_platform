@@ -9,7 +9,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { IconComponent } from '@components/shared/icon/icon.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Section A — Établissement & Propriétaire.
  *
@@ -31,6 +31,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
     MatFormFieldModule,
     MatInputModule,
     IconComponent,
+    TranslatePipe
   ],
   templateUrl: './identity.component.html',
   styleUrl: './identity.component.scss',

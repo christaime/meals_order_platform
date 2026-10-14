@@ -14,7 +14,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 // ── Registration wizard components ────────────────────────
 import { StepperHeaderComponent } from '@components/marketplace/registration/vendor/stepper-header/stepper-header.component';
 import { PreviewCardComponent } from '@components/marketplace/registration/vendor/preview-card/preview-card.component';
@@ -25,7 +25,7 @@ import { CuisineComponent } from '@components/marketplace/registration/vendor/se
 import { VisualsComponent } from '@components/marketplace/registration/vendor/sections/visuals/visuals.component';
 import { LogisticsComponent } from '@components/marketplace/registration/vendor/sections/logistics/logistics.component';
 import { KycComponent } from '@components/marketplace/registration/vendor/sections/kyc/kyc.component';
-
+import { toSignal } from '@angular/core/rxjs-interop';
 // ── Shared ─────────────────────────────────────────────────
 import { IconComponent } from '@components/shared/icon/icon.component';
 
@@ -80,6 +80,7 @@ import { SessionManager } from '@app/core/services/session/session-manager.servi
     VisualsComponent,
     LogisticsComponent,
     KycComponent,
+    TranslatePipe,
   ],
   templateUrl: './vendor-registration.page.html',
   styleUrl: './vendor-registration.page.scss',
@@ -97,6 +98,7 @@ export class VendorRegistrationPage {
   private readonly ctx = inject(USER_CONTEXT_SERVICE);
   private readonly router = inject(Router);
   private readonly session = inject(SessionManager);
+  private readonly translate = inject(TranslateService);
 
   // ══════════════════════════════════════════════════════════
   // Form — single source of truth
@@ -202,9 +204,14 @@ export class VendorRegistrationPage {
   // ══════════════════════════════════════════════════════════
   // Derived: preview state
   // ══════════════════════════════════════════════════════════
+  /** Signal mirror of the form's raw value. */
+  private readonly formValue = toSignal(
+    this.form.valueChanges,
+    { initialValue: this.form.getRawValue() },
+  );
 
   protected readonly previewState = computed<PreviewState>(() => {
-    const v = this.form.getRawValue();
+    const v = this.formValue();
     const radius = typeof v.deliveryRadius === 'number' ? v.deliveryRadius : null;
 
     return {
@@ -220,12 +227,11 @@ export class VendorRegistrationPage {
   // ══════════════════════════════════════════════════════════
   // Derived: section error for the cuisine pills
   // ══════════════════════════════════════════════════════════
-
-  protected readonly cuisineError = computed<string | null>(() => {
+  protected readonly cuisineErrorKey = computed<string | null>(() => {
     const ctrl = this.form.get('cuisineCategoryIds');
     if (!ctrl || !ctrl.touched) return null;
     if (ctrl.hasError('minlength') || ctrl.hasError('required')) {
-      return 'Sélectionnez au moins une spécialité culinaire.';
+      return 'vendorRegistration.cuisineError';
     }
     return null;
   });
@@ -348,8 +354,9 @@ export class VendorRegistrationPage {
       await this.router.navigateByUrl(returnUrl);
     } catch (e: any) {
       this.submitError.set(
-        e?.error?.message ?? "Échec de l'inscription. Veuillez réessayer.",
-      );
+              e?.error?.message
+                ?? this.translate.instant('vendorRegistration.submitErrorFallback'),
+            );
     } finally {
       this.submitting.set(false);
     }

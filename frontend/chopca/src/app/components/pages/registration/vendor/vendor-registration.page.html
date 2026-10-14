@@ -1,35 +1,31 @@
 <div class="w-full max-w-[1440px] mx-auto px-margin md:px-margin-md lg:px-margin-lg py-space-lg">
   <div class="flex flex-col w-full">
 
-    <!-- ═══════════════════════════════════════════════════════
-         Stepper header
-         ═══════════════════════════════════════════════════════ -->
+    <!-- Stepper header -->
     <app-stepper-header [currentStep]="currentStep()" />
 
-    <!-- ═══════════════════════════════════════════════════════
-         Main grid: form (8 cols) + sidebar (4 cols)
-         ═══════════════════════════════════════════════════════ -->
+    <!-- Main grid: form (8 cols) + sidebar (4 cols) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start pb-space-xl">
 
-      <!-- ─── Left: form sections ─────────────────────────── -->
+      <!-- Left: form sections -->
       <form
         [formGroup]="form"
         (ngSubmit)="submit()"
         novalidate
         class="lg:col-span-8 flex flex-col gap-space-lg">
 
-        <!-- ═══ Step 1 — Identité ══════════════════════════ -->
+        <!-- Step 1 — Identité -->
         @if (currentStep() === 1) {
         <app-identity
           [form]="form"
           (appendInspiration)="onAppendInspiration($event)" />
         }
 
-        <!-- ═══ Step 2 — Spécialités & Vitrine ═════════════ -->
+        <!-- Step 2 — Spécialités & Vitrine -->
         @if (currentStep() === 2) {
         <app-cuisine
           [form]="form"
-          [error]="cuisineError()"
+          [error]="cuisineErrorKey() | translate"
           [maxSelection]="3"
           (categoriesSelected)="onCategoriesSelected($event)" />
 
@@ -43,12 +39,12 @@
           (coverCleared)="onCoverCleared()" />
         }
 
-        <!-- ═══ Step 3 — Logistique ════════════════════════ -->
+        <!-- Step 3 — Logistique -->
         @if (currentStep() === 3) {
         <app-logistics [form]="form" />
         }
 
-        <!-- ═══ Step 4 — KYC ═══════════════════════════════ -->
+        <!-- Step 4 — KYC -->
         @if (currentStep() === 4) {
         <app-kyc
           [form]="form"
@@ -60,7 +56,7 @@
           (backCleared)="onBackCleared()" />
         }
 
-        <!-- ── Submit error ─────────────────────────────────── -->
+        <!-- Submit error -->
         @if (submitError(); as err) {
         <div class="p-space-md rounded-lg bg-error-container
                       text-on-error-container flex items-start gap-space-sm">
@@ -69,7 +65,7 @@
         </div>
         }
 
-        <!-- ── Navigation + action bar ──────────────────────── -->
+        <!-- Navigation + action bar -->
         <div class="sticky bottom-4 z-40 w-full mt-space-lg">
           <div class="bg-surface/95 backdrop-blur-md rounded-2xl p-space-md
                       shadow-xl flex flex-col sm:flex-row items-center
@@ -84,19 +80,19 @@
               <div class="text-left">
                 @if (currentStep() < 4) {
                 <p class="font-label-md text-label-md text-on-surface">
-                  Étape {{ currentStep() }} sur 4
+                  {{ 'vendorRegistration.actionBar.stepCounter' | translate: { step: currentStep() } }}
                 </p>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Continuez pour compléter votre inscription.
+                  {{ 'vendorRegistration.actionBar.stepHint' | translate }}
                 </p>
                 } @else {
                 <p class="font-label-md text-label-md text-on-surface">
-                  Prêt(e) à lancer votre cuisine en ligne ?
+                  {{ 'vendorRegistration.actionBar.readyTitle' | translate }}
                 </p>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">
-                  Statut d'inscription automatique :
+                  {{ 'vendorRegistration.actionBar.readyHintPrefix' | translate }}
                   <span class="text-primary font-bold">PENDING</span>
-                  (Audit &amp; validation sous 24h).
+                  {{ 'vendorRegistration.actionBar.readyHintSuffix' | translate }}
                 </p>
                 }
               </div>
@@ -114,7 +110,7 @@
                          hover:bg-surface-container-highest transition-colors
                          flex items-center justify-center gap-1.5">
                 <app-icon name="arrow_back" size="md" />
-                <span>Retour</span>
+                <span>{{ 'vendorRegistration.actionBar.back' | translate }}</span>
               </button>
               }
 
@@ -126,7 +122,7 @@
                          bg-primary text-on-primary font-label-lg text-label-lg
                          hover:bg-primary-container shadow-md transition-all
                          flex items-center justify-center gap-2">
-                <span>Continuer</span>
+                <span>{{ 'vendorRegistration.actionBar.continue' | translate }}</span>
                 <app-icon name="arrow_forward" size="md" />
               </button>
               } @else {
@@ -140,7 +136,9 @@
                          disabled:opacity-60 disabled:cursor-not-allowed">
                 <app-icon name="send" size="md" />
                 <span>
-                    {{ submitting() ? 'Envoi en cours…' : "Soumettre ma demande" }}
+                    {{ (submitting()
+                        ? 'vendorRegistration.actionBar.submitting'
+                        : 'vendorRegistration.actionBar.submit') | translate }}
                   </span>
               </button>
               }
@@ -149,7 +147,7 @@
         </div>
       </form>
 
-      <!-- ─── Right: sticky sidebar ───────────────────────── -->
+      <!-- Right: sticky sidebar -->
       <aside class="lg:col-span-4 flex flex-col gap-space-lg lg:sticky lg:top-24">
         <app-preview-card [state]="previewState()" />
         <app-benefits-sidebar />

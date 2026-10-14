@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { MEDIA_SERVICE } from '@app/core/services/marketplace/media.service';
 import {
@@ -37,7 +37,7 @@ export type ImageUploaderShape = 'circle' | 'square' | 'wide';
 @Component({
   selector: 'app-image-uploader',
   standalone: true,
-  imports: [MatProgressBarModule, IconComponent],
+  imports: [MatProgressBarModule, IconComponent, TranslatePipe],
   templateUrl: './image-uploader.component.html',
   styleUrl: './image-uploader.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

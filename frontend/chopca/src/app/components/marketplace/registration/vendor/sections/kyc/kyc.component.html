@@ -3,9 +3,7 @@
   class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
          flex flex-col gap-space-md">
 
-  <!-- ═══════════════════════════════════════════════════════
-       Section header
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Section header -->
   <div class="flex items-center justify-between pb-space-sm">
     <div class="flex items-center gap-space-sm">
       <span
@@ -15,11 +13,10 @@
       </span>
       <div>
         <h2 class="font-headline-sm text-headline-sm text-on-surface">
-          Modération Réglementaire &amp; Documents KYC
+          {{ 'vendorKyc.sectionTitle' | translate }}
         </h2>
         <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Vérification d'identité requise par la réglementation des paiements
-          UEMOA / CEMAC
+          {{ 'vendorKyc.sectionSubtitle' | translate }}
         </p>
       </div>
     </div>
@@ -32,44 +29,34 @@
       [class.bg-surface-container-highest]="!bothUploaded()"
       [class.text-on-surface-variant]="!bothUploaded()">
       <app-icon name="shield" size="sm" />
-      @if (bothUploaded()) {
-        Conforme
-      } @else {
-        En attente
-      }
+      {{ (bothUploaded() ? 'vendorKyc.status.compliant' : 'vendorKyc.status.pending') | translate }}
     </span>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Informational banner — PENDING status explanation
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Informational banner -->
   <div class="p-space-md rounded-xl bg-primary-fixed/30 flex items-start gap-space-sm">
     <app-icon name="info" size="lg" class="text-primary mt-0.5 shrink-0" />
     <div>
       <p class="font-label-md text-label-md text-on-surface">
-        Processus de vérification et statut initial :
+        {{ 'vendorKyc.infoBanner.title' | translate }}
       </p>
       <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
-        À la soumission du formulaire, le statut de votre compte sera configuré
-        sur <strong class="text-primary uppercase font-bold">En attente
-        d'approbation</strong>. Notre équipe d'audit culinaire et légale
-        vérifiera vos pièces d'identité et contact sous
-        <strong>24 heures ouvrées</strong> pour activer la réception de
-        commandes en direct.
+        {{ 'vendorKyc.infoBanner.bodyPrefix' | translate }}
+        <strong class="text-primary uppercase font-bold">{{ 'vendorKyc.infoBanner.bodyBold1' | translate }}</strong>{{ 'vendorKyc.infoBanner.bodyMiddle' | translate }}
+        <strong>{{ 'vendorKyc.infoBanner.bodyBold2' | translate }}</strong>
+        {{ 'vendorKyc.infoBanner.bodySuffix' | translate }}
       </p>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Two CNI uploaders
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Two CNI uploaders -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
 
-    <!-- ─── CNI front ─────────────────────────────────────── -->
+    <!-- CNI front -->
     <div class="flex flex-col gap-space-xs">
       <div class="flex items-center justify-between">
         <span class="font-label-md text-label-md text-on-surface">
-          CNI / Passeport (Recto) <span class="text-primary">*</span>
+          {{ 'vendorKyc.front.label' | translate }} <span class="text-primary">*</span>
         </span>
       </div>
 
@@ -77,7 +64,7 @@
         purpose="ID_CARD_FRONT"
         shape="wide"
         label=""
-        hint="Photo nette, bords visibles, sans reflets."
+        [hint]="'vendorKyc.frontHint' | translate"
         [mediaRef]="frontMediaRef()"
         (uploaded)="frontUploaded.emit($event)"
         (cleared)="frontCleared.emit()" />
@@ -88,16 +75,16 @@
                  bg-surface-container-highest font-mono text-[10px]
                  text-on-surface-variant w-fit">
         <app-icon name="check_circle" size="sm" class="text-secondary" />
-        <span>{{ ref }} (Uploadé)</span>
+        <span>{{ ref }} {{ 'vendorKyc.uploadedSuffix' | translate }}</span>
       </div>
       }
     </div>
 
-    <!-- ─── CNI back ──────────────────────────────────────── -->
+    <!-- CNI back -->
     <div class="flex flex-col gap-space-xs">
       <div class="flex items-center justify-between">
         <span class="font-label-md text-label-md text-on-surface">
-          CNI / Passeport (Verso) <span class="text-primary">*</span>
+          {{ 'vendorKyc.back.label' | translate }} <span class="text-primary">*</span>
         </span>
       </div>
 
@@ -105,7 +92,7 @@
         purpose="ID_CARD_BACK"
         shape="wide"
         label=""
-        hint="Signature et date de validité lisibles."
+        [hint]="'vendorKyc.backHint' | translate"
         [mediaRef]="backMediaRef()"
         (uploaded)="backUploaded.emit($event)"
         (cleared)="backCleared.emit()" />
@@ -116,15 +103,13 @@
                  bg-surface-container-highest font-mono text-[10px]
                  text-on-surface-variant w-fit">
         <app-icon name="check_circle" size="sm" class="text-secondary" />
-        <span>{{ ref }} (Uploadé)</span>
+        <span>{{ ref }} {{ 'vendorKyc.uploadedSuffix' | translate }}</span>
       </div>
       }
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Terms certification checkbox
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Terms certification checkbox -->
   <div class="flex items-start gap-space-sm mt-space-xs">
     <mat-checkbox
       formControlName="termsCertify"
@@ -136,10 +121,9 @@
       class="font-body-sm text-body-sm text-on-surface-variant leading-snug
              cursor-pointer select-none"
       for="termsCertify">
-      Je certifie sur l'honneur l'exactitude des informations fournies, être
-      habilité(e) à représenter cet établissement de restauration et accepter
-      la <a class="text-primary hover:underline font-semibold" href="#">
-      Charte d'Hygiène &amp; Fraîcheur ChopÇa!</a>.
+      {{ 'vendorKyc.terms.prefix' | translate }}
+      <a class="text-primary hover:underline font-semibold" href="#">
+        {{ 'vendorKyc.terms.charter' | translate }}</a>{{ 'vendorKyc.terms.suffix' | translate }}
     </label>
   </div>
 
@@ -147,7 +131,7 @@
   && form().get('termsCertify')?.touched) {
   <p class="font-body-sm text-body-sm text-error flex items-center gap-1">
     <app-icon name="error" size="sm" />
-    Vous devez accepter les conditions pour continuer.
+    {{ 'vendorKyc.termsError' | translate }}
   </p>
   }
 </div>

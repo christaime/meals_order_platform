@@ -1,14 +1,14 @@
 import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * One step in the registration progress indicator.
  * `index` is 1-based to match the mockup's "1 / 2 / 3 / 4" circles.
  */
 export interface RegistrationStep {
   index: number;
-  label: string;
-  subLabel: string;
+  labelKey: string;
+  subLabelKey: string;
 }
 
 /**
@@ -28,7 +28,7 @@ export interface RegistrationStep {
 @Component({
   selector: 'app-stepper-header',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   templateUrl: './stepper-header.component.html',
   styleUrl: './stepper-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,10 +45,10 @@ export class StepperHeaderComponent {
    * Override to reuse this component for other multi-step flows.
    */
   readonly steps = input<RegistrationStep[]>([
-    { index: 1, label: 'Identité & Contact',    subLabel: 'Établissement' },
-    { index: 2, label: 'Spécialités & Vitrine', subLabel: 'Terroirs & visuels' },
-    { index: 3, label: 'Logistique & Rayon',    subLabel: 'Point de retrait' },
-    { index: 4, label: 'KYC & CNI',             subLabel: 'Modération légale' },
+    { index: 1, labelKey: 'stepperHeader.steps.identity.label',     subLabelKey: 'stepperHeader.steps.identity.subLabel' },
+    { index: 2, labelKey: 'stepperHeader.steps.specialties.label',  subLabelKey: 'stepperHeader.steps.specialties.subLabel' },
+    { index: 3, labelKey: 'stepperHeader.steps.logistics.label',    subLabelKey: 'stepperHeader.steps.logistics.subLabel' },
+    { index: 4, labelKey: 'stepperHeader.steps.kyc.label',          subLabelKey: 'stepperHeader.steps.kyc.subLabel' },
   ]);
 
   // ─── Derived ──────────────────────────────────────────────

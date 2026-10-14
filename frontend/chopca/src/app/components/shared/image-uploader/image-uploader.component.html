@@ -9,33 +9,33 @@
 
   <!-- Preview or empty picker -->
   <div data-testid="image-uploader-picker"
-    [class]="wrapperClasses()"
-    (click)="picker.click()"
-    (dragover)="onDragOver($event)"
-    (dragleave)="onDragLeave($event)"
-    (drop)="onDrop($event)">
+       [class]="wrapperClasses()"
+       (click)="picker.click()"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave($event)"
+       (drop)="onDrop($event)">
 
     @if (hasPreview()) {
     <!-- Preview image -->
     <img
       data-testid="image-uploader-img"
       [src]="previewUrl()!"
-      alt="Aperçu"
+      [alt]="'imageUploader.previewAlt' | translate"
       class="absolute inset-0 w-full h-full object-cover"
       [class.rounded-full]="shape() === 'circle'" />
 
     <!-- Remove button -->
     @if (!disabled() && !isUploading()) {
     <button data-testid="clear-image-uploader"
-      type="button"
-      aria-label="Retirer l'image"
-      class="absolute top-2 right-2 z-10
+            type="button"
+            [attr.aria-label]="'imageUploader.removeImage' | translate"
+            class="absolute top-2 right-2 z-10
                  w-8 h-8 rounded-full
                  bg-black/60 text-white
                  flex items-center justify-center
                  border-0 cursor-pointer
                  hover:bg-black/80 transition-colors"
-      (click)="clear($event)">
+            (click)="clear($event)">
       <app-icon name="close" size="sm" />
     </button>
     }
@@ -51,7 +51,7 @@
         class="!w-full">
       </mat-progress-bar>
       <span class="text-[10px] text-white font-medium">
-            Envoi en cours… {{ uploadProgress() }}%
+            {{ 'imageUploader.uploading' | translate: { progress: uploadProgress() } }}
           </span>
     </div>
     }
@@ -65,7 +65,7 @@
 
       @if (shape() !== 'circle') {
       <span class="text-xs text-on-surface-variant">
-            Cliquez ou déposez une image
+            {{ 'imageUploader.dropHint' | translate }}
           </span>
       }
     </div>
@@ -109,7 +109,7 @@
       class="text-xs font-semibold underline
                  bg-transparent border-0 cursor-pointer
                  text-on-error-container">
-      Réessayer
+      {{ 'imageUploader.retry' | translate }}
     </button>
     }
   </div>

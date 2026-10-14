@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { PreviewState } from './preview-state.model';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Phone-app preview of the vendor's storefront.
  *
@@ -12,7 +12,7 @@ import { PreviewState } from './preview-state.model';
 @Component({
   selector: 'app-preview-card',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   templateUrl: './preview-card.component.html',
   styleUrl: './preview-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

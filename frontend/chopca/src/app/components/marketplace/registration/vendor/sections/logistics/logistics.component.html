@@ -3,9 +3,7 @@
   class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm
          flex flex-col gap-space-md">
 
-  <!-- ═══════════════════════════════════════════════════════
-       Section header
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Section header -->
   <div class="flex items-center justify-between pb-space-sm">
     <div class="flex items-center gap-space-sm">
       <span
@@ -15,7 +13,7 @@
       </span>
       <div>
         <h2 class="font-headline-sm text-headline-sm text-on-surface">
-          Géolocalisation &amp; Logistique Flotte
+          {{ 'vendorLogistics.sectionTitle' | translate }}
         </h2>
       </div>
     </div>
@@ -23,15 +21,13 @@
     <span
       class="px-space-sm py-0.5 rounded-full bg-primary-fixed text-primary
              font-label-sm text-label-sm whitespace-nowrap">
-      Obligatoire
+      {{ 'vendorLogistics.requiredBadge' | translate }}
     </span>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       City select
-       ═══════════════════════════════════════════════════════ -->
+  <!-- City select -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Ville d'implantation</mat-label>
+    <mat-label>{{ 'vendorLogistics.city.label' | translate }}</mat-label>
     <app-icon
       matPrefix
       name="location_city"
@@ -40,7 +36,7 @@
 
     <mat-select
       formControlName="cityId"
-      placeholder="Sélectionnez une ville">
+      [placeholder]="'vendorLogistics.city.placeholder' | translate">
       @for (city of cities(); track city.id) {
       <mat-option [value]="city.id">
           <span class="flex items-center justify-between gap-space-md w-full">
@@ -57,57 +53,53 @@
       } @empty {
       <mat-option disabled>
           <span class="font-body-sm text-body-sm text-on-surface-variant">
-            Aucune ville disponible
+            {{ 'vendorLogistics.city.empty' | translate }}
           </span>
       </mat-option>
       }
     </mat-select>
 
     <mat-hint>
-      La ville détermine la zone de recherche pour vos clients.
+      {{ 'vendorLogistics.city.hint' | translate }}
     </mat-hint>
 
     @if (form().get('cityId')?.hasError('required')
     && form().get('cityId')?.touched) {
-    <mat-error>La ville d'implantation est obligatoire.</mat-error>
+    <mat-error>{{ 'vendorLogistics.city.requiredError' | translate }}</mat-error>
     }
   </mat-form-field>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Main address
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Main address -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Adresse physique principale de l'établissement</mat-label>
+    <mat-label>{{ 'vendorLogistics.address.label' | translate }}</mat-label>
     <app-icon matPrefix name="pin_drop" size="md" class="text-primary pr-2" />
     <input
       matInput
       formControlName="address"
       maxlength="255"
-      placeholder="ex: Rue des Palmiers, Akwa, Douala"
+      [placeholder]="'vendorLogistics.address.placeholder' | translate"
       (input)="onAddressInput($any($event.target).value)" />
     <mat-hint>
-      Adresse officielle d'implantation utilisée pour le géocodage GPS précis.
+      {{ 'vendorLogistics.address.hint' | translate }}
     </mat-hint>
     @if (form().get('address')?.hasError('required')
     && form().get('address')?.touched) {
-    <mat-error>L'adresse physique est obligatoire.</mat-error>
+    <mat-error>{{ 'vendorLogistics.address.requiredError' | translate }}</mat-error>
     }
   </mat-form-field>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Pickup address + same-as checkbox
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Pickup address + same-as checkbox -->
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between gap-space-sm flex-wrap">
       <label class="font-label-md text-label-md text-on-surface" for="pickupAddress">
-        Adresse de retrait des commandes (Pick-up Coursiers)
+        {{ 'vendorLogistics.pickup.label' | translate }}
       </label>
 
       <mat-checkbox
         [checked]="sameAddress()"
         (change)="onSameAddressToggle($event.checked)"
         class="font-label-sm text-label-sm">
-        Identique à l'adresse principale
+        {{ 'vendorLogistics.pickup.sameAsMain' | translate }}
       </mat-checkbox>
     </div>
 
@@ -118,26 +110,24 @@
         id="pickupAddress"
         formControlName="pickupAddress"
         maxlength="255"
-        placeholder="ex: Entrée coursière au fond de l'impasse..." />
+        [placeholder]="'vendorLogistics.pickup.placeholder' | translate" />
       <mat-hint>
-        Précision utile pour les livreurs partenaires lors des heures de pointe.
+        {{ 'vendorLogistics.pickup.hint' | translate }}
       </mat-hint>
     </mat-form-field>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════
-       Delivery radius
-       ═══════════════════════════════════════════════════════ -->
+  <!-- Delivery radius -->
   <div class="flex flex-col gap-2 p-space-md rounded-xl bg-surface-container-low mt-2">
 
     <div class="flex items-center justify-between gap-space-md">
       <div>
         <span class="font-label-md text-label-md text-on-surface">
-          Rayon de livraison garanti
+          {{ 'vendorLogistics.radius.label' | translate }}
           (<code class="font-mono text-label-sm text-primary">deliveryRadius</code>)
         </span>
         <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Périmètre maximal d'expédition des repas chauds pour préserver la fraîcheur.
+          {{ 'vendorLogistics.radius.description' | translate }}
         </p>
       </div>
 
@@ -146,7 +136,7 @@
                font-headline-sm text-headline-sm flex items-center gap-1
                shadow-sm shrink-0">
         <span>{{ radius() }}</span>
-        <span class="font-label-md text-label-md">km</span>
+        <span class="font-label-md text-label-md">{{ 'vendorLogistics.radius.unit' | translate }}</span>
       </div>
     </div>
 
@@ -160,10 +150,10 @@
     </mat-slider>
 
     <div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
-      <span>1 km (Ultra local)</span>
-      <span>8 km (Recommandé)</span>
-      <span>15 km (Grand bassin)</span>
-      <span>25 km (Zone max métropole)</span>
+      <span>{{ 'vendorLogistics.radius.tierUltraLocal' | translate }}</span>
+      <span>{{ 'vendorLogistics.radius.tierRecommended' | translate }}</span>
+      <span>{{ 'vendorLogistics.radius.tierWide' | translate }}</span>
+      <span>{{ 'vendorLogistics.radius.tierMax' | translate }}</span>
     </div>
 
     <!-- Radar simulation -->
@@ -185,7 +175,7 @@
                backdrop-blur font-label-sm text-label-sm text-on-surface
                flex items-center gap-1 shadow-sm">
         <app-icon name="radar" size="sm" class="text-secondary" />
-        Simulation de couverture : Bonapriso, Akwa, Bonanjo, Deido
+        {{ 'vendorLogistics.radius.simulationLabel' | translate }}
       </div>
     </div>
   </div>
