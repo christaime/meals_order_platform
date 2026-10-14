@@ -19,14 +19,14 @@
         </a>
 
         <p class="font-body text-xs leading-relaxed text-on-surface-variant max-w-[22rem] m-0">
-          {{ tagline }}
+          {{ taglineKey | translate }}
         </p>
 
         <div class="flex items-center gap-2.5 pt-2">
-          @for (link of socialLinks; track link.label) {
+          @for (link of socialLinks; track link.href) {
           <a
             [href]="link.href"
-            [attr.aria-label]="link.label"
+            [attr.aria-label]="link.ariaLabelKey | translate"
             rel="noopener"
             class="inline-flex items-center justify-center w-9 h-9
                      rounded-full bg-surface-container-lowest
@@ -41,21 +41,32 @@
       </div>
 
       <!-- Link columns -->
-      @for (column of columns; track column.title) {
+      @for (column of columns; track column.titleKey) {
       <div class="flex flex-col gap-3">
         <h3 class="font-heading text-sm font-bold text-on-surface m-0 mb-1">
-          {{ column.title }}
+          {{ column.titleKey | translate }}
         </h3>
         <ul class="list-none m-0 p-0 flex flex-col gap-3">
-          @for (link of column.links; track link.href) {
+          @for (link of column.links; track link.key) {
           <li>
+            @if (link.route) {
+            <a
+              [routerLink]="link.route"
+              class="font-body text-xs leading-normal
+                           text-on-surface-variant no-underline
+                           hover:text-primary transition-colors">
+              {{ link.key | translate }}
+            </a>
+            } @else {
             <a
               [href]="link.href"
+              rel="noopener"
               class="font-body text-xs leading-normal
-                         text-on-surface-variant no-underline
-                         hover:text-primary transition-colors">
-              {{ link.label }}
+                           text-on-surface-variant no-underline
+                           hover:text-primary transition-colors">
+              {{ link.key | translate }}
             </a>
+            }
           </li>
           }
         </ul>
@@ -70,14 +81,14 @@
              pt-8 mt-4 border-t border-surface-container-high">
 
       <p class="font-body text-xs text-on-surface-variant m-0 text-center md:text-left">
-        © {{ currentYear }} Chop ça! Tous droits réservés. Fait avec passion au Cameroun.
+        {{ copyright() }}
       </p>
 
       <div class="flex items-center gap-6 flex-wrap justify-center md:justify-end">
 
         <span class="inline-flex items-center gap-1.5 font-label text-xs font-semibold text-on-surface">
           <app-icon name="verified" size="md" class="text-secondary" />
-          <span>100% Terroir Garanti</span>
+          <span>{{ 'footer.bottom.terroirGuarantee' | translate }}</span>
         </span>
 
         <span
@@ -86,7 +97,7 @@
                  border border-outline-variant/60
                  font-label text-[11px] font-semibold text-on-surface">
           <span class="inline-block w-2 h-2 rounded-full bg-primary"></span>
-          <span>XAF accepted</span>
+          <span>{{ 'footer.bottom.currency' | translate }}</span>
         </span>
 
       </div>
