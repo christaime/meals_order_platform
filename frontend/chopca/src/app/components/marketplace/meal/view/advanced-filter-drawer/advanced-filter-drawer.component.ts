@@ -15,6 +15,7 @@ import { AppAmountPipe } from '@components/shared/pipes/app-amount.pipe';
 import { IngredientAutocompleteComponent } from '@components/shared/ingredient-autocomplete/ingredient-autocomplete.component';
 
 import { Category, IngredientSummary } from '@app/core/models/marketplace';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const PRICE_MIN  = 500;
 const PRICE_MAX  = 20000;
@@ -83,6 +84,7 @@ export const DEFAULT_FILTERS: FilterState = {
     CategoryPillsSelectorComponent,
     IngredientAutocompleteComponent,
     AppAmountPipe,
+    TranslatePipe
   ],
   templateUrl: './advanced-filter-drawer.component.html',
   styleUrl: './advanced-filter-drawer.component.scss',

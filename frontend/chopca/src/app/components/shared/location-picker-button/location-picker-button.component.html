@@ -23,21 +23,17 @@
         <span
           data-testid="location-picker-button-summary"
           class="font-label-sm text-[11px] text-on-surface-variant truncate">
-            @if (committedPoint()) {
-              {{ committedLocations().length }}
-              {{ committedLocations().length === 1 ? 'point de retrait' : 'points de retrait' }}
-              dans un rayon de {{ committedPoint()!.radiusKm }} km
-            } @else {
-              {{ committedLocations().length }}
-              {{ committedLocations().length === 1 ? 'point de retrait' : 'points de retrait' }} dans cette ville
-            }
+            {{ summaryKey() | translate: {
+                count: committedLocations().length,
+                radius: committedPoint()?.radiusKm ?? 0
+            } }}
           </span>
         } @else {
         <span class="font-body-md text-sm font-semibold text-on-surface">
-            Choisir une zone
+            {{ 'locationPickerButton.chooseZone' | translate }}
           </span>
         <span class="font-label-sm text-[11px] text-on-surface-variant">
-            Ville, point sur la carte, rayon
+            {{ 'locationPickerButton.chooseZoneSubtitle' | translate }}
           </span>
         }
 
@@ -52,7 +48,7 @@
         data-testid="location-picker-button-clear"
         (click)="clear($event)"
         (keydown.enter)="clear($any($event))"
-        aria-label="Effacer la zone"
+        [attr.aria-label]="'locationPickerButton.clearAriaLabel' | translate"
         class="w-7 h-7 rounded-full flex items-center justify-center
                text-on-surface-variant hover:bg-surface-container transition-colors"
       >
@@ -85,22 +81,21 @@
         data-testid="location-picker-count"
         class="flex items-center gap-2 min-w-0">
         @if (isSearchingLocations()) {
-        <span class="text-xs text-on-surface-variant">Recherche…</span>
+        <span class="text-xs text-on-surface-variant">{{ 'locationPickerButton.searching' | translate }}</span>
         } @else if (foundLocationsCount() > 0) {
         <app-icon name="check_circle" class="text-primary" size="sm" />
         <span class="text-xs text-on-surface truncate">
-      <strong>{{ foundLocationsCount() }}</strong>
-      {{ foundLocationsCount() === 1 ? 'point de restauration trouvé' : 'points de restauration trouvés' }}
-    </span>
+          {{ resultFoundKey() | translate: { count: foundLocationsCount() } }}
+        </span>
         } @else if (draftCity()) {
         <app-icon name="warning" class="text-error" size="sm" />
         <span class="text-xs text-on-surface-variant truncate">
-      Aucun point de restauration dans cette zone.
-    </span>
+          {{ 'locationPickerButton.noResultsInZone' | translate }}
+        </span>
         } @else {
         <span class="text-xs text-on-surface-variant truncate">
-      Choisir une ville
-    </span>
+          {{ 'locationPickerButton.chooseCity' | translate }}
+        </span>
         }
       </div>
       <button
@@ -139,7 +134,7 @@
                text-on-surface font-label-md text-xs font-semibold
                hover:bg-surface-container transition-colors"
       >
-        Annuler
+        {{ 'locationPickerButton.cancel' | translate }}
       </button>
       <button
         type="button"
@@ -151,7 +146,7 @@
                hover:bg-primary-container transition-colors shadow-sm
                disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        Appliquer
+        {{ 'locationPickerButton.apply' | translate }}
       </button>
     </div>
   </div>

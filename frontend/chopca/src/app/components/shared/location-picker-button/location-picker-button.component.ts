@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import {
@@ -35,7 +35,7 @@ import { PickerSize } from './picker-size';
 @Component({
   selector: 'app-location-picker-button',
   standalone: true,
-  imports: [CommonModule, IconComponent, LocationPickerComponent],
+  imports: [CommonModule, IconComponent, LocationPickerComponent, TranslatePipe],
   templateUrl: './location-picker-button.component.html',
   styleUrl: './location-picker-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -285,5 +285,24 @@ export class LocationPickerButtonComponent {
 
   protected canApply(): boolean {
     return !!this.draftCity();
+  }
+
+  protected summaryKey(): string {
+    const count = this.committedLocations().length;
+    const inRadius = this.committedPoint() != null;
+    if (inRadius) {
+      return count === 1
+        ? 'locationPickerButton.summaryOnePointInRadius'
+        : 'locationPickerButton.summaryManyPointsInRadius';
+    }
+    return count === 1
+      ? 'locationPickerButton.summaryOnePointInCity'
+      : 'locationPickerButton.summaryManyPointsInCity';
+  }
+
+  protected resultFoundKey(): string {
+    return this.foundLocationsCount() === 1
+      ? 'locationPickerButton.resultFoundOne'
+      : 'locationPickerButton.resultFoundMany';
   }
 }

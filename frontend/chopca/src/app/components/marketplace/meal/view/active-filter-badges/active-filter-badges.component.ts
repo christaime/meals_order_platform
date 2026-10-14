@@ -6,10 +6,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface ActiveFilterItem {
   key: string;
-  label: string;
+  labelKey: string;
+  labelParams?: Record<string, unknown>;
   value: string | number | boolean;
 }
 
@@ -24,7 +26,7 @@ export interface ActiveFilterItem {
 @Component({
   selector: 'app-active-filter-badges',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, TranslatePipe],
   templateUrl: './active-filter-badges.component.html',
   styleUrl: './active-filter-badges.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

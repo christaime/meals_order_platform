@@ -6,7 +6,7 @@
   class="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors shadow-xs"
 >
   <app-icon name="tune" size="sm" class="text-primary" />
-  <span class="font-label-md text-xs font-semibold">Filtres</span>
+  <span class="font-label-md text-xs font-semibold">{{ 'advancedFilter.trigger' | translate }}</span>
 </button>
 
 <!-- Backdrop & Drawer -->
@@ -25,7 +25,7 @@
   <div class="p-5 border-b border-outline-variant flex items-center justify-between">
     <div class="flex items-center gap-2">
       <app-icon name="tune" class="text-primary" />
-      <h2 class="font-headline-sm text-lg font-bold text-on-surface">Filtres avancés</h2>
+      <h2 class="font-headline-sm text-lg font-bold text-on-surface">{{ 'advancedFilter.title' | translate }}</h2>
     </div>
     <button
       type="button"
@@ -45,7 +45,7 @@
       <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-            Prix minimum
+            {{ 'advancedFilter.minPrice' | translate }}
           </label>
           <span
             data-testid="advanced-filter-min-price-value"
@@ -72,7 +72,7 @@
       <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-            Prix maximum
+            {{ 'advancedFilter.maxPrice' | translate }}
           </label>
           <span
             data-testid="advanced-filter-max-price-value"
@@ -101,7 +101,7 @@
     <div class="flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-          Temps de préparation max
+          {{ 'advancedFilter.maxPrepTime' | translate }}
         </label>
         <span class="font-body-md text-sm font-bold text-primary">
           {{ draftFilters().maxPrepTime }} min
@@ -122,7 +122,7 @@
     <!-- Minimum Rating -->
     <div class="flex flex-col gap-2">
       <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider">
-        Note minimale
+        {{ 'advancedFilter.minRating' | translate }}
       </label>
       <div class="flex items-center gap-2">
         @for (stars of [0, 3, 4, 4.5]; track stars) {
@@ -139,7 +139,7 @@
           [class.text-on-surface-variant]="draftFilters().minRating !== stars"
           [class.border-outline-variant]="draftFilters().minRating !== stars"
         >
-          {{ stars === 0 ? 'Toutes' : stars + '+ ★' }}
+          {{ stars === 0 ? ('advancedFilter.ratingAny' | translate) : stars + '+ ★' }}
         </button>
         }
       </div>
@@ -148,19 +148,20 @@
     <!-- Excluded ingredients -->
     <div class="flex flex-col gap-2 pt-2 border-t border-outline-variant">
       <app-ingredient-autocomplete
-        label="Exclure des ingrédients"
-        hint="Les plats contenant ces ingrédients seront masqués."
+        [labelKey]="'advancedFilter.excludeIngredients'"
+        [hintKey]="'advancedFilter.excludeIngredientsHint'"
         [maxSelection]="5"
         [initialSelection]="initialIngredients"
         (selectionChange)="onExcludedIngredientsChange($event)"
       />
     </div>
+
     <!-- Category pills -->
     <div class="flex flex-col gap-4 pt-2 border-t border-outline-variant">
       <app-category-pills-selector
         categoryType="CUISINE"
         [control]="cuisineControl"
-        label="Cuisines"
+        [labelKey]="'advancedFilter.cuisines'"
         [maxSelection]="3"
         [minSelection]="0"
         (categoriesSelected)="onCuisinesSelected($event)" />
@@ -168,7 +169,7 @@
       <app-category-pills-selector
         categoryType="DISH_TYPE"
         [control]="dishTypeControl"
-        label="Types de plat"
+        [labelKey]="'advancedFilter.dishTypes'"
         [maxSelection]="3"
         [minSelection]="0"
         (categoriesSelected)="onDishTypesSelected($event)" />
@@ -187,7 +188,7 @@
          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
          transition-all duration-150"
     >
-      Tout effacer
+      {{ 'advancedFilter.clearAll' | translate }}
     </button>
     <button
       type="button"
@@ -195,7 +196,7 @@
       (click)="onApply()"
       class="flex-1 py-3 rounded-full bg-primary text-on-primary font-label-md text-xs font-bold hover:bg-primary-container transition-colors shadow-sm"
     >
-      Appliquer les filtres
+      {{ 'advancedFilter.apply' | translate }}
     </button>
   </div>
 </aside>

@@ -3,7 +3,7 @@
   data-testid="active-filter-bar"
   class="flex flex-wrap items-center gap-2 py-2">
     <span class="text-xs font-label-sm font-semibold text-on-surface-variant mr-1">
-      Filtres actifs:
+      {{ 'activeFilters.label' | translate }}
     </span>
 
   @for (filter of activeFilters(); track filter.key + ':' + filter.value) {
@@ -13,7 +13,7 @@
     [attr.data-value]="filter.value"
     class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-label-sm font-medium bg-secondary-container text-on-secondary-container border border-secondary border-opacity-30 shadow-2xs"
   >
-        <span>{{ filter.label }}</span>
+        <span>{{ filter.labelKey | translate: filter.labelParams }}</span>
         <button
           type="button"
           [attr.data-testid]="'remove-active-filter-' + filter.key"
@@ -21,7 +21,7 @@
           [attr.data-value]="filter.value"
           (click)="onRemove(filter)"
           class="w-4 h-4 rounded-full inline-flex items-center justify-center hover:bg-secondary hover:text-on-secondary transition-colors cursor-pointer"
-          aria-label="Effacer le filtre"
+          [attr.aria-label]="'activeFilters.remove' | translate"
         >
           <app-icon name="close" size="sm" />
         </button>
@@ -34,7 +34,7 @@
     (click)="onClearAll()"
     class="text-xs font-label-sm font-bold text-primary hover:underline cursor-pointer ml-1"
   >
-    Tout effacer
+    {{ 'activeFilters.clearAll' | translate }}
   </button>
 </div>
 }

@@ -4,7 +4,7 @@
        City selector — shrink-0: sized by content
        ═══════════════════════════════════════════════════════════ -->
   <label class="flex flex-col gap-1.5 shrink-0">
-    <span class="font-label-sm text-xs font-semibold text-on-surface">Ville</span>
+    <span class="font-label-sm text-xs font-semibold text-on-surface">{{ 'locationPicker.cityLabel' | translate }}</span>
     <select
       data-testid="location-picker-city"
       [value]="draftCity()?.id ?? ''"
@@ -14,7 +14,7 @@
              font-body-md text-sm border border-outline-variant
              focus:outline-none focus:ring-2 focus:ring-primary"
     >
-      <option value="" [selected]="!draftCity()">Sélectionner une ville…</option>
+      <option value="" [selected]="!draftCity()">{{ 'locationPicker.cityPlaceholder' | translate }}</option>
       @for (city of cities(); track city.id) {
       <option [value]="city.id" [selected]="draftCity()?.id === city.id">
         {{ city.name }}@if (city.region) { — {{ city.region }} }
@@ -98,7 +98,7 @@
         data-testid="location-picker-card-close"
         class="picker-detail-card__close"
         (click)="clearSelectedLocation()"
-        aria-label="Fermer"
+        [attr.aria-label]="'locationPicker.closeAriaLabel' | translate"
       >
         <app-icon name="close" size="sm" />
       </button>
@@ -142,14 +142,14 @@
       @if (mapsState() === 'failed') {
       <app-icon name="map_off" size="xl" class="text-error" />
       <p class="text-sm font-semibold text-on-surface">
-        Carte indisponible
+        {{ 'locationPicker.mapUnavailableTitle' | translate }}
       </p>
       <p class="text-xs text-on-surface-variant max-w-xs">
-        Impossible de charger la carte. Rechargez la page pour réessayer.
+        {{ 'locationPicker.mapUnavailableDescription' | translate }}
       </p>
       } @else {
       <span class="text-sm text-on-surface-variant">
-        Chargement de la carte…
+        {{ 'locationPicker.mapLoading' | translate }}
       </span>
       }
     </div>
@@ -159,20 +159,19 @@
 
   <!-- Hint — shrink-0 -->
   <p class="font-label-sm text-[11px] text-on-surface-variant -mt-1 shrink-0">
-    Cliquez sur la carte ou déplacez le repère rouge pour définir votre point de repère.
-    Les points de retrait disponibles s'affichent avec l'épingle Chop ça.
+    {{ 'locationPicker.hint' | translate }}
   </p>
 
   <!-- Radius slider — shrink-0 -->
   <div class="flex flex-col gap-1.5 shrink-0">
     <div class="flex items-center justify-between">
       <span class="font-label-sm text-xs font-semibold text-on-surface">
-        Rayon de couverture
+        {{ 'locationPicker.radiusLabel' | translate }}
       </span>
       <span
         data-testid="location-picker-radius-value"
         class="font-body-md text-sm font-bold text-primary">
-        {{ draftRadiusKm() }} km
+        {{ 'locationPicker.radiusValue' | translate: { km: draftRadiusKm() } }}
       </span>
     </div>
     <input

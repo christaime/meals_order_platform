@@ -28,6 +28,7 @@ import {
   LocationSummary,
 } from '@app/core/models/marketplace';
 import { VendorContextService } from '@core/services/marketplace/vendor-context.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const RADIUS_MIN = 1;
 const RADIUS_MAX = 30;
@@ -63,7 +64,7 @@ export interface PickerPoint {
 @Component({
   selector: 'app-location-picker',
   standalone: true,
-  imports: [CommonModule, IconComponent, GoogleMapsModule],
+  imports: [CommonModule, IconComponent, GoogleMapsModule, TranslatePipe],
   templateUrl: './location-picker.component.html',
   styleUrl: './location-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
