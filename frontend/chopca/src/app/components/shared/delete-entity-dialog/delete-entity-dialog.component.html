@@ -8,26 +8,26 @@
     </div>
     <div class="flex-1">
       <h2 data-testid="delete-entity-dialog-title"
-       class="font-headline-sm text-headline-sm font-bold text-on-surface">
-        {{ copy.title }}
+          class="font-headline-sm text-headline-sm font-bold text-on-surface">
+        {{ copy.titleKey | translate: { name: data.name } }}
       </h2>
       <p  data-testid="delete-entity-dialog-body" class="font-body-md text-body-md text-on-surface-variant mt-1">
-        {{ copy.body }} <strong>{{ data.name }}</strong>.
-        Si cet élément est utilisé, préférez le <strong>désactiver</strong>
-        plutôt que de le supprimer.
+        {{ 'deleteEntityDialog.bodyPrefix' | translate }}
+        <strong>{{ data.name }}</strong>.
+        {{ 'deleteEntityDialog.bodySuffix' | translate }}
       </p>
     </div>
   </div>
 
   <div class="mt-space-md">
     <label class="block font-label-md text-label-md text-on-surface font-semibold">
-      Motif
+      {{ 'deleteEntityDialog.reasonLabel' | translate }}
     </label>
     <textarea
       data-testid="delete-entity-dialog-reason"
       [(ngModel)]="reason"
       rows="2"
-      [placeholder]="placeholder()"
+      [placeholder]="placeholderKey() | translate"
       class="mt-1 w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface
              font-body-md text-body-md placeholder:text-outline
              focus:outline-none focus:ring-2 focus:ring-primary resize-none">
@@ -41,7 +41,7 @@
       (click)="ref.close()"
       class="px-space-md h-10 bg-surface-container hover:bg-surface-container-high
              text-on-surface rounded-lg font-label-md text-label-md font-semibold">
-      Annuler
+      {{ 'deleteEntityDialog.cancel' | translate }}
     </button>
     <button
       type="button"
@@ -51,7 +51,7 @@
       class="px-space-md h-10 bg-error hover:bg-error/80 text-on-error rounded-lg
              font-label-md text-label-md font-bold shadow-sm
              disabled:opacity-60 disabled:cursor-not-allowed">
-      Supprimer
+      {{ 'deleteEntityDialog.confirm' | translate }}
     </button>
   </div>
 </div>

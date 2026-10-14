@@ -1,26 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 
-/**
- * The kind of entity being deleted. Drives the dialog's copy.
- * Extend this union when a new entity type is added.
- */
-export type DeletableEntityKind = 'category' | 'ingredient' | 'location' | 'meal';
+export type DeletableEntityKind = 'category' | 'ingredient' | 'location' | 'meal' | 'city';
 
 export interface DeleteEntityDialogData {
-  /** The display name of the entity, e.g. "Cuisine Sawa". */
   readonly name: string;
-
-  /** What kind of entity this is — drives the labels. */
   readonly kind: DeletableEntityKind;
-
-  /**
-   * Optional custom reason placeholder.
-   * Falls back to a kind-specific default.
-   */
-  readonly reasonPlaceholder?: string;
+  /** Optional translation key for a custom reason placeholder. */
+  readonly reasonPlaceholderKey?: string;
 }
 
 export interface DeleteEntityDialogResult {
@@ -28,15 +18,14 @@ export interface DeleteEntityDialogResult {
 }
 
 interface KindCopy {
-  readonly title: string;
-  readonly body: string;
-  readonly placeholder: string;
+  readonly titleKey: string;
+  readonly placeholderKey: string;
 }
 
 @Component({
   selector: 'app-delete-entity-dialog',
   standalone: true,
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent, TranslatePipe],
   templateUrl: './delete-entity-dialog.component.html',
   styleUrl: './delete-entity-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,38 +44,36 @@ export class DeleteEntityDialogComponent {
     switch (kind) {
       case 'category':
         return {
-          title: `Supprimer la category '${ this.data.name }'?`,
-          body: 'Vous êtes sur le point de supprimer',
-          placeholder: 'Ex: Doublon avec "Cuisine Sawa"',
+          titleKey: 'deleteEntityDialog.title.category',
+          placeholderKey: 'deleteEntityDialog.placeholder.category',
         };
       case 'ingredient':
         return {
-          title: `Supprimer l'ingrédient '${ this.data.name }'?`,
-          body: 'Vous êtes sur le point de supprimer',
-          placeholder: 'Ex: Doublon avec "Arachide"',
+          titleKey: 'deleteEntityDialog.title.ingredient',
+          placeholderKey: 'deleteEntityDialog.placeholder.ingredient',
         };
       case 'location':
         return {
-          title: `Supprimer l'emplacement '${ this.data.name }'?`,
-          body: 'Vous êtes sur le point de supprimer',
-          placeholder: 'Ex: Ancienne adresse, déménagement…',
+          titleKey: 'deleteEntityDialog.title.location',
+          placeholderKey: 'deleteEntityDialog.placeholder.location',
         };
       case 'meal':
         return {
-          title: `Supprimer le met '${ this.data.name }'?`,
-          body: 'Vous êtes sur le point de supprimer',
-          placeholder: 'Ex: Repas méconnu et non apprécié par le grand public…',
+          titleKey: 'deleteEntityDialog.title.meal',
+          placeholderKey: 'deleteEntityDialog.placeholder.meal',
+        };
+      case 'city':
+        return {
+          titleKey: 'deleteEntityDialog.title.city',
+          placeholderKey: 'deleteEntityDialog.placeholder.city',
         };
       default:
         return {
-          title: 'Supprimer cet élément ?',
-          body: 'Vous êtes sur le point de supprimer',
-          placeholder: 'Raison de la suppression…',
+          titleKey: 'deleteEntityDialog.title.default',
+          placeholderKey: 'deleteEntityDialog.placeholder.default',
         };
     }
-
   }
 
-  protected readonly placeholder = () =>
-    this.data.reasonPlaceholder ?? this.copy.placeholder;
+  protected readonly placeholderKey = () =>  this.data.reasonPlaceholderKey ?? this.copy.placeholderKey;
 }
