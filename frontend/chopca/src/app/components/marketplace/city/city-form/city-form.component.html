@@ -15,9 +15,9 @@
       </span>
       <h2 class="font-headline-sm text-headline-sm text-on-surface">
         @if (editing(); as c) {
-        Modifier « {{ c.name }} »
+        {{ 'cityForm.title.edit' | translate: { name: c.name } }}
         } @else {
-        Nouvelle ville
+        {{ 'cityForm.title.create' | translate }}
         }
       </h2>
     </div>
@@ -25,46 +25,48 @@
 
   <!-- Name -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Nom de la ville</mat-label>
+    <mat-label>{{ 'cityForm.name.label' | translate }}</mat-label>
     <app-icon matPrefix name="badge" size="md" class="text-primary pr-2" />
     <input
       matInput
       id="city-name"
       formControlName="name"
       maxlength="120"
-      placeholder="ex: Douala, Yaoundé, Bafoussam…"
+      [placeholder]="'cityForm.name.placeholder' | translate"
       autocomplete="off" />
-    @if (nameError()) {
-    <mat-error>{{ nameError() }}</mat-error>
+    @if (nameErrorKey(); as k) {
+    <mat-error>{{ k | translate }}</mat-error>
     }
   </mat-form-field>
 
   <!-- Region -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Région (optionnel)</mat-label>
+    <mat-label>{{ 'cityForm.region.label' | translate }}</mat-label>
     <app-icon matPrefix name="map" size="md" class="text-on-surface-variant pr-2" />
     <input
       matInput
       formControlName="region"
       maxlength="120"
-      placeholder="ex: Littoral, Centre, Ouest…"
+      [placeholder]="'cityForm.region.placeholder' | translate"
       autocomplete="off" />
-    @if (regionError()) {
-    <mat-error>{{ regionError() }}</mat-error>
+    @if (regionErrorKey(); as k) {
+    <mat-error>{{ k | translate }}</mat-error>
     }
   </mat-form-field>
 
   <!-- Country code -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Code pays</mat-label>
+    <mat-label>{{ 'cityForm.countryCode.label' | translate }}</mat-label>
     <app-icon matPrefix name="public" size="md" class="text-on-surface-variant pr-2" />
     <input
       matInput
       formControlName="countryCode"
       maxlength="2"
-      placeholder="CM" />
+      [placeholder]="'cityForm.countryCode.placeholder' | translate" />
     <mat-hint>
-      ISO 3166-1 alpha-2. Fixé à <code class="font-mono">CM</code> pour le Cameroun.
+      {{ 'cityForm.countryCode.hintPrefix' | translate }}
+      <code class="font-mono">CM</code>
+      {{ 'cityForm.countryCode.hintSuffix' | translate }}
     </mat-hint>
   </mat-form-field>
 
@@ -76,7 +78,7 @@
       mat-button
       (click)="onCancel()"
       [disabled]="submitting()">
-      Annuler
+      {{ 'cityForm.cancel' | translate }}
     </button>
     }
 
@@ -87,10 +89,10 @@
       [disabled]="submitting()">
       @if (submitting()) {
       <mat-spinner diameter="18" class="inline-block mr-2" />
-      <span>Enregistrement…</span>
+      <span>{{ 'cityForm.saving' | translate }}</span>
       } @else {
       <app-icon name="check" size="sm" class="mr-1" />
-      <span>{{ editing() ? 'Enregistrer' : 'Créer' }}</span>
+      <span>{{ (editing() ? 'cityForm.save' : 'cityForm.create') | translate }}</span>
       }
     </button>
   </div>

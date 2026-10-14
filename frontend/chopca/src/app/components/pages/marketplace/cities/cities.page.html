@@ -7,19 +7,18 @@
                      bg-primary-fixed text-on-primary-fixed
                      font-label-sm text-label-sm uppercase tracking-wide">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-          Référentiel Géographique
+          {{ 'citiesPage.badge' | translate }}
         </span>
         <span class="text-outline-variant">•</span>
         <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-          Villes Cameroun
+          {{ 'citiesPage.scope' | translate }}
         </span>
       </div>
       <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-        Gestion des Villes
+        {{ 'citiesPage.title' | translate }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        Référentiel des villes où les vendeurs peuvent opérer et où les clients
-        peuvent commander ou retirer leurs repas.
+        {{ 'citiesPage.subtitle' | translate }}
       </p>
     </div>
 
@@ -31,7 +30,7 @@
                text-on-primary font-label-lg text-label-lg shadow-md transition-all
                duration-200 flex items-center gap-2 active:scale-95">
         <app-icon name="add_circle" size="md" />
-        <span>+ Nouvelle Ville</span>
+        <span>+ {{ 'citiesPage.newCity' | translate }}</span>
       </button>
     </div>
   </div>

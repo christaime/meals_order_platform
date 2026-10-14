@@ -16,7 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { IconComponent } from '@components/shared';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import { City, CityRequest } from '@app/core/models/marketplace';
 
 /**
@@ -34,6 +34,7 @@ import { City, CityRequest } from '@app/core/models/marketplace';
   selector: 'app-city-form',
   standalone: true,
   imports: [
+    TranslatePipe,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -102,19 +103,19 @@ export class CityFormComponent {
   protected get region() { return this.form.controls.region; }
   protected get countryCode() { return this.form.controls.countryCode; }
 
-  protected nameError(): string | null {
+  protected nameErrorKey(): string | null {
     const c = this.name;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required'])  return 'Le nom est requis';
-    if (c.errors['minlength']) return 'Minimum 2 caractères';
-    if (c.errors['maxlength']) return 'Maximum 120 caractères';
+    if (c.errors['required'])  return 'cityForm.name.required';
+    if (c.errors['minlength']) return 'cityForm.name.minLength';
+    if (c.errors['maxlength']) return 'cityForm.name.maxLength';
     return null;
   }
 
-  protected regionError(): string | null {
+  protected regionErrorKey(): string | null {
     const c = this.region;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['maxlength']) return 'Maximum 120 caractères';
+    if (c.errors['maxlength']) return 'cityForm.region.maxLength';
     return null;
   }
 

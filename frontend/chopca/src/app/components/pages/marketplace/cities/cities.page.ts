@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
-
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { PaginatorComponent } from '@components/shared/paginator/paginator.component';
 import { ToastService } from '@components/shared/toast/toast.service';
@@ -35,6 +35,7 @@ import {
     CityFormComponent,
     CityFiltersComponent,
     CityTableComponent,
+    TranslatePipe,
   ],
   templateUrl: './cities.page.html',
   styleUrl: './cities.page.scss',
@@ -46,6 +47,7 @@ export class CitiesPageComponent {
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+ private readonly translate = inject(TranslateService);
 
   // ─── Filter state ──────────────────────────────────────────
   protected readonly keyword = signal<string>('');
@@ -125,7 +127,9 @@ export class CitiesPageComponent {
         this.submitting.set(false);
         this.editing.set(null);
         this.toast.show(
-          current ? 'Ville mise à jour' : 'Ville créée',
+          this.translate.instant(
+            current ? 'citiesPage.toast.updated' : 'citiesPage.toast.created',
+          ),
           'success',
         );
         this.refresh();
@@ -134,7 +138,9 @@ export class CitiesPageComponent {
       error: (err) => {
         this.submitting.set(false);
         this.toast.show(
-          current ? 'Échec de la mise à jour' : 'Échec de la création',
+          this.translate.instant(
+            current ? 'citiesPage.toast.updateFailed' : 'citiesPage.toast.createFailed',
+          ),
           'error',
         );
         console.error(err);
@@ -157,14 +163,16 @@ export class CitiesPageComponent {
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => {
-              this.toast.show('Ville supprimée', 'success');
+              this.translate.instant('citiesPage.toast.deleted'),
               this.refresh();
             },
             error: (err) => {
               this.toast.show(
-                err?.status === 409
-                  ? 'Ville référencée par des vendeurs ou emplacements'
-                  : 'Échec de la suppression',
+                this.translate.instant(
+                  err?.status === 409
+                    ? 'citiesPage.toast.referenced'
+                    : 'citiesPage.toast.deleteFailed',
+                ),
                 'error',
               );
             },
@@ -192,7 +200,7 @@ export class CitiesPageComponent {
         },
         error: (err) => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des villes', 'error');
+          this.toast.show(this.translate.instant('citiesPage.toast.loadFailed'), 'error');
           console.error(err);
         },
       });

@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { IconComponent } from '@components/shared/icon/icon.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * Sort options supported by the city admin page.
@@ -25,6 +26,7 @@ export type CitySort =
   selector: 'app-city-filters',
   standalone: true,
   imports: [
+    TranslatePipe,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
