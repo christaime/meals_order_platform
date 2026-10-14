@@ -12,7 +12,7 @@ export const AUTH_ROUTES: Routes = [
       import('./login/login.page').then(
         (m) => m.LoginPageComponent
       ),
-    title: 'Connexion Vendor',
+    title: 'routes.auth.login',
   },
   {
       path: 'callback',

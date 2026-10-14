@@ -1,0 +1,983 @@
+{
+  "footer": {
+    "trustLine": "Chop ça! Cameroun",
+    "paymentsLabel": "Paiements certifiés :",
+    "whatsappSupport": "Assistance WhatsApp Pro (+237)",
+    "legalLink": "Mentions légales & conditions",
+    "tagline": "La marketplace camerounaise des mets authentiques, préparés localement. Commandez chez des restaurateurs de confiance, livrés chauds et frais.",
+
+    "columns": {
+      "discover": {
+        "title": "Découvrir",
+        "links": {
+          "exploreMeals": "Explorer les plats",
+          "vendors": "Restaurateurs partenaires",
+          "howItWorks": "Comment ça marche"
+        }
+      },
+      "vendors": {
+        "title": "Pour les restaurateurs",
+        "links": {
+          "becomePartner": "Devenir partenaire",
+          "vendorSpace": "Espace vendeur",
+          "pricing": "Tarifs"
+        }
+      },
+      "support": {
+        "title": "Assistance",
+        "links": {
+          "helpCenter": "Centre d'aide",
+          "whatsapp": "WhatsApp Pro",
+          "contact": "Nous contacter"
+        }
+      }
+    },
+
+    "bottom": {
+      "copyright": "© {{year}} Chop ça! Tous droits réservés. Fait avec passion au Cameroun.",
+      "terroirGuarantee": "100% Terroir Garanti",
+      "currency": "XAF accepté"
+    },
+
+    "social": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "tiktok": "TikTok"
+    }
+  },
+  "header": {
+    "portal": {
+      "admin": "Espace Admin",
+      "vendor": "Espace Vendeur",
+      "customer": "Espace Client",
+      "marketplace": "Marketplace"
+    },
+
+    "switch": {
+      "toVendor": "Je Cook!",
+      "toCustomer": "Je Chop!"
+    },
+
+    "mobileMenuOpen": "Ouvrir le menu",
+    "mobileMenuClose": "Fermer le menu",
+    "cart": "Voir le panier",
+    "logout": "Déconnexion",
+    "account": "Mon compte",
+    "vendorProfile": "Mon restaurant",
+    "adminSettings": "Paramètres admin",
+
+    "public": {
+      "exploreMeals": "Explorer les plats",
+      "partnerVendors": "Restaurateurs Partenaires"
+    },
+
+    "vendorMenu": {
+      "manageDishes": "Gestion des Plats",
+      "dishList": "Liste des plats",
+      "newDish": "Nouveau plat",
+      "presenceZones": "Zones de présence"
+    },
+
+    "adminMenu": {
+      "mealCatalog": "Catalogue de mets",
+      "categories": "Catégories",
+      "ingredients": "Ingrédients",
+      "meals": "Plats",
+      "vendorsAndPlaces": "Vendeurs & lieux",
+      "vendors": "Vendeurs",
+      "presenceZones": "Zones de présence"
+    },
+
+    "customerMenu": {
+      "exploreMeals": "Explorer les plats",
+      "myOrders": "Mes commandes",
+      "myFavorites": "Mes favoris",
+      "myAccount": "Mon compte"
+    }
+  },
+  "marketplaceHome": {
+    "hero": {
+      "title": "Explorer les mets",
+      "subtitle": "Découvrez les meilleurs mets de chez nous."
+    }
+  },
+
+  "quickStats": {
+    "delivery": "Livraison moyenne",
+    "satisfaction": "Note clients",
+    "coverage": "Villes",
+    "hygiene": "Cuisines",
+    "hygieneCertified": "100% Vérifiées"
+  },
+
+  "deliveryCoverage": {
+    "defaultTitle": "Consommation à temps",
+    "subtitle": "Repas chauds servis dans nos restaurants près de chez vous.",
+    "highlights": {
+      "express": {
+        "title": "Service express",
+        "detail": "10 à 15 min en moyenne"
+      },
+      "tracking": {
+        "title": "Suivi en direct",
+        "detail": "Notification à chaque étape de la préparation de votre commande"
+      },
+      "takeaway": {
+        "title": "Plats à emporter",
+        "detail": "Conteneurs isothermes disponibles"
+      }
+    },
+    "zonesLabel": "Quartiers couverts actuellement"
+  },
+  "mealCard": {
+    "addToCart": "Ajouter au panier",
+    "unavailable": "Épuisé",
+    "order": "Commander",
+    "details": "Détails",
+    "prepTimeSuffix": "min"
+  },
+
+  "advancedFilter": {
+    "trigger": "Filtres",
+    "title": "Filtres avancés",
+    "minPrice": "Prix minimum",
+    "maxPrice": "Prix maximum",
+    "maxPrepTime": "Temps de préparation max",
+    "minRating": "Note minimale",
+    "ratingAny": "Toutes",
+    "excludeIngredients": "Exclure des ingrédients",
+    "excludeIngredientsHint": "Les plats contenant ces ingrédients seront masqués.",
+    "cuisines": "Cuisines",
+    "dishTypes": "Types de plat",
+    "clearAll": "Tout effacer",
+    "apply": "Appliquer les filtres"
+  },
+
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+
+  "sort": {
+    "label": "Trier par:",
+    "nameAsc": "Noms alphabétiquement"
+  },
+  "ingredientAutocomplete": {
+    "defaultLabel": "Ingrédients",
+    "defaultPlaceholder": "Rechercher un ingrédient…",
+    "allergenTag": "Allergène",
+    "noMatch": "Aucun ingrédient ne correspond.",
+    "limitHint": "Maximum {{count}} ingrédients exclus.",
+    "removeAriaLabel": "Retirer {{name}}"
+  },
+
+  "categoryPills": {
+    "defaultLabel": "Catégories",
+    "defaultEmpty": "Aucune option disponible.",
+    "loadError": "Impossible de charger les catégories."
+  },
+
+  "floatingCart": {
+    "itemsSuffix": "article(s)",
+    "viewCart": "Voir le panier"
+  },
+
+  "vendorDirectory": {
+    "title": "Restaurants & Restaurateurs Partenaires",
+    "subtitle": "Découvrez les meilleurs établissements et traiteurs locaux livrant dans votre zone.",
+    "searchPlaceholder": "Rechercher un restaurant, un établissement...",
+    "emptyTitle": "Aucun restaurant trouvé",
+    "emptyDescription": "Nous n'avons trouvé aucun restaurant correspondant à vos critères dans cette zone.",
+    "emptyReset": "Réinitialiser la recherche",
+    "defaultChipLabel": "Toutes les categories",
+    "sortByRating": "Mieux notés",
+    "sortByBusinessName": "Nom des plats alphabetiquement"
+  },
+  "vendorIdentity": {
+    "header": {
+      "title": "Établissement & Propriétaire",
+      "subtitle": "Données contractuelles de base enregistrées sur ChopÇa!",
+      "requiredBadge": "Obligatoire"
+    },
+    "businessName": {
+      "label": "Nom commercial de l'établissement",
+      "placeholder": "ex: Le Chaudron Sawa",
+      "hint": "Nom public affiché aux utilisateurs (2 à 100 car.).",
+      "requiredError": "Le nom commercial est obligatoire.",
+      "minLengthError": "Minimum 2 caractères."
+    },
+    "ownerName": {
+      "label": "Nom complet du gérant / propriétaire",
+      "placeholder": "ex: Pauline Ngo Moukoko",
+      "hint": "Identité légale figurant sur la pièce d'identité officielle.",
+      "requiredError": "Le nom du gérant est obligatoire."
+    },
+    "phone": {
+      "label": "Numéro de téléphone joignable (OTP & Commandes)",
+      "placeholder": "+237699001122",
+      "prefix": "CMR",
+      "hint": "Format standard CEMAC/Cameroun. Un SMS de confirmation sera envoyé à ce contact.",
+      "requiredError": "Le numéro de téléphone est obligatoire.",
+      "patternError": "Format invalide. Exemple : +237699001122"
+    },
+    "description": {
+      "label": "Description de la cuisine / Histoire culinaire",
+      "placeholder": "Racontez le savoir-faire de votre marmite, l'origine de vos épices et vos mets signatures...",
+      "hint": ""
+    },
+    "inspirations": {
+      "label": "Inspirations rapides :",
+      "smoking": "+ Fumage artisanal",
+      "terroir": "+ Terroir ancestral",
+      "fresh": "+ Produits frais"
+    }
+  },
+
+  "vendorCuisine": {
+    "title": "Spécialités & Terroirs Culinaires",
+    "subtitle": "(Sélectionnez au moins 1 spécialité)",
+    "label": "Spécialités culinaires",
+    "hint": "Cliquez sur les tags correspondant à l'ADN gastronomique de votre enseigne pour optimiser votre visibilité dans le filtre de recherche de l'application.",
+    "empty": "Aucune spécialité disponible pour le moment."
+  },
+
+  "mealCatalog": {
+    "defaultChip": "Tous les types",
+    "sort": {
+      "ratingAvg": "Mieux notés",
+      "priceAsc": "Prix : Croissant",
+      "priceDesc": "Prix : Décroissant",
+      "prepTime": "Temps de préparation",
+      "name": "Nom des plats alphabetiquement"
+    },
+    "shortcut": {
+      "express": "Prépa ≤ {{minutes}} min",
+      "eco": "À partir de {{price}} FCFA"
+    },
+    "searchPlaceholder": "Rechercher un plat, un ingrédient...",
+    "emptyTitle": "Aucun plat ne correspond à vos critères",
+    "emptyDescription": "Essayez de modifier votre recherche ou de réinitialiser vos filtres pour découvrir d'autres spécialités.",
+    "emptyReset": "Réinitialiser tous les filtres"
+  },
+  "activeFilters": {
+    "raw": "{{value}}",
+    "search": "Recherche: \"{{query}}\"",
+    "minPrice": "Min {{price}} FCFA",
+    "maxPrice": "Max {{price}} FCFA",
+    "prepTime": "Prépa ≤ {{minutes}} min",
+    "rating": "{{rating}}+ ★",
+    "excludeIngredient": "Sans {{name}}",
+    "label": "Filtres actifs:",
+    "remove": "Effacer le filtre",
+    "clearAll": "Tout effacer"
+  },
+  "searchBar": {
+    "defaultPlaceholder": "Rechercher un plat, un ingrédient ou un restaurant...",
+    "clear": "Effacer la recherche",
+    "submit": "Chercher"
+  },
+  "locationPicker": {
+    "cityLabel": "Ville",
+    "cityPlaceholder": "Sélectionner une ville…",
+    "mapUnavailableTitle": "Carte indisponible",
+    "mapUnavailableDescription": "Impossible de charger la carte. Rechargez la page pour réessayer.",
+    "mapLoading": "Chargement de la carte…",
+    "hint": "Cliquez sur la carte ou déplacez le repère rouge pour définir votre point de repère. Les points de retrait disponibles s'affichent avec l'épingle Chop ça.",
+    "radiusLabel": "Rayon de couverture",
+    "radiusValue": "{{km}} km",
+    "closeAriaLabel": "Fermer"
+  },
+
+  "locationPickerButton": {
+    "chooseZone": "Choisir une zone",
+    "chooseZoneSubtitle": "Ville, point sur la carte, rayon",
+    "clearAriaLabel": "Effacer la zone",
+    "summaryOnePointInRadius": "{{count}} point de retrait dans un rayon de {{radius}} km",
+    "summaryManyPointsInRadius": "{{count}} points de retrait dans un rayon de {{radius}} km",
+    "summaryOnePointInCity": "{{count}} point de retrait dans cette ville",
+    "summaryManyPointsInCity": "{{count}} points de retrait dans cette ville",
+    "searching": "Recherche…",
+    "resultFoundOne": "{{count}} point de restauration trouvé",
+    "resultFoundMany": "{{count}} points de restauration trouvés",
+    "noResultsInZone": "Aucun point de restauration dans cette zone.",
+    "chooseCity": "Choisir une ville",
+    "cancel": "Annuler",
+    "apply": "Appliquer"
+  },
+  "chatWidget": {
+    "openAriaLabel": "Ouvrir MealMate",
+    "closeAriaLabel": "Fermer",
+    "loading": "Chargement…",
+    "greetingTitle": "Bonjour, je suis MealMate.",
+    "greetingSubtitle": "Dites-moi ce que vous cherchez.",
+    "jumpToLatest": "Aller au dernier message",
+    "inputPlaceholder": "Posez votre question…",
+    "sendAriaLabel": "Envoyer"
+  },
+  "mealDetail": {
+    "unavailable": "Actuellement indisponible",
+    "prepTime": "{{minutes}} min de préparation",
+    "proposedBy": "Proposé par",
+    "ingredientsLabel": "Ingrédients :",
+    "pickupLocationsLabel": "Points de retrait :",
+    "totalPriceLabel": "Prix Total",
+    "decreaseQuantity": "Réduire la quantité",
+    "increaseQuantity": "Augmenter la quantité",
+    "addToCart": "Ajouter au panier"
+  },
+
+  "vendorDetail": {
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "deliveryTime": "{{minutes}} min",
+    "minOrder": "Min. {{amount}} FCFA"
+  },
+  "vendorCard": {
+    "open": "Ouvert",
+    "closed": "Fermé"
+  },
+  "app": {
+    "name": "Chop ça!"
+  },
+
+  "routes": {
+    "accessDenied": "Acces interdit",
+    "auth": {
+      "login": "Connexion utilisateur"
+    },
+    "registration": {
+      "vendor": "Inscription vendeur"
+    },
+    "marketplace": {
+      "home": "Les meilleurs plats camerounais livrés chez vous",
+      "mealDetail": "Détail du plat",
+      "vendorDirectory": "Restaurants partenaires",
+      "vendorDetail": "Restaurant"
+    },
+    "admin": {
+      "cities": "Les villes",
+      "categories": "Les catégories de repas",
+      "ingredients": "Les ingrédients de repas",
+      "locations": "Les emplacements de distribution de repas",
+      "meals": "Les plats",
+      "vendors": "Modération des vendeurs"
+    },
+    "vendor": {
+      "locations": "Vos emplacements de distribution de repas",
+      "profile": "Votre profil",
+      "meals": "Gérer les plats",
+      "mealNew": "Nouveau plat",
+      "mealEdit": "Modifier un plat",
+      "mealDetail": "Détail du plat"
+    }
+  },
+  "imageUploader": {
+    "previewAlt": "Aperçu",
+    "removeImage": "Retirer l'image",
+    "uploading": "Envoi en cours… {{progress}}%",
+    "dropHint": "Cliquez ou déposez une image",
+    "retry": "Réessayer"
+  },
+
+  "deleteEntityDialog": {
+    "title": {
+      "category": "Supprimer la catégorie '{{name}}'?",
+      "ingredient": "Supprimer l'ingrédient '{{name}}'?",
+      "location": "Supprimer l'emplacement '{{name}}'?",
+      "meal": "Supprimer le met '{{name}}'?",
+      "default": "Supprimer cet élément ?"
+    },
+    "bodyPrefix": "Vous êtes sur le point de supprimer",
+    "bodySuffix": "Si cet élément est utilisé, préférez le <strong>désactiver</strong> plutôt que de le supprimer.",
+    "reasonLabel": "Motif",
+    "placeholder": {
+      "category": "Ex: Doublon avec \"Cuisine Sawa\"",
+      "ingredient": "Ex: Doublon avec \"Arachide\"",
+      "location": "Ex: Ancienne adresse, déménagement…",
+      "meal": "Ex: Repas méconnu et non apprécié par le grand public…",
+      "default": "Raison de la suppression…"
+    },
+    "cancel": "Annuler",
+    "confirm": "Supprimer"
+  },
+
+  "paginator": {
+    "showing": "Affichage de",
+    "of": "sur",
+    "items": "éléments",
+    "perPage": "Par page",
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+
+  "moderationStatus": {
+    "approved": "Approuvé",
+    "pending": "En attente",
+    "rejected": "Rejeté",
+    "disabled": "Désactivé"
+  },
+  "categoryTable": {
+    "headers": {
+      "iconAndCategory": "Icône & Catégorie",
+      "type": "Type",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "loading": "Chargement…",
+    "emptyTitle": "Aucune catégorie trouvée",
+    "emptyDescription": "Aucun élément ne correspond aux filtres actifs.",
+    "type": {
+      "CUISINE": "CUISINE",
+      "DISH_TYPE": "TYPE DE PLAT"
+    },
+    "actions": {
+      "editing": "En cours d'édition",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    }
+  },
+
+  "ingredientTable": {
+    "headers": {
+      "ingredient": "Ingrédient",
+      "origin": "Origine",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "loading": "Chargement…",
+    "emptyTitle": "Aucun ingrédient trouvé",
+    "emptyDescription": "Aucun élément ne correspond aux filtres actifs.",
+    "allergen": "Allergène",
+    "nonAllergen": "Non allergène",
+    "creator": {
+      "ADMIN": "Admin",
+      "VENDOR": "Vendeur",
+      "CUSTOMER": "Client",
+      "SYSTEM": "Système"
+    },
+    "actions": {
+      "editing": "En cours d'édition",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    }
+  },
+
+  "locationTable": {
+    "headers": {
+      "location": "Emplacement",
+      "coordinates": "Coordonnées",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "loading": "Chargement…",
+    "emptyTitle": "Aucun emplacement",
+    "emptyDescription": "Aucun emplacement ne correspond aux filtres actifs.",
+    "radius": "Rayon {{km}} km",
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "selectedForModeration": "Sélectionné pour modération",
+      "selectForModeration": "Sélectionner pour modération"
+    }
+  },
+
+  "mealTable": {
+    "headers": {
+      "meal": "Plat",
+      "categories": "Catégories",
+      "price": "Prix",
+      "composition": "Composition & distribution",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "loading": "Chargement…",
+    "emptyTitle": "Aucun plat",
+    "emptyDescription": "Aucun plat ne correspond aux filtres actifs.",
+    "ingredients_one": "{{count}} ingrédient",
+    "ingredients_many": "{{count}} ingrédients",
+    "allergens_one": "{{count}} allergène",
+    "allergens_many": "{{count}} allergènes",
+    "locations_one": "{{count}} point",
+    "locations_many": "{{count}} points",
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "selectedForModeration": "Sélectionné pour modération",
+      "selectForModeration": "Sélectionner pour modération"
+    }
+  },
+  "mealReferencesPanel": {
+    "title": "Références du plat",
+    "subtitle": "Ingrédients et points de distribution liés à ce plat.",
+    "unapprovedCount": "{{count}} à valider",
+    "loading": "Chargement…",
+    "error": "Impossible de charger les références de ce plat.",
+    "noSelection": "Sélectionnez un plat dans la liste pour voir ses références.",
+    "ingredientsLabel": "Ingrédients",
+    "ingredientsEmpty": "Aucun ingrédient.",
+    "locationsLabel": "Points de distribution",
+    "locationsEmpty": "Aucun point de distribution."
+  },
+
+  "mealFilters": {
+    "namePlaceholder": "Rechercher un plat…",
+    "status": {
+      "ALL": "Tous les statuts",
+      "PENDING": "En attente",
+      "APPROVED": "Approuvé",
+      "REJECTED": "Rejeté",
+      "DISABLED": "Désactivé"
+    },
+    "sort": {
+      "nameAsc": "Nom (A → Z)",
+      "nameDesc": "Nom (Z → A)",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant",
+      "recent": "Plus récents"
+    }
+  },
+
+  "inlineLocationSelector": {
+    "allCities": "Toutes les villes",
+    "zonePlaceholder": "Sélectionner une zone…",
+    "noMatch": "Aucune zone ne correspond.",
+    "removeAriaLabel": "Retirer {{name}}"
+  },
+
+  "moderationPanel": {
+    "title": "Modération",
+    "subtitle": "Statut actuel et actions disponibles selon votre rôle.",
+    "reasonLabel": "Motif",
+    "reasonPlaceholder": "Expliquez la raison de la décision…",
+    "reasonRequired": "Un motif est requis pour cette action.",
+    "invalidTransition": "Transition invalide depuis le statut actuel.",
+    "moderationFailed": "Échec de la modération. Réessayez.",
+    "noDecisionRejected": "Cette catégorie a été rejetée. Corrigez le contenu puis contactez un administrateur pour la remettre en revue.",
+    "noDecisionDefault": "Aucune action de modération n'est disponible pour ce statut.",
+    "latestAction": "Dernière action :",
+    "by": "par",
+    "reasonPrefix": "Motif :",
+    "decision": {
+      "APPROVE": {
+        "label": "Approuver",
+        "confirm": "Approuver cette catégorie ?"
+      },
+      "REJECT": {
+        "label": "Rejeter",
+        "confirm": "Rejeter cette catégorie ?"
+      },
+      "DISABLE": {
+        "label": "Désactiver",
+        "confirm": "Désactiver cette catégorie ?"
+      },
+      "REVOKE": {
+        "label": "Réviser",
+        "confirm": "Renvoyer cette catégorie en revue ?"
+      },
+      "REACTIVATE": {
+        "label": "Réactiver",
+        "confirm": "Réactiver cette catégorie ?"
+      }
+    },
+    "actor": {
+      "ADMIN": "Admin",
+      "SYSTEM": "Système",
+      "VENDOR": "Vendeur",
+      "CUSTOMER": "Client"
+    }
+  },
+  "mealsPage": {
+    "badge": "Plats",
+    "scope": {
+      "admin": "Modération",
+      "vendor": "Mon menu"
+    },
+    "title": {
+      "admin": "Modération des Plats",
+      "vendor": "Mes Plats"
+    },
+    "subtitle": {
+      "admin": "Examinez et modérez les plats soumis par les vendeurs.",
+      "vendor": "Gérez votre menu et vos plats pour vos clients Chop ça!."
+    },
+    "newButton": "Nouveau Plat",
+    "noVendor": {
+      "title": "Aucun vendeur associé",
+      "description": "Votre compte n'est pas encore relié à un profil vendeur."
+    },
+    "adminNoVendor": {
+      "title": "Sélectionnez un vendeur",
+      "description": "Utilisez le panneau de gauche pour choisir un vendeur et afficher ses plats."
+    },
+    "adminHint": "Sélectionnez un plat dans la liste pour le modérer.",
+    "toast": {
+      "loadFailed": "Échec du chargement des plats",
+      "deleted": "Plat supprimé",
+      "deleteFailed": "Échec de la suppression"
+    }
+  },
+  "categoryIconPicker": {
+    "soup": "Soupes & Sauces",
+    "seafood": "Poisson & Fruits de mer",
+    "grill": "Grillades & Braisés",
+    "stew": "Marmites & Banquets",
+    "rice": "Riz & Céréales",
+    "noodles": "Pâtes & Nouilles",
+    "skewers": "Brochettes & Soya",
+    "starters": "Entrées & Amuse-bouche",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "brunch": "Brunch",
+    "pastry": "Beignets & Pâtisseries",
+    "icecream": "Desserts glacés",
+    "cake": "Gâteaux & Douceurs",
+    "celebration": "Fêtes & Événements",
+    "plant": "Végétal & Bio",
+    "herbs": "Herbes & Feuilles",
+    "spicy": "Épicé & Piment",
+    "sauce": "Sauces & Bouillons",
+    "terroir": "Produits du terroir",
+    "general": "Généraliste",
+    "menu": "Menu",
+    "streetfood": "Street Food",
+    "local": "Cuisine locale"
+  },
+
+  "categoryForm": {
+    "title": {
+      "edit": "Modifier la catégorie",
+      "create": "Ajouter une catégorie"
+    },
+    "subtitle": "Définir une taxonomie pour les plats et les cuisines partenaires Chop ça!.",
+    "statusBadge": {
+      "editing": "Édition",
+      "draft": "Brouillon"
+    },
+    "name": {
+      "label": "Nom de la catégorie",
+      "placeholder": "Ex: Cuisine Sawa (Littoral), Street Food...",
+      "error": "Nom requis (2 à 100 caractères).",
+      "hint": "Nom clair affiché aux utilisateurs et dans les cartes de livraison."
+    },
+    "type": {
+      "label": "Type de catégorie",
+      "CUISINE": {
+        "label": "Cuisine",
+        "caption": "Région, terroir ou tradition culinaire (ex: Sawa, Grassfields)."
+      },
+      "DISH_TYPE": {
+        "label": "Type de plat",
+        "caption": "Rôle structurel du plat (ex: Entrée, Plat principal, Dessert)."
+      }
+    },
+    "description": {
+      "label": "Description d'accroche & Mots-clés",
+      "placeholder": "Décrivez les ingrédients phares, saveurs et particularités pour le moteur de recherche..."
+    },
+    "icon": {
+      "label": "Icône de la catégorie",
+      "hint": "Choisissez une icône parmi les suggestions. Recliquez pour désélectionner."
+    },
+    "submit": {
+      "saving": "Enregistrement…",
+      "update": "Mettre à jour",
+      "create": "Enregistrer la catégorie"
+    },
+    "cancel": "Annuler",
+    "reset": "Réinitialiser"
+  },
+
+  "categoryFilters": {
+    "namePlaceholder": "Rechercher par nom, mot-clé...",
+    "clearTitle": "Effacer",
+    "clearAriaLabel": "Effacer la recherche",
+    "searchTitle": "Rechercher",
+    "searchAriaLabel": "Rechercher",
+    "type": {
+      "ALL": "Tous les types",
+      "CUISINE": "Cuisine",
+      "DISH_TYPE": "Type de plat"
+    },
+    "status": {
+      "ALL": "Tous les statuts",
+      "APPROVED": "Approuvé",
+      "PENDING": "En attente",
+      "REJECTED": "Rejeté"
+    },
+    "sort": {
+      "nameAsc": "Nom (A-Z)",
+      "nameDesc": "Nom (Z-A)",
+      "statusAsc": "Statut"
+    }
+  },
+
+  "categoriesPage": {
+    "badge": "Meals e-commerce taxonomie",
+    "title": "Gestion des catégories",
+    "subtitle": "Structurez les catégories et les types de plats qui alimentent les filtres du catalogue client.",
+    "importCsv": "Importer CSV",
+    "exportCsv": "Exporter CSV",
+    "newCategory": "Nouvelle Catégorie",
+    "toast": {
+      "updated": "Catégorie mise à jour",
+      "created": "Catégorie créée",
+      "updateFailed": "Échec de la mise à jour",
+      "createFailed": "Échec de la création",
+      "activated": "Catégorie activée",
+      "deactivated": "Catégorie désactivée",
+      "toggleFailed": "Échec du changement de statut",
+      "deleted": "Catégorie supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "importNotReady": "Import CSV — fonctionnalité à venir",
+      "exportNotReady": "Export CSV — fonctionnalité à venir",
+      "loadFailed": "Échec du chargement des catégories"
+    }
+  },
+  "vendorVisuals": {
+    "sectionTitle": "Identité Visuelle & Vitrine",
+    "logo": {
+      "label": "Logo de l'enseigne"
+    },
+    "logoHint": "PNG, WEBP ou JPEG (Max. 5 Mo)",
+    "banner": {
+      "label": "Bannière de couverture (16:9)"
+    },
+    "bannerHint": "Conseil : Privilégiez un plan serré de vos plats signatures",
+    "bannerRecommendedSize": "1920x1080 recommandé",
+    "reference": "ref: {{ref}}"
+  },
+
+  "vendorLogistics": {
+    "sectionTitle": "Géolocalisation & Logistique Flotte",
+    "requiredBadge": "Obligatoire",
+    "city": {
+      "label": "Ville d'implantation",
+      "placeholder": "Sélectionnez une ville",
+      "empty": "Aucune ville disponible",
+      "hint": "La ville détermine la zone de recherche pour vos clients.",
+      "requiredError": "La ville d'implantation est obligatoire."
+    },
+    "address": {
+      "label": "Adresse physique principale de l'établissement",
+      "placeholder": "ex: Rue des Palmiers, Akwa, Douala",
+      "hint": "Adresse officielle d'implantation utilisée pour le géocodage GPS précis.",
+      "requiredError": "L'adresse physique est obligatoire."
+    },
+    "pickup": {
+      "label": "Adresse de retrait des commandes (Pick-up Coursiers)",
+      "sameAsMain": "Identique à l'adresse principale",
+      "placeholder": "ex: Entrée coursière au fond de l'impasse...",
+      "hint": "Précision utile pour les livreurs partenaires lors des heures de pointe."
+    },
+    "radius": {
+      "label": "Rayon de livraison garanti",
+      "description": "Périmètre maximal d'expédition des repas chauds pour préserver la fraîcheur.",
+      "unit": "km",
+      "tierUltraLocal": "1 km (Ultra local)",
+      "tierRecommended": "8 km (Recommandé)",
+      "tierWide": "15 km (Grand bassin)",
+      "tierMax": "25 km (Zone max métropole)",
+      "simulationLabel": "Simulation de couverture : Bonapriso, Akwa, Bonanjo, Deido"
+    }
+  },
+
+  "vendorKyc": {
+    "sectionTitle": "Modération Réglementaire & Documents KYC",
+    "sectionSubtitle": "Vérification d'identité requise par la réglementation des paiements UEMOA / CEMAC",
+    "status": {
+      "compliant": "Conforme",
+      "pending": "En attente"
+    },
+    "infoBanner": {
+      "title": "Processus de vérification et statut initial :",
+      "bodyPrefix": "À la soumission du formulaire, le statut de votre compte sera configuré sur",
+      "bodyBold1": "En attente d'approbation",
+      "bodyMiddle": ". Notre équipe d'audit culinaire et légale vérifiera vos pièces d'identité et contact sous",
+      "bodyBold2": "24 heures ouvrées",
+      "bodySuffix": "pour activer la réception de commandes en direct."
+    },
+    "front": {
+      "label": "CNI / Passeport (Recto)"
+    },
+    "frontHint": "Photo nette, bords visibles, sans reflets.",
+    "back": {
+      "label": "CNI / Passeport (Verso)"
+    },
+    "backHint": "Signature et date de validité lisibles.",
+    "uploadedSuffix": "(Uploadé)",
+    "terms": {
+      "prefix": "Je certifie sur l'honneur l'exactitude des informations fournies, être habilité(e) à représenter cet établissement de restauration et accepter la",
+      "charter": "Charte d'Hygiène & Fraîcheur ChopÇa!",
+      "suffix": "."
+    },
+    "termsError": "Vous devez accepter les conditions pour continuer."
+  },
+
+  "stepperHeader": {
+    "eyebrow": "Portail Partenaire Culinaire • Cameroun & Sous-région",
+    "title": "Demande d'Adhésion Restaurant & Artisan",
+    "subtitle": "Créez votre vitrine gastronomique ChopÇa! et touchez des dizaines de milliers de gourmets passionnés.",
+    "badge": "Inscription 100% Gratuite • Validation sous 24h",
+    "steps": {
+      "identity": {
+        "label": "Identité & Contact",
+        "subLabel": "Établissement"
+      },
+      "specialties": {
+        "label": "Spécialités & Vitrine",
+        "subLabel": "Terroirs & visuels"
+      },
+      "logistics": {
+        "label": "Logistique & Rayon",
+        "subLabel": "Point de retrait"
+      },
+      "kyc": {
+        "label": "KYC & CNI",
+        "subLabel": "Modération légale"
+      }
+    }
+  },
+
+  "vendorPreviewCard": {
+    "header": "Aperçu Vitrine en Direct",
+    "simulation": "Simulation App Client",
+    "newBadge": "4.9 • Nouveau",
+    "verifiedBadge": "Vérifié ChopÇa!",
+    "businessNameFallback": "Nom de votre établissement",
+    "descriptionFallback": "Racontez l'histoire de votre carte culinaire...",
+    "deliveryTime": "25-40 min",
+    "radius": "Rayon : {{km}} km",
+    "noCategories": "Aucune catégorie sélectionnée",
+    "footer": "Cette vue représente l'agencement exact de votre enseigne sur l'application mobile ChopÇa! pour les clients finaux."
+  },
+
+  "vendorBenefits": {
+    "title": "Pourquoi rejoindre Chop ça!",
+    "zeroFees": {
+      "label": "0 FCFA de frais d'activation",
+      "description": "Aucun abonnement mensuel caché. Commission prélevée uniquement sur les ventes livrées."
+    },
+    "weeklyPayments": {
+      "label": "Paiements Hebdomadaires MoMo / OM",
+      "description": "Reversements automatiques sur votre compte Orange Money, MTN MoMo ou virement bancaire UBA/Ecobank."
+    },
+    "audience": {
+      "label": "+50 000 gourmets actifs",
+      "description": "Accédez instantanément à un vivier qualifié de passionnés de bonne cuisine et de cuisine de terroir."
+    },
+    "testimonial": {
+      "name": "Cheffe Christiane Ebodé",
+      "role": "Fondatrice • Le Comptoir de Yaoundé",
+      "quote": "« En 3 mois sur ChopÇa!, nous avons doublé notre débit sur les commandes du midi sans embaucher de livreurs supplémentaires. La flotte de coursiers est ultra ponctuelle ! »",
+      "partnerSince": "Partenaire depuis 2024",
+      "portraitAlt": "Portrait cheffe partenaire"
+    }
+  },
+  "vendorRegistration": {
+    "actionBar": {
+      "stepCounter": "Étape {{step}} sur 4",
+      "stepHint": "Continuez pour compléter votre inscription.",
+      "readyTitle": "Prêt(e) à lancer votre cuisine en ligne ?",
+      "readyHintPrefix": "Statut d'inscription automatique :",
+      "readyHintSuffix": "(Audit & validation sous 24h).",
+      "back": "Retour",
+      "continue": "Continuer",
+      "submitting": "Envoi en cours…",
+      "submit": "Soumettre ma demande"
+    },
+    "cuisineError": "Sélectionnez au moins une spécialité culinaire.",
+    "submitErrorFallback": "Échec de l'inscription. Veuillez réessayer."
+  },
+  "userAccessDenied": {
+    "title": "Accès refusé",
+    "fallbackUser": "Utilisateur",
+    "role": {
+      "ADMIN": "administrateur",
+      "VENDOR": "vendeur",
+      "CUSTOMER": "client",
+      "unknown": "cette section"
+    },
+    "message": {
+      "roleMissingWithRole": "{{email}} n'a pas accès aux pages {{role}}.",
+      "roleMissing": "{{email}} n'a pas les permissions requises pour accéder à cette page.",
+      "contextMissingWithRole": "Aucun profil {{role}} n'est associé à {{email}}.",
+      "contextMissing": "Aucun profil n'est associé à {{email}}.",
+      "default": "{{email}} n'a pas accès à cette page."
+    },
+    "supportHint": "Si vous pensez qu'il s'agit d'une erreur, contactez le support Chop ça!.",
+    "backToCatalog": "Retour au catalogue",
+    "logout": "Se déconnecter"
+  },
+  "cityTable": {
+    "headers": {
+      "name": "Nom",
+      "region": "Région",
+      "actions": "Actions"
+    },
+    "regionEmpty": "Non renseignée",
+    "empty": "Aucune ville trouvée.",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+
+  "cityForm": {
+    "title": {
+      "edit": "Modifier « {{name}} »",
+      "create": "Nouvelle ville"
+    },
+    "name": {
+      "label": "Nom de la ville",
+      "placeholder": "ex: Douala, Yaoundé, Bafoussam…",
+      "required": "Le nom est requis",
+      "minLength": "Minimum 2 caractères",
+      "maxLength": "Maximum 120 caractères"
+    },
+    "region": {
+      "label": "Région (optionnel)",
+      "placeholder": "ex: Littoral, Centre, Ouest…",
+      "maxLength": "Maximum 120 caractères"
+    },
+    "countryCode": {
+      "label": "Code pays",
+      "placeholder": "CM",
+      "hintPrefix": "ISO 3166-1 alpha-2. Fixé à",
+      "hintSuffix": "pour le Cameroun."
+    },
+    "cancel": "Annuler",
+    "saving": "Enregistrement…",
+    "save": "Enregistrer",
+    "create": "Créer"
+  },
+
+  "cityFilters": {
+    "searchLabel": "Recherche",
+    "searchPlaceholder": "Nom ou région…",
+    "clearAriaLabel": "Effacer",
+    "sortLabel": "Trier par",
+    "sort": {
+      "nameAsc": "Nom (A → Z)",
+      "nameDesc": "Nom (Z → A)",
+      "regionAsc": "Région (A → Z)",
+      "regionDesc": "Région (Z → A)"
+    }
+  },
+  "citiesPage": {
+    "badge": "Référentiel Géographique",
+    "scope": "Villes Cameroun",
+    "title": "Gestion des Villes",
+    "subtitle": "Référentiel des villes où les vendeurs peuvent opérer et où les clients peuvent commander ou retirer leurs repas.",
+    "newCity": "Nouvelle Ville",
+    "toast": {
+      "updated": "Ville mise à jour",
+      "created": "Ville créée",
+      "updateFailed": "Échec de la mise à jour",
+      "createFailed": "Échec de la création",
+      "deleted": "Ville supprimée",
+      "referenced": "Ville référencée par des vendeurs ou emplacements",
+      "deleteFailed": "Échec de la suppression",
+      "loadFailed": "Échec du chargement des villes"
+    }
+  },
+  "title": { "city": "Supprimer la ville '{{name}}'?" },
+  "placeholder": { "city": "Ex: Doublon, ville plus desservie…" }
+}

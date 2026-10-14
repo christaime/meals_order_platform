@@ -16,6 +16,6 @@ export const REGISTRATION_ROUTES: Routes = [
       loadComponent: () =>
         import('./vendor/vendor-registration.page')
           .then(m => m.VendorRegistrationPage),
-      title: 'Chop ça! • Register as a vendor',
+      title: 'routes.registration.vendor',
     }
 ];

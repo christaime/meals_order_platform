@@ -7,7 +7,8 @@ export const routes: Routes = [
   // Access denied to a route or page
   {
     path: 'user-access-denied',
-    component: UserAccessDeniedPage
+    component: UserAccessDeniedPage,
+    title: 'routes.accessDenied',
   },
   // Auth routes (Wrapped in AuthLayoutComponent)
   {

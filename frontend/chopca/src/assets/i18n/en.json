@@ -1,0 +1,983 @@
+{
+  "footer": {
+    "trustLine": "Chop ça! Cameroon",
+    "paymentsLabel": "Certified payments:",
+    "whatsappSupport": "WhatsApp Pro support (+237)",
+    "legalLink": "Legal notice & terms",
+    "tagline": "Cameroon's marketplace for authentic, locally-crafted meals. Order from trusted restaurateurs, delivered hot and fresh.",
+
+    "columns": {
+      "discover": {
+        "title": "Discover",
+        "links": {
+          "exploreMeals": "Explore meals",
+          "vendors": "Partner restaurateurs",
+          "howItWorks": "How it works"
+        }
+      },
+      "vendors": {
+        "title": "For restaurateurs",
+        "links": {
+          "becomePartner": "Become a partner",
+          "vendorSpace": "Vendor space",
+          "pricing": "Pricing"
+        }
+      },
+      "support": {
+        "title": "Support",
+        "links": {
+          "helpCenter": "Help center",
+          "whatsapp": "WhatsApp Pro",
+          "contact": "Contact us"
+        }
+      }
+    },
+
+    "bottom": {
+      "copyright": "© {{year}} Chop ça! All rights reserved. Made with passion in Cameroon.",
+      "terroirGuarantee": "100% local guaranteed",
+      "currency": "XAF accepted"
+    },
+
+    "social": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "tiktok": "TikTok"
+    }
+  },
+  "header": {
+    "portal": {
+      "admin": "Admin space",
+      "vendor": "Vendor space",
+      "customer": "Customer space",
+      "marketplace": "Marketplace"
+    },
+
+    "switch": {
+      "toVendor": "I Cook!",
+      "toCustomer": "I Chop!"
+    },
+
+    "mobileMenuOpen": "Open menu",
+    "mobileMenuClose": "Close menu",
+    "cart": "View cart",
+    "logout": "Sign out",
+    "account": "My account",
+    "vendorProfile": "My restaurant",
+    "adminSettings": "Admin settings",
+
+    "public": {
+      "exploreMeals": "Explore meals",
+      "partnerVendors": "Partner restaurateurs"
+    },
+
+    "vendorMenu": {
+      "manageDishes": "Manage dishes",
+      "dishList": "Dish list",
+      "newDish": "New dish",
+      "presenceZones": "Presence zones"
+    },
+
+    "adminMenu": {
+      "mealCatalog": "Meal catalog",
+      "categories": "Categories",
+      "ingredients": "Ingredients",
+      "meals": "Meals",
+      "vendorsAndPlaces": "Vendors & places",
+      "vendors": "Vendors",
+      "presenceZones": "Presence zones"
+    },
+
+    "customerMenu": {
+      "exploreMeals": "Explore meals",
+      "myOrders": "My orders",
+      "myFavorites": "My favorites",
+      "myAccount": "My account"
+    }
+  },
+  "marketplaceHome": {
+    "hero": {
+      "title": "Explore dishes",
+      "subtitle": "Discover the best meals from home."
+    }
+  },
+
+  "quickStats": {
+    "delivery": "Average delivery",
+    "satisfaction": "Customer rating",
+    "coverage": "Cities",
+    "hygiene": "Kitchens",
+    "hygieneCertified": "100% Verified"
+  },
+
+  "deliveryCoverage": {
+    "defaultTitle": "On-time consumption",
+    "subtitle": "Hot meals served in our restaurants near you.",
+    "highlights": {
+      "express": {
+        "title": "Express service",
+        "detail": "10 to 15 min on average"
+      },
+      "tracking": {
+        "title": "Live tracking",
+        "detail": "Notification at every step of your order's preparation"
+      },
+      "takeaway": {
+        "title": "Takeaway dishes",
+        "detail": "Insulated containers available"
+      }
+    },
+    "zonesLabel": "Neighborhoods currently covered"
+  },
+  "mealCard": {
+    "addToCart": "Add to cart",
+    "unavailable": "Sold out",
+    "order": "Order",
+    "details": "Details",
+    "prepTimeSuffix": "min"
+  },
+
+  "advancedFilter": {
+    "trigger": "Filters",
+    "title": "Advanced filters",
+    "minPrice": "Minimum price",
+    "maxPrice": "Maximum price",
+    "maxPrepTime": "Max preparation time",
+    "minRating": "Minimum rating",
+    "ratingAny": "Any",
+    "excludeIngredients": "Exclude ingredients",
+    "excludeIngredientsHint": "Dishes containing these ingredients will be hidden.",
+    "cuisines": "Cuisines",
+    "dishTypes": "Dish types",
+    "clearAll": "Clear all",
+    "apply": "Apply filters"
+  },
+
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+
+  "sort": {
+    "label": "Sort by:",
+    "nameAsc": "Name (A–Z)"
+  },
+  "ingredientAutocomplete": {
+    "defaultLabel": "Ingredients",
+    "defaultPlaceholder": "Search an ingredient…",
+    "allergenTag": "Allergen",
+    "noMatch": "No ingredient matches.",
+    "limitHint": "Maximum {{count}} ingredients excluded.",
+    "removeAriaLabel": "Remove {{name}}"
+  },
+
+  "categoryPills": {
+    "defaultLabel": "Categories",
+    "defaultEmpty": "No option available.",
+    "loadError": "Unable to load categories."
+  },
+
+  "floatingCart": {
+    "itemsSuffix": "item(s)",
+    "viewCart": "View cart"
+  },
+
+  "vendorDirectory": {
+    "title": "Restaurants & Partner Restaurateurs",
+    "subtitle": "Discover the best local establishments and caterers delivering in your area.",
+    "searchPlaceholder": "Search a restaurant, an establishment...",
+    "emptyTitle": "No restaurant found",
+    "emptyDescription": "We couldn't find any restaurant matching your criteria in this area.",
+    "emptyReset": "Reset search",
+    "defaultChipLabel": "All categories",
+    "sortByRating": "Best rated",
+    "sortByBusinessName": "Business name (A–Z)"
+  },
+  "vendorIdentity": {
+    "header": {
+      "title": "Establishment & Owner",
+      "subtitle": "Basic contractual data registered on ChopÇa!",
+      "requiredBadge": "Required"
+    },
+    "businessName": {
+      "label": "Business name of the establishment",
+      "placeholder": "e.g. Le Chaudron Sawa",
+      "hint": "Public name displayed to users (2 to 100 chars).",
+      "requiredError": "Business name is required.",
+      "minLengthError": "Minimum 2 characters."
+    },
+    "ownerName": {
+      "label": "Full name of the manager / owner",
+      "placeholder": "e.g. Pauline Ngo Moukoko",
+      "hint": "Legal identity as it appears on the official ID document.",
+      "requiredError": "Manager name is required."
+    },
+    "phone": {
+      "label": "Reachable phone number (OTP & Orders)",
+      "placeholder": "+237699001122",
+      "prefix": "CMR",
+      "hint": "Standard CEMAC/Cameroon format. A confirmation SMS will be sent to this contact.",
+      "requiredError": "Phone number is required.",
+      "patternError": "Invalid format. Example: +237699001122"
+    },
+    "description": {
+      "label": "Cuisine description / Culinary story",
+      "placeholder": "Tell the story of your cooking, the origin of your spices, and your signature dishes...",
+      "hint": ""
+    },
+    "inspirations": {
+      "label": "Quick inspirations:",
+      "smoking": "+ Artisanal smoking",
+      "terroir": "+ Ancestral terroir",
+      "fresh": "+ Fresh products"
+    }
+  },
+
+  "vendorCuisine": {
+    "title": "Culinary Specialties & Terroirs",
+    "subtitle": "(Select at least 1 specialty)",
+    "label": "Culinary specialties",
+    "hint": "Click the tags that match your establishment's culinary DNA to boost your visibility in the app's search filter.",
+    "empty": "No specialty available at the moment."
+  },
+
+  "mealCatalog": {
+    "defaultChip": "All types",
+    "sort": {
+      "ratingAvg": "Best rated",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "prepTime": "Preparation time",
+      "name": "Dish name (A–Z)"
+    },
+    "shortcut": {
+      "express": "Prep ≤ {{minutes}} min",
+      "eco": "From {{price}} FCFA"
+    },
+    "searchPlaceholder": "Search a dish, an ingredient...",
+    "emptyTitle": "No dishes match your criteria",
+    "emptyDescription": "Try adjusting your search or resetting your filters to discover other specialties.",
+    "emptyReset": "Reset all filters"
+  },
+  "activeFilters": {
+    "raw": "{{value}}",
+    "search": "Search: \"{{query}}\"",
+    "minPrice": "Min {{price}} FCFA",
+    "maxPrice": "Max {{price}} FCFA",
+    "prepTime": "Prep ≤ {{minutes}} min",
+    "rating": "{{rating}}+ ★",
+    "excludeIngredient": "Without {{name}}",
+    "label": "Active filters:",
+    "remove": "Remove filter",
+    "clearAll": "Clear all"
+  },
+  "searchBar": {
+    "defaultPlaceholder": "Search a dish, an ingredient or a restaurant...",
+    "clear": "Clear search",
+    "submit": "Search"
+  },
+  "locationPicker": {
+    "cityLabel": "City",
+    "cityPlaceholder": "Select a city…",
+    "mapUnavailableTitle": "Map unavailable",
+    "mapUnavailableDescription": "Unable to load the map. Reload the page to try again.",
+    "mapLoading": "Loading map…",
+    "hint": "Click on the map or drag the red marker to set your landmark. Available pickup points show up with the Chop ça pin.",
+    "radiusLabel": "Coverage radius",
+    "radiusValue": "{{km}} km",
+    "closeAriaLabel": "Close"
+  },
+
+  "locationPickerButton": {
+    "chooseZone": "Choose an area",
+    "chooseZoneSubtitle": "City, map point, radius",
+    "clearAriaLabel": "Clear area",
+    "summaryOnePointInRadius": "{{count}} pickup point within {{radius}} km",
+    "summaryManyPointsInRadius": "{{count}} pickup points within {{radius}} km",
+    "summaryOnePointInCity": "{{count}} pickup point in this city",
+    "summaryManyPointsInCity": "{{count}} pickup points in this city",
+    "searching": "Searching…",
+    "resultFoundOne": "{{count}} pickup point found",
+    "resultFoundMany": "{{count}} pickup points found",
+    "noResultsInZone": "No pickup points in this area.",
+    "chooseCity": "Choose a city",
+    "cancel": "Cancel",
+    "apply": "Apply"
+  },
+  "chatWidget": {
+    "openAriaLabel": "Open MealMate",
+    "closeAriaLabel": "Close",
+    "loading": "Loading…",
+    "greetingTitle": "Hi, I'm MealMate.",
+    "greetingSubtitle": "Tell me what you're looking for.",
+    "jumpToLatest": "Go to latest message",
+    "inputPlaceholder": "Ask your question…",
+    "sendAriaLabel": "Send"
+  },
+  "mealDetail": {
+    "unavailable": "Currently unavailable",
+    "prepTime": "{{minutes}} min preparation",
+    "proposedBy": "Offered by",
+    "ingredientsLabel": "Ingredients:",
+    "pickupLocationsLabel": "Pickup points:",
+    "totalPriceLabel": "Total price",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "addToCart": "Add to cart"
+  },
+
+  "vendorDetail": {
+    "open": "Open",
+    "closed": "Closed",
+    "deliveryTime": "{{minutes}} min",
+    "minOrder": "Min. {{amount}} FCFA"
+  },
+  "vendorCard": {
+    "open": "Open",
+    "closed": "Closed"
+  },
+  "app": {
+    "name": "Chop ça!"
+  },
+
+  "routes": {
+    "accessDenied": "Access denied",
+    "auth": {
+      "login": "User sign-in"
+    },
+    "registration": {
+      "vendor": "Register as a vendor"
+    },
+    "marketplace": {
+      "home": "Cameroonian meals delivered to your door",
+      "mealDetail": "Meal details",
+      "vendorDirectory": "Partner restaurants",
+      "vendorDetail": "Restaurant"
+    },
+    "admin": {
+      "cities": "Cities",
+      "categories": "Meal categories",
+      "ingredients": "Meal ingredients",
+      "locations": "Distribution locations",
+      "meals": "Meals",
+      "vendors": "Vendor moderation"
+    },
+    "vendor": {
+      "locations": "Your distribution locations",
+      "profile": "Your profile",
+      "meals": "Manage dishes",
+      "mealNew": "New dish",
+      "mealEdit": "Edit a dish",
+      "mealDetail": "Meal details"
+    }
+  },
+  "imageUploader": {
+    "previewAlt": "Preview",
+    "removeImage": "Remove image",
+    "uploading": "Uploading… {{progress}}%",
+    "dropHint": "Click or drop an image",
+    "retry": "Retry"
+  },
+
+  "deleteEntityDialog": {
+    "title": {
+      "category": "Delete category '{{name}}'?",
+      "ingredient": "Delete ingredient '{{name}}'?",
+      "location": "Delete location '{{name}}'?",
+      "meal": "Delete dish '{{name}}'?",
+      "default": "Delete this item?"
+    },
+    "bodyPrefix": "You are about to delete",
+    "bodySuffix": "If this item is in use, prefer <strong>disabling</strong> it rather than deleting it.",
+    "reasonLabel": "Reason",
+    "placeholder": {
+      "category": "E.g. Duplicate of \"Cuisine Sawa\"",
+      "ingredient": "E.g. Duplicate of \"Peanut\"",
+      "location": "E.g. Old address, relocation…",
+      "meal": "E.g. Dish unknown and not appreciated by the general public…",
+      "default": "Reason for deletion…"
+    },
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+
+  "paginator": {
+    "showing": "Showing",
+    "of": "of",
+    "items": "items",
+    "perPage": "Per page",
+    "previous": "Previous",
+    "next": "Next"
+  },
+
+  "moderationStatus": {
+    "approved": "Approved",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "disabled": "Disabled"
+  },
+  "categoryTable": {
+    "headers": {
+      "iconAndCategory": "Icon & Category",
+      "type": "Type",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "loading": "Loading…",
+    "emptyTitle": "No category found",
+    "emptyDescription": "No item matches the active filters.",
+    "type": {
+      "CUISINE": "CUISINE",
+      "DISH_TYPE": "DISH TYPE"
+    },
+    "actions": {
+      "editing": "Editing",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+
+  "ingredientTable": {
+    "headers": {
+      "ingredient": "Ingredient",
+      "origin": "Origin",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "loading": "Loading…",
+    "emptyTitle": "No ingredient found",
+    "emptyDescription": "No item matches the active filters.",
+    "allergen": "Allergen",
+    "nonAllergen": "Not an allergen",
+    "creator": {
+      "ADMIN": "Admin",
+      "VENDOR": "Vendor",
+      "CUSTOMER": "Customer",
+      "SYSTEM": "System"
+    },
+    "actions": {
+      "editing": "Editing",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+
+  "locationTable": {
+    "headers": {
+      "location": "Location",
+      "coordinates": "Coordinates",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "loading": "Loading…",
+    "emptyTitle": "No location",
+    "emptyDescription": "No location matches the active filters.",
+    "radius": "Radius {{km}} km",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "selectedForModeration": "Selected for moderation",
+      "selectForModeration": "Select for moderation"
+    }
+  },
+
+  "mealTable": {
+    "headers": {
+      "meal": "Dish",
+      "categories": "Categories",
+      "price": "Price",
+      "composition": "Composition & distribution",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "loading": "Loading…",
+    "emptyTitle": "No dish",
+    "emptyDescription": "No dish matches the active filters.",
+    "ingredients_one": "{{count}} ingredient",
+    "ingredients_many": "{{count}} ingredients",
+    "allergens_one": "{{count}} allergen",
+    "allergens_many": "{{count}} allergens",
+    "locations_one": "{{count}} point",
+    "locations_many": "{{count}} points",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "selectedForModeration": "Selected for moderation",
+      "selectForModeration": "Select for moderation"
+    }
+  },
+  "mealReferencesPanel": {
+    "title": "Meal references",
+    "subtitle": "Ingredients and distribution points linked to this meal.",
+    "unapprovedCount": "{{count}} to validate",
+    "loading": "Loading…",
+    "error": "Unable to load this meal's references.",
+    "noSelection": "Select a meal in the list to see its references.",
+    "ingredientsLabel": "Ingredients",
+    "ingredientsEmpty": "No ingredient.",
+    "locationsLabel": "Distribution points",
+    "locationsEmpty": "No distribution point."
+  },
+
+  "mealFilters": {
+    "namePlaceholder": "Search a dish…",
+    "status": {
+      "ALL": "All statuses",
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "DISABLED": "Disabled"
+    },
+    "sort": {
+      "nameAsc": "Name (A → Z)",
+      "nameDesc": "Name (Z → A)",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "recent": "Most recent"
+    }
+  },
+
+  "inlineLocationSelector": {
+    "allCities": "All cities",
+    "zonePlaceholder": "Select an area…",
+    "noMatch": "No area matches.",
+    "removeAriaLabel": "Remove {{name}}"
+  },
+
+  "moderationPanel": {
+    "title": "Moderation",
+    "subtitle": "Current status and available actions based on your role.",
+    "reasonLabel": "Reason",
+    "reasonPlaceholder": "Explain the reason for the decision…",
+    "reasonRequired": "A reason is required for this action.",
+    "invalidTransition": "Invalid transition from the current status.",
+    "moderationFailed": "Moderation failed. Please try again.",
+    "noDecisionRejected": "This category was rejected. Fix the content and contact an administrator to bring it back for review.",
+    "noDecisionDefault": "No moderation action is available for this status.",
+    "latestAction": "Last action:",
+    "by": "by",
+    "reasonPrefix": "Reason:",
+    "decision": {
+      "APPROVE": {
+        "label": "Approve",
+        "confirm": "Approve this category?"
+      },
+      "REJECT": {
+        "label": "Reject",
+        "confirm": "Reject this category?"
+      },
+      "DISABLE": {
+        "label": "Disable",
+        "confirm": "Disable this category?"
+      },
+      "REVOKE": {
+        "label": "Revoke",
+        "confirm": "Send this category back for review?"
+      },
+      "REACTIVATE": {
+        "label": "Reactivate",
+        "confirm": "Reactivate this category?"
+      }
+    },
+    "actor": {
+      "ADMIN": "Admin",
+      "SYSTEM": "System",
+      "VENDOR": "Vendor",
+      "CUSTOMER": "Customer"
+    }
+  },
+  "mealsPage": {
+    "badge": "Dishes",
+    "scope": {
+      "admin": "Moderation",
+      "vendor": "My menu"
+    },
+    "title": {
+      "admin": "Dish moderation",
+      "vendor": "My dishes"
+    },
+    "subtitle": {
+      "admin": "Review and moderate dishes submitted by vendors.",
+      "vendor": "Manage your menu and dishes for your Chop ça! customers."
+    },
+    "newButton": "New dish",
+    "noVendor": {
+      "title": "No vendor associated",
+      "description": "Your account is not yet linked to a vendor profile."
+    },
+    "adminNoVendor": {
+      "title": "Select a vendor",
+      "description": "Use the left panel to choose a vendor and display their dishes."
+    },
+    "adminHint": "Select a dish in the list to moderate it.",
+    "toast": {
+      "loadFailed": "Failed to load dishes",
+      "deleted": "Dish deleted",
+      "deleteFailed": "Failed to delete"
+    }
+  },
+  "categoryIconPicker": {
+    "soup": "Soups & Sauces",
+    "seafood": "Fish & Seafood",
+    "grill": "Grills & Braises",
+    "stew": "Stews & Banquets",
+    "rice": "Rice & Cereals",
+    "noodles": "Pasta & Noodles",
+    "skewers": "Skewers & Soya",
+    "starters": "Starters & Appetizers",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "brunch": "Brunch",
+    "pastry": "Pastries & Fritters",
+    "icecream": "Frozen Desserts",
+    "cake": "Cakes & Sweets",
+    "celebration": "Parties & Events",
+    "plant": "Plant-based & Organic",
+    "herbs": "Herbs & Leaves",
+    "spicy": "Spicy & Chili",
+    "sauce": "Sauces & Broths",
+    "terroir": "Local Produce",
+    "general": "General",
+    "menu": "Menu",
+    "streetfood": "Street Food",
+    "local": "Local Cuisine"
+  },
+
+  "categoryForm": {
+    "title": {
+      "edit": "Edit category",
+      "create": "Add a category"
+    },
+    "subtitle": "Define a taxonomy for dishes and Chop ça! partner cuisines.",
+    "statusBadge": {
+      "editing": "Editing",
+      "draft": "Draft"
+    },
+    "name": {
+      "label": "Category name",
+      "placeholder": "E.g. Sawa cuisine (Littoral), Street Food...",
+      "error": "Name required (2 to 100 characters).",
+      "hint": "Clear name displayed to users and on delivery cards."
+    },
+    "type": {
+      "label": "Category type",
+      "CUISINE": {
+        "label": "Cuisine",
+        "caption": "Region, terroir or culinary tradition (e.g. Sawa, Grassfields)."
+      },
+      "DISH_TYPE": {
+        "label": "Dish type",
+        "caption": "Structural role of the dish (e.g. Starter, Main course, Dessert)."
+      }
+    },
+    "description": {
+      "label": "Hook description & Keywords",
+      "placeholder": "Describe the key ingredients, flavors and specialties for the search engine..."
+    },
+    "icon": {
+      "label": "Category icon",
+      "hint": "Choose an icon from the suggestions. Click again to deselect."
+    },
+    "submit": {
+      "saving": "Saving…",
+      "update": "Update",
+      "create": "Save category"
+    },
+    "cancel": "Cancel",
+    "reset": "Reset"
+  },
+
+  "categoryFilters": {
+    "namePlaceholder": "Search by name, keyword...",
+    "clearTitle": "Clear",
+    "clearAriaLabel": "Clear search",
+    "searchTitle": "Search",
+    "searchAriaLabel": "Search",
+    "type": {
+      "ALL": "All types",
+      "CUISINE": "Cuisine",
+      "DISH_TYPE": "Dish type"
+    },
+    "status": {
+      "ALL": "All statuses",
+      "APPROVED": "Approved",
+      "PENDING": "Pending",
+      "REJECTED": "Rejected"
+    },
+    "sort": {
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "statusAsc": "Status"
+    }
+  },
+
+  "categoriesPage": {
+    "badge": "Meals e-commerce taxonomy",
+    "title": "Category management",
+    "subtitle": "Organize the categories and dish types that feed the customer catalog filters.",
+    "importCsv": "Import CSV",
+    "exportCsv": "Export CSV",
+    "newCategory": "New category",
+    "toast": {
+      "updated": "Category updated",
+      "created": "Category created",
+      "updateFailed": "Update failed",
+      "createFailed": "Creation failed",
+      "activated": "Category activated",
+      "deactivated": "Category deactivated",
+      "toggleFailed": "Failed to change status",
+      "deleted": "Category deleted",
+      "deleteFailed": "Delete failed",
+      "importNotReady": "CSV import — feature coming soon",
+      "exportNotReady": "CSV export — feature coming soon",
+      "loadFailed": "Failed to load categories"
+    }
+  },
+  "vendorVisuals": {
+    "sectionTitle": "Visual identity & Storefront",
+    "logo": {
+      "label": "Brand logo"
+    },
+    "logoHint": "PNG, WEBP or JPEG (Max. 5 MB)",
+    "banner": {
+      "label": "Cover banner (16:9)"
+    },
+    "bannerHint": "Tip: prefer a close-up of your signature dishes",
+    "bannerRecommendedSize": "1920x1080 recommended",
+    "reference": "ref: {{ref}}"
+  },
+
+  "vendorLogistics": {
+    "sectionTitle": "Geolocation & Fleet logistics",
+    "requiredBadge": "Required",
+    "city": {
+      "label": "Operating city",
+      "placeholder": "Select a city",
+      "empty": "No city available",
+      "hint": "The city determines the search area for your customers.",
+      "requiredError": "The operating city is required."
+    },
+    "address": {
+      "label": "Main physical address of the establishment",
+      "placeholder": "e.g. Rue des Palmiers, Akwa, Douala",
+      "hint": "Official address used for precise GPS geocoding.",
+      "requiredError": "The physical address is required."
+    },
+    "pickup": {
+      "label": "Order pickup address (Courier pickup)",
+      "sameAsMain": "Same as main address",
+      "placeholder": "e.g. Courier entrance at the end of the alley...",
+      "hint": "Helpful detail for partner couriers during peak hours."
+    },
+    "radius": {
+      "label": "Guaranteed delivery radius",
+      "description": "Maximum shipping perimeter for hot meals to preserve freshness.",
+      "unit": "km",
+      "tierUltraLocal": "1 km (Ultra local)",
+      "tierRecommended": "8 km (Recommended)",
+      "tierWide": "15 km (Wide basin)",
+      "tierMax": "25 km (Max metropolitan area)",
+      "simulationLabel": "Coverage simulation: Bonapriso, Akwa, Bonanjo, Deido"
+    }
+  },
+
+  "vendorKyc": {
+    "sectionTitle": "Regulatory moderation & KYC documents",
+    "sectionSubtitle": "Identity verification required by UEMOA / CEMAC payment regulations",
+    "status": {
+      "compliant": "Compliant",
+      "pending": "Pending"
+    },
+    "infoBanner": {
+      "title": "Verification process and initial status:",
+      "bodyPrefix": "When you submit the form, your account status will be set to",
+      "bodyBold1": "Pending approval",
+      "bodyMiddle": ". Our culinary and legal audit team will review your ID documents and contact within",
+      "bodyBold2": "24 business hours",
+      "bodySuffix": "to activate live order reception."
+    },
+    "front": {
+      "label": "ID card / Passport (Front)"
+    },
+    "frontHint": "Clear photo, visible edges, no glare.",
+    "back": {
+      "label": "ID card / Passport (Back)"
+    },
+    "backHint": "Signature and validity date legible.",
+    "uploadedSuffix": "(Uploaded)",
+    "terms": {
+      "prefix": "I certify on my honor the accuracy of the information provided, that I am authorized to represent this catering establishment, and I accept the",
+      "charter": "ChopÇa! Hygiene & Freshness Charter",
+      "suffix": "."
+    },
+    "termsError": "You must accept the terms to continue."
+  },
+
+  "stepperHeader": {
+    "eyebrow": "Culinary Partner Portal • Cameroon & Sub-region",
+    "title": "Restaurant & Artisan Membership Application",
+    "subtitle": "Create your ChopÇa! culinary storefront and reach tens of thousands of passionate food lovers.",
+    "badge": "100% Free registration • Validation within 24h",
+    "steps": {
+      "identity": {
+        "label": "Identity & Contact",
+        "subLabel": "Establishment"
+      },
+      "specialties": {
+        "label": "Specialties & Storefront",
+        "subLabel": "Terroirs & visuals"
+      },
+      "logistics": {
+        "label": "Logistics & Radius",
+        "subLabel": "Pickup point"
+      },
+      "kyc": {
+        "label": "KYC & ID",
+        "subLabel": "Legal moderation"
+      }
+    }
+  },
+
+  "vendorPreviewCard": {
+    "header": "Live Storefront Preview",
+    "simulation": "Customer App Simulation",
+    "newBadge": "4.9 • New",
+    "verifiedBadge": "Verified ChopÇa!",
+    "businessNameFallback": "Name of your establishment",
+    "descriptionFallback": "Tell the story of your culinary menu...",
+    "deliveryTime": "25-40 min",
+    "radius": "Radius: {{km}} km",
+    "noCategories": "No category selected",
+    "footer": "This view represents the exact layout of your establishment on the ChopÇa! mobile app for end customers."
+  },
+
+  "vendorBenefits": {
+    "title": "Why join Chop ça!",
+    "zeroFees": {
+      "label": "0 FCFA activation fees",
+      "description": "No hidden monthly subscription. Commission charged only on delivered sales."
+    },
+    "weeklyPayments": {
+      "label": "Weekly MoMo / OM payments",
+      "description": "Automatic payouts to your Orange Money, MTN MoMo account or UBA/Ecobank bank transfer."
+    },
+    "audience": {
+      "label": "+50,000 active food lovers",
+      "description": "Instantly access a qualified pool of enthusiasts for good food and terroir cuisine."
+    },
+    "testimonial": {
+      "name": "Cheffe Christiane Ebodé",
+      "role": "Founder • Le Comptoir de Yaoundé",
+      "quote": "In 3 months on ChopÇa!, we doubled our lunch order volume without hiring additional couriers. The courier fleet is ultra punctual!",
+      "partnerSince": "Partner since 2024",
+      "portraitAlt": "Portrait of partner chef"
+    }
+  },
+  "vendorRegistration": {
+    "actionBar": {
+      "stepCounter": "Step {{step}} of 4",
+      "stepHint": "Continue to complete your registration.",
+      "readyTitle": "Ready to launch your kitchen online?",
+      "readyHintPrefix": "Automatic registration status:",
+      "readyHintSuffix": "(Audit & validation within 24h).",
+      "back": "Back",
+      "continue": "Continue",
+      "submitting": "Submitting…",
+      "submit": "Submit my application"
+    },
+    "cuisineError": "Select at least one culinary specialty.",
+    "submitErrorFallback": "Registration failed. Please try again."
+  },
+  "userAccessDenied": {
+    "title": "Access denied",
+    "fallbackUser": "User",
+    "role": {
+      "ADMIN": "administrator",
+      "VENDOR": "vendor",
+      "CUSTOMER": "customer",
+      "unknown": "this section"
+    },
+    "message": {
+      "roleMissingWithRole": "{{email}} does not have access to {{role}} pages.",
+      "roleMissing": "{{email}} does not have the required permissions to access this page.",
+      "contextMissingWithRole": "No {{role}} profile is associated with {{email}}.",
+      "contextMissing": "No profile is associated with {{email}}.",
+      "default": "{{email}} does not have access to this page."
+    },
+    "supportHint": "If you believe this is an error, contact Chop ça! support.",
+    "backToCatalog": "Back to catalog",
+    "logout": "Sign out"
+  },
+  "cityTable": {
+    "headers": {
+      "name": "Name",
+      "region": "Region",
+      "actions": "Actions"
+    },
+    "regionEmpty": "Not provided",
+    "empty": "No city found.",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+
+  "cityForm": {
+    "title": {
+      "edit": "Edit \"{{name}}\"",
+      "create": "New city"
+    },
+    "name": {
+      "label": "City name",
+      "placeholder": "e.g. Douala, Yaoundé, Bafoussam…",
+      "required": "Name is required",
+      "minLength": "Minimum 2 characters",
+      "maxLength": "Maximum 120 characters"
+    },
+    "region": {
+      "label": "Region (optional)",
+      "placeholder": "e.g. Littoral, Centre, West…",
+      "maxLength": "Maximum 120 characters"
+    },
+    "countryCode": {
+      "label": "Country code",
+      "placeholder": "CM",
+      "hintPrefix": "ISO 3166-1 alpha-2. Locked to",
+      "hintSuffix": "for Cameroon."
+    },
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save",
+    "create": "Create"
+  },
+
+  "cityFilters": {
+    "searchLabel": "Search",
+    "searchPlaceholder": "Name or region…",
+    "clearAriaLabel": "Clear",
+    "sortLabel": "Sort by",
+    "sort": {
+      "nameAsc": "Name (A → Z)",
+      "nameDesc": "Name (Z → A)",
+      "regionAsc": "Region (A → Z)",
+      "regionDesc": "Region (Z → A)"
+    }
+  },
+  "citiesPage": {
+    "badge": "Geographic reference",
+    "scope": "Cameroon cities",
+    "title": "City management",
+    "subtitle": "Reference of cities where vendors can operate and customers can order or pick up their meals.",
+    "newCity": "New city",
+    "toast": {
+      "updated": "City updated",
+      "created": "City created",
+      "updateFailed": "Update failed",
+      "createFailed": "Creation failed",
+      "deleted": "City deleted",
+      "referenced": "City referenced by vendors or locations",
+      "deleteFailed": "Delete failed",
+      "loadFailed": "Failed to load cities"
+    }
+  },
+  "title": { "city": "Delete city '{{name}}'?" },
+  "placeholder": { "city": "E.g. Duplicate, city no longer covered…" }
+}
