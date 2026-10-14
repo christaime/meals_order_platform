@@ -6,12 +6,12 @@
       <thead>
       <tr class="bg-surface-container-low text-on-surface-variant
                    font-label-sm text-label-sm uppercase tracking-wider">
-        <th class="py-3 px-space-md font-bold">Plat</th>
-        <th class="py-3 px-space-md font-bold">Catégories</th>
-        <th class="py-3 px-space-md font-bold">Prix</th>
-        <th class="py-3 px-space-md font-bold">Composition &amp; distribution</th>
-        <th class="py-3 px-space-md font-bold">Statut</th>
-        <th class="py-3 px-space-md font-bold text-right">Actions</th>
+        <th class="py-3 px-space-md font-bold">{{ 'mealTable.headers.meal' | translate }}</th>
+        <th class="py-3 px-space-md font-bold">{{ 'mealTable.headers.categories' | translate }}</th>
+        <th class="py-3 px-space-md font-bold">{{ 'mealTable.headers.price' | translate }}</th>
+        <th class="py-3 px-space-md font-bold">{{ 'mealTable.headers.composition' | translate }}</th>
+        <th class="py-3 px-space-md font-bold">{{ 'mealTable.headers.status' | translate }}</th>
+        <th class="py-3 px-space-md font-bold text-right">{{ 'mealTable.headers.actions' | translate }}</th>
       </tr>
       </thead>
       <tbody class="divide-y divide-outline-variant/30">
@@ -20,7 +20,7 @@
       <tr data-testid="meal-table-loading">
         <td colspan="6" class="py-12 px-space-md text-center text-on-surface-variant">
           <app-icon name="progress_activity" size="xl" class="animate-spin" />
-          <p class="mt-2 font-body-sm text-body-sm">Chargement…</p>
+          <p class="mt-2 font-body-sm text-body-sm">{{ 'mealTable.loading' | translate }}</p>
         </td>
       </tr>
       } @else if (meals().length === 0) {
@@ -31,10 +31,10 @@
             <app-icon name="restaurant_menu" size="xl" />
           </div>
           <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-            Aucun plat
+            {{ 'mealTable.emptyTitle' | translate }}
           </h3>
           <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
-            Aucun plat ne correspond aux filtres actifs.
+            {{ 'mealTable.emptyDescription' | translate }}
           </p>
         </td>
       </tr>
@@ -131,10 +131,10 @@
               [attr.data-allergen-count]="meal.allergenIngredientCount ?? 0"
               class="flex items-center gap-1">
               <app-icon name="restaurant" size="sm" />
-              {{ meal.ingredientCount ?? 0 }} ingrédient{{ (meal.ingredientCount ?? 0) > 1 ? 's' : '' }}
+              {{ pluralKey('ingredients', meal.ingredientCount ?? 0) | translate: { count: meal.ingredientCount ?? 0 } }}
               @if ((meal.allergenIngredientCount ?? 0) > 0) {
               · <span class="text-error font-semibold">
-                {{ meal.allergenIngredientCount }} allergène{{ (meal.allergenIngredientCount ?? 0) > 1 ? 's' : '' }}
+                {{ pluralKey('allergens', meal.allergenIngredientCount ?? 0) | translate: { count: meal.allergenIngredientCount ?? 0 } }}
               </span>
               }
             </span>
@@ -143,7 +143,7 @@
               [attr.data-location-count]="meal.distributionLocationCount ?? 0"
               class="flex items-center gap-1">
               <app-icon name="storefront" size="sm" />
-              {{ meal.distributionLocationCount ?? 0 }} point{{ (meal.distributionLocationCount ?? 0) > 1 ? 's' : '' }}
+              {{ pluralKey('locations', meal.distributionLocationCount ?? 0) | translate: { count: meal.distributionLocationCount ?? 0 } }}
             </span>
           </div>
         </td>
@@ -155,7 +155,7 @@
               [variant]="statusVariant(meal.moderationStatus)"
               [icon]="statusIcon(meal.moderationStatus)"
               size="sm">
-              {{ statusLabel(meal.moderationStatus) }}
+              {{ statusLabelKey(meal.moderationStatus) | translate }}
             </app-badge>
           </span>
         </td>
@@ -168,7 +168,7 @@
               type="button"
               [attr.data-testid]="'meal-table-edit-' + meal.id"
               (click)="edit.emit(meal)"
-              title="Modifier"
+              [attr.title]="'mealTable.actions.edit' | translate"
               class="p-1.5 rounded-lg text-on-surface-variant
                              hover:text-primary hover:bg-surface-container transition-colors
                              bg-transparent border-0 cursor-pointer">
@@ -178,7 +178,7 @@
               type="button"
               [attr.data-testid]="'meal-table-delete-' + meal.id"
               (click)="delete.emit(meal)"
-              title="Supprimer"
+              [attr.title]="'mealTable.actions.delete' | translate"
               class="p-1.5 rounded-lg text-on-surface-variant
                              hover:text-error hover:bg-error-container/40 transition-colors
                              bg-transparent border-0 cursor-pointer">
@@ -189,7 +189,7 @@
               type="button"
               [attr.data-testid]="'meal-table-select-' + meal.id"
               (click)="select.emit(meal)"
-              [title]="isEditing(meal) ? 'Sélectionné pour modération' : 'Sélectionner pour modération'"
+              [attr.title]="(isEditing(meal) ? 'mealTable.actions.selectedForModeration' : 'mealTable.actions.selectForModeration') | translate"
               class="p-1.5 rounded-lg transition-colors
                              bg-transparent border-0 cursor-pointer"
               [ngClass]="isEditing(meal)

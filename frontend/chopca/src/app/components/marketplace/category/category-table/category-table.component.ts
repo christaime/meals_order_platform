@@ -2,18 +2,19 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { BadgeComponent, BadgeVariant } from '@components/shared/badge/badge.component';
 import { Category } from '@app/core/models/marketplace';
-import { CategoryType, ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
+import { CategoryType } from '@app/core/models/marketplace/enum-type.model';
 import { NgClass } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   moderationIcon,
-  moderationLabel,
+  moderationLabelKey,
   moderationVariant,
 } from '@components/shared/moderation-status/moderation-status.util';
 
 @Component({
   selector: 'app-category-table',
   standalone: true,
-  imports: [IconComponent, BadgeComponent, NgClass],
+  imports: [IconComponent, BadgeComponent, NgClass, TranslatePipe],
   templateUrl: './category-table.component.html',
   styleUrl: './category-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,13 +37,14 @@ export class CategoryTableComponent {
     return type === 'CUISINE' ? 'primary' : 'tertiary';
   }
 
-  protected typeLabel(type: CategoryType): string {
-    return type === 'CUISINE' ? 'CUISINE' : 'TYPE DE PLAT';
+  protected typeLabelKey(type: CategoryType): string {
+    return type === 'CUISINE'
+      ? 'categoryTable.type.CUISINE'
+      : 'categoryTable.type.DISH_TYPE';
   }
 
- // ─── Moderation helpers (delegated to the shared util) ────
   protected readonly statusVariant = moderationVariant;
-  protected readonly statusLabel   = moderationLabel;
+  protected readonly statusLabelKey = moderationLabelKey;
   protected readonly statusIcon    = moderationIcon;
 
   protected canToggle(c: Category): boolean {

@@ -11,15 +11,15 @@
     <tr>
       <th class="px-space-md py-space-sm font-label-md text-label-md
                    text-on-surface-variant uppercase tracking-wide">
-        Nom
+        {{ 'cityTable.headers.name' | translate }}
       </th>
       <th class="px-space-md py-space-sm font-label-md text-label-md
                    text-on-surface-variant uppercase tracking-wide">
-        Région
+        {{ 'cityTable.headers.region' | translate }}
       </th>
       <th class="px-space-md py-space-sm font-label-md text-label-md
                    text-on-surface-variant uppercase tracking-wide text-right">
-        Actions
+        {{ 'cityTable.headers.actions' | translate }}
       </th>
     </tr>
     </thead>
@@ -55,7 +55,7 @@
               </span>
         } @else {
         <span class="font-body-sm text-body-sm text-outline italic">
-                Non renseignée
+                {{ 'cityTable.regionEmpty' | translate }}
               </span>
         }
       </td>
@@ -66,7 +66,7 @@
           <button
             type="button"
             mat-icon-button
-            aria-label="Modifier"
+            [attr.aria-label]="'cityTable.edit' | translate"
             (click)="onEdit(city)">
             <app-icon name="edit" size="sm" class="text-primary" />
           </button>
@@ -74,7 +74,7 @@
           <button
             type="button"
             mat-icon-button
-            aria-label="Supprimer"
+            [attr.aria-label]="'cityTable.delete' | translate"
             (click)="onDelete(city)">
             <app-icon name="delete" size="sm" class="text-error" />
           </button>
@@ -87,7 +87,7 @@
         <div class="flex flex-col items-center gap-space-sm text-on-surface-variant">
           <app-icon name="location_off" size="xl" class="opacity-40" />
           <span class="font-body-md text-body-md">
-                Aucune ville trouvée.
+                {{ 'cityTable.empty' | translate }}
               </span>
         </div>
       </td>

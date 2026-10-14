@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DecimalPipe, NgClass } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { BadgeComponent } from '@components/shared/badge/badge.component';
 import {
   moderationIcon,
-  moderationLabel,
+  moderationLabelKey,
   moderationVariant,
 } from '@components/shared/moderation-status/moderation-status.util';
 import { MealSummary } from '@app/core/models/marketplace';
@@ -13,7 +14,7 @@ import { CategorySummary } from '@app/core/models/marketplace/category.model';
 @Component({
   selector: 'app-meal-table',
   standalone: true,
-  imports: [DecimalPipe, NgClass, IconComponent, BadgeComponent],
+  imports: [DecimalPipe, NgClass, IconComponent, BadgeComponent, TranslatePipe],
   templateUrl: './meal-table.component.html',
   styleUrl: './meal-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,10 +34,6 @@ export class MealTableComponent {
     return this.editingId() === meal.id;
   }
 
-  /**
-   * Cuisine + dish-type badges are capped at 2 to keep the row compact.
-   * Returns the overflow count for the "+N" badge.
-   */
   protected categoryOverflow(
     cuisines: readonly CategorySummary[],
     dishTypes: readonly CategorySummary[],
@@ -45,8 +42,17 @@ export class MealTableComponent {
     return Math.max(0, cuisines.length + dishTypes.length - limit);
   }
 
-  // ─── Moderation helpers (delegated to the shared util) ────
+  /** Plural key for a count of ingredients / allergens / locations. */
+  protected pluralKey(
+    base: 'ingredients' | 'allergens' | 'locations',
+    count: number,
+  ): string {
+    return count > 1
+      ? `mealTable.${base}_many`
+      : `mealTable.${base}_one`;
+  }
+
   protected readonly statusVariant = moderationVariant;
-  protected readonly statusLabel   = moderationLabel;
+  protected readonly statusLabelKey = moderationLabelKey;
   protected readonly statusIcon    = moderationIcon;
 }

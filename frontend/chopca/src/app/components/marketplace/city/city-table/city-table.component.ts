@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { City } from '@app/core/models/marketplace';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-city-table',
@@ -20,6 +21,7 @@ import { City } from '@app/core/models/marketplace';
     MatIconModule,
     MatProgressSpinnerModule,
     IconComponent,
+    TranslatePipe,
   ],
   templateUrl: './city-table.component.html',
   styleUrl: './city-table.component.scss',
