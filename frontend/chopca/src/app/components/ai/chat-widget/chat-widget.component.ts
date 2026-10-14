@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   ChatHistoryMessage,
   ChatTurn,
@@ -25,11 +25,13 @@ import { CHAT_SERVICE, ChatSessionStore } from '@core/services/ai';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { ChatMealCardComponent } from '../chat-meal-card/chat-meal-card.component';
 import { ChatVendorCardComponent } from '../chat-vendor-card/chat-vendor-card.component';
+import { MarkdownComponent } from 'ngx-markdown';
 
 @Component({
   selector: 'app-chat-widget',
   standalone: true,
-  imports: [FormsModule, IconComponent, ChatMealCardComponent, ChatVendorCardComponent],
+  imports: [FormsModule, IconComponent, ChatMealCardComponent,
+    ChatVendorCardComponent, TranslatePipe, MarkdownComponent],
   templateUrl: './chat-widget.component.html',
   styleUrl: './chat-widget.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

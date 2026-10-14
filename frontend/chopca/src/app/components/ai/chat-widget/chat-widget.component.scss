@@ -7,3 +7,47 @@
     overscroll-behavior: contain;
   }
 }
+// chat-widget.component.scss
+.chat-markdown {
+  :is(p, ul, ol, pre, blockquote) {
+    margin: 0 0 0.5rem 0;
+  }
+  :is(p, ul, ol, pre, blockquote):last-child {
+    margin-bottom: 0;
+  }
+  ul, ol {
+    padding-left: 1.25rem;
+  }
+  li {
+    margin: 0.125rem 0;
+  }
+  strong {
+    font-weight: 600;
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8em;
+    padding: 0.1em 0.35em;
+    border-radius: 0.25rem;
+    background: var(--mat-sys-surface-container-high);
+  }
+  pre {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--mat-sys-surface-container-high);
+    overflow-x: auto;
+  }
+  pre code {
+    padding: 0;
+    background: none;
+  }
+  a {
+    color: var(--mat-sys-primary);
+    text-decoration: underline;
+  }
+  blockquote {
+    border-left: 3px solid var(--mat-sys-outline-variant);
+    padding-left: 0.75rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
