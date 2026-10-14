@@ -10,7 +10,7 @@
  */
 export interface NavLink {
   readonly kind: 'link';
-  readonly label: string;
+  readonly labelKey: string;
   readonly route: string;
   readonly exact?: boolean;
   /** Optional icon (Material Symbols name). */
@@ -27,7 +27,7 @@ export interface NavLink {
  */
 export interface NavGroup {
   readonly kind: 'group';
-  readonly label: string;
+  readonly labelKey: string;
   readonly icon?: string;
   readonly children: readonly NavLink[];
   /** Whether any child is currently the active route (used for highlight). */

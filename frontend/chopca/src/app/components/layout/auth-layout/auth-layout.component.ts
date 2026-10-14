@@ -1,8 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthHeaderComponent } from './auth-header/auth-header.component';
 import { AuthFooterComponent } from './auth-footer/auth-footer.component';
-
+import { HeaderComponent } from '../header/header.component';
 /**
  * Layout shell for all vendor-auth pages.
  *
@@ -21,13 +20,13 @@ import { AuthFooterComponent } from './auth-footer/auth-footer.component';
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
-  imports: [RouterOutlet, AuthHeaderComponent, AuthFooterComponent],
+  imports: [RouterOutlet, HeaderComponent, AuthFooterComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="min-h-screen flex flex-col bg-surface">
 
       <!-- ─── Header (fixed, 64px tall) ─────────────────── -->
-      <app-auth-header />
+      <app-header />
 
       <!-- ─── Page content ──────────────────────────────── -->
       <main class="flex-1 w-full pt-20">

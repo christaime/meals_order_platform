@@ -1,0 +1,117 @@
+<nav
+  id="header-mobile-menu"
+  data-testid="header-mobile-menu"
+  aria-label="Navigation mobile"
+  class="xl:hidden absolute left-0 right-0 top-full
+         bg-surface/95 backdrop-blur-xl
+         border-b border-outline-variant/40
+         shadow-header
+         max-h-[calc(100vh-5rem)] overflow-y-auto
+         px-4 py-3">
+
+  @if (portalLabelKey()) {
+  <div class="sm:hidden mb-3">
+      <span
+        data-testid="header-mobile-portal-label"
+        class="inline-flex items-center px-2.5 py-1 rounded-full
+               bg-surface-container border border-outline-variant
+               font-label text-[11px] uppercase tracking-wider
+               text-on-surface-variant">
+        {{ portalLabelKey() | translate }}
+      </span>
+  </div>
+  }
+
+  <ul class="list-none m-0 p-0 flex flex-col gap-0.5">
+    @for (item of menu(); track item.labelKey; let i = $index) {
+    @if (isLink(item)) {
+    <li>
+      <a
+        [attr.data-testid]="'header-mobile-item-' + i"
+        [attr.data-label]="item.labelKey"
+        [routerLink]="item.route"
+        routerLinkActive="bg-primary-fixed text-on-primary-fixed font-bold"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+        (click)="navigate.emit()"
+        class="flex items-center gap-2 px-3 py-3 rounded-lg
+                   font-label text-sm no-underline
+                   text-on-surface-variant
+                   hover:bg-surface-container-high transition-colors">
+        <app-nav-item [item]="asNavLink(item)" />
+      </a>
+    </li>
+    }
+
+    @if (isGroup(item)) {
+    <li>
+      <button
+        type="button"
+        [attr.data-testid]="'header-mobile-group-' + i"
+        [attr.data-label]="item.labelKey"
+        [attr.aria-expanded]="openIndex() === i"
+        (click)="toggleGroup.emit({ index: i, event: $event })"
+        class="w-full flex items-center gap-2 px-3 py-3 rounded-lg
+                   font-label text-sm text-left border-0 cursor-pointer
+                   bg-transparent text-on-surface-variant
+                   hover:bg-surface-container-high transition-colors">
+        <app-nav-item [item]="asNavLink(item)" />
+        <app-icon
+          name="keyboard_arrow_down"
+          size="sm"
+          class="ml-auto transition-transform"
+          [class.rotate-180]="openIndex() === i" />
+      </button>
+
+      @if (openIndex() === i) {
+      <ul class="list-none m-0 p-0 mt-0.5 ml-3 flex flex-col gap-0.5
+                       border-l border-outline-variant/50 pl-2">
+        @for (child of item.children; track child.route) {
+        <li>
+          <a
+            [attr.data-testid]="'header-mobile-child-' + child.labelKey"
+            [attr.data-route]="child.route"
+            [routerLink]="child.route"
+            routerLinkActive="bg-primary-fixed/40 text-primary font-bold"
+            (click)="navigate.emit()"
+            class="flex items-center gap-2 px-3 py-2.5 rounded-lg
+                           font-label text-xs no-underline
+                           text-on-surface
+                           hover:bg-surface-container-high transition-colors">
+            <app-nav-item [item]="child" />
+          </a>
+        </li>
+        }
+      </ul>
+      }
+    </li>
+    }
+    }
+  </ul>
+
+  <div class="md:hidden mt-3 pt-3 border-t border-outline-variant/40 flex flex-col gap-2">
+    @if (showVendorSwitch()) {
+    <a
+      data-testid="header-mobile-switch-vendor"
+      [routerLink]="links().vendor.route"
+      (click)="navigate.emit()"
+      class="px-3 py-2.5 rounded-lg text-center
+               border border-secondary text-secondary
+               font-label text-xs font-bold no-underline
+               hover:bg-secondary/10 transition-colors">
+      {{ links().vendor.labelKey | translate }}
+    </a>
+    }
+    @if (showCustomerSwitch()) {
+    <a
+      data-testid="header-mobile-switch-customer"
+      [routerLink]="links().customer.route"
+      (click)="navigate.emit()"
+      class="px-3 py-2.5 rounded-lg text-center
+               border border-primary text-primary
+               font-label text-xs font-bold no-underline
+               hover:bg-primary/10 transition-colors">
+      {{ links().customer.labelKey | translate }}
+    </a>
+    }
+  </div>
+</nav>

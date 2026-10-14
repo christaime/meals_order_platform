@@ -1,0 +1,247 @@
+<header
+  class="fixed top-0 left-0 right-0 w-full z-50
+         bg-surface/90 backdrop-blur-xl
+         border-b border-outline-variant/40
+         shadow-header">
+
+  <div class="h-20 max-w-[200vh] mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
+
+    <!-- ─── Brand ─────────────────────────────────────────── -->
+    <div class="flex items-center gap-1 shrink-0">
+      <!-- Mobile menu trigger (below xl) -->
+      <button
+        type="button"
+        data-testid="header-mobile-menu-trigger"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        aria-controls="header-mobile-menu"
+        [attr.aria-label]="(mobileMenuOpen() ? 'header.mobileMenuClose' : 'header.mobileMenuOpen') | translate"
+        (click)="toggleMobileMenu($event)"
+        class="xl:hidden p-2.5 rounded-full border-0 cursor-pointer
+               bg-transparent text-on-surface-variant
+               hover:bg-surface-container-high hover:text-on-surface
+               transition-colors">
+        <app-icon [name]="mobileMenuOpen() ? 'close' : 'menu'" size="md" />
+      </button>
+
+      <a
+        data-testid="header-brand-link"
+        routerLink="/meals"
+        aria-label="Chop ça! — Accueil"
+        class="flex items-center transition-transform hover:scale-[1.02]">
+        <app-logo variant="full" size="sm" label="Chop ça!" />
+      </a>
+
+      @if (portalLabelKey()) {
+      <span
+        data-testid="header-portal-label"
+        class="hidden sm:inline-flex items-center
+                 px-2.5 py-1 rounded-full
+                 bg-surface-container
+                 border border-outline-variant
+                 font-label text-[11px] uppercase tracking-wider
+                 text-on-surface-variant">
+          {{ portalLabelKey() | translate }}
+        </span>
+      }
+    </div>
+
+    <!-- ─── Desktop navigation (xl and up) ────────────────── -->
+    <app-desktop-nav
+      [menu]="menu()"
+      [openIndex]="openDropdownIndex()"
+      (toggleGroup)="onToggleGroup($event)"
+      (navigate)="closeAllDropdowns()" />
+
+    <!-- ─── Right-side actions ────────────────────────────── -->
+    <div class="mr-4 flex items-center gap-3 shrink-0">
+
+      <!-- Cross-workspace switches -->
+      <div class="hidden md:flex items-center gap-2">
+        @if (!isVendorWorkspace()) {
+        <a
+          data-testid="header-switch-vendor"
+          [routerLink]="links.vendor.route"
+          class="px-3 py-2 rounded-full
+                   border border-secondary text-secondary
+                   font-label text-xs font-bold no-underline
+                   hover:bg-secondary/10 transition-colors">
+          {{ links.vendor.labelKey | translate }}
+        </a>
+        }
+        @if (!isCustomerWorkspace()) {
+        <a
+          data-testid="header-switch-customer"
+          [routerLink]="links.customer.route"
+          class="px-3 py-2 rounded-full
+                   border border-primary text-primary
+                   font-label text-xs font-bold no-underline
+                   hover:bg-primary/10 transition-colors">
+          {{ links.customer.labelKey | translate }}
+        </a>
+        }
+      </div>
+
+      <!-- Language selector (unchanged — labels are FR / EN codes) -->
+      <div
+        data-testid="header-language-selector"
+        class="flex items-center
+               bg-surface-container-low rounded-lg p-0.5
+               border border-outline-variant
+               font-label text-[11px]">
+        <span class="material-symbols-outlined text-[16px] text-outline mx-1.5">language</span>
+        @for (lang of languages; track lang) {
+        <button
+          type="button"
+          [attr.data-testid]="'header-language-' + lang"
+          [attr.data-lang]="lang"
+          [attr.aria-pressed]="language.current().toUpperCase() === lang"
+          (click)="selectLanguage(lang)"
+          class="px-2 py-1 rounded cursor-pointer border-0 transition-colors"
+          [class.bg-surface-container-lowest]="language.current().toUpperCase() === lang"
+          [class.text-primary]="language.current().toUpperCase() === lang"
+          [class.font-bold]="language.current().toUpperCase() === lang"
+          [class.shadow-sm]="language.current().toUpperCase() === lang"
+          [class.bg-transparent]="language.current().toUpperCase() !== lang"
+          [class.text-on-surface-variant]="language.current().toUpperCase() !== lang">
+          {{ lang }}
+        </button>
+        }
+      </div>
+
+      <!-- Cart trigger (authenticated) -->
+      @if (isAuthenticated()) {
+      <button
+        type="button"
+        (click)="onToggleCart()"
+        [attr.aria-label]="'header.cart' | translate"
+        class="relative p-2.5 rounded-full bg-surface-container-lowest
+                 border border-outline-variant/60 text-on-surface
+                 hover:bg-surface-container-low transition-colors
+                 focus:outline-none">
+        <app-icon name="shopping_cart" size="md" class="text-primary" />
+        @if (cartCount() > 0) {
+        <span class="absolute -top-1.5 -right-1.5">
+              <app-badge variant="danger" size="sm">{{ cartCount() }}</app-badge>
+            </span>
+        }
+      </button>
+      }
+
+      <!-- Profile dropdown (authenticated) -->
+      @if (isAuthenticated()) {
+      <div class="relative header-dropdown">
+        <button
+          type="button"
+          data-testid="header-profile-trigger"
+          (click)="toggleProfileDropdown($event)"
+          [attr.aria-expanded]="profileOpen()"
+          class="flex items-center gap-2 p-1 rounded-full border-0 cursor-pointer
+                   bg-transparent transition-shadow hover:ring-2 hover:ring-primary/30">
+            <span
+              data-testid="header-profile-initials"
+              class="w-9 h-9 rounded-full
+                     bg-primary text-on-primary
+                     border border-outline
+                     inline-flex items-center justify-center
+                     font-label text-xs font-bold">
+              {{ currentUser().initials }}
+            </span>
+          <div class="hidden 2xl:flex flex-col text-left">
+              <span
+                data-testid="header-profile-name-compact"
+                class="font-label text-xs font-semibold text-on-surface leading-tight">
+                {{ currentUser().name }}
+              </span>
+          </div>
+          <app-icon name="keyboard_arrow_down" size="sm" class="hidden 2xl:block" />
+        </button>
+
+        @if (profileOpen()) {
+        <div
+          data-testid="header-profile-dropdown"
+          class="absolute right-0 top-[calc(100%+0.5rem)]
+                     min-w-[240px]
+                     bg-surface-container-lowest
+                     border border-outline-variant
+                     rounded-2xl shadow-modal
+                     py-2 z-50">
+          <div class="px-4 py-2.5 border-b border-surface-container-high">
+            <p
+              data-testid="header-profile-name"
+              class="m-0 font-label text-xs font-bold text-on-surface truncate">
+              {{ currentUser().name }}
+            </p>
+          </div>
+
+          @if (isVendor()) {
+          <a
+            data-testid="header-profile-vendor-profile"
+            routerLink="/vendor/profile"
+            (click)="closeAllDropdowns()"
+            class="flex items-center gap-2.5 px-4 py-2
+                         font-label text-xs text-on-surface no-underline
+                         hover:bg-surface-container-low transition-colors">
+            <app-icon name="storefront" size="sm" class="text-primary" />
+            <span>{{ vendorBusinessName() || ('header.vendorProfile' | translate) }}</span>
+          </a>
+          }
+
+          @if (isCustomer()) {
+          <a
+            data-testid="header-profile-account"
+            routerLink="/account"
+            (click)="closeAllDropdowns()"
+            class="flex items-center gap-2.5 px-4 py-2
+                         font-label text-xs text-on-surface no-underline
+                         hover:bg-surface-container-low transition-colors">
+            <app-icon name="person" size="sm" class="text-primary" />
+            <span>{{ 'header.account' | translate }}</span>
+          </a>
+          }
+
+          @if (isAdmin()) {
+          <a
+            data-testid="header-profile-admin-settings"
+            routerLink="/admin/settings"
+            (click)="closeAllDropdowns()"
+            class="flex items-center gap-2.5 px-4 py-2
+                         font-label text-xs text-on-surface no-underline
+                         hover:bg-surface-container-low transition-colors">
+            <app-icon name="settings" size="sm" class="text-primary" />
+            <span>{{ 'header.adminSettings' | translate }}</span>
+          </a>
+          }
+
+          <div class="h-px bg-surface-container-high my-1"></div>
+
+          <button
+            type="button"
+            data-testid="header-profile-logout"
+            (click)="logout()"
+            class="w-full flex items-center gap-2.5 px-4 py-2 text-left
+                       font-label text-xs text-error
+                       bg-transparent border-0 cursor-pointer
+                       hover:bg-error-container/50 transition-colors">
+            <app-icon name="logout" size="sm" />
+            <span>{{ 'header.logout' | translate }}</span>
+          </button>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- ─── Mobile drawer (below xl) ─────────────────────────── -->
+  @if (mobileMenuOpen()) {
+  <app-mobile-nav
+    [menu]="menu()"
+    [openIndex]="openDropdownIndex()"
+    [portalLabelKey]="portalLabelKey()"
+    [links]="links"
+    [showVendorSwitch]="!isVendorWorkspace()"
+    [showCustomerSwitch]="!isCustomerWorkspace()"
+    (toggleGroup)="onToggleGroup($event)"
+    (navigate)="closeAllDropdowns()" />
+  }
+</header>

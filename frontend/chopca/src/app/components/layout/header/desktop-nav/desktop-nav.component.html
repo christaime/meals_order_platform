@@ -1,0 +1,83 @@
+<nav
+  data-testid="header-menu-container"
+  class="hidden xl:flex items-center gap-1"
+  aria-label="Navigation principale">
+
+  @for (item of menu(); track item.labelKey; let i = $index) {
+
+  <!-- Direct link -->
+  @if (isLink(item)) {
+  <a
+    [attr.data-testid]="'header-menu-item-' + i"
+    [attr.data-label]="item.labelKey"
+    [routerLink]="item.route"
+    routerLinkActive="nav-active"
+    [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+    (click)="navigate.emit()"
+    class="px-4 py-2 rounded-lg font-label text-sm
+               no-underline whitespace-nowrap transition-colors
+               text-on-surface-variant
+               hover:bg-surface-container-high hover:text-on-surface
+               [&.nav-active]:bg-primary-fixed
+               [&.nav-active]:text-on-primary-fixed
+               [&.nav-active]:font-bold [&.nav-active]:shadow-sm
+               flex items-center gap-1.5">
+    <app-nav-item [item]="asNavLink(item)" />
+  </a>
+  }
+
+  <!-- Group -->
+  @if (isGroup(item)) {
+  <div class="relative">
+    <button
+      type="button"
+      [attr.data-testid]="'header-menu-item-' + i"
+      [attr.data-label]="item.labelKey"
+      [attr.aria-expanded]="openIndex() === i"
+      (click)="toggleGroup.emit({ index: i, event: $event })"
+      class="px-4 py-2 rounded-lg font-label text-sm
+                 flex items-center gap-1 transition-colors
+                 cursor-pointer border-0 bg-transparent
+                 text-on-surface-variant
+                 hover:bg-surface-container-high hover:text-on-surface"
+      [class.bg-primary-fixed]="openIndex() === i"
+      [class.text-on-primary-fixed]="openIndex() === i"
+      [class.font-bold]="openIndex() === i"
+      [class.shadow-sm]="openIndex() === i">
+      <app-nav-item [item]="asNavLink(item)" />
+      <app-icon
+        name="keyboard_arrow_down"
+        size="sm"
+        class="transition-transform"
+        [class.rotate-180]="openIndex() === i" />
+    </button>
+
+    @if (openIndex() === i) {
+    <div
+      [attr.data-testid]="'header-menu-dropdown-' + i"
+      class="absolute left-0 top-[calc(100%+0.375rem)]
+                   min-w-[220px] bg-surface-container-lowest
+                   border border-outline-variant rounded-xl shadow-modal
+                   p-1.5 flex flex-col gap-0.5 z-50">
+      @for (child of item.children; track child.route) {
+      <a
+        [attr.data-testid]="'header-menu-child-' + child.labelKey"
+        [attr.data-label]="child.labelKey"
+        [attr.data-route]="child.route"
+        [routerLink]="child.route"
+        routerLinkActive="bg-primary-fixed/40 text-primary font-bold"
+        (click)="navigate.emit()"
+        class="px-3 py-2 rounded-lg font-label text-xs
+                       text-on-surface no-underline
+                       flex items-center justify-between gap-2
+                       transition-colors
+                       hover:bg-surface-container-high">
+        <app-nav-item [item]="child" />
+      </a>
+      }
+    </div>
+    }
+  </div>
+  }
+  }
+</nav>

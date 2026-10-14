@@ -2,7 +2,6 @@
   display: block;
 }
 
-/* Rotate the chevron when the parent group is open */
 :host ::ng-deep .rotate-180 {
   transform: rotate(180deg);
 }

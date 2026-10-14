@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '@components/shared/icon/icon.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Minimal footer used on all vendor-auth pages.
  *
@@ -21,7 +21,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 @Component({
   selector: 'app-auth-footer',
   standalone: true,
-  imports: [RouterLink, IconComponent],
+  imports: [RouterLink, IconComponent, TranslatePipe],
   templateUrl: './auth-footer.component.html',
   styleUrl: './auth-footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
