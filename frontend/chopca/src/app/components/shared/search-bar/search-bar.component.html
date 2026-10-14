@@ -9,7 +9,7 @@
     type="text"
     data-testid="search-bar-input"
     [value]="query()"
-    [placeholder]="placeholder()"
+    [placeholder]="placeholderKey() | translate"
     (input)="onInput($event)"
     (keydown)="onKeyDown($event)"
     class="w-full pl-12 pr-24 py-3.5 rounded-full bg-surface-container-lowest border border-outline-variant/50 text-on-surface placeholder:text-on-surface-variant/70 text-body-md font-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-xs transition-all"
@@ -22,7 +22,7 @@
     <button
       type="button"
       data-testid="search-bar-clear"
-      aria-label="Effacer la recherche"
+      [attr.aria-label]="'searchBar.clear' | translate"
       (click)="onClear()"
       class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
     >
@@ -34,11 +34,11 @@
     <button
       type="button"
       data-testid="search-bar-submit"
-      aria-label="Lancer la recherche"
+      [attr.aria-label]="'searchBar.submit' | translate"
       (click)="onSubmit()"
       class="px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-xs font-semibold hover:bg-primary-container transition-colors shadow-xs"
     >
-      Chercher
+      {{ 'searchBar.submit' | translate }}
     </button>
   </div>
 </div>

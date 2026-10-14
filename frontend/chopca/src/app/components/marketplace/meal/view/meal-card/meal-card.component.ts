@@ -13,7 +13,7 @@ import {
   RatingStarsComponent,
   PriceTagComponent,
 } from '@components/shared';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Meal Card — Marketplace product item representation.
  *
@@ -37,6 +37,7 @@ import {
     BadgeComponent,
     RatingStarsComponent,
     PriceTagComponent,
+    TranslatePipe,
   ],
   templateUrl: './meal-card.component.html',
   styleUrl: './meal-card.component.scss',

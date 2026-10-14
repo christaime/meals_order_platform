@@ -8,12 +8,12 @@
     (click)="toggleDropdown()"
     class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low transition-all duration-150 text-xs font-label-md font-semibold cursor-pointer select-none shadow-xs"
   >
-    <span class="text-on-surface-variant font-medium">Trier par:</span>
+    <span class="text-on-surface-variant font-medium">{{ 'sort.label' | translate }}</span>
     <div class="flex items-center gap-1.5 font-bold text-primary">
       @if (selectedOption.icon) {
       <app-icon [name]="selectedOption.icon" size="sm" />
       }
-      <span data-testid="sort-dropdown-label">{{ selectedOption.label }}</span>
+      <span data-testid="sort-dropdown-label">{{ selectedOption.labelKey | translate }}</span>
     </div>
     <app-icon
       name="expand_more"
@@ -53,7 +53,7 @@
           [class.text-on-surface-variant]="selectedSortId() !== option.id"
         />
         }
-        <span>{{ option.label }}</span>
+        <span>{{ option.labelKey | translate }}</span>
       </div>
 
       @if (selectedSortId() === option.id) {

@@ -37,7 +37,7 @@
     <button
       type="button"
       data-testid="meal-card-quick-add"
-      aria-label="Ajouter au panier"
+      [attr.aria-label]="'mealCard.addToCart' | translate"
       class="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all"
       (click)="onAddToCart($event)"
     >
@@ -65,7 +65,7 @@
 
         @if (!meal().isAvailable) {
         <span data-testid="meal-card-unavailable">
-          <app-badge variant="danger">Épuisé</app-badge>
+          <app-badge variant="danger">{{ 'mealCard.unavailable' | translate }}</app-badge>
         </span>
         }
       </div>
@@ -106,7 +106,7 @@
           data-testid="meal-card-prep-time"
           class="flex items-center gap-1">
           <app-icon name="schedule" class="text-primary" />
-          <span>{{ meal().prepTimeMinutes }} min</span>
+          <span>{{ meal().prepTimeMinutes }} {{ 'mealCard.prepTimeSuffix' | translate }}</span>
         </div>
         }
       </div>
@@ -121,7 +121,7 @@
           class="flex-1 py-2.5 rounded-full bg-primary text-on-primary font-label-lg text-label-lg font-bold hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm text-center"
           (click)="onAddToCart($event)"
         >
-          Commander
+          {{ 'mealCard.order' | translate }}
         </button>
         <button
           type="button"
@@ -129,7 +129,7 @@
           class="px-3.5 py-2.5 rounded-full bg-surface-container-low border border-outline-variant/30 text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container transition-colors"
           (click)="onViewDetails($event)"
         >
-          Détails
+          {{ 'mealCard.details' | translate }}
         </button>
       </div>
       }

@@ -13,7 +13,7 @@
     class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-on-surface bg-surface-container-low border border-outline-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
   >
     <app-icon name="chevron_left" size="sm" />
-    <span>Précédent</span>
+    <span>{{ 'pagination.previous' | translate }}</span>
   </button>
 
   <!-- Page Numbers -->
@@ -51,7 +51,7 @@
     [disabled]="currentPage() === totalPages()"
     class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-on-surface bg-surface-container-low border border-outline-variant hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
   >
-    <span>Suivant</span>
+    <span>{{ 'pagination.next' | translate }}</span>
     <app-icon name="chevron_right" size="sm" />
   </button>
 </nav>

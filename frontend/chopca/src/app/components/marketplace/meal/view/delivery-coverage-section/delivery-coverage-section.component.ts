@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { BadgeComponent } from '@components/shared/badge/badge.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface CoverageZone {
   city: string;
@@ -16,14 +17,14 @@ export interface CoverageZone {
 @Component({
   selector: 'app-delivery-coverage-section',
   standalone: true,
-  imports: [CommonModule, IconComponent, BadgeComponent],
+  imports: [CommonModule, IconComponent, BadgeComponent, TranslatePipe],
   templateUrl: './delivery-coverage-section.component.html',
   styleUrl: './delivery-coverage-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeliveryCoverageSectionComponent {
   /** Optional custom title override. */
-  readonly title = input<string>('Consommation à temps');
+  readonly titleKey = input<string>('deliveryCoverage.defaultTitle');
 
   /** Supported delivery zones. Defaults to Douala & Yaoundé hubs if not provided. */
   readonly zones = input<CoverageZone[]>([

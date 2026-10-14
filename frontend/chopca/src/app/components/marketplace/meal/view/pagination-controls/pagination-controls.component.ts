@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * PaginationControls — Navigation bar for paginated meal listings.
  *
@@ -20,7 +20,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 @Component({
   selector: 'app-pagination-controls',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, TranslatePipe],
   templateUrl: './pagination-controls.component.html',
   styleUrl: './pagination-controls.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

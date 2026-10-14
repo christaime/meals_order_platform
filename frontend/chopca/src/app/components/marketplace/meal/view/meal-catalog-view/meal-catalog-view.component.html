@@ -8,7 +8,7 @@
     <div class="flex-1">
       <app-search-bar
         [query]="searchQuery()"
-        placeholder="Rechercher un plat, un ingrédient..."
+        [placeholderKey]="'mealCatalog.searchPlaceholder'"
         (search)="onSearchChange($event)"
       />
     </div>
@@ -76,16 +76,16 @@
       <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant/50 mb-4">
         <app-icon name="search_off" size="xl" />
       </div>
-      <h3 class="font-bold text-lg text-on-surface mb-1">Aucun plat ne correspond à vos critères</h3>
+      <h3 class="font-bold text-lg text-on-surface mb-1">{{ 'mealCatalog.emptyTitle' | translate }}</h3>
       <p class="text-xs text-on-surface-variant max-w-md mb-6">
-        Essayez de modifier votre recherche ou de réinitialiser vos filtres pour découvrir d'autres spécialités.
+        {{ 'mealCatalog.emptyDescription' | translate }}
       </p>
       <button
         type="button"
         (click)="onClearAllFilters()"
         class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-colors shadow-xs"
       >
-        Réinitialiser tous les filtres
+        {{ 'mealCatalog.emptyReset' | translate }}
       </button>
     </div>
     }

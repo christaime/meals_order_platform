@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, input, output } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { PriceTagComponent } from '@components/shared/price-tag/price-tag.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * FloatingCartSummaryComponent — Persistent bottom-right/bottom bar floating summary
  * showing total items, vendor preview, and total amount in XAF.
@@ -10,7 +10,7 @@ import { PriceTagComponent } from '@components/shared/price-tag/price-tag.compon
 @Component({
   selector: 'app-floating-cart-summary',
   standalone: true,
-  imports: [CommonModule, IconComponent, PriceTagComponent],
+  imports: [CommonModule, IconComponent, PriceTagComponent, TranslatePipe],
   templateUrl: './floating-cart-summary.component.html',
   styleUrl: './floating-cart-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

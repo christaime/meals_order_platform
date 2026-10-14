@@ -11,10 +11,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface SortOption {
   id: string;
-  label: string;
+  labelKey: string;
   icon?: string;
 }
 
@@ -29,7 +30,7 @@ export interface SortOption {
 @Component({
   selector: 'app-sort-dropdown',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, TranslatePipe],
   templateUrl: './sort-dropdown.component.html',
   styleUrl: './sort-dropdown.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,7 +44,7 @@ export class SortDropdownComponent {
 
   /** Available sorting strategies. */
   readonly options = input<SortOption[]>([
-    { id: 'name', label: 'Noms alphabetiquement', icon: 'sort_by_alpha' },
+    { id: 'name', labelKey: 'sort.nameAsc', icon: 'sort_by_alpha' },
   ]);
 
   /** Emitted when the sorting order is changed. */

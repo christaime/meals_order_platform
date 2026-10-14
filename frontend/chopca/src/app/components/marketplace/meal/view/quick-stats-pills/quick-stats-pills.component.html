@@ -9,8 +9,12 @@
     />
 
     <span class="font-label-md text-xs font-medium text-on-surface-variant flex items-center gap-1">
-        <span>{{ stat.label }}</span>
-        @if (stat.highlight) {
+        <span>{{ stat.labelKey | translate }}</span>
+        @if (stat.highlightKey) {
+          <strong class="font-semibold text-on-surface text-xs">
+            {{ stat.highlightKey | translate }}
+          </strong>
+        } @else if (stat.highlight) {
           <strong class="font-semibold text-on-surface text-xs">
             {{ stat.highlight }}
           </strong>

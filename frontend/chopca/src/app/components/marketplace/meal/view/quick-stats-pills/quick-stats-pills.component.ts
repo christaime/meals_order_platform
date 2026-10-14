@@ -1,56 +1,52 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface StatItem {
   id: string;
   icon: string;
-  label: string;
+  /** Translation key for the stat label. */
+  labelKey: string;
+  /** Translation key for the highlighted value, when the value is text. */
+  highlightKey?: string;
+  /** Raw highlighted value (numbers, times, city names) when not translatable. */
   highlight?: string;
 }
 
-/**
- * QuickStatsPills — Renders compact trust badges inside the hero section.
- *
- * Responsibilities:
- * - Display key marketplace value props (delivery time, satisfaction, active zones).
- * - Allow dynamic custom stat items via optional Signal input.
- * - Provide sensible defaults tuned for the marketplace value props.
- */
 @Component({
   selector: 'app-quick-stats-pills',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, TranslatePipe],
   templateUrl: './quick-stats-pills.component.html',
   styleUrl: './quick-stats-pills.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuickStatsPillsComponent {
-  /** Optional custom stat items. Defaults to primary hero trust metrics if omitted. */
   readonly stats = input<StatItem[]>([
     {
       id: 'delivery',
       icon: 'schedule',
-      label: 'Livraison moyenne',
+      labelKey: 'quickStats.delivery',
       highlight: '35 min',
     },
     {
       id: 'satisfaction',
       icon: 'star',
-      label: 'Note clients',
+      labelKey: 'quickStats.satisfaction',
       highlight: '4.9/5',
     },
     {
       id: 'coverage',
       icon: 'location_on',
-      label: 'Zones',
+      labelKey: 'quickStats.coverage',
       highlight: 'Douala & Yaoundé',
     },
     {
       id: 'hygiene',
       icon: 'verified',
-      label: 'Cuisines',
-      highlight: '100% Vérifiées',
+      labelKey: 'quickStats.hygiene',
+      highlightKey: 'quickStats.hygieneCertified',
     },
   ]);
 }

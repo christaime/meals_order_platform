@@ -6,10 +6,10 @@
     </div>
     <div>
       <h2 class="text-base md:text-lg font-bold text-on-surface">
-        {{ title() }}
+        {{ titleKey() | translate }}
       </h2>
       <p class="text-xs text-on-surface-variant">
-        Repas chauds servis dans nos restaurants près de chez vous.
+        {{ 'deliveryCoverage.subtitle' | translate }}
       </p>
     </div>
   </div>
@@ -19,24 +19,24 @@
     <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/60">
       <app-icon name="timer" size="md" class="text-primary shrink-0 mt-0.5" />
       <div class="flex flex-col">
-        <span class="text-xs font-bold text-on-surface">Service express</span>
-        <span class="text-xs text-on-surface-variant">10 à 15 min en moyenne</span>
+        <span class="text-xs font-bold text-on-surface">{{ 'deliveryCoverage.highlights.express.title' | translate }}</span>
+        <span class="text-xs text-on-surface-variant">{{ 'deliveryCoverage.highlights.express.detail' | translate }}</span>
       </div>
     </div>
 
     <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/60">
       <app-icon name="verified_user" size="md" class="text-primary shrink-0 mt-0.5" />
       <div class="flex flex-col">
-        <span class="text-xs font-bold text-on-surface">Suivi en direct</span>
-        <span class="text-xs text-on-surface-variant">Notification à chaque étape de la préparation de votre commande</span>
+        <span class="text-xs font-bold text-on-surface">{{ 'deliveryCoverage.highlights.tracking.title' | translate }}</span>
+        <span class="text-xs text-on-surface-variant">{{ 'deliveryCoverage.highlights.tracking.detail' | translate }}</span>
       </div>
     </div>
 
     <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/60">
       <app-icon name="thermostat" size="md" class="text-primary shrink-0 mt-0.5" />
       <div class="flex flex-col">
-        <span class="text-xs font-bold text-on-surface">Plats à emporter</span>
-        <span class="text-xs text-on-surface-variant">Conteneurs isothermes disponibles</span>
+        <span class="text-xs font-bold text-on-surface">{{ 'deliveryCoverage.highlights.takeaway.title' | translate }}</span>
+        <span class="text-xs text-on-surface-variant">{{ 'deliveryCoverage.highlights.takeaway.detail' | translate }}</span>
       </div>
     </div>
   </div>
@@ -45,7 +45,7 @@
   @if(zones().length > 0){
   <div class="flex flex-col gap-4">
     <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-      Quartiers couverts actuellement
+      {{ 'deliveryCoverage.zonesLabel' | translate }}
     </span>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

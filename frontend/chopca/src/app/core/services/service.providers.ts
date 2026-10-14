@@ -41,6 +41,8 @@ import { MediaApiService } from './marketplace/media-api.service';
 import { CHAT_SERVICE } from './ai/chat.service';
 import { ChatApiService } from './ai/chat-api.service';
 
+import { LanguageService } from './i18n/language.service';
+
 // ─── Mock implementations (isolated in /mock) ─────────────────
 import { KeycloakMockService } from '@app/mock/services/keycloak-mock.service';
 import { UserContextMockService } from '@app/mock/services/user-context-mock.service';
@@ -68,6 +70,7 @@ import { ChatMockService } from '@app/mock/services/chat-mock.service';
  * 3. That's it — no component changes.
  */
 export const SERVICE_PROVIDERS: Provider[] = [
+  LanguageService,
   {
     provide: KEYCLOAK_SERVICE,
     useClass: environment.useMockServices ? KeycloakMockService : KeycloakApiService,

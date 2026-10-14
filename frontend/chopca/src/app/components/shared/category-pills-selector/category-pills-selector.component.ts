@@ -15,7 +15,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 import { FormErrorComponent } from '@components/shared/form-error/form-error.component';
 import { CATEGORY_SERVICE } from '@app/core/services/marketplace/category.service';
 import { Category, CategoryType } from '@app/core/models/marketplace';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 /**
  * Multi-select chip group for categories of a given type.
  *
@@ -54,7 +54,7 @@ import { Category, CategoryType } from '@app/core/models/marketplace';
 @Component({
   selector: 'app-category-pills-selector',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, FormErrorComponent],
+  imports: [ReactiveFormsModule, IconComponent, FormErrorComponent, TranslatePipe],
   templateUrl: './category-pills-selector.component.html',
   styleUrl: './category-pills-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,11 +72,11 @@ export class CategoryPillsSelectorComponent implements OnInit {
   readonly control = input.required<FormControl<string[]>>();
 
   // ─── Optional configuration ───────────────────────────────
-  /** Optional label above the pills. */
-  readonly label = input<string>('Catégories');
+  /** Translation key for the label above the pills. */
+  readonly labelKey = input<string>('categoryPills.defaultLabel');
 
-  /** Optional hint line under the label. */
-  readonly hint = input<string | null>(null);
+  /** Translation key for the optional hint, or null. */
+  readonly hintKey = input<string | null>(null);
 
   /** Maximum number of pills that can be selected. */
   readonly maxSelection = input<number>(3);
@@ -87,8 +87,8 @@ export class CategoryPillsSelectorComponent implements OnInit {
   /** Optional error message from the parent. */
   readonly error = input<string | null>(null);
 
-  /** Optional empty-state message when the API returns no items. */
-  readonly emptyMessage = input<string>('Aucune option disponible.');
+   /** Translation key for the empty-state message. */
+  readonly emptyMessageKey = input<string>('categoryPills.defaultEmpty');
 
   // ─── Outputs ──────────────────────────────────────────────
   /** Emits when the selection changes. */

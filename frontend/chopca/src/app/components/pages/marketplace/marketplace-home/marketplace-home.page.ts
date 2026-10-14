@@ -13,7 +13,7 @@ import { MealCatalogViewComponent , QuickStatsPillsComponent,
   DeliveryCoverageSectionComponent, FloatingCartSummaryComponent , FilterState, StatItem} from '@components/marketplace/meal/view';
 import { MEAL_SERVICE } from '@core/services/marketplace/meal.service';
 import { MealSummary, MealSearchRequest } from '@core/models/marketplace';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Marketplace home page — the public meal catalog.
  *
@@ -30,6 +30,7 @@ import { MealSummary, MealSearchRequest } from '@core/models/marketplace';
   selector: 'app-marketplace-home-page',
   standalone: true,
   imports: [
+    TranslatePipe,
     MealCatalogViewComponent,
     QuickStatsPillsComponent,
     DeliveryCoverageSectionComponent,
@@ -62,45 +63,42 @@ export class MarketplaceHomePageComponent implements OnInit {
   // ─── Lifecycle ────────────────────────────────────────────
 
   ngOnInit(): void {
-   /* this.onAddToCart({name:"Nouveau",price:3000, id:"", vendorId:"",
-      vendorBusinessName:"Vendor", description:"", imageUrl:"", averageRating:50, totalRatings:100,
-       prepTimeMinutes:30, moderationStatus:"APPROVED", cuisines:[], dishTypes:[]});*/
     this.loadMeals();
-    let stats:StatItem[] = [];
-    if(this.statistics?.deliveryAverageTimeMin){
+
+    const stats: StatItem[] = [];
+    if (this.statistics?.deliveryAverageTimeMin) {
       stats.push({
         id: 'delivery',
         icon: 'schedule',
-        label: 'Livraison moyenne',
-        highlight: this.statistics?.deliveryAverageTimeMin +' min',
+        labelKey: 'quickStats.delivery',
+        highlight: this.statistics.deliveryAverageTimeMin + ' min',
       });
     }
-    if(this.statistics?.satisfactionRate){
-        stats.push({
-          id: 'satisfaction',
-          icon: 'star',
-          label: 'Note clients',
-          highlight: this.statistics?.satisfactionRate ,
-        });
+    if (this.statistics?.satisfactionRate) {
+      stats.push({
+        id: 'satisfaction',
+        icon: 'star',
+        labelKey: 'quickStats.satisfaction',
+        highlight: this.statistics.satisfactionRate,
+      });
     }
-    if(this.statistics?.cityCoverage){
-        stats.push({
-           id: 'coverage',
-           icon: 'location_on',
-           label: 'Villes',
-           highlight: this.statistics?.cityCoverage ,
-        });
-      }
-    if(this.statistics?.hygieneCertified){
+    if (this.statistics?.cityCoverage) {
+      stats.push({
+        id: 'coverage',
+        icon: 'location_on',
+        labelKey: 'quickStats.coverage',
+        highlight: this.statistics.cityCoverage,
+      });
+    }
+    if (this.statistics?.hygieneCertified) {
       stats.push({
         id: 'hygiene',
         icon: 'verified',
-        label: 'Cuisines',
-        highlight:'100% Vérifiées' ,
+        labelKey: 'quickStats.hygiene',
+        highlightKey: 'quickStats.hygieneCertified',
       });
     }
     this.stats = stats;
-
   }
 
   // ─── Data loading ─────────────────────────────────────────
@@ -151,7 +149,7 @@ export class MarketplaceHomePageComponent implements OnInit {
         },
         error: err => {
           this.isLoading.set(false);
-          this.toast.show('Échec du chargement des catégories', 'error');
+          this.toast.show('Fail to load meals', 'error');
           console.error(err);
         },
       });

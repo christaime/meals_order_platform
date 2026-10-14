@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * SearchBar — Primary text input for meal, vendor, or ingredient searching.
  *
@@ -19,7 +19,7 @@ import { IconComponent } from '@components/shared/icon/icon.component';
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, TranslatePipe],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,10 +29,8 @@ export class SearchBarComponent {
   /** Two-way bindable search query string. */
   readonly query = model<string>('');
 
-  /** Customizable input placeholder text. */
-  readonly placeholder = input<string>(
-    'Rechercher un plat, un ingrédient ou un restaurant...'
-  );
+  /** Translation key for the input placeholder. */
+  readonly placeholderKey = input<string>('searchBar.defaultPlaceholder');
 
   /** Emitted when the search action is triggered (Enter key or click). */
   readonly search = output<string>();

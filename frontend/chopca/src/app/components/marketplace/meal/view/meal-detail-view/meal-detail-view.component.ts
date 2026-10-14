@@ -13,7 +13,7 @@ import {
   RatingStarsComponent,
 } from '@components/shared';
 import { Meal } from '@app/core/models/marketplace';
-
+import { TranslatePipe } from '@ngx-translate/core';
 /**
  * Presentational meal detail view.
  *
@@ -37,6 +37,7 @@ import { Meal } from '@app/core/models/marketplace';
     IconComponent,
     PriceTagComponent,
     RatingStarsComponent,
+    TranslatePipe,
   ],
   templateUrl: './meal-detail-view.component.html',
   styleUrl: './meal-detail-view.component.scss',

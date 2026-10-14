@@ -10,8 +10,9 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin , of} from 'rxjs';
 import { CommonModule } from '@angular/common';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Category, MealSummary, MealStatFilter } from '@core/models/marketplace';
 import { IngredientSummary } from '@app/core/models/marketplace/ingredient.model';
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
@@ -34,7 +35,7 @@ import { REFERENCE_SERVICE } from '@core/services/marketplace';
 
 const DEFAULT_CHIP: SubCategoryChip = {
   id: 'all',
-  name: 'Tous les types',
+  name: 'mealCatalog.defaultChip',
   kind: 'ALL',
 };
 
@@ -79,7 +80,8 @@ export const EMPTY_ADVANCE_FILTERS: FilterState = {
     MealCardComponent,
     MealCardSkeletonComponent,
     PaginationControlsComponent,
-    LocationSelectorComponent
+    LocationSelectorComponent,
+    TranslatePipe,
   ],
   templateUrl: './meal-catalog-view.component.html',
   styleUrl: './meal-catalog-view.component.scss',
@@ -88,6 +90,7 @@ export const EMPTY_ADVANCE_FILTERS: FilterState = {
 export class MealCatalogViewComponent implements OnInit {
 
   private readonly referenceService = inject(REFERENCE_SERVICE);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   // ═════════════════════════════════════════════════════════════
@@ -99,13 +102,13 @@ export class MealCatalogViewComponent implements OnInit {
   readonly totalMeals = input<number>(0);
   readonly pageSize = input<number>(12);
 
-  readonly sortOptions:SortOption[] = [
-      { id: 'averageRating', label: 'Mieux notés', icon: 'star' },
-      { id: 'price-asc', label: 'Prix : Croissant', icon: 'arrow_upward' },
-      { id: 'price-desc', label: 'Prix : Décroissant', icon: 'arrow_downward' },
-      { id: 'prepTimeMinutes', label: 'Temps de préparation', icon: 'schedule' },
-      { id: 'name', label: 'Nom des plats alphabetiquement', icon: 'sort_by_alpha' },
-    ];
+  readonly sortOptions: SortOption[] = [
+    { id: 'averageRating',   labelKey: 'mealCatalog.sort.ratingAvg',  icon: 'star' },
+    { id: 'price-asc',       labelKey: 'mealCatalog.sort.priceAsc',   icon: 'arrow_upward' },
+    { id: 'price-desc',      labelKey: 'mealCatalog.sort.priceDesc',  icon: 'arrow_downward' },
+    { id: 'prepTimeMinutes', labelKey: 'mealCatalog.sort.prepTime',   icon: 'schedule' },
+    { id: 'name',            labelKey: 'mealCatalog.sort.name',       icon: 'sort_by_alpha' },
+  ];
   /** Optional — the host can supply these to enable ingredient
    *  exclusion and distribution-location filters in the drawer. */
   readonly ingredientOptions = input<IngredientSummary[]>([]);
@@ -174,96 +177,106 @@ export class MealCatalogViewComponent implements OnInit {
     const list: ActiveFilterItem[] = [];
     const filters = this.advancedFilters();
     const chips = this.selectedSubCategories();
+
     // ── Search ────────────────────────────────────────────────
     if (this.searchQuery()) {
       list.push({
         key: 'query',
-        label: `Recherche: "${this.searchQuery()}"`,
+        labelKey: 'activeFilters.search',
+        labelParams: { query: this.searchQuery() },
         value: this.searchQuery(),
       });
     }
 
-    // ── Shortcut presence flags (used to dedupe below) ────────
     const hasExpress = chips.some((c) => c.kind === 'SHORTCUT' && c.id === 'express');
     const hasEco = chips.some((c) => c.kind === 'SHORTCUT' && c.id === 'eco');
 
-    // ── Chips, routed by kind ─────────────────────────────────
+    // ── Chips ─────────────────────────────────────────────────
     for (const chip of chips) {
       switch (chip.kind) {
         case 'ALL':
           break;
 
         case 'CUISINE':
-          list.push({ key: 'cuisine', label: chip.name, value: chip.id });
-          break;
-
         case 'DISH_TYPE':
-          list.push({ key: 'dishType', label: chip.name, value: chip.id });
+          list.push({
+            key: chip.kind === 'CUISINE' ? 'cuisine' : 'dishType',
+            labelKey: 'activeFilters.raw',
+            labelParams: { value: chip.name },
+            value: chip.id,
+          });
           break;
 
         case 'SHORTCUT':
-          if (chip.id === 'express') {
-            list.push({
-              key: 'express',
-              label: `Prépa ≤ ${this.shortcutValues().express ?? 30} min`,
-              value: true,
-            });
-          } else if (chip.id === 'eco') {
-            list.push({
-              key: 'eco',
-              label: `Max ${this.shortcutValues().eco ?? 0} FCFA`,
-              value: true,
-            });
-          }
+          // chip.name is already the resolved display string
+          // (translated when the chips were built).
+          list.push({
+            key: chip.id,   // 'express' | 'eco'
+            labelKey: 'activeFilters.raw',
+            labelParams: { value: chip.name },
+            value: true,
+          });
           break;
       }
     }
 
-    // ── Drawer cuisines not already shown as a chip ───────────
+    // ── Drawer items not already shown as a chip ──────────────
     const chipCuisineIds = new Set(
       chips.filter((c) => c.kind === 'CUISINE').map((c) => c.id));
-    for (const c of this.drawerSelection().cuisines) {
-      if (chipCuisineIds.has(c.id)) continue;
-      list.push({ key: 'cuisine', label: c.name, value: c.id });
-    }
-
-    // ── Drawer dish types not already shown as a chip ─────────
     const chipDishIds = new Set(
       chips.filter((c) => c.kind === 'DISH_TYPE').map((c) => c.id));
+
+    for (const c of this.drawerSelection().cuisines) {
+      if (chipCuisineIds.has(c.id)) continue;
+      list.push({
+        key: 'cuisine',
+        labelKey: 'activeFilters.raw',
+        labelParams: { value: c.name },
+        value: c.id,
+      });
+    }
     for (const d of this.drawerSelection().dishTypes) {
       if (chipDishIds.has(d.id)) continue;
-      list.push({ key: 'dishType', label: d.name, value: d.id });
+      list.push({
+        key: 'dishType',
+        labelKey: 'activeFilters.raw',
+        labelParams: { value: d.name },
+        value: d.id,
+      });
     }
 
-    // ── Price / time / rating / availability ──────────────────
-    // Skip the maxPrepTime / maxPrice entries when the corresponding
-    // shortcut chip already covers them — otherwise the same filter
-    // shows up twice.
-    if (filters.minPrice) {
+    // ── Price / time / rating ─────────────────────────────────
+    // A value of 0 means "no constraint" for every slider-backed
+    // filter, so it is treated as unset rather than as a real filter.
+    if (filters.minPrice && filters.minPrice > 0) {
       list.push({
         key: 'minPrice',
-        label: `Min ${filters.minPrice} FCFA`,
+        labelKey: 'activeFilters.minPrice',
+        labelParams: { price: filters.minPrice },
         value: filters.minPrice,
       });
     }
-    if (filters.maxPrice && !hasEco) {
+    if (filters.maxPrice && filters.maxPrice > 0 && !hasEco) {
       list.push({
         key: 'maxPrice',
-        label: `Max ${filters.maxPrice} FCFA`,
+        labelKey: 'activeFilters.maxPrice',
+        labelParams: { price: filters.maxPrice },
         value: filters.maxPrice,
       });
     }
-    if (filters.maxPrepTime && !hasExpress) {
+    if (filters.maxPrepTime && filters.maxPrepTime > 0 && !hasExpress) {
       list.push({
         key: 'maxPrepTime',
-        label: `Prépa ≤  ${filters.maxPrepTime} min`,
+        labelKey: 'activeFilters.prepTime',
+        labelParams: { minutes: filters.maxPrepTime },
         value: filters.maxPrepTime,
       });
     }
     if (filters.minRating && filters.minRating > 0) {
       list.push({
         key: 'minRating',
-        label: `${filters.minRating}+ ★`,
+        labelKey: 'activeFilters.rating',
+        labelParams: { rating: filters.minRating },
         value: filters.minRating,
       });
     }
@@ -271,9 +284,11 @@ export class MealCatalogViewComponent implements OnInit {
     // ── Excluded ingredients ──────────────────────────────────
     for (const id of filters.excludeIngredientIds ?? []) {
       const ing = this.drawerSelection().ingredients.find((i) => i.id === id);
+      if (!ing) continue;   // cannot describe it, do not show it
       list.push({
         key: 'excludeIngredient',
-        label: `Sans ${ing?.name ?? 'ingrédient'}`,
+        labelKey: 'activeFilters.excludeIngredient',
+        labelParams: { name: ing.name },
         value: id,
       });
     }
@@ -292,9 +307,18 @@ export class MealCatalogViewComponent implements OnInit {
       .subscribe({
         next: (stats) => {
           this.mealStatFilters = { ...stats };
-          this.subCategoryOptions.set(this.toChips(stats));
+          if(stats) this.buildChips(stats);
         },
         error: (err) => console.error('[MealCatalog] failed to load stats', err),
+      });
+
+    // Rebuild chips when the language changes.
+    // The subscription is taken down when the component is destroyed.
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const stats = this.mealStatFilters;
+        if (stats) this.buildChips(stats);
       });
   }
 
@@ -302,42 +326,67 @@ export class MealCatalogViewComponent implements OnInit {
   //  Chip building
   // ═════════════════════════════════════════════════════════════
 
-  private toChips(stats: MealStatFilter): SubCategoryChip[] {
-    const chips: SubCategoryChip[] = [DEFAULT_CHIP];
+  private buildChips(stats: MealStatFilter): void {
+    // Keys with params — resolved individually, joined.
+      const express$ = stats.expressPrepTimeInMinutes.count > 0
+        ? this.translate.get('mealCatalog.shortcut.express', {
+            minutes: stats.expressPrepTimeInMinutes.time,
+          })
+        : of<string | null>(null);
 
-    for (const dish of stats.mostDemandedDish) {
-      chips.push({
-        id: dish.id,
-        name: dish.name,
-        count: dish.count,
-        kind: 'DISH_TYPE',
-      });
-    }
-    for (const cuisine of stats.mostDemandedCuisines) {
-      chips.push({
-        id: cuisine.id,
-        name: cuisine.name,
-        count: cuisine.count,
-        kind: 'CUISINE',
-      });
-    }
-    if (stats.expressPrepTimeInMinutes.count > 0) {
-      chips.push({
-        id: 'express',
-        name: `Prépa ≤ ${stats.expressPrepTimeInMinutes.time} min`,
-        count: stats.expressPrepTimeInMinutes.count,
-        kind: 'SHORTCUT',
-      });
-    }
-    if (stats.minMealPrice.count > 0) {
-      chips.push({
-        id: 'eco',
-        name: `À partir de ${stats.minMealPrice.price} FCFA`,
-        count: stats.minMealPrice.count,
-        kind: 'SHORTCUT',
-      });
-    }
-    return chips;
+      const eco$ = stats.minMealPrice.count > 0
+        ? this.translate.get('mealCatalog.shortcut.eco', {
+            price: stats.minMealPrice.price,
+          })
+        : of<string | null>(null);
+
+      forkJoin({
+        defaultChip: this.translate.get('mealCatalog.defaultChip'),
+        express: express$,
+        eco: eco$,
+      })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(({ defaultChip, express, eco }) => {
+          const chips: SubCategoryChip[] = [
+            { id: 'all', name: defaultChip, kind: 'ALL' },
+          ];
+
+          for (const dish of stats.mostDemandedDish) {
+            chips.push({
+              id: dish.id,
+              name: dish.name,
+              count: dish.count,
+              kind: 'DISH_TYPE',
+            });
+          }
+          for (const cuisine of stats.mostDemandedCuisines) {
+            chips.push({
+              id: cuisine.id,
+              name: cuisine.name,
+              count: cuisine.count,
+              kind: 'CUISINE',
+            });
+          }
+
+          if (express) {
+            chips.push({
+              id: 'express',
+              name: express,
+              count: stats.expressPrepTimeInMinutes.count,
+              kind: 'SHORTCUT',
+            });
+          }
+          if (eco) {
+            chips.push({
+              id: 'eco',
+              name: eco,
+              count: stats.minMealPrice.count,
+              kind: 'SHORTCUT',
+            });
+          }
+
+          this.subCategoryOptions.set(chips);
+        });
   }
 
   // ═════════════════════════════════════════════════════════════
