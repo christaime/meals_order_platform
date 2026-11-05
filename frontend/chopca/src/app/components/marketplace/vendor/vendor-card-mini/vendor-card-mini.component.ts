@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { RatingStarsComponent } from '@components/shared/rating-stars/rating-stars.component';
 import { VendorSummary } from '@core/models/marketplace';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * VendorCardMiniComponent — Compact representation of a vendor/restaurant
@@ -17,7 +18,7 @@ import { VendorSummary } from '@core/models/marketplace';
 @Component({
   selector: 'app-vendor-card-mini',
   standalone: true,
-  imports: [CommonModule, IconComponent, RatingStarsComponent],
+  imports: [CommonModule, IconComponent, RatingStarsComponent, TranslatePipe],
   templateUrl: './vendor-card-mini.component.html',
   styleUrl: './vendor-card-mini.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

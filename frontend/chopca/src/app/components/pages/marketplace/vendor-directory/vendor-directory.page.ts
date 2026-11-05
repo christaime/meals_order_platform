@@ -17,6 +17,7 @@ import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
 import { ToastService } from '@components/shared/toast';
 import { VendorSummary, VendorSearchRequest, LocationSummary } from '@app/core/models/marketplace';
 import { DataPage } from '@app/core/models/shared';
+import { TranslateService } from '@ngx-translate/core';
 
 const DEFAULT_PAGE_SIZE = 9;
 
@@ -41,6 +42,7 @@ export class VendorDirectoryPageComponent {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   protected readonly pageSize = DEFAULT_PAGE_SIZE;
 
@@ -84,7 +86,10 @@ export class VendorDirectoryPageComponent {
         next: page => { this.result.set(page); this.loading.set(false); },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des restaurants', 'error');
+          this.toast.show(
+            this.translate.instant('vendorDirectoryPage.toast.loadFailed'),
+            'error',
+          );
           console.error(err);
         },
       });

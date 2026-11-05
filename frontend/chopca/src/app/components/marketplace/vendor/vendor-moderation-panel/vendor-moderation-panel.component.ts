@@ -24,13 +24,14 @@ import {
 import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
 import { Vendor } from '@app/core/models/marketplace';
 import { VendorStatus } from '@app/core/models/marketplace/enum-type.model';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /** The four admin state transitions a vendor can undergo. */
 type VendorAction = 'ACTIVATE' | 'SUSPEND' | 'BAN' | 'DEACTIVATE';
 
 interface ActionMeta {
   readonly action: VendorAction;
-  readonly label: string;
+  readonly labelKey: string;
   readonly icon: string;
   readonly requiresReason: boolean;
   /** Warn tone for destructive/terminal actions. */
@@ -38,10 +39,10 @@ interface ActionMeta {
 }
 
 const ACTIONS: Record<VendorAction, ActionMeta> = {
-  ACTIVATE:   { action: 'ACTIVATE',   label: 'Activer',     icon: 'check_circle',   requiresReason: false, destructive: false },
-  SUSPEND:    { action: 'SUSPEND',    label: 'Suspendre',   icon: 'pause_circle',   requiresReason: true,  destructive: true  },
-  BAN:        { action: 'BAN',        label: 'Bannir',      icon: 'block',          requiresReason: true,  destructive: true  },
-  DEACTIVATE: { action: 'DEACTIVATE', label: 'Désactiver',  icon: 'visibility_off', requiresReason: false, destructive: false },
+  ACTIVATE:   { action: 'ACTIVATE',   labelKey: 'vendorModerationPanel.actions.activate',     icon: 'check_circle',   requiresReason: false, destructive: false },
+  SUSPEND:    { action: 'SUSPEND',    labelKey: 'vendorModerationPanel.actions.suspend',      icon: 'pause_circle',   requiresReason: true,  destructive: true  },
+  BAN:        { action: 'BAN',        labelKey: 'vendorModerationPanel.actions.ban',          icon: 'block',          requiresReason: true,  destructive: true  },
+  DEACTIVATE: { action: 'DEACTIVATE', labelKey: 'vendorModerationPanel.actions.deactivate',   icon: 'visibility_off', requiresReason: false, destructive: false },
 };
 
 /** Valid transitions per current status — mirrors VendorState.canTransitionTo. */
@@ -67,7 +68,7 @@ const VALID_ACTIONS: Record<VendorStatus, readonly VendorAction[]> = {
 @Component({
   selector: 'app-vendor-moderation-panel',
   standalone: true,
-  imports: [NgClass, FormsModule, IconComponent, BadgeComponent],
+  imports: [NgClass, FormsModule, IconComponent, BadgeComponent, TranslatePipe],
   templateUrl: './vendor-moderation-panel.component.html',
   styleUrl: './vendor-moderation-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,6 +78,7 @@ export class VendorModerationPanelComponent {
   private readonly vendorService = inject(VENDOR_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   /** The selected vendor. `null` clears the panel. */
   readonly vendorId = input.required<string>();
@@ -143,17 +145,25 @@ export class VendorModerationPanelComponent {
       meta.action === 'BAN'        ? this.vendorService.banVendor(id, reason) :
                                      this.vendorService.deactivateVendor(id, reason || undefined);
 
+    const actionLabel = this.translate.instant(meta.labelKey);
+
     call$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         this.submitting.set(false);
         this.pendingAction.set(null);
         this.reason.set('');
-        this.toast.show(`${meta.label} — succès`, 'success');
+        this.toast.show(
+          this.translate.instant('vendorModerationPanel.toast.success', { action: actionLabel }),
+          'success',
+        );
         this.moderated.emit(updated);
       },
       error: (err) => {
         this.submitting.set(false);
-        this.toast.show(`Échec de l'action « ${meta.label} »`, 'error');
+        this.toast.show(
+          this.translate.instant('vendorModerationPanel.toast.failure', { action: actionLabel }),
+          'error',
+        );
         console.error('[VendorModerationPanel]', err);
       },
     });

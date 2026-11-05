@@ -19,7 +19,7 @@
     <div class="absolute top-4 right-4 flex items-center gap-2">
       <button
         type="button"
-        aria-label="Partager ce restaurant"
+        [attr.aria-label]="'vendorHeader.shareAriaLabel' | translate"
         (click)="onShare()"
         class="w-10 h-10 rounded-full bg-surface-container-lowest/80 backdrop-blur-md text-on-surface flex items-center justify-center shadow-md hover:bg-surface-container-lowest active:scale-95 transition-all"
       >
@@ -60,9 +60,9 @@
             }
             <div class="ml-auto sm:ml-0">
               @if (isOpen()) {
-              <app-badge variant="secondary" icon="check_circle">Ouvert</app-badge>
+              <app-badge variant="secondary" icon="check_circle">{{ 'vendorHeader.open' | translate }}</app-badge>
               } @else {
-              <app-badge variant="danger" icon="schedule">Fermé</app-badge>
+              <app-badge variant="danger" icon="schedule">{{ 'vendorHeader.closed' | translate }}</app-badge>
               }
             </div>
           </div>
@@ -73,7 +73,7 @@
             <div class="flex items-center gap-1.5">
               <app-rating-stars [rating]="vendor().ratingAvg" [showValue]="false" size="sm" />
               <span class="font-bold text-on-surface">{{ vendor().ratingAvg | number:'1.1-1' }}</span>
-              <span>({{ vendor().totalRatings }} avis)</span>
+              <span>{{ 'vendorHeader.reviews' | translate: { count: vendor().totalRatings } }}</span>
             </div>
             }
 
@@ -93,7 +93,7 @@
           class="flex-1 md:flex-initial px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-lg font-bold hover:bg-primary-container transition-colors shadow-sm flex items-center justify-center gap-2"
         >
           <app-icon name="call" size="sm" />
-          <span>Contacter</span>
+          <span>{{ 'vendorHeader.contact' | translate }}</span>
         </button>
       </div>
 

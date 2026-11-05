@@ -20,6 +20,7 @@ import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
 import { Vendor, VendorSearchRequest } from '@app/core/models/marketplace';
 import { VendorStatus } from '@app/core/models/marketplace/enum-type.model';
 import { DataPage } from '@app/core/models/shared';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-vendors-page',
@@ -30,6 +31,7 @@ import { DataPage } from '@app/core/models/shared';
     VendorFiltersComponent,
     VendorTableComponent,
     VendorModerationPanelComponent,
+    TranslatePipe,
   ],
   templateUrl: './vendors.page.html',
   styleUrl: './vendors.page.scss',
@@ -40,6 +42,7 @@ export class VendorsPageComponent {
   private readonly vendorService = inject(VENDOR_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   // ─── Filters ──────────────────────────────────────────────
   protected readonly keyword = signal<string>('');
@@ -90,7 +93,10 @@ export class VendorsPageComponent {
         next: page => { this.result.set(page); this.loading.set(false); },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des vendeurs', 'error');
+          this.toast.show(
+            this.translate.instant('vendorsPage.toast.loadFailed'),
+            'error',
+          );
           console.error(err);
         },
       });

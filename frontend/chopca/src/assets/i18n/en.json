@@ -1358,5 +1358,115 @@
       "title": "Contact us",
       "intro": "A question that isn't in the help center? Write to us or call us, we respond within 24 to 48 hours."
     }
+  },
+  "vendorDetailPage": {
+    "toast": {
+      "loadFailed": "Failed to load the restaurant"
+    }
+  },
+  "vendorDirectoryPage": {
+    "toast": {
+      "loadFailed": "Failed to load restaurants"
+    }
+  },
+  "vendorProfile": {
+    "loading": "Loading profile…",
+    "error": {
+      "title": "Profile unavailable",
+      "description": "Unable to load your restaurant's information."
+    },
+    "header": {
+      "managedBy": "Managed by {{name}}"
+    },
+    "sections": {
+      "info": "Restaurant information",
+      "delivery": "Delivery",
+      "cuisines": "Cuisines",
+      "account": "Account"
+    },
+    "fields": {
+      "address": "Address",
+      "city": "City",
+      "email": "Email",
+      "phone": "Phone",
+      "radius": "Radius",
+      "radiusValue": "{{km}} km",
+      "pickupAddress": "Pickup point",
+      "owner": "Owner",
+      "accountEmail": "Account email"
+    },
+    "toast": {
+      "loadFailed": "Failed to load profile"
+    }
+  },
+  "vendorsPage": {
+    "badge": "Vendors",
+    "scope": "Moderation",
+    "title": "Vendor moderation",
+    "subtitle": "Review and moderate the vendor lifecycle — activation, suspension, banning.",
+    "emptyState": "Select a vendor in the list to moderate them.",
+    "toast": {
+      "loadFailed": "Failed to load vendors"
+    }
+  },
+  "vendorFilters": {
+    "namePlaceholder": "Search a vendor…",
+    "status": {
+      "ALL": "All statuses",
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "BANNED": "Banned",
+      "INACTIVE": "Inactive"
+    },
+    "sort": {
+      "nameAsc": "Name (A → Z)",
+      "nameDesc": "Name (Z → A)",
+      "ratingDesc": "Best rated",
+      "recent": "Most recent"
+    }
+  },
+  "vendorHeader": {
+    "open": "Open",
+    "closed": "Closed",
+    "reviews": "({{count}} reviews)",
+    "contact": "Contact",
+    "shareAriaLabel": "Share this restaurant"
+  },
+  "vendorModerationPanel": {
+    "title": "Vendor moderation",
+    "banned": "This vendor is permanently banned. No further action is possible.",
+    "actions": {
+      "activate": "Activate",
+      "suspend": "Suspend",
+      "ban": "Ban",
+      "deactivate": "Deactivate"
+    },
+    "confirmTitle": "Confirm: {{action}}",
+    "reasonPlaceholder": "Reason (required, min. 3 characters)…",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "submitting": "Processing…",
+    "toast": {
+      "success": "{{action}} — success",
+      "failure": "{{action}} action failed"
+    }
+  },
+  "vendorTable": {
+    "headers": {
+      "vendor": "Vendor",
+      "locations": "Locations",
+      "cuisines": "Cuisines",
+      "rating": "Rating",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "loading": "Loading…",
+    "emptyTitle": "No vendor",
+    "emptyDescription": "No vendor matches the active filters.",
+    "actions": {
+      "selectedForModeration": "Selected for moderation",
+      "selectForModeration": "Select for moderation"
+    }
   }
 }

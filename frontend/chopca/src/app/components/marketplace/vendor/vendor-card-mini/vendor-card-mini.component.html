@@ -15,7 +15,7 @@
         [class.bg-error-container]="!isOpen()"
         [class.text-on-error-container]="!isOpen()"
       >
-        {{ isOpen() ? 'Ouvert' : 'Fermé' }}
+        {{ (isOpen() ? 'vendorCardMini.open' : 'vendorCardMini.closed') | translate }}
       </span>
     </div>
   </div>

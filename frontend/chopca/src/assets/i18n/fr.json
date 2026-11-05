@@ -1358,5 +1358,115 @@
       "title": "Nous contacter",
       "intro": "Une question qui n'est pas dans le centre d'aide ? Écrivez-nous ou appelez-nous, nous répondons sous 24 à 48 heures."
     }
+  },
+  "vendorDetailPage": {
+    "toast": {
+      "loadFailed": "Échec du chargement du restaurant"
+    }
+  },
+  "vendorDirectoryPage": {
+    "toast": {
+      "loadFailed": "Échec du chargement des restaurants"
+    }
+  },
+  "vendorProfile": {
+    "loading": "Chargement du profil…",
+    "error": {
+      "title": "Profil indisponible",
+      "description": "Impossible de charger les informations de votre restaurant."
+    },
+    "header": {
+      "managedBy": "Géré par {{name}}"
+    },
+    "sections": {
+      "info": "Informations du restaurant",
+      "delivery": "Livraison",
+      "cuisines": "Cuisines",
+      "account": "Compte"
+    },
+    "fields": {
+      "address": "Adresse",
+      "city": "Ville",
+      "email": "Email",
+      "phone": "Téléphone",
+      "radius": "Rayon",
+      "radiusValue": "{{km}} km",
+      "pickupAddress": "Point de retrait",
+      "owner": "Propriétaire",
+      "accountEmail": "Email du compte"
+    },
+    "toast": {
+      "loadFailed": "Échec du chargement du profil"
+    }
+  },
+  "vendorsPage": {
+    "badge": "Vendeurs",
+    "scope": "Modération",
+    "title": "Modération des Vendeurs",
+    "subtitle": "Examinez et modérez le cycle de vie des vendeurs — activation, suspension, bannissement.",
+    "emptyState": "Sélectionnez un vendeur dans la liste pour le modérer.",
+    "toast": {
+      "loadFailed": "Échec du chargement des vendeurs"
+    }
+  },
+  "vendorFilters": {
+    "namePlaceholder": "Rechercher un vendeur…",
+    "status": {
+      "ALL": "Tous les statuts",
+      "PENDING": "En attente",
+      "ACTIVE": "Actif",
+      "SUSPENDED": "Suspendu",
+      "BANNED": "Banni",
+      "INACTIVE": "Inactif"
+    },
+    "sort": {
+      "nameAsc": "Nom (A → Z)",
+      "nameDesc": "Nom (Z → A)",
+      "ratingDesc": "Meilleure note",
+      "recent": "Plus récents"
+    }
+  },
+  "vendorHeader": {
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "reviews": "({{count}} avis)",
+    "contact": "Contacter",
+    "shareAriaLabel": "Partager ce restaurant"
+  },
+  "vendorModerationPanel": {
+    "title": "Modération du vendeur",
+    "banned": "Ce vendeur est définitivement banni. Aucune action supplémentaire n'est possible.",
+    "actions": {
+      "activate": "Activer",
+      "suspend": "Suspendre",
+      "ban": "Bannir",
+      "deactivate": "Désactiver"
+    },
+    "confirmTitle": "Confirmer : {{action}}",
+    "reasonPlaceholder": "Motif (obligatoire, min. 3 caractères)…",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "submitting": "En cours…",
+    "toast": {
+      "success": "{{action}} — succès",
+      "failure": "Échec de l'action « {{action}} »"
+    }
+  },
+  "vendorTable": {
+    "headers": {
+      "vendor": "Vendeur",
+      "locations": "Emplacements",
+      "cuisines": "Cuisines",
+      "rating": "Note",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "loading": "Chargement…",
+    "emptyTitle": "Aucun vendeur",
+    "emptyDescription": "Aucun vendeur ne correspond aux filtres actifs.",
+    "actions": {
+      "selectedForModeration": "Sélectionné pour modération",
+      "selectForModeration": "Sélectionner pour modération"
+    }
   }
 }

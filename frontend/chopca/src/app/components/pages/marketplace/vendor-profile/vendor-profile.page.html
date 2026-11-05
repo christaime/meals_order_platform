@@ -7,7 +7,7 @@
   <div
     data-testid="vendor-profile-loading"
     class="flex items-center justify-center py-24 text-on-surface-variant">
-    <span class="text-sm">Chargement du profil…</span>
+    <span class="text-sm">{{ 'vendorProfile.loading' | translate }}</span>
   </div>
   }
 
@@ -18,9 +18,9 @@
     class="flex flex-col items-center justify-center text-center py-16 px-4
            bg-error/5 rounded-3xl border border-error/40">
     <app-icon name="error" size="xl" class="text-error mb-3" />
-    <h2 class="font-bold text-lg text-on-surface mb-1">Profil indisponible</h2>
+    <h2 class="font-bold text-lg text-on-surface mb-1">{{ 'vendorProfile.error.title' | translate }}</h2>
     <p class="text-xs text-on-surface-variant">
-      Impossible de charger les informations de votre restaurant.
+      {{ 'vendorProfile.error.description' | translate }}
     </p>
   </div>
   }
@@ -54,7 +54,7 @@
       <p
         data-testid="vendor-profile-owner"
         class="text-xs text-on-surface-variant truncate">
-        Géré par {{ v.ownerName }}
+        {{ 'vendorProfile.header.managedBy' | translate: { name: v.ownerName } }}
       </p>
     </div>
   </header>
@@ -64,7 +64,7 @@
     data-testid="vendor-profile-section-info"
     class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-4">
     <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
-      Informations du restaurant
+      {{ 'vendorProfile.sections.info' | translate }}
     </h2>
 
     @if (v.description) {
@@ -77,14 +77,14 @@
 
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 m-0">
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Adresse</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.address' | translate }}</dt>
         <dd
           data-testid="vendor-profile-address"
           class="text-sm text-on-surface m-0">{{ v.address }}</dd>
       </div>
 
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Ville</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.city' | translate }}</dt>
         <dd
           data-testid="vendor-profile-city"
           [attr.data-city-id]="v.city.id"
@@ -92,14 +92,14 @@
       </div>
 
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Email</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.email' | translate }}</dt>
         <dd
           data-testid="vendor-profile-email"
           class="text-sm text-on-surface m-0 truncate">{{ v.email }}</dd>
       </div>
 
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Téléphone</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.phone' | translate }}</dt>
         <dd
           data-testid="vendor-profile-phone"
           class="text-sm text-on-surface m-0">{{ v.phone }}</dd>
@@ -112,23 +112,23 @@
     data-testid="vendor-profile-section-delivery"
     class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-4">
     <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
-      Livraison
+      {{ 'vendorProfile.sections.delivery' | translate }}
     </h2>
 
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 m-0">
       @if (v.deliveryRadius != null) {
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Rayon</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.radius' | translate }}</dt>
         <dd
           data-testid="vendor-profile-delivery-radius"
           [attr.data-radius-km]="v.deliveryRadius"
-          class="text-sm text-on-surface m-0">{{ v.deliveryRadius }} km</dd>
+          class="text-sm text-on-surface m-0">{{ 'vendorProfile.fields.radiusValue' | translate: { km: v.deliveryRadius } }}</dd>
       </div>
       }
 
       @if (v.pickupAddress) {
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Point de retrait</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.pickupAddress' | translate }}</dt>
         <dd
           data-testid="vendor-profile-pickup-address"
           class="text-sm text-on-surface m-0">{{ v.pickupAddress }}</dd>
@@ -158,7 +158,7 @@
     data-testid="vendor-profile-section-cuisines"
     class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-3">
     <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
-      Cuisines
+      {{ 'vendorProfile.sections.cuisines' | translate }}
     </h2>
     <ul class="list-none m-0 p-0 flex flex-wrap gap-2">
       @for (cuisine of v.cuisines; track cuisine.id) {
@@ -178,17 +178,17 @@
     data-testid="vendor-profile-section-account"
     class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 flex flex-col gap-3">
     <h2 class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">
-      Compte
+      {{ 'vendorProfile.sections.account' | translate }}
     </h2>
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 m-0">
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Propriétaire</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.owner' | translate }}</dt>
         <dd
           data-testid="vendor-profile-owner-name"
           class="text-sm text-on-surface m-0">{{ v.ownerName }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">Email du compte</dt>
+        <dt class="text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">{{ 'vendorProfile.fields.accountEmail' | translate }}</dt>
         <dd
           data-testid="vendor-profile-account-email"
           class="text-sm text-on-surface m-0 truncate">{{ v.email }}</dd>

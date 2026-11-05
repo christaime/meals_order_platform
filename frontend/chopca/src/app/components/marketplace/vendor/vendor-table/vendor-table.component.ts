@@ -10,6 +10,7 @@ import {
 import { Vendor } from '@app/core/models/marketplace';
 import { CategorySummary } from '@app/core/models/marketplace/category.model';
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** Max badges shown per cell before the "+N" overflow badge kicks in. */
 const MAX_BADGES = 2;
@@ -20,7 +21,7 @@ const BADGE_MAX_WIDTH = '150px';
 @Component({
   selector: 'app-vendor-table',
   standalone: true,
-  imports: [DecimalPipe, NgClass, IconComponent, BadgeComponent],
+  imports: [DecimalPipe, NgClass, IconComponent, BadgeComponent, TranslatePipe],
   templateUrl: './vendor-table.component.html',
   styleUrl: './vendor-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

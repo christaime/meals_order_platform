@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { VendorStatus } from '@app/core/models/marketplace/enum-type.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export type VendorSort =
   | 'name-asc'
@@ -24,7 +25,7 @@ export type VendorStatusFilter = VendorStatus | 'ALL';
 @Component({
   selector: 'app-vendor-filters',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   templateUrl: './vendor-filters.component.html',
   styleUrl: './vendor-filters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,20 +40,20 @@ export class VendorFiltersComponent {
   readonly statusChange = output<VendorStatusFilter>();
   readonly sortChange = output<VendorSort>();
 
-  protected readonly statusOptions: { value: VendorStatusFilter; label: string }[] = [
-    { value: 'ALL',       label: 'Tous les statuts' },
-    { value: 'PENDING',   label: 'En attente' },
-    { value: 'ACTIVE',    label: 'Actif' },
-    { value: 'SUSPENDED', label: 'Suspendu' },
-    { value: 'BANNED',    label: 'Banni' },
-    { value: 'INACTIVE',  label: 'Inactif' },
+  protected readonly statusOptions: { value: VendorStatusFilter; labelKey: string }[] = [
+    { value: 'ALL',       labelKey: 'vendorFilters.status.ALL' },
+    { value: 'PENDING',   labelKey: 'vendorFilters.status.PENDING' },
+    { value: 'ACTIVE',    labelKey: 'vendorFilters.status.ACTIVE' },
+    { value: 'SUSPENDED', labelKey: 'vendorFilters.status.SUSPENDED' },
+    { value: 'BANNED',    labelKey: 'vendorFilters.status.BANNED' },
+    { value: 'INACTIVE',  labelKey: 'vendorFilters.status.INACTIVE' },
   ];
 
-  protected readonly sortOptions: { value: VendorSort; label: string }[] = [
-    { value: 'name-asc',    label: 'Nom (A → Z)' },
-    { value: 'name-desc',   label: 'Nom (Z → A)' },
-    { value: 'rating-desc', label: 'Meilleure note' },
-    { value: 'recent',      label: 'Plus récents' },
+  protected readonly sortOptions: { value: VendorSort; labelKey: string }[] = [
+    { value: 'name-asc',    labelKey: 'vendorFilters.sort.nameAsc' },
+    { value: 'name-desc',   labelKey: 'vendorFilters.sort.nameDesc' },
+    { value: 'rating-desc', labelKey: 'vendorFilters.sort.ratingDesc' },
+    { value: 'recent',      labelKey: 'vendorFilters.sort.recent' },
   ];
 
   protected onKeywordInput(event: Event): void {

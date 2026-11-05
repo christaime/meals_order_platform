@@ -12,7 +12,7 @@
       (input)="onKeywordInput($event)"
       (keydown.enter)="onKeywordSubmit($event)"
       (blur)="onKeywordSubmit($event)"
-      placeholder="Rechercher un vendeur…"
+      [placeholder]="'vendorFilters.namePlaceholder' | translate"
       class="w-full min-w-0 h-11 pl-9 pr-3 rounded-full bg-surface-container-lowest
              border border-outline-variant text-on-surface
              font-body-md text-sm placeholder:text-outline
@@ -28,7 +28,7 @@
            font-label-md text-xs font-semibold
            focus:outline-none focus:ring-2 focus:ring-primary">
     @for (opt of statusOptions; track opt.value) {
-    <option [value]="opt.value">{{ opt.label }}</option>
+    <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
     }
   </select>
 
@@ -41,7 +41,7 @@
            font-label-md text-xs font-semibold
            focus:outline-none focus:ring-2 focus:ring-primary">
     @for (opt of sortOptions; track opt.value) {
-    <option [value]="opt.value">{{ opt.label }}</option>
+    <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
     }
   </select>
 

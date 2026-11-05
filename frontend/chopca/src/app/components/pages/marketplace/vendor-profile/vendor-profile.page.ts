@@ -14,6 +14,7 @@ import { IconComponent } from '@components/shared';
 import { VENDOR_SERVICE } from '@core/services/marketplace/vendor.service';
 import { Vendor } from '@core/models/marketplace';
 import { ToastService } from '@components/shared/toast/toast.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * "Mon restaurant" — the vendor's own view of their business.
@@ -25,7 +26,7 @@ import { ToastService } from '@components/shared/toast/toast.service';
 @Component({
   selector: 'app-vendor-profile',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, TranslatePipe],
   templateUrl: './vendor-profile.page.html',
   styleUrl: './vendor-profile.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +36,7 @@ export class VendorProfilePageComponent implements OnInit {
   private readonly vendorService = inject(VENDOR_SERVICE);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   readonly vendor = signal<Vendor | null>(null);
   readonly isLoading = signal<boolean>(true);
@@ -52,7 +54,10 @@ export class VendorProfilePageComponent implements OnInit {
           console.error('[VendorProfile] load failed', err);
           this.hasError.set(true);
           this.isLoading.set(false);
-          this.toast.show('Échec du chargement du profil', 'error');
+          this.toast.show(
+            this.translate.instant('vendorProfile.toast.loadFailed'),
+            'error',
+          );
         },
       });
   }

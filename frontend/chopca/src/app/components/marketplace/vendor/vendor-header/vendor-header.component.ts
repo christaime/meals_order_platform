@@ -12,6 +12,7 @@ import {
   BadgeComponent,
   RatingStarsComponent,
 } from '@components/shared';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * VendorHeaderComponent — Hero banner and core business profile details
@@ -25,6 +26,7 @@ import {
     IconComponent,
     BadgeComponent,
     RatingStarsComponent,
+    TranslatePipe,
   ],
   templateUrl: './vendor-header.component.html',
   styleUrl: './vendor-header.component.scss',

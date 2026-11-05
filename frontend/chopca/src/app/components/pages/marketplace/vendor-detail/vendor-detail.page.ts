@@ -22,6 +22,7 @@ import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
 import { ToastService } from '@components/shared/toast';
 import { Vendor, VendorSummary } from '@app/core/models/marketplace';
 import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-vendor-detail-page',
@@ -46,6 +47,7 @@ export class VendorDetailPageComponent {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   protected readonly loading = signal<boolean>(true);
   private readonly vendor = signal<Vendor | null>(null);
@@ -82,7 +84,10 @@ export class VendorDetailPageComponent {
         },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement du restaurant', 'error');
+          this.toast.show(
+            this.translate.instant('vendorDetailPage.toast.loadFailed'),
+            'error',
+          );
           console.error(err);
         },
       });
