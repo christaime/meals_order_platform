@@ -4,13 +4,14 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export type LocationSort = 'name-asc' | 'name-desc' | 'recent';
 
 @Component({
   selector: 'app-location-filters',
   standalone: true,
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent, TranslatePipe],
   templateUrl: './location-filters.component.html',
   styleUrl: './location-filters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,17 +29,17 @@ export class LocationFiltersComponent {
   protected readonly draft = signal<string>('');
 
   protected readonly statusOptions = [
-    { value: 'ALL',      label: 'Tous les statuts' },
-    { value: 'APPROVED', label: 'Approuvé' },
-    { value: 'PENDING',  label: 'En attente' },
-    { value: 'REJECTED', label: 'Rejeté' },
-    { value: 'DISABLED', label: 'Désactivé' },
+    { value: 'ALL',      labelKey: 'locationFilters.status.ALL' },
+    { value: 'APPROVED', labelKey: 'moderationStatus.approved' },
+    { value: 'PENDING',  labelKey: 'moderationStatus.pending' },
+    { value: 'REJECTED', labelKey: 'moderationStatus.rejected' },
+    { value: 'DISABLED', labelKey: 'moderationStatus.disabled' },
   ] as const;
 
   protected readonly sortOptions = [
-    { value: 'name-asc',  label: 'Nom (A-Z)' },
-    { value: 'name-desc', label: 'Nom (Z-A)' },
-    { value: 'recent',    label: 'Plus récents' },
+    { value: 'name-asc',  labelKey: 'locationFilters.sort.nameAsc' },
+    { value: 'name-desc', labelKey: 'locationFilters.sort.nameDesc' },
+    { value: 'recent',    labelKey: 'locationFilters.sort.recent' },
   ] as const;
 
   protected onDraftInput(value: string): void { this.draft.set(value); }

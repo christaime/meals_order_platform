@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { LocationFormComponent } from '../../location-form/location-form.component';
 import { Location } from '@app/core/models/marketplace';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-
+import { TranslatePipe } from '@ngx-translate/core';
 export interface NewLocationDialogData extends Location {
 
 }
@@ -29,6 +29,7 @@ export interface NewLocationDialogData extends Location {
     MatDialogModule,
     MatIconModule,
     LocationFormComponent,
+    TranslatePipe
   ],
   templateUrl: './new-location-dialog.component.html',
   styleUrl: './new-location-dialog.component.scss',

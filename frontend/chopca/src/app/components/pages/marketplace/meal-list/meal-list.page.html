@@ -5,19 +5,19 @@
     <div class="flex flex-col gap-1">
       <span class="text-[11px] uppercase tracking-widest
                    text-primary font-bold">
-        Catalogue Culinaire
+        {{ 'mealListPage.badge' | translate }}
       </span>
       <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 m-0">
-        Mes Plats
+        {{ 'mealListPage.title' | translate }}
       </h1>
       <p class="text-sm text-gray-600 m-0">
-        Gérez votre menu, les prix et la disponibilité de vos spécialités.
+        {{ 'mealListPage.subtitle' | translate }}
       </p>
     </div>
 
     <a mat-flat-button color="primary" routerLink="/vendor/meals/new">
       <mat-icon>add</mat-icon>
-      Nouveau plat
+      {{ 'mealListPage.newButton' | translate }}
     </a>
   </div>
 
@@ -39,14 +39,14 @@
       <mat-icon class="!text-5xl !w-12 !h-12 opacity-40">
         restaurant_menu
       </mat-icon>
-      <h2 class="text-lg font-bold m-0">Aucun plat pour le moment</h2>
+      <h2 class="text-lg font-bold m-0">{{ 'mealListPage.empty.title' | translate }}</h2>
       <p class="text-sm text-gray-600 m-0">
-        Créez votre première spécialité pour commencer à recevoir des commandes.
+        {{ 'mealListPage.empty.description' | translate }}
       </p>
       <a mat-flat-button color="primary"
          routerLink="/vendor/meals/new" class="mt-2">
         <mat-icon>add</mat-icon>
-        Créer un plat
+        {{ 'mealListPage.empty.cta' | translate }}
       </a>
     </mat-card-content>
   </mat-card>
@@ -88,19 +88,19 @@
             @case ('APPROVED') {
             <mat-chip highlighted color="primary">
               <mat-icon>check_circle</mat-icon>
-              Publié
+              {{ 'moderationStatus.approved' | translate }}
             </mat-chip>
             }
             @case ('PENDING') {
             <mat-chip highlighted>
               <mat-icon>schedule</mat-icon>
-              En attente
+              {{ 'moderationStatus.pending' | translate }}
             </mat-chip>
             }
             @case ('REJECTED') {
             <mat-chip highlighted class="!bg-red-100">
               <mat-icon>cancel</mat-icon>
-              Rejeté
+              {{ 'moderationStatus.rejected' | translate }}
             </mat-chip>
             }
             }

@@ -9,7 +9,7 @@
       class="inline-flex items-center gap-1 text-sm text-gray-600
              no-underline hover:text-primary w-fit">
       <mat-icon class="!text-base !w-4 !h-4">arrow_back</mat-icon>
-      Mes plats
+      {{ 'mealEditorPage.backLink' | translate }}
     </a>
     <h1
       data-testid="meal-editor-title"
@@ -38,17 +38,17 @@
        Load error
        ═══════════════════════════════════════════════════════ -->
   @else if (loadError()) {
-    <div
-      data-testid="meal-editor-load-error"
-      class="flex flex-col items-center gap-3 py-16 text-center">
-      <mat-icon class="!text-5xl !w-12 !h-12 text-red-500">error</mat-icon>
-      <h2 class="text-lg font-bold m-0">Impossible de charger ce plat</h2>
-      <p class="text-sm text-gray-600 m-0">{{ loadError() }}</p>
-      <a mat-flat-button color="primary" routerLink="/vendor/meals" class="mt-2">
-        <mat-icon>arrow_back</mat-icon>
-        Retour à la liste
-      </a>
-    </div>
+  <div
+    data-testid="meal-editor-load-error"
+    class="flex flex-col items-center gap-3 py-16 text-center">
+    <mat-icon class="!text-5xl !w-12 !h-12 text-red-500">error</mat-icon>
+    <h2 class="text-lg font-bold m-0">{{ 'mealEditorPage.loadError.title' | translate }}</h2>
+    <p class="text-sm text-gray-600 m-0">{{ loadError() }}</p>
+    <a mat-flat-button color="primary" routerLink="/vendor/meals" class="mt-2">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'mealEditorPage.loadError.backToList' | translate }}
+    </a>
+  </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════
@@ -76,7 +76,7 @@
 
           <!-- ═════════ STEP 1 — IDENTITY ═════════ -->
           <mat-step data-testid="meal-editor-step-identity">
-            <ng-template matStepLabel>Identité</ng-template>
+            <ng-template matStepLabel>{{ 'mealEditorPage.steps.identity' | translate }}</ng-template>
             <div class="pt-6 pb-2">
               <app-step-identity
                 [form]="form"
@@ -91,7 +91,7 @@
                 mat-flat-button
                 color="primary"
                 matStepperNext>
-                Continuer : Ingrédients
+                {{ 'mealEditorPage.steps.nextComposition' | translate }}
                 <mat-icon>arrow_forward</mat-icon>
               </button>
             </div>
@@ -99,7 +99,7 @@
 
           <!-- ═════════ STEP 2 — COMPOSITION ═════════ -->
           <mat-step data-testid="meal-editor-step-composition">
-            <ng-template matStepLabel>Composition</ng-template>
+            <ng-template matStepLabel>{{ 'mealEditorPage.steps.composition' | translate }}</ng-template>
             <div class="pt-6 pb-2">
               <app-step-composition
                 [form]="form"
@@ -112,7 +112,7 @@
                 mat-button
                 matStepperPrevious>
                 <mat-icon>arrow_back</mat-icon>
-                Retour
+                {{ 'mealEditorPage.steps.back' | translate }}
               </button>
               <button
                 type="button"
@@ -120,7 +120,7 @@
                 mat-flat-button
                 color="primary"
                 matStepperNext>
-                Continuer : Tarifs
+                {{ 'mealEditorPage.steps.nextPricing' | translate }}
                 <mat-icon>arrow_forward</mat-icon>
               </button>
             </div>
@@ -128,7 +128,7 @@
 
           <!-- ═════════ STEP 3 — PRICING ═════════ -->
           <mat-step data-testid="meal-editor-step-pricing">
-            <ng-template matStepLabel>Tarifs &amp; Zones</ng-template>
+            <ng-template matStepLabel>{{ 'mealEditorPage.steps.pricing' | translate }}</ng-template>
             <div class="pt-6 pb-2">
               <app-step-pricing
                 [form]="form"
@@ -153,7 +153,7 @@
                 mat-button
                 matStepperPrevious>
                 <mat-icon>arrow_back</mat-icon>
-                Retour
+                {{ 'mealEditorPage.steps.back' | translate }}
               </button>
               <div class="flex items-center gap-2">
                 <button
@@ -161,7 +161,7 @@
                   data-testid="meal-editor-cancel"
                   mat-button
                   (click)="onCancel()">
-                  Annuler
+                  {{ 'mealEditorPage.cancel' | translate }}
                 </button>
                 <button
                   type="submit"
@@ -171,11 +171,11 @@
                   [disabled]="submitting()">
                   @if (submitting()) {
                   <mat-spinner diameter="18" class="inline-block mr-2" />
-                  <span>Publication…</span>
+                  <span>{{ 'mealEditorPage.submit.saving' | translate }}</span>
                   } @else {
                   <ng-container>
-                  <mat-icon>check_circle</mat-icon>
-                  <span>{{ isEditMode() ? 'Enregistrer' : 'Valider et publier' }}</span>
+                    <mat-icon>check_circle</mat-icon>
+                    <span>{{ (isEditMode() ? 'mealEditorPage.submit.update' : 'mealEditorPage.submit.create') | translate }}</span>
                   </ng-container>
                   }
                 </button>
@@ -201,7 +201,7 @@
         }
 
         <p class="text-[11px] text-on-surface-variant text-center mt-3">
-          Aperçu en temps réel de votre fiche plat.
+          {{ 'mealEditorPage.previewHint' | translate }}
         </p>
       </div>
     </aside>

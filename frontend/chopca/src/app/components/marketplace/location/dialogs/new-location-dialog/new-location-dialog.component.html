@@ -3,7 +3,7 @@
   data-testid="new-location-dialog"
   class="flex items-center gap-2">
   <mat-icon class="text-primary">location_on</mat-icon>
-  {{ prefill ? 'Modifier l\'emplacement' : 'Nouvel emplacement' }}
+  {{ (prefill ? 'newLocationDialog.title.edit' : 'newLocationDialog.title.create') | translate }}
 </h2>
 
 <mat-dialog-content class="!max-h-[80vh]">

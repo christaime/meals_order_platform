@@ -18,6 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 
 import { MEAL_SERVICE } from '@app/core/services/marketplace/meal.service';
 import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * Vendor meal list page.
@@ -38,6 +39,7 @@ import { MealSummary, MealSearchRequest } from '@app/core/models/marketplace';
     MatCardModule,
     MatProgressSpinnerModule,
     MatChipsModule,
+    TranslatePipe,
   ],
   templateUrl: './meal-list.page.html',
   styleUrl: './meal-list.page.scss',
@@ -47,6 +49,7 @@ export class MealListPageComponent implements OnInit {
 
   private readonly mealService = inject(MEAL_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   protected readonly meals = signal<MealSummary[]>([]);
   protected readonly loading = signal<boolean>(true);
@@ -66,7 +69,8 @@ export class MealListPageComponent implements OnInit {
         error: (err) => {
           console.error('[MealListPage] load error', err);
           this.error.set(
-            err?.error?.message ?? 'Impossible de charger vos plats.'
+            err?.error?.message
+              ?? this.translate.instant('mealListPage.errors.loadFailed'),
           );
           this.loading.set(false);
         },

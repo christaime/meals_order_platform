@@ -29,6 +29,7 @@ import { LOCATION_SERVICE } from '@app/core/services/marketplace/location.servic
 import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { GoogleMapsLoaderService } from '@app/core/services/google-maps-loader.service';
 import { Location, LocationRequest, City } from '@app/core/models/marketplace';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * Location create / edit form with Google Map picker.
@@ -54,6 +55,7 @@ import { Location, LocationRequest, City } from '@app/core/models/marketplace';
     MatIconModule,
     MatProgressSpinnerModule,
     GoogleMapsModule,
+    TranslatePipe,
   ],
   templateUrl: './location-form.component.html',
   styleUrl: './location-form.component.scss',
@@ -67,6 +69,7 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   private readonly mapsLoader = inject(GoogleMapsLoaderService);
   private readonly zone = inject(NgZone);
   private readonly cityCoordinates = inject(CityCoordinatesService);
+  private readonly translate = inject(TranslateService);
 
   @ViewChild(GoogleMap) map?: GoogleMap;
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
@@ -273,54 +276,54 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
   protected nameError(): string | null {
     const c = this.name;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required'])  return 'Le nom est requis';
-    if (c.errors['minlength']) return 'Minimum 2 caractères';
-    if (c.errors['maxlength']) return 'Maximum 100 caractères';
+    if (c.errors['required'])  return this.translate.instant('locationForm.errors.nameRequired');
+    if (c.errors['minlength']) return this.translate.instant('locationForm.errors.nameMinLength');
+    if (c.errors['maxlength']) return this.translate.instant('locationForm.errors.nameMaxLength');
     return null;
   }
 
   protected cityIdError(): string | null {
     const c = this.cityId;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required']) return 'La ville est requise';
+    if (c.errors['required']) return this.translate.instant('locationForm.errors.cityRequired');
     return null;
   }
 
   protected addressError(): string | null {
     const c = this.address;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required'])  return "L'adresse est requise";
-    if (c.errors['maxlength']) return 'Maximum 255 caractères';
+    if (c.errors['required'])  return this.translate.instant('locationForm.errors.addressRequired');
+    if (c.errors['maxlength']) return this.translate.instant('locationForm.errors.addressMaxLength');
     return null;
   }
 
   protected phoneError(): string | null {
     const c = this.phone;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['maxlength']) return 'Maximum 50 caractères';
+    if (c.errors['maxlength']) return this.translate.instant('locationForm.errors.phoneMaxLength');
     return null;
   }
 
   protected latitudeError(): string | null {
     const c = this.latitude;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required']) return 'Latitude requise';
-    if (c.errors['min'] || c.errors['max']) return 'Entre -90 et 90';
+    if (c.errors['required']) return this.translate.instant('locationForm.errors.latitudeRequired');
+    if (c.errors['min'] || c.errors['max']) return this.translate.instant('locationForm.errors.latitudeRange');
     return null;
   }
 
   protected longitudeError(): string | null {
     const c = this.longitude;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required']) return 'Longitude requise';
-    if (c.errors['min'] || c.errors['max']) return 'Entre -180 et 180';
+    if (c.errors['required']) return this.translate.instant('locationForm.errors.longitudeRequired');
+    if (c.errors['min'] || c.errors['max']) return this.translate.instant('locationForm.errors.longitudeRange');
     return null;
   }
 
   protected deliveryRadiusError(): string | null {
     const c = this.deliveryRadius;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['min']) return 'Doit être positif';
+    if (c.errors['min']) return this.translate.instant('locationForm.errors.deliveryRadiusMin');
     return null;
   }
 
@@ -365,7 +368,8 @@ export class LocationFormComponent implements OnInit, AfterViewInit {
       error: (err) => {
         this.submitting.set(false);
         this.serverError.set(
-          err?.error?.message ?? 'Une erreur est survenue. Veuillez réessayer.'
+          err?.error?.message
+            ?? this.translate.instant('locationForm.errors.saveFailed'),
         );
       },
     });

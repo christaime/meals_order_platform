@@ -979,5 +979,348 @@
     }
   },
   "title": { "city": "Delete city '{{name}}'?" },
-  "placeholder": { "city": "E.g. Duplicate, city no longer covered…" }
+  "placeholder": { "city": "E.g. Duplicate, city no longer covered…" },
+  "ingredientsPage": {
+    "badge": "Ingredient reference",
+    "scope": "National catalog",
+    "title": "Ingredient management",
+    "subtitle": "Centralize, normalize and moderate the ingredients used in Chop ça! dishes. Flag allergens to protect customer food safety.",
+    "importCsv": "Import CSV",
+    "exportCsv": "Export CSV",
+    "newIngredient": "New ingredient",
+    "toast": {
+      "updated": "Ingredient updated",
+      "created": "Ingredient created",
+      "activated": "Ingredient activated",
+      "deactivated": "Ingredient deactivated",
+      "toggleFailed": "Failed to change status",
+      "deleted": "Ingredient deleted",
+      "deleteFailed": "Delete failed",
+      "loadFailed": "Failed to load ingredients",
+      "importNotReady": "CSV import — feature coming soon",
+      "exportNotReady": "CSV export — feature coming soon"
+    }
+  },
+  "ingredientForm": {
+    "title": {
+      "edit": "Edit ingredient",
+      "create": "Add an ingredient"
+    },
+    "subtitle": "Define the ingredients used in Chop ça! dishes.",
+    "mode": {
+      "editing": "Editing",
+      "draft": "Draft"
+    },
+    "name": {
+      "label": "Ingredient name",
+      "placeholder": "E.g. Ndolé leaves, Djansang, Peanut...",
+      "error": "Name required (2 to 100 characters).",
+      "hint": "Clear name shown to customers and used on meal cards."
+    },
+    "classification": {
+      "label": "Classification"
+    },
+    "allergen": {
+      "label": "Allergen",
+      "hint": "Check if the ingredient is a common allergen (peanut, shellfish, gluten, lactose, eggs, fish, soy…)."
+    },
+    "submit": {
+      "saving": "Saving…",
+      "update": "Update",
+      "create": "Save ingredient"
+    },
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "errors": {
+      "saveFailed": "An error occurred. Please try again."
+    }
+  },
+  "ingredientFilters": {
+    "namePlaceholder": "Search an ingredient…",
+    "clearTitle": "Clear",
+    "clearAriaLabel": "Clear search",
+    "searchTitle": "Search",
+    "searchAriaLabel": "Search",
+    "allergen": {
+      "ALL": "All",
+      "YES": "Allergens",
+      "NO": "Non-allergens"
+    },
+    "status": {
+      "ALL": "All statuses"
+    },
+    "sort": {
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "statusAsc": "Status"
+    }
+  },
+  "newLocationDialog": {
+    "title": {
+      "create": "New location",
+      "edit": "Edit location"
+    }
+  },
+  "locationFilters": {
+    "namePlaceholder": "Search a location…",
+    "clearAriaLabel": "Clear",
+    "searchAriaLabel": "Search",
+    "status": {
+      "ALL": "All statuses"
+    },
+    "sort": {
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "recent": "Most recent"
+    }
+  },
+  "locationForm": {
+    "city": {
+      "placeholder": "Select a city",
+      "empty": "No city available"
+    },
+    "search": {
+      "label": "Search a place (optional)",
+      "placeholder": "E.g. Bonapriso market, Douala…"
+    },
+    "map": {
+      "loading": "Loading map…"
+    },
+    "latitude": {
+      "label": "Latitude"
+    },
+    "longitude": {
+      "label": "Longitude"
+    },
+    "name": {
+      "label": "Location name",
+      "placeholder": "E.g. Akwa, Bonapriso, Bastos…"
+    },
+    "address": {
+      "label": "Full address",
+      "placeholder": "E.g. Rue des Palmiers, Akwa, Douala"
+    },
+    "phone": {
+      "label": "Phone (optional)",
+      "placeholder": "+237 6 12 34 56 78"
+    },
+    "deliveryRadius": {
+      "label": "Delivery radius (km)"
+    },
+    "cancel": "Cancel",
+    "submit": {
+      "saving": "Saving…",
+      "update": "Save",
+      "create": "Create"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameMinLength": "Minimum 2 characters",
+      "nameMaxLength": "Maximum 100 characters",
+      "cityRequired": "City is required",
+      "addressRequired": "Address is required",
+      "addressMaxLength": "Maximum 255 characters",
+      "phoneMaxLength": "Maximum 50 characters",
+      "latitudeRequired": "Latitude is required",
+      "latitudeRange": "Between -90 and 90",
+      "longitudeRequired": "Longitude is required",
+      "longitudeRange": "Between -180 and 180",
+      "deliveryRadiusMin": "Must be positive",
+      "saveFailed": "An error occurred. Please try again."
+    }
+  },
+  "locationsPage": {
+    "badge": "Distribution points",
+    "scope": {
+      "admin": "Moderation",
+      "vendor": "My presence points"
+    },
+    "title": {
+      "admin": "Presence zones moderation",
+      "vendor": "My presence zones"
+    },
+    "subtitle": {
+      "admin": "Review and moderate distribution locations submitted by vendors.",
+      "vendor": "Manage your presence points for your Chop ça! customers."
+    },
+    "newButton": "New location",
+    "form": {
+      "title": {
+        "edit": "Edit location",
+        "create": "Add a location"
+      },
+      "subtitle": "Define your pickup and delivery points.",
+      "mode": {
+        "editing": "Editing",
+        "draft": "Draft"
+      }
+    },
+    "adminHint": "Select a location in the list to moderate it.",
+    "emptyState": {
+      "title": "Select a vendor",
+      "description": "Use the left panel to choose a vendor and display their locations."
+    },
+    "toast": {
+      "saved": "Location saved",
+      "deleted": "Location deleted",
+      "deleteFailed": "Delete failed",
+      "loadFailed": "Failed to load locations"
+    }
+  },
+  "vendorPicker": {
+    "searchPlaceholder": "Search a vendor…",
+    "removeAriaLabel": "Remove {{name}}",
+    "emptyState": "No vendor matches.",
+    "minLengthHint": "Enter at least {{count}} characters."
+  },
+  "stepComposition": {
+    "prepTime": {
+      "label": "Preparation time",
+      "hint": "Preparation time after receiving the order — not the total cooking time.",
+      "undefined": "Not set"
+    },
+    "ingredients": {
+      "label": "Ingredients",
+      "searchPlaceholder": "Search or add…",
+      "allergenSuffix": "(allergen)",
+      "allergenBadge": "Allergen",
+      "createHint": "Create \"{{name}}\"",
+      "editAriaLabel": "Edit {{name}}",
+      "removeAriaLabel": "Remove {{name}}",
+      "hint": "Main ingredients, allergens, and those that shape the taste (sweet, salty, sour) or aroma."
+    },
+    "snack": {
+      "updated": "\"{{name}}\" updated",
+      "created": "\"{{name}}\" added"
+    },
+    "errors": {
+      "prepTimeRequired": "Preparation time is required",
+      "ingredientRequired": "Add at least one ingredient"
+    }
+  },
+  "stepIdentity": {
+    "name": {
+      "label": "Dish name",
+      "placeholder": "E.g. Mbongo Tchobi with Captain fish, Poulet DG…",
+      "hint": "Mention the signature side dish to boost orders."
+    },
+    "cuisines": {
+      "label": "Culinary origin & specialty",
+      "hint": "Choose up to 3 cuisines (minimum 1).",
+      "emptyMessage": "No cuisine available."
+    },
+    "dishTypes": {
+      "label": "Dish type",
+      "hint": "Main course, dessert, drink… (minimum 1).",
+      "emptyMessage": "No dish type available."
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Describe the dish, its flavors, its origin…"
+    },
+    "image": {
+      "label": "Dish photo",
+      "hint": "JPG, PNG or WebP, up to 8 MB. 4:3 format recommended."
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameMinLength": "Minimum 3 characters",
+      "nameMaxLength": "Maximum 100 characters",
+      "cuisineRequired": "Select at least one cuisine",
+      "dishTypeRequired": "Select at least one dish type"
+    }
+  },
+  "stepPricing": {
+    "optional": "(optional)",
+    "price": {
+      "label": "Regular price (FCFA)",
+      "placeholder": "3500"
+    },
+    "promoPrice": {
+      "label": "Promo price",
+      "placeholder": "3000"
+    },
+    "commission": {
+      "title": "Earnings preview",
+      "customerPays": "Customer pays",
+      "platformRate": "Platform commission ({{rate}}%)",
+      "youReceive": "You receive"
+    },
+    "locations": {
+      "label": "Distribution zones",
+      "searchPlaceholder": "Search a zone…",
+      "createHint": "Create \"{{name}}\"",
+      "editAriaLabel": "Edit {{name}}",
+      "removeAriaLabel": "Remove {{name}}",
+      "hint": "A dish can exist without a distribution zone for now."
+    },
+    "snack": {
+      "updated": "\"{{name}}\" updated",
+      "created": "\"{{name}}\" added"
+    },
+    "errors": {
+      "priceRequired": "Price is required",
+      "priceMin": "Minimum price is 100 FCFA",
+      "priceMax": "Maximum price is 1,000,000 FCFA",
+      "promoNotLower": "Promo price must be lower than the regular price",
+      "promoMin": "Minimum 100 FCFA"
+    }
+  },
+  "mealEditorPage": {
+    "backLink": "My dishes",
+    "title": {
+      "create": "New dish",
+      "edit": "Edit a dish"
+    },
+    "subtitle": {
+      "create": "Fill in the information for your new specialty in 3 steps.",
+      "edit": "Update the information for your specialty."
+    },
+    "loadError": {
+      "title": "Unable to load this dish",
+      "backToList": "Back to list"
+    },
+    "steps": {
+      "identity": "Identity",
+      "composition": "Composition",
+      "pricing": "Pricing & Zones",
+      "nextComposition": "Continue: Ingredients",
+      "nextPricing": "Continue: Pricing",
+      "back": "Back"
+    },
+    "cancel": "Cancel",
+    "submit": {
+      "saving": "Publishing…",
+      "update": "Save",
+      "create": "Validate and publish"
+    },
+    "previewHint": "Real-time preview of your dish card.",
+    "previewVendorName": "My kitchen",
+    "snack": {
+      "validationFailed": "Please fix the errors before publishing.",
+      "updated": "Dish updated successfully!",
+      "created": "Dish published successfully!"
+    },
+    "confirm": {
+      "discardChanges": "You have unsaved changes. Leave anyway?"
+    },
+    "errors": {
+      "loadFailed": "Unable to load this dish.",
+      "submitFailed": "An error occurred. Please try again."
+    }
+  },
+  "mealListPage": {
+    "badge": "Culinary catalog",
+    "title": "My dishes",
+    "subtitle": "Manage your menu, prices and availability of your specialties.",
+    "newButton": "New dish",
+    "empty": {
+      "title": "No dishes yet",
+      "description": "Create your first specialty to start receiving orders.",
+      "cta": "Create a dish"
+    },
+    "errors": {
+      "loadFailed": "Unable to load your dishes."
+    }
+  }
 }

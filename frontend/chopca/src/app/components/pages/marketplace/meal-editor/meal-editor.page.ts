@@ -35,6 +35,7 @@ import { Meal, MealRequest,MediaRef,
 import { MealCardComponent, MealCardSkeletonComponent } from '@components/marketplace/meal/view';
 import { MEDIA_SERVICE } from '@app/core/services/marketplace/media.service';
 import { USER_CONTEXT_SERVICE } from '@core/services/auth';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 /**
  * Meal editor page.
  *
@@ -59,7 +60,8 @@ import { USER_CONTEXT_SERVICE } from '@core/services/auth';
     StepCompositionComponent,
     StepPricingComponent,
     MealCardComponent,
-    MealCardSkeletonComponent
+    MealCardSkeletonComponent,
+    TranslatePipe,
   ],
   templateUrl: './meal-editor.page.html',
   styleUrl: './meal-editor.page.scss',
@@ -76,6 +78,7 @@ export class MealEditorPageComponent implements OnInit {
   private readonly categoryService = inject(CATEGORY_SERVICE);
   private readonly mediaService = inject(MEDIA_SERVICE);
   private readonly userContextService = inject(USER_CONTEXT_SERVICE);
+  private readonly translate = inject(TranslateService);
 
   private readonly stepper = viewChild<import('@angular/material/stepper').MatStepper>('stepper');
 
@@ -137,13 +140,15 @@ export class MealEditorPageComponent implements OnInit {
 
   // ─── Derived ──────────────────────────────────────────────
   protected readonly pageTitle = computed(() =>
-    this.isEditMode() ? 'Modifier un plat' : 'Nouveau plat'
+    this.isEditMode()
+      ? this.translate.instant('mealEditorPage.title.edit')
+      : this.translate.instant('mealEditorPage.title.create')
   );
 
   protected readonly pageSubtitle = computed(() =>
     this.isEditMode()
-      ? 'Mettez à jour les informations de votre spécialité.'
-      : 'Renseignez les informations de votre nouvelle spécialité en 3 étapes.'
+      ? this.translate.instant('mealEditorPage.subtitle.edit')
+      : this.translate.instant('mealEditorPage.subtitle.create')
   );
 
   private readonly _formValue = signal(this.form.getRawValue());
@@ -164,7 +169,7 @@ export class MealEditorPageComponent implements OnInit {
     return {
       id: '',                                       // not published yet
       vendorId: '',                                 // resolved server-side
-      vendorBusinessName: 'Ma cuisine',             // TODO: replace with vendor name from auth/context
+      vendorBusinessName: this.translate.instant('mealEditorPage.previewVendorName'),
       name,
       description: (v.description ?? '').trim() || null,
       price: price?? 0,
@@ -237,7 +242,8 @@ export class MealEditorPageComponent implements OnInit {
         error: (err) => {
           console.error('[MealEditorPage] load error', err);
           this.loadError.set(
-            err?.error?.message ?? 'Impossible de charger ce plat.'
+            err?.error?.message
+              ?? this.translate.instant('mealEditorPage.errors.loadFailed'),
           );
           this.isLoading.set(false);
         },
@@ -268,7 +274,7 @@ export class MealEditorPageComponent implements OnInit {
     if (this.form.invalid) {
       this.jumpToFirstInvalidStep();
       this.snackBar.open(
-        'Veuillez corriger les erreurs avant de publier.',
+        this.translate.instant('mealEditorPage.snack.validationFailed'),
         'OK',
         { duration: 4000 },
       );
@@ -289,9 +295,11 @@ export class MealEditorPageComponent implements OnInit {
       next: () => {
         this.submitting.set(false);
         this.snackBar.open(
-          this.isEditMode()
-            ? 'Plat mis à jour avec succès !'
-            : 'Plat publié avec succès !',
+          this.translate.instant(
+            this.isEditMode()
+              ? 'mealEditorPage.snack.updated'
+              : 'mealEditorPage.snack.created',
+          ),
           'OK',
           { duration: 4000 },
         );
@@ -300,7 +308,8 @@ export class MealEditorPageComponent implements OnInit {
       error: (err) => {
         this.submitting.set(false);
         const message =
-          err?.error?.message ?? 'Une erreur est survenue. Veuillez réessayer.';
+          err?.error?.message
+            ?? this.translate.instant('mealEditorPage.errors.submitFailed');
         this.submitError.set(message);
         this.snackBar.open(message, 'OK', { duration: 5000 });
       },
@@ -354,7 +363,7 @@ export class MealEditorPageComponent implements OnInit {
   onCancel(): void {
     if (this.form.dirty) {
       const ok = window.confirm(
-        'Vous avez des modifications non enregistrées. Quitter ?'
+        this.translate.instant('mealEditorPage.confirm.discardChanges'),
       );
       if (!ok) return;
     }

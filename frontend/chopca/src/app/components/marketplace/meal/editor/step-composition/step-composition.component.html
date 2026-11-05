@@ -4,7 +4,7 @@
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
       <label class="text-xs font-semibold text-on-surface">
-        Temps de préparation
+        {{ 'stepComposition.prepTime.label' | translate }}
         <span class="text-error ml-0.5">*</span>
       </label>
       <span
@@ -40,14 +40,14 @@
     }
 
     <p class="text-[11px] text-on-surface-variant">
-      Temps de préparation après réception de la commande — pas le temps de cuisson total.
+      {{ 'stepComposition.prepTime.hint' | translate }}
     </p>
   </div>
 
   <!-- ═════════ Ingredients ═════════ -->
   <div class="flex flex-col gap-1">
     <label class="text-xs font-semibold text-on-surface">
-      Ingrédients
+      {{ 'stepComposition.ingredients.label' | translate }}
     </label>
 
     <div
@@ -73,7 +73,7 @@
         <button
           type="button"
           [attr.data-testid]="'edit-ingredient-chip-' + ing.id"
-          [attr.aria-label]="'Modifier ' + ing.name"
+          [attr.aria-label]="'stepComposition.ingredients.editAriaLabel' | translate: { name: ing.name }"
           (click)="editIngredient(ing)"
           class="border-0 bg-transparent p-0 cursor-pointer leading-none
                  text-tertiary hover:text-error transition-colors">
@@ -82,13 +82,13 @@
         }
 
         <span class="truncate max-w-[180px]">
-          {{ ing.name }}@if (ing.isAllergen) {<span class="text-tertiary"> (allergène)</span>}
+          {{ ing.name }}@if (ing.isAllergen) {<span class="text-tertiary"> {{ 'stepComposition.ingredients.allergenSuffix' | translate }}</span>}
         </span>
 
         <button
           type="button"
           [attr.data-testid]="'remove-ingredient-chip-' + ing.id"
-          [attr.aria-label]="'Retirer ' + ing.name"
+          [attr.aria-label]="'stepComposition.ingredients.removeAriaLabel' | translate: { name: ing.name }"
           (click)="removeIngredient(ing)"
           class="border-0 bg-transparent p-0 cursor-pointer leading-none
                  text-on-surface-variant hover:text-error transition-colors">
@@ -105,7 +105,7 @@
         (input)="onIngredientInput($event)"
         (keydown)="onInputKeydown($event)"
         (focus)="filteredResults().length > 0 && dropdownOpen.set(true)"
-        placeholder="Rechercher ou ajouter…"
+        [placeholder]="'stepComposition.ingredients.searchPlaceholder' | translate"
         autocomplete="off"
         class="chip-input flex-1 min-w-[120px] h-8 px-1 bg-transparent border-0
          outline-none focus:outline-none focus-visible:outline-none
@@ -138,7 +138,7 @@
           @if (ing.isAllergen) {
           <span class="text-[10px] font-semibold px-1.5 py-0.5
                        rounded bg-tertiary-fixed text-on-tertiary-fixed">
-            Allergène
+            {{ 'stepComposition.ingredients.allergenBadge' | translate }}
           </span>
           }
         </li>
@@ -159,7 +159,7 @@
              font-label-md text-xs font-semibold
              transition-colors cursor-pointer">
       <app-icon name="add" size="sm" />
-      Créer « {{ ingredientFilter() }} »
+      {{ 'stepComposition.ingredients.createHint' | translate: { name: ingredientFilter() } }}
     </button>
     }
 
@@ -169,7 +169,7 @@
       class="text-xs text-error mt-1">{{ ingredientError() }}</p>
     }
     <p class="text-[11px] text-on-surface-variant mt-0.5">
-      Ingrédients principaux, allergènes, et ceux qui marquent le goût (sucré, salé, acide) ou l'odeur.
+      {{ 'stepComposition.ingredients.hint' | translate }}
     </p>
   </div>
 

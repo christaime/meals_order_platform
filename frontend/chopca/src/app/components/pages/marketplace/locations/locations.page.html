@@ -7,20 +7,18 @@
                      bg-primary-fixed text-on-primary-fixed
                      font-label-sm text-label-sm uppercase tracking-wide">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-          Points de distribution
+          {{ 'locationsPage.badge' | translate }}
         </span>
         <span class="text-outline-variant">•</span>
         <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-          {{ scope() === 'admin' ? 'Modération' : 'Mes points de présence' }}
+          {{ (scope() === 'admin' ? 'locationsPage.scope.admin' : 'locationsPage.scope.vendor') | translate }}
         </span>
       </div>
       <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-        {{ scope() === 'admin' ? 'Modération des zones de présence' : 'Mes zones de présence' }}
+        {{ (scope() === 'admin' ? 'locationsPage.title.admin' : 'locationsPage.title.vendor') | translate }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        {{ scope() === 'admin'
-        ? 'Examinez et modérez les emplacements de distribution soumis par les vendeurs.'
-        : 'Gérez vos points de présence pour vos clients Chop ça!.' }}
+        {{ (scope() === 'admin' ? 'locationsPage.subtitle.admin' : 'locationsPage.subtitle.vendor') | translate }}
       </p>
     </div>
 
@@ -33,7 +31,7 @@
                  text-on-primary font-label-lg text-label-lg shadow-md transition-all
                  duration-200 flex items-center gap-2 active:scale-95">
         <app-icon name="add_circle" size="md" />
-        <span>+ Nouvel Emplacement</span>
+        <span>+ {{ 'locationsPage.newButton' | translate }}</span>
       </button>
     </div>
     }
@@ -59,17 +57,17 @@
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
               <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-                {{ editing() ? 'Modifier l\'emplacement' : 'Ajouter un emplacement' }}
+                {{ (editing() ? 'locationsPage.form.title.edit' : 'locationsPage.form.title.create') | translate }}
               </h2>
             </div>
             <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-              Définissez vos points de retrait et de livraison.
+              {{ 'locationsPage.form.subtitle' | translate }}
             </p>
           </div>
           <span class="px-2 py-1 rounded bg-surface-container-low text-on-surface-variant
                          font-label-sm text-label-sm uppercase font-semibold">
-              {{ editing() ? 'Édition' : 'Brouillon' }}
-            </span>
+              {{ (editing() ? 'locationsPage.form.mode.editing' : 'locationsPage.form.mode.draft') | translate }}
+          </span>
         </div>
 
         <div class="mt-space-md">
@@ -97,7 +95,7 @@
                       flex items-start gap-3">
         <app-icon name="info" size="lg" class="text-outline shrink-0 mt-0.5" />
         <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Sélectionnez un emplacement dans la liste pour le modérer.
+          {{ 'locationsPage.adminHint' | translate }}
         </p>
       </div>
       }
@@ -117,10 +115,10 @@
           <app-icon name="person_search" size="xl" />
         </div>
         <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
-          Sélectionnez un vendeur
+          {{ 'locationsPage.emptyState.title' | translate }}
         </h3>
         <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
-          Utilisez le panneau de gauche pour choisir un vendeur et afficher ses emplacements.
+          {{ 'locationsPage.emptyState.description' | translate }}
         </p>
       </div>
 

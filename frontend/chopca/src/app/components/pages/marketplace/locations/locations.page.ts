@@ -27,6 +27,7 @@ import { LocationSort } from '@components/marketplace/location/location-filters/
 import {
   DeleteEntityDialogComponent,
 } from '@components/shared/delete-entity-dialog/delete-entity-dialog.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 
 type Scope = 'vendor' | 'admin';
@@ -42,6 +43,7 @@ type Scope = 'vendor' | 'admin';
     LocationFiltersComponent,
     LocationTableComponent,
     VendorPickerComponent,
+    TranslatePipe,
   ],
   templateUrl: './locations.page.html',
   styleUrl: './locations.page.scss',
@@ -56,6 +58,7 @@ export class LocationsPageComponent {
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   /** Route-data driven: 'vendor' | 'admin'. */
   protected readonly scope = signal<Scope>(
@@ -147,7 +150,10 @@ export class LocationsPageComponent {
         next: page => { this.result.set(page); this.loading.set(false); },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des emplacements', 'error');
+          this.toast.show(
+            this.translate.instant('locationsPage.toast.loadFailed'),
+            'error',
+          );
           console.error(err);
         },
       });
@@ -190,7 +196,10 @@ export class LocationsPageComponent {
 
   protected onSaved(saved: Location): void {
     this.editing.set(saved);
-    this.toast.show('Emplacement enregistré', 'success');
+    this.toast.show(
+      this.translate.instant('locationsPage.toast.saved'),
+      'success',
+    );
     this.refresh();
   }
 
@@ -207,11 +216,17 @@ export class LocationsPageComponent {
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => {
-              this.toast.show('Emplacement supprimé', 'success');
+              this.toast.show(
+                this.translate.instant('locationsPage.toast.deleted'),
+                'success',
+              );
               if (this.editing()?.id === loc.id) this.editing.set(null);
               this.refresh();
             },
-            error: () => this.toast.show('Échec de la suppression', 'error'),
+            error: () => this.toast.show(
+              this.translate.instant('locationsPage.toast.deleteFailed'),
+              'error',
+            ),
           });
       });
   }

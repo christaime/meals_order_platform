@@ -16,6 +16,7 @@ import {
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { INGREDIENT_SERVICE } from '@app/core/services/marketplace/ingredient.service';
 import { Ingredient, IngredientRequest } from '@app/core/models/marketplace';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * Ingredient create / edit form.
@@ -34,7 +35,7 @@ import { Ingredient, IngredientRequest } from '@app/core/models/marketplace';
 @Component({
   selector: 'app-ingredient-form',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent],
+  imports: [ReactiveFormsModule, IconComponent, TranslatePipe],
   templateUrl: './ingredient-form.component.html',
   styleUrl: './ingredient-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +44,7 @@ export class IngredientFormComponent {
 
   private readonly fb = inject(FormBuilder);
   private readonly ingredientService = inject(INGREDIENT_SERVICE);
+  private readonly translate = inject(TranslateService);
 
   /** Existing (edit) / partial prefill (create with defaults) / null (blank). */
   readonly ingredient = input<Ingredient | null>(null);
@@ -118,7 +120,8 @@ export class IngredientFormComponent {
       error: err => {
         this.submitting.set(false);
         this.serverError.set(
-          err?.error?.message ?? 'Une erreur est survenue. Veuillez réessayer.',
+          err?.error?.message
+            ?? this.translate.instant('ingredientForm.errors.saveFailed'),
         );
       },
     });

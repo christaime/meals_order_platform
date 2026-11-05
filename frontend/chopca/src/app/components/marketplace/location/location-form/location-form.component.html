@@ -9,7 +9,7 @@
   <mat-select
     data-testid="location-form-city"
     formControlName="cityId"
-    placeholder="Sélectionner une ville">
+    [placeholder]="'locationForm.city.placeholder' | translate">
     @for (city of cities(); track city.id) {
     <mat-option
       [value]="city.id"
@@ -19,20 +19,20 @@
     }
     @if (cities().length === 0) {
     <mat-option disabled data-testid="location-form-city-empty">
-      Aucune ville disponible
+      {{ 'locationForm.city.empty' | translate }}
     </mat-option>
     }
   </mat-select>
 
   <!-- Places search -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Rechercher un lieu (optionnel)</mat-label>
+    <mat-label>{{ 'locationForm.search.label' | translate }}</mat-label>
     <mat-icon matPrefix>search</mat-icon>
     <input
       data-testid="location-form-search"
       matInput
       #searchInput
-      placeholder="Ex: Marché de Bonapriso, Douala…" />
+      [placeholder]="'locationForm.search.placeholder' | translate" />
   </mat-form-field>
 
   <!-- Map -->
@@ -59,14 +59,14 @@
     data-testid="location-form-map-loading"
     class="rounded-lg border border-gray-200 bg-gray-50
            h-[260px] flex items-center justify-center">
-    <span class="text-sm text-gray-500">Chargement de la carte…</span>
+    <span class="text-sm text-gray-500">{{ 'locationForm.map.loading' | translate }}</span>
   </div>
   }
 
   <!-- Coordinates -->
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     <mat-form-field appearance="outline">
-      <mat-label>Latitude</mat-label>
+      <mat-label>{{ 'locationForm.latitude.label' | translate }}</mat-label>
       <input
         data-testid="location-form-latitude"
         matInput
@@ -79,7 +79,7 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Longitude</mat-label>
+      <mat-label>{{ 'locationForm.longitude.label' | translate }}</mat-label>
       <input
         data-testid="location-form-longitude"
         matInput
@@ -94,13 +94,13 @@
 
   <!-- Name -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Nom de l'emplacement</mat-label>
+    <mat-label>{{ 'locationForm.name.label' | translate }}</mat-label>
     <mat-icon matPrefix>storefront</mat-icon>
     <input
       data-testid="location-form-name"
       matInput
       [formControl]="name"
-      placeholder="Ex: Akwa, Bonapriso, Bastos…"
+      [placeholder]="'locationForm.name.placeholder' | translate"
       autocomplete="off" />
     @if (nameError()) {
     <mat-error>{{ nameError() }}</mat-error>
@@ -109,13 +109,13 @@
 
   <!-- Address -->
   <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Adresse complète</mat-label>
+    <mat-label>{{ 'locationForm.address.label' | translate }}</mat-label>
     <mat-icon matPrefix>location_on</mat-icon>
     <input
       data-testid="location-form-address"
       matInput
       [formControl]="address"
-      placeholder="Ex: Rue des Palmiers, Akwa, Douala" />
+      [placeholder]="'locationForm.address.placeholder' | translate" />
     @if (addressError()) {
     <mat-error>{{ addressError() }}</mat-error>
     }
@@ -124,21 +124,21 @@
   <!-- Phone + radius -->
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     <mat-form-field appearance="outline">
-      <mat-label>Téléphone (optionnel)</mat-label>
+      <mat-label>{{ 'locationForm.phone.label' | translate }}</mat-label>
       <mat-icon matPrefix>call</mat-icon>
       <input
         data-testid="location-form-phone"
         matInput
         type="tel"
         [formControl]="phone"
-        placeholder="+237 6 12 34 56 78" />
+        [placeholder]="'locationForm.phone.placeholder' | translate" />
       @if (phoneError()) {
       <mat-error>{{ phoneError() }}</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Rayon livraison (km)</mat-label>
+      <mat-label>{{ 'locationForm.deliveryRadius.label' | translate }}</mat-label>
       <mat-icon matPrefix>explore</mat-icon>
       <input
         data-testid="location-form-delivery-radius"
@@ -169,7 +169,7 @@
       mat-button
       (click)="onCancel()"
       [disabled]="submitting()">
-      Annuler
+      {{ 'locationForm.cancel' | translate }}
     </button>
 
     <button
@@ -180,11 +180,11 @@
       [disabled]="submitting()">
       @if (submitting()) {
       <mat-spinner diameter="18" class="inline-block mr-2" />
-      <span>Enregistrement…</span>
+      <span>{{ 'locationForm.submit.saving' | translate }}</span>
       } @else {
       <ng-container>
         <mat-icon>check</mat-icon>
-        <span>{{ isEditMode() ? 'Enregistrer' : 'Créer' }}</span>
+        <span>{{ (isEditMode() ? 'locationForm.submit.update' : 'locationForm.submit.create') | translate }}</span>
       </ng-container>
       }
     </button>

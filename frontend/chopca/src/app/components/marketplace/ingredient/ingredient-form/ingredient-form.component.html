@@ -5,11 +5,11 @@
       <h2
         data-testid="ingredient-form-title"
         class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-        {{ isEditMode() ? 'Modifier l\'ingrédient' : 'Ajouter un ingrédient' }}
+        {{ (isEditMode() ? 'ingredientForm.title.edit' : 'ingredientForm.title.create') | translate }}
       </h2>
     </div>
     <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-      Définissez les ingrédients utilisés dans les plats Chop ça!.
+      {{ 'ingredientForm.subtitle' | translate }}
     </p>
   </div>
   <span
@@ -17,7 +17,7 @@
     [attr.data-mode]="isEditMode() ? 'edit' : 'create'"
     class="px-2 py-1 rounded bg-surface-container-low text-on-surface-variant
            font-label-sm text-label-sm uppercase font-semibold">
-    {{ isEditMode() ? 'Édition' : 'Brouillon' }}
+    {{ (isEditMode() ? 'ingredientForm.mode.editing' : 'ingredientForm.mode.draft') | translate }}
   </span>
 </div>
 
@@ -30,14 +30,14 @@
   <!-- Nom -->
   <div class="space-y-1">
     <label class="block font-label-md text-label-md text-on-surface font-semibold" for="ing-name">
-      Nom de l'ingrédient <span class="text-error">*</span>
+      {{ 'ingredientForm.name.label' | translate }} <span class="text-error">*</span>
     </label>
     <input
       data-testid="ingredient-form-name"
       id="ing-name"
       type="text"
       formControlName="name"
-      placeholder="Ex: Feuilles de Ndolé, Djansang, Arachide..."
+      [placeholder]="'ingredientForm.name.placeholder' | translate"
       class="w-full h-11 px-space-md rounded-lg bg-surface-container-low text-on-surface
              font-body-md text-body-md placeholder:text-outline
              focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary
@@ -46,11 +46,11 @@
     <p
       data-testid="ingredient-form-name-error"
       class="font-body-sm text-body-sm text-error text-[11px] leading-tight">
-      Nom requis (2 à 100 caractères).
+      {{ 'ingredientForm.name.error' | translate }}
     </p>
     } @else {
     <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
-      Nom clair affiché aux clients et utilisé dans les fiches de plat.
+      {{ 'ingredientForm.name.hint' | translate }}
     </p>
     }
   </div>
@@ -58,7 +58,7 @@
   <!-- Allergène -->
   <div class="space-y-1.5">
     <label class="block font-label-md text-label-md text-on-surface font-semibold">
-      Classification
+      {{ 'ingredientForm.classification.label' | translate }}
     </label>
 
     <label
@@ -76,11 +76,10 @@
         class="mt-0.5 w-5 h-5 rounded accent-primary cursor-pointer shrink-0" />
       <div class="flex-1">
         <span class="block font-label-md text-label-md text-on-surface font-semibold">
-          Allergène
+          {{ 'ingredientForm.allergen.label' | translate }}
         </span>
         <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight mt-0.5">
-          Cochez si l'ingrédient est un allergène courant
-          (arachide, crustacés, gluten, lactose, œufs, poisson, soja…).
+          {{ 'ingredientForm.allergen.hint' | translate }}
         </p>
       </div>
     </label>
@@ -110,8 +109,8 @@
       <app-icon name="save" size="md" />
       <span>
         {{ submitting()
-          ? 'Enregistrement…'
-          : (isEditMode() ? 'Mettre à jour' : 'Enregistrer l\'ingrédient') }}
+          ? ('ingredientForm.submit.saving' | translate)
+          : ((isEditMode() ? 'ingredientForm.submit.update' : 'ingredientForm.submit.create') | translate) }}
       </span>
     </button>
     <button
@@ -122,7 +121,7 @@
       class="px-space-md h-12 bg-surface-container hover:bg-surface-container-high
              text-on-surface rounded-lg font-label-md text-label-md font-semibold
              transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-      {{ isEditMode() ? 'Annuler' : 'Réinitialiser' }}
+      {{ (isEditMode() ? 'ingredientForm.cancel' : 'ingredientForm.reset') | translate }}
     </button>
   </div>
 </form>

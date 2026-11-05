@@ -27,6 +27,7 @@ import { CITY_SERVICE } from '@app/core/services/marketplace/city.service';
 import { LOCATION_SERVICE } from '@app/core/services/marketplace/location.service';
 import { City } from '@app/core/models/marketplace/city.model';
 import { LocationSummary } from '@app/core/models/marketplace/location.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const SEARCH_DEBOUNCE_MS = 250;
 const SEARCH_RESULT_LIMIT = 10;
@@ -49,7 +50,7 @@ const MAX_SELECTED_LOCATIONS = 2;
 @Component({
   selector: 'app-inline-location-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, TranslatePipe],
   templateUrl: './inline-location-selector.component.html',
   styleUrl: './inline-location-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

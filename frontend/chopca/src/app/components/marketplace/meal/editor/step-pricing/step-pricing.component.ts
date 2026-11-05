@@ -28,6 +28,7 @@ import {
   LocationSummary,
   LocationSearchRequest,
 } from '@app/core/models/marketplace';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * Step 3 — Pricing & distribution.
@@ -52,6 +53,7 @@ import {
   imports: [
     ReactiveFormsModule,
     IconComponent,
+    TranslatePipe,
   ],
   templateUrl: './step-pricing.component.html',
   styleUrl: './step-pricing.component.scss',
@@ -63,6 +65,7 @@ export class StepPricingComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   readonly commissionActive = signal<boolean>(false)
   @ViewChild('locationInput')
@@ -356,7 +359,11 @@ export class StepPricingComponent implements OnInit {
         if (!created) return;
         const beingCreated = {...created , ...(!created.city ? {id: created.cityId} : {}) } as LocationSummary;
         this.addLocation(beingCreated);
-        this.snackBar.open(`« ${created.name} » ajouté`, 'OK', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('stepPricing.snack.created', { name: created.name }),
+          'OK',
+          { duration: 3000 },
+        );
       });
   }
 
@@ -384,7 +391,11 @@ export class StepPricingComponent implements OnInit {
 
         this.updateSelectedFromCache(this.locationIds.value);
 
-        this.snackBar.open(`« ${updated.name} » mis à jour`, 'OK', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('stepPricing.snack.updated', { name: updated.name }),
+          'OK',
+          { duration: 3000 },
+        );
       });
   }
   // ─── Outside-click closes dropdown ────────────────────────
@@ -401,9 +412,9 @@ export class StepPricingComponent implements OnInit {
   protected priceError(): string | null {
     const c = this.price;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required']) return 'Le prix est requis';
-    if (c.errors['min']) return 'Le prix minimum est de 100 FCFA';
-    if (c.errors['max']) return 'Le prix maximum est de 1 000 000 FCFA';
+    if (c.errors['required']) return this.translate.instant('stepPricing.errors.priceRequired');
+    if (c.errors['min']) return this.translate.instant('stepPricing.errors.priceMin');
+    if (c.errors['max']) return this.translate.instant('stepPricing.errors.priceMax');
     return null;
   }
 
@@ -413,8 +424,8 @@ export class StepPricingComponent implements OnInit {
     const promo = c.value;
     if (promo == null || promo <= 0) return null;
     const base = this.price.value ?? 0;
-    if (promo >= base) return 'Le prix promo doit être inférieur au prix normal';
-    if (promo < 100) return 'Minimum 100 FCFA';
+    if (promo >= base) return this.translate.instant('stepPricing.errors.promoNotLower');
+    if (promo < 100) return this.translate.instant('stepPricing.errors.promoMin');
     return null;
   }
 

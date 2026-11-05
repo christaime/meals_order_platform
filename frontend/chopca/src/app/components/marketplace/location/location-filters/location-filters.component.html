@@ -13,7 +13,7 @@
         name="locationSearch"
         [value]="draft()"
         (input)="onDraftInput($any($event.target).value)"
-        placeholder="Rechercher un emplacement..."
+        [placeholder]="'locationFilters.namePlaceholder' | translate"
         autocomplete="off"
         class="flex-1 min-w-0 h-full pl-space-md pr-space-sm bg-transparent border-0
                text-on-surface font-body-md text-body-md placeholder:text-outline
@@ -22,7 +22,7 @@
       <button
         type="button"
         (click)="clearSearch()"
-        aria-label="Effacer"
+        [attr.aria-label]="'locationFilters.clearAriaLabel' | translate"
         class="h-full px-2 text-outline hover:text-on-surface
                  bg-transparent border-0 cursor-pointer
                  flex items-center justify-center">
@@ -31,7 +31,7 @@
       }
       <button
         type="submit"
-        aria-label="Rechercher"
+        [attr.aria-label]="'locationFilters.searchAriaLabel' | translate"
         class="h-full w-11 shrink-0 bg-primary text-on-primary
                hover:bg-primary-container transition-colors
                flex items-center justify-center
@@ -48,7 +48,7 @@
                font-label-md text-label-md text-on-surface appearance-none
                focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
         @for (opt of statusOptions; track opt.value) {
-        <option [value]="opt.value">{{ opt.label }}</option>
+        <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
         }
       </select>
       <app-icon name="expand_more" size="sm"
@@ -63,7 +63,7 @@
                font-label-md text-label-md text-on-surface appearance-none
                focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
         @for (opt of sortOptions; track opt.value) {
-        <option [value]="opt.value">{{ opt.label }}</option>
+        <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
         }
       </select>
       <app-icon name="unfold_more" size="sm"

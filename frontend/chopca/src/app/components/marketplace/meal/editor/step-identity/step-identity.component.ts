@@ -17,6 +17,7 @@ import {
 import { ImageUploaderComponent } from '@components/shared/image-uploader/image-uploader.component';
 
 import { MediaRef, MediaUploadResponse } from '@app/core/models/marketplace';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * Step 1 — Identity.
@@ -35,6 +36,7 @@ import { MediaRef, MediaUploadResponse } from '@app/core/models/marketplace';
     ReactiveFormsModule,
     CategoryPillsSelectorComponent,
     ImageUploaderComponent,
+    TranslatePipe,
   ],
   templateUrl: './step-identity.component.html',
   styleUrl: './step-identity.component.scss',
@@ -43,6 +45,7 @@ import { MediaRef, MediaUploadResponse } from '@app/core/models/marketplace';
 export class StepIdentityComponent implements OnInit {
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   readonly form = input.required<FormGroup>();
 
@@ -90,21 +93,25 @@ export class StepIdentityComponent implements OnInit {
   protected nameError(): string | null {
     const c = this.name;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required'])  return 'Le nom est requis';
-    if (c.errors['minlength']) return 'Minimum 3 caractères';
-    if (c.errors['maxlength']) return 'Maximum 100 caractères';
+    if (c.errors['required'])  return this.translate.instant('stepIdentity.errors.nameRequired');
+    if (c.errors['minlength']) return this.translate.instant('stepIdentity.errors.nameMinLength');
+    if (c.errors['maxlength']) return this.translate.instant('stepIdentity.errors.nameMaxLength');
     return null;
   }
 
   protected cuisineError(): string | null {
     const c = this.cuisineIds;
     if (!c.touched) return null;
-    return (c.value ?? []).length === 0 ? 'Sélectionnez au moins une cuisine' : null;
+    return (c.value ?? []).length === 0
+      ? this.translate.instant('stepIdentity.errors.cuisineRequired')
+      : null;
   }
 
   protected dishTypeError(): string | null {
     const c = this.dishTypeIds;
     if (!c.touched) return null;
-    return (c.value ?? []).length === 0 ? 'Sélectionnez au moins un type de plat' : null;
+    return (c.value ?? []).length === 0
+      ? this.translate.instant('stepIdentity.errors.dishTypeRequired')
+      : null;
   }
 }

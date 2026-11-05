@@ -25,7 +25,7 @@
            font-label-md text-xs font-semibold
            focus:outline-none focus:ring-2 focus:ring-primary
            disabled:opacity-60">
-    <option value="">Toutes les villes</option>
+    <option value="">{{ 'inlineLocationSelector.allCities' | translate }}</option>
     @for (city of cities(); track city.id) {
     <option [value]="city.id">{{ city.name }}</option>
     }
@@ -53,7 +53,7 @@
         <button
           type="button"
           [attr.data-testid]="'inline-location-selector-remove-' + loc.id"
-          [attr.aria-label]="'Retirer ' + loc.name"
+          [attr.aria-label]="'inlineLocationSelector.removeAriaLabel' | translate: { name: loc.name }"
           (click)="removeLocation(loc)"
           class="border-0 bg-transparent p-0 cursor-pointer leading-none
                  text-on-primary/80 hover:text-on-primary transition-colors">
@@ -72,7 +72,7 @@
         (focus)="onLocationFocus()"
         (blur)="onLocationBlur()"
         (keydown)="onLocationKeyDown($event)"
-        placeholder="Sélectionner une zone…"
+        [placeholder]="'inlineLocationSelector.zonePlaceholder' | translate"
         autocomplete="off"
         class="inline-location-selector-input
                flex-1 min-w-[80px] h-full px-1 bg-transparent border-0
@@ -120,7 +120,7 @@
          bg-surface-container-lowest rounded-xl shadow-xl
          border border-outline-variant px-3 py-2
          text-xs text-on-surface-variant">
-      Aucune zone ne correspond.
+      {{ 'inlineLocationSelector.noMatch' | translate }}
     </div>
     }
 

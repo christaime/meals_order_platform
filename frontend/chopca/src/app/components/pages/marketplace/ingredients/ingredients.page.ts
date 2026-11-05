@@ -15,7 +15,7 @@ import {
 import {
   IngredientFormComponent
 } from '@components/marketplace/ingredient/ingredient-form/ingredient-form.component';
-
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { INGREDIENT_SERVICE } from '@app/core/services/marketplace/ingredient.service';
 import {
   Ingredient, IngredientSearchRequest,
@@ -42,6 +42,7 @@ import {
     IngredientFormComponent,
     IngredientFiltersComponent,
     IngredientTableComponent,
+    TranslatePipe
   ],
   templateUrl: './ingredients.page.html',
   styleUrl: './ingredients.page.scss',
@@ -54,6 +55,7 @@ export class IngredientsPageComponent {
   private readonly dialog = inject(MatDialog);
   private readonly roleContext = inject(KEYCLOAK_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   // Filters
   protected readonly name = signal<string>('');
@@ -120,7 +122,7 @@ export class IngredientsPageComponent {
         },
         error: err => {
           this.loading.set(false);
-          this.toast.show('Échec du chargement des ingrédients', 'error');
+          this.toast.show(this.translate.instant('ingredientsPage.toast.loadFailed'), 'error');
           console.error(err);
         },
       });
@@ -170,7 +172,9 @@ export class IngredientsPageComponent {
     this.editing.set(saved);
 
     this.toast.show(
-      wasEditing ? 'Ingrédient mis à jour' : 'Ingrédient créé',
+      this.translate.instant(
+        wasEditing ? 'ingredientsPage.toast.updated' : 'ingredientsPage.toast.created',
+      ),
       'success',
     );
 
@@ -183,10 +187,18 @@ export class IngredientsPageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.toast.show(ing.isActive ? 'Ingrédient désactivé' : 'Ingrédient activé', 'success');
+          this.toast.show(
+            this.translate.instant(
+              ing.isActive ? 'ingredientsPage.toast.deactivated' : 'ingredientsPage.toast.activated',
+            ),
+            'success',
+          );
           this.refresh();
         },
-        error: () => this.toast.show('Échec du changement de statut', 'error'),
+        error: () => this.toast.show(
+          this.translate.instant('ingredientsPage.toast.toggleFailed'),
+          'error',
+        ),
       });
   }
 
@@ -203,11 +215,17 @@ export class IngredientsPageComponent {
            .pipe(takeUntilDestroyed(this.destroyRef))
            .subscribe({
              next: () => {
-               this.toast.show('Ingrédient supprimé', 'success');
+               this.toast.show(
+                 this.translate.instant('ingredientsPage.toast.deleted'),
+                 'success',
+               );
                if (this.editing()?.id === ing.id) this.editing.set(null);
                this.refresh();
              },
-             error: () => this.toast.show('Échec de la suppression', 'error'),
+             error: () => this.toast.show(
+               this.translate.instant('ingredientsPage.toast.deleteFailed'),
+               'error',
+             ),
            });
        });
    }
@@ -231,11 +249,17 @@ export class IngredientsPageComponent {
 
   protected onImportCsv(): void {
     // TODO: wire to backend
-    this.toast.show('Import CSV — fonctionnalité à venir', 'info');
+    this.toast.show(
+      this.translate.instant('ingredientsPage.toast.importNotReady'),
+      'info',
+    );
   }
 
   protected onExportCsv(): void {
     // TODO: wire to backend
-    this.toast.show('Export CSV — fonctionnalité à venir', 'info');
+    this.toast.show(
+      this.translate.instant('ingredientsPage.toast.exportNotReady'),
+      'info',
+    );
   }
 }

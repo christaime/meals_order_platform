@@ -4,6 +4,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { ModerationStatus } from '@app/core/models/marketplace/enum-type.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export type IngredientSort = 'name-asc' | 'name-desc' | 'status-asc';
 export type AllergenFilter = 'ALL' | 'YES' | 'NO';
@@ -11,7 +12,7 @@ export type AllergenFilter = 'ALL' | 'YES' | 'NO';
 @Component({
   selector: 'app-ingredient-filters',
   standalone: true,
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent, TranslatePipe],
   templateUrl: './ingredient-filters.component.html',
   styleUrl: './ingredient-filters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,23 +32,23 @@ export class IngredientFiltersComponent {
   protected readonly draft = signal<string>('');
 
   protected readonly allergenOptions = [
-    { value: 'ALL', label: 'Tous' },
-    { value: 'YES', label: 'Allergènes' },
-    { value: 'NO',  label: 'Non allergènes' },
+    { value: 'ALL', labelKey: 'ingredientFilters.allergen.ALL' },
+    { value: 'YES', labelKey: 'ingredientFilters.allergen.YES' },
+    { value: 'NO',  labelKey: 'ingredientFilters.allergen.NO' },
   ] as const;
 
   protected readonly statusOptions = [
-    { value: 'ALL',      label: 'Tous les statuts' },
-    { value: 'APPROVED', label: 'Approuvé' },
-    { value: 'PENDING',  label: 'En attente' },
-    { value: 'REJECTED', label: 'Rejeté' },
-    { value: 'DISABLED', label: 'Désactivé' },
+    { value: 'ALL',      labelKey: 'ingredientFilters.status.ALL' },
+    { value: 'APPROVED', labelKey: 'moderationStatus.approved' },
+    { value: 'PENDING',  labelKey: 'moderationStatus.pending' },
+    { value: 'REJECTED', labelKey: 'moderationStatus.rejected' },
+    { value: 'DISABLED', labelKey: 'moderationStatus.disabled' },
   ] as const;
 
   protected readonly sortOptions = [
-    { value: 'name-asc',   label: 'Nom (A-Z)' },
-    { value: 'name-desc',  label: 'Nom (Z-A)' },
-    { value: 'status-asc', label: 'Statut' },
+    { value: 'name-asc',   labelKey: 'ingredientFilters.sort.nameAsc' },
+    { value: 'name-desc',  labelKey: 'ingredientFilters.sort.nameDesc' },
+    { value: 'status-asc', labelKey: 'ingredientFilters.sort.statusAsc' },
   ] as const;
 
   protected readonly hasPendingChange = computed(() => this.draft() !== this.name());

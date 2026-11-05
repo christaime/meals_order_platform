@@ -27,6 +27,7 @@ import {
   IngredientSummary,
   IngredientSearchRequest,
 } from '@app/core/models/marketplace';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 /**
  * Step 2 — Composition.
@@ -51,6 +52,7 @@ import {
     ReactiveFormsModule,
     MatSliderModule,
     IconComponent,
+    TranslatePipe,
   ],
   templateUrl: './step-composition.component.html',
   styleUrl: './step-composition.component.scss',
@@ -62,6 +64,7 @@ export class StepCompositionComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   @ViewChild('ingredientInput')
   private ingredientInputRef?: ElementRef<HTMLInputElement>;
@@ -119,7 +122,7 @@ export class StepCompositionComponent implements OnInit {
   }
 
   protected formatPrepTime(minutes: number | null): string {
-    if (minutes == null || minutes === 0) return 'Non défini';
+    if (minutes == null || minutes === 0) return this.translate.instant('stepComposition.prepTime.undefined');
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     if (h === 0) return `${m} min`;
@@ -327,7 +330,11 @@ export class StepCompositionComponent implements OnInit {
         // Re-resolve the chips from the cache.
         this.updateSelectedFromCache(this.ingredientIds.value);
 
-        this.snackBar.open(`« ${updated.name} » mis à jour`, 'OK', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('stepComposition.snack.updated', { name: updated.name }),
+          'OK',
+          { duration: 3000 },
+        );
       });
   }
 
@@ -351,7 +358,11 @@ export class StepCompositionComponent implements OnInit {
           isAllergen: created.isAllergen,
           moderationStatus: created.moderationStatus,
         } as IngredientSummary);
-        this.snackBar.open(`« ${created.name} » ajouté`, 'OK', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('stepComposition.snack.created', { name: created.name }),
+          'OK',
+          { duration: 3000 },
+        );
       });
   }
 
@@ -369,7 +380,7 @@ export class StepCompositionComponent implements OnInit {
   protected prepTimeError(): string | null {
     const c = this.prepTimeMinutes;
     if (!c.touched || !c.errors) return null;
-    if (c.errors['required']) return 'Le temps de préparation est requis';
+    if (c.errors['required']) return this.translate.instant('stepComposition.errors.prepTimeRequired');
     return null;
   }
 
@@ -377,7 +388,7 @@ export class StepCompositionComponent implements OnInit {
     const c = this.ingredientIds;
     if (!c.touched) return null;
     return (c.value ?? []).length === 0
-      ? 'Ajoutez au moins un ingrédient'
+      ? this.translate.instant('stepComposition.errors.ingredientRequired')
       : null;
   }
 

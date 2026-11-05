@@ -7,20 +7,18 @@
                      bg-primary-fixed text-on-primary-fixed
                      font-label-sm text-label-sm uppercase tracking-wide">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-          Référentiel Ingrédients
+          {{ 'ingredientsPage.badge' | translate }}
         </span>
         <span class="text-outline-variant">•</span>
         <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">
-          Catalogue National
+          {{ 'ingredientsPage.scope' | translate }}
         </span>
       </div>
       <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-        Gestion des Ingrédients
+        {{ 'ingredientsPage.title' | translate }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        Centralisez, normalisez et modérez les ingrédients utilisés dans les
-        plats Chop ça!. Identifiez les allergènes pour la sécurité alimentaire
-        des clients.
+        {{ 'ingredientsPage.subtitle' | translate }}
       </p>
     </div>
 
@@ -32,7 +30,7 @@
                text-on-surface transition-all duration-200 flex items-center gap-2
                font-label-lg text-label-lg active:scale-95 shadow-sm">
         <app-icon name="upload_file" size="md" class="text-primary" />
-        <span>Importer CSV</span>
+        <span>{{ 'ingredientsPage.importCsv' | translate }}</span>
       </button>
       <button
         type="button"
@@ -41,7 +39,7 @@
                text-on-surface transition-all duration-200 flex items-center gap-2
                font-label-lg text-label-lg active:scale-95 shadow-sm">
         <app-icon name="download" size="md" class="text-on-surface-variant" />
-        <span>Exporter CSV</span>
+        <span>{{ 'ingredientsPage.exportCsv' | translate }}</span>
       </button>
       <button
         type="button"
@@ -50,7 +48,7 @@
                text-on-primary font-label-lg text-label-lg shadow-md transition-all
                duration-200 flex items-center gap-2 active:scale-95">
         <app-icon name="add_circle" size="md" />
-        <span>+ Nouvel Ingrédient</span>
+        <span>+ {{ 'ingredientsPage.newIngredient' | translate }}</span>
       </button>
     </div>
   </div>
@@ -65,10 +63,10 @@
                 flex flex-col gap-space-md"
          id="ingredient-form-container">
       <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md">
-      <app-ingredient-form
-        [ingredient]="editing()"
-        (saved)="onSaved($event)"
-        (cancelled)="onCancelEdit()" />
+        <app-ingredient-form
+          [ingredient]="editing()"
+          (saved)="onSaved($event)"
+          (cancelled)="onCancelEdit()" />
       </div>
       @if (moderableIngredient(); as ing) {
       <app-moderation-panel

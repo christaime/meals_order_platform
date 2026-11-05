@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { IngredientFormComponent } from '../../ingredient-form/ingredient-form.component';
 import { Ingredient } from '@app/core/models/marketplace';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-
+import { TranslatePipe } from '@ngx-translate/core';
 export interface NewIngredientDialogData extends Ingredient{
 }
 
@@ -23,6 +23,7 @@ export interface NewIngredientDialogData extends Ingredient{
     MatDialogModule,
     MatIconModule,
     IngredientFormComponent,
+    TranslatePipe
   ],
   templateUrl: './new-ingredient-dialog.component.html',
   styleUrl: './new-ingredient-dialog.component.scss',

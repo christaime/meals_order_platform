@@ -24,6 +24,7 @@ import { Observable } from 'rxjs';
 import { IconComponent } from '@components/shared/icon/icon.component';
 import { VENDOR_SERVICE } from '@app/core/services/marketplace/vendor.service';
 import { Vendor, VendorSummary } from '@app/core/models/marketplace';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const SEARCH_DEBOUNCE_MS = 250;
 const SEARCH_RESULT_LIMIT = 10;
@@ -46,7 +47,7 @@ const MIN_SEARCH_LENGTH = 2;
 @Component({
   selector: 'app-vendor-picker',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, TranslatePipe],
   templateUrl: './vendor-picker.component.html',
   styleUrl: './vendor-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -60,7 +60,7 @@
       <button
         type="button"
         [attr.data-testid]="'vendor-picker-remove-' + vendor.id"
-        [attr.aria-label]="'Retirer ' + vendor.businessName"
+        [attr.aria-label]="'vendorPicker.removeAriaLabel' | translate: { name: vendor.businessName }"
         (click)="removeVendor(vendor)"
         class="border-0 bg-transparent p-0 cursor-pointer leading-none
                text-primary/70 hover:text-primary transition-colors shrink-0">
@@ -79,7 +79,7 @@
       (focus)="onFocus()"
       (blur)="onBlur()"
       (keydown)="onKeyDown($event)"
-      placeholder="Rechercher un vendeur…"
+      [placeholder]="'vendorPicker.searchPlaceholder' | translate"
       autocomplete="off"
       class="vendor-chip-input flex-1 min-w-[140px] h-9 px-2 bg-transparent border-0
              outline-none focus:outline-none focus-visible:outline-none
@@ -151,7 +151,7 @@
     class="mt-1 bg-surface-container-lowest rounded-xl shadow-xl
            border border-outline-variant px-3 py-2
            text-xs text-on-surface-variant">
-    Aucun vendeur ne correspond.
+    {{ 'vendorPicker.emptyState' | translate }}
   </div>
   }
 
@@ -162,7 +162,7 @@
     class="mt-1 bg-surface-container-lowest rounded-xl shadow-xl
            border border-outline-variant px-3 py-2
            text-xs text-on-surface-variant">
-    Saisissez au moins {{ minSearchLength }} caractères.
+    {{ 'vendorPicker.minLengthHint' | translate: { count: minSearchLength } }}
   </div>
   }
 

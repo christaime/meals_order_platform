@@ -3,14 +3,14 @@
   <!-- ═════════ Name ═════════ -->
   <div class="flex flex-col gap-1">
     <label for="meal-name" class="text-xs font-semibold text-on-surface">
-      Nom du plat <span class="text-error">*</span>
+      {{ 'stepIdentity.name.label' | translate }} <span class="text-error">*</span>
     </label>
     <input
       data-testid="step-identity-name"
       id="meal-name"
       type="text"
       [formControl]="name"
-      placeholder="Ex: Mbongo Tchobi de Capitaine, Poulet DG…"
+      [placeholder]="'stepIdentity.name.placeholder' | translate"
       class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface
              font-body-md text-sm placeholder:text-outline border border-outline-variant
              focus:outline-none focus:ring-2 focus:ring-primary" />
@@ -20,7 +20,7 @@
       class="text-xs text-error">{{ nameError() }}</p>
     }
     <p class="text-[11px] text-on-surface-variant">
-      Mentionnez l'accompagnement signature pour booster les commandes.
+      {{ 'stepIdentity.name.hint' | translate }}
     </p>
   </div>
 
@@ -29,24 +29,24 @@
     data-testid="step-identity-cuisines"
     categoryType="CUISINE"
     [control]="cuisineIds"
-    label="Origine culinaire & spécialité"
-    hint="Choisissez jusqu'à 3 cuisines (minimum 1)."
+    [label]="'stepIdentity.cuisines.label' | translate"
+    [hint]="'stepIdentity.cuisines.hint' | translate"
     [minSelection]="1"
     [maxSelection]="3"
     [error]="cuisineError()"
-    emptyMessage="Aucune cuisine disponible." />
+    [emptyMessage]="'stepIdentity.cuisines.emptyMessage' | translate" />
 
   <!-- ═════════ Dish types ═════════ -->
   <app-category-pills-selector
     data-testid="step-identity-dish-types"
     categoryType="DISH_TYPE"
     [control]="dishTypeIds"
-    label="Type de plat"
-    hint="Plat principal, dessert, boisson… (minimum 1)."
+    [label]="'stepIdentity.dishTypes.label' | translate"
+    [hint]="'stepIdentity.dishTypes.hint' | translate"
     [minSelection]="1"
     [maxSelection]="3"
     [error]="dishTypeError()"
-    emptyMessage="Aucun type de plat disponible." />
+    [emptyMessage]="'stepIdentity.dishTypes.emptyMessage' | translate" />
 
   <!-- ═════════ Description + Image (image 1/3 left, description 2/3 right) ═════════ -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
@@ -57,8 +57,8 @@
         data-testid="step-identity-image-uploader"
         purpose="MEAL_IMAGE"
         shape="wide"
-        label="Photographie du plat"
-        hint="JPG, PNG ou WebP, jusqu'à 8 Mo. Format 4:3 recommandé."
+        [label]="'stepIdentity.image.label' | translate"
+        [hint]="'stepIdentity.image.hint' | translate"
         [mediaRef]="imageMedia()"
         [maxSizeMb]="8"
         (uploaded)="imageUploaded.emit($event)"
@@ -68,7 +68,7 @@
     <!-- Description — right, 2/3 -->
     <div class="md:col-span-2 flex flex-col gap-1">
       <label for="meal-description" class="text-xs font-semibold text-on-surface">
-        Description
+        {{ 'stepIdentity.description.label' | translate }}
       </label>
       <textarea
         data-testid="step-identity-description"
@@ -76,7 +76,7 @@
         [formControl]="description"
         rows="8"
         maxlength="300"
-        placeholder="Décrivez le plat, ses saveurs, son origine…"
+        [placeholder]="'stepIdentity.description.placeholder' | translate"
         class="w-full px-3 py-2 rounded-lg bg-surface-container-low text-on-surface
                font-body-md text-sm placeholder:text-outline border border-outline-variant
                focus:outline-none focus:ring-2 focus:ring-primary resize-none"></textarea>

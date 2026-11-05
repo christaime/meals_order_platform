@@ -979,5 +979,348 @@
     }
   },
   "title": { "city": "Supprimer la ville '{{name}}'?" },
-  "placeholder": { "city": "Ex: Doublon, ville plus desservie…" }
+  "placeholder": { "city": "Ex: Doublon, ville plus desservie…" },
+  "ingredientsPage": {
+    "badge": "Référentiel Ingrédients",
+    "scope": "Catalogue National",
+    "title": "Gestion des Ingrédients",
+    "subtitle": "Centralisez, normalisez et modérez les ingrédients utilisés dans les plats Chop ça!. Identifiez les allergènes pour la sécurité alimentaire des clients.",
+    "importCsv": "Importer CSV",
+    "exportCsv": "Exporter CSV",
+    "newIngredient": "Nouvel Ingrédient",
+    "toast": {
+      "updated": "Ingrédient mis à jour",
+      "created": "Ingrédient créé",
+      "activated": "Ingrédient activé",
+      "deactivated": "Ingrédient désactivé",
+      "toggleFailed": "Échec du changement de statut",
+      "deleted": "Ingrédient supprimé",
+      "deleteFailed": "Échec de la suppression",
+      "loadFailed": "Échec du chargement des ingrédients",
+      "importNotReady": "Import CSV — fonctionnalité à venir",
+      "exportNotReady": "Export CSV — fonctionnalité à venir"
+    }
+  },
+  "ingredientForm": {
+    "title": {
+      "edit": "Modifier l'ingrédient",
+      "create": "Ajouter un ingrédient"
+    },
+    "subtitle": "Définissez les ingrédients utilisés dans les plats Chop ça!.",
+    "mode": {
+      "editing": "Édition",
+      "draft": "Brouillon"
+    },
+    "name": {
+      "label": "Nom de l'ingrédient",
+      "placeholder": "Ex: Feuilles de Ndolé, Djansang, Arachide...",
+      "error": "Nom requis (2 à 100 caractères).",
+      "hint": "Nom clair affiché aux clients et utilisé dans les fiches de plat."
+    },
+    "classification": {
+      "label": "Classification"
+    },
+    "allergen": {
+      "label": "Allergène",
+      "hint": "Cochez si l'ingrédient est un allergène courant (arachide, crustacés, gluten, lactose, œufs, poisson, soja…)."
+    },
+    "submit": {
+      "saving": "Enregistrement…",
+      "update": "Mettre à jour",
+      "create": "Enregistrer l'ingrédient"
+    },
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "errors": {
+      "saveFailed": "Une erreur est survenue. Veuillez réessayer."
+    }
+  },
+  "ingredientFilters": {
+    "namePlaceholder": "Rechercher un ingrédient...",
+    "clearTitle": "Effacer",
+    "clearAriaLabel": "Effacer la recherche",
+    "searchTitle": "Rechercher",
+    "searchAriaLabel": "Rechercher",
+    "allergen": {
+      "ALL": "Tous",
+      "YES": "Allergènes",
+      "NO": "Non allergènes"
+    },
+    "status": {
+      "ALL": "Tous les statuts"
+    },
+    "sort": {
+      "nameAsc": "Nom (A-Z)",
+      "nameDesc": "Nom (Z-A)",
+      "statusAsc": "Statut"
+    }
+  },
+  "newLocationDialog": {
+    "title": {
+      "create": "Nouvel emplacement",
+      "edit": "Modifier l'emplacement"
+    }
+  },
+  "locationFilters": {
+    "namePlaceholder": "Rechercher un emplacement...",
+    "clearAriaLabel": "Effacer",
+    "searchAriaLabel": "Rechercher",
+    "status": {
+      "ALL": "Tous les statuts"
+    },
+    "sort": {
+      "nameAsc": "Nom (A-Z)",
+      "nameDesc": "Nom (Z-A)",
+      "recent": "Plus récents"
+    }
+  },
+  "locationForm": {
+    "city": {
+      "placeholder": "Sélectionner une ville",
+      "empty": "Aucune ville disponible"
+    },
+    "search": {
+      "label": "Rechercher un lieu (optionnel)",
+      "placeholder": "Ex: Marché de Bonapriso, Douala…"
+    },
+    "map": {
+      "loading": "Chargement de la carte…"
+    },
+    "latitude": {
+      "label": "Latitude"
+    },
+    "longitude": {
+      "label": "Longitude"
+    },
+    "name": {
+      "label": "Nom de l'emplacement",
+      "placeholder": "Ex: Akwa, Bonapriso, Bastos…"
+    },
+    "address": {
+      "label": "Adresse complète",
+      "placeholder": "Ex: Rue des Palmiers, Akwa, Douala"
+    },
+    "phone": {
+      "label": "Téléphone (optionnel)",
+      "placeholder": "+237 6 12 34 56 78"
+    },
+    "deliveryRadius": {
+      "label": "Rayon livraison (km)"
+    },
+    "cancel": "Annuler",
+    "submit": {
+      "saving": "Enregistrement…",
+      "update": "Enregistrer",
+      "create": "Créer"
+    },
+    "errors": {
+      "nameRequired": "Le nom est requis",
+      "nameMinLength": "Minimum 2 caractères",
+      "nameMaxLength": "Maximum 100 caractères",
+      "cityRequired": "La ville est requise",
+      "addressRequired": "L'adresse est requise",
+      "addressMaxLength": "Maximum 255 caractères",
+      "phoneMaxLength": "Maximum 50 caractères",
+      "latitudeRequired": "Latitude requise",
+      "latitudeRange": "Entre -90 et 90",
+      "longitudeRequired": "Longitude requise",
+      "longitudeRange": "Entre -180 et 180",
+      "deliveryRadiusMin": "Doit être positif",
+      "saveFailed": "Une erreur est survenue. Veuillez réessayer."
+    }
+  },
+  "locationsPage": {
+    "badge": "Points de distribution",
+    "scope": {
+      "admin": "Modération",
+      "vendor": "Mes points de présence"
+    },
+    "title": {
+      "admin": "Modération des zones de présence",
+      "vendor": "Mes zones de présence"
+    },
+    "subtitle": {
+      "admin": "Examinez et modérez les emplacements de distribution soumis par les vendeurs.",
+      "vendor": "Gérez vos points de présence pour vos clients Chop ça!."
+    },
+    "newButton": "Nouvel Emplacement",
+    "form": {
+      "title": {
+        "edit": "Modifier l'emplacement",
+        "create": "Ajouter un emplacement"
+      },
+      "subtitle": "Définissez vos points de retrait et de livraison.",
+      "mode": {
+        "editing": "Édition",
+        "draft": "Brouillon"
+      }
+    },
+    "adminHint": "Sélectionnez un emplacement dans la liste pour le modérer.",
+    "emptyState": {
+      "title": "Sélectionnez un vendeur",
+      "description": "Utilisez le panneau de gauche pour choisir un vendeur et afficher ses emplacements."
+    },
+    "toast": {
+      "saved": "Emplacement enregistré",
+      "deleted": "Emplacement supprimé",
+      "deleteFailed": "Échec de la suppression",
+      "loadFailed": "Échec du chargement des emplacements"
+    }
+  },
+  "vendorPicker": {
+    "searchPlaceholder": "Rechercher un vendeur…",
+    "removeAriaLabel": "Retirer {{name}}",
+    "emptyState": "Aucun vendeur ne correspond.",
+    "minLengthHint": "Saisissez au moins {{count}} caractères."
+  },
+  "stepComposition": {
+    "prepTime": {
+      "label": "Temps de préparation",
+      "hint": "Temps de préparation après réception de la commande — pas le temps de cuisson total.",
+      "undefined": "Non défini"
+    },
+    "ingredients": {
+      "label": "Ingrédients",
+      "searchPlaceholder": "Rechercher ou ajouter…",
+      "allergenSuffix": "(allergène)",
+      "allergenBadge": "Allergène",
+      "createHint": "Créer « {{name}} »",
+      "editAriaLabel": "Modifier {{name}}",
+      "removeAriaLabel": "Retirer {{name}}",
+      "hint": "Ingrédients principaux, allergènes, et ceux qui marquent le goût (sucré, salé, acide) ou l'odeur."
+    },
+    "snack": {
+      "updated": "« {{name}} » mis à jour",
+      "created": "« {{name}} » ajouté"
+    },
+    "errors": {
+      "prepTimeRequired": "Le temps de préparation est requis",
+      "ingredientRequired": "Ajoutez au moins un ingrédient"
+    }
+  },
+  "stepIdentity": {
+    "name": {
+      "label": "Nom du plat",
+      "placeholder": "Ex: Mbongo Tchobi de Capitaine, Poulet DG…",
+      "hint": "Mentionnez l'accompagnement signature pour booster les commandes."
+    },
+    "cuisines": {
+      "label": "Origine culinaire & spécialité",
+      "hint": "Choisissez jusqu'à 3 cuisines (minimum 1).",
+      "emptyMessage": "Aucune cuisine disponible."
+    },
+    "dishTypes": {
+      "label": "Type de plat",
+      "hint": "Plat principal, dessert, boisson… (minimum 1).",
+      "emptyMessage": "Aucun type de plat disponible."
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Décrivez le plat, ses saveurs, son origine…"
+    },
+    "image": {
+      "label": "Photographie du plat",
+      "hint": "JPG, PNG ou WebP, jusqu'à 8 Mo. Format 4:3 recommandé."
+    },
+    "errors": {
+      "nameRequired": "Le nom est requis",
+      "nameMinLength": "Minimum 3 caractères",
+      "nameMaxLength": "Maximum 100 caractères",
+      "cuisineRequired": "Sélectionnez au moins une cuisine",
+      "dishTypeRequired": "Sélectionnez au moins un type de plat"
+    }
+  },
+  "stepPricing": {
+    "optional": "(optionnel)",
+    "price": {
+      "label": "Prix normal (FCFA)",
+      "placeholder": "3500"
+    },
+    "promoPrice": {
+      "label": "Prix promo",
+      "placeholder": "3000"
+    },
+    "commission": {
+      "title": "Aperçu de la rémunération",
+      "customerPays": "Client paie",
+      "platformRate": "Commission plateforme ({{rate}}%)",
+      "youReceive": "Vous recevez"
+    },
+    "locations": {
+      "label": "Zones de distribution",
+      "searchPlaceholder": "Rechercher une zone…",
+      "createHint": "Créer « {{name}} »",
+      "editAriaLabel": "Modifier {{name}}",
+      "removeAriaLabel": "Retirer {{name}}",
+      "hint": "Un plat peut exister sans zone de distribution pour le moment."
+    },
+    "snack": {
+      "updated": "« {{name}} » mis à jour",
+      "created": "« {{name}} » ajouté"
+    },
+    "errors": {
+      "priceRequired": "Le prix est requis",
+      "priceMin": "Le prix minimum est de 100 FCFA",
+      "priceMax": "Le prix maximum est de 1 000 000 FCFA",
+      "promoNotLower": "Le prix promo doit être inférieur au prix normal",
+      "promoMin": "Minimum 100 FCFA"
+    }
+  },
+  "mealEditorPage": {
+    "backLink": "Mes plats",
+    "title": {
+      "create": "Nouveau plat",
+      "edit": "Modifier un plat"
+    },
+    "subtitle": {
+      "create": "Renseignez les informations de votre nouvelle spécialité en 3 étapes.",
+      "edit": "Mettez à jour les informations de votre spécialité."
+    },
+    "loadError": {
+      "title": "Impossible de charger ce plat",
+      "backToList": "Retour à la liste"
+    },
+    "steps": {
+      "identity": "Identité",
+      "composition": "Composition",
+      "pricing": "Tarifs & Zones",
+      "nextComposition": "Continuer : Ingrédients",
+      "nextPricing": "Continuer : Tarifs",
+      "back": "Retour"
+    },
+    "cancel": "Annuler",
+    "submit": {
+      "saving": "Publication…",
+      "update": "Enregistrer",
+      "create": "Valider et publier"
+    },
+    "previewHint": "Aperçu en temps réel de votre fiche plat.",
+    "previewVendorName": "Ma cuisine",
+    "snack": {
+      "validationFailed": "Veuillez corriger les erreurs avant de publier.",
+      "updated": "Plat mis à jour avec succès !",
+      "created": "Plat publié avec succès !"
+    },
+    "confirm": {
+      "discardChanges": "Vous avez des modifications non enregistrées. Quitter ?"
+    },
+    "errors": {
+      "loadFailed": "Impossible de charger ce plat.",
+      "submitFailed": "Une erreur est survenue. Veuillez réessayer."
+    }
+  },
+  "mealListPage": {
+    "badge": "Catalogue Culinaire",
+    "title": "Mes Plats",
+    "subtitle": "Gérez votre menu, les prix et la disponibilité de vos spécialités.",
+    "newButton": "Nouveau plat",
+    "empty": {
+      "title": "Aucun plat pour le moment",
+      "description": "Créez votre première spécialité pour commencer à recevoir des commandes.",
+      "cta": "Créer un plat"
+    },
+    "errors": {
+      "loadFailed": "Impossible de charger vos plats."
+    }
+  }
 }
