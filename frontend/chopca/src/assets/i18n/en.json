@@ -1322,5 +1322,41 @@
     "errors": {
       "loadFailed": "Unable to load your dishes."
     }
+  },
+  "aboutPage": {
+    "ourStory": {
+      "title": "Our story",
+      "p1": "MealMarket was born from a simple observation: finding a good meal online today takes more effort than crossing the city to go pick it up.",
+      "p2": "Existing platforms force you to navigate through filters, categories and endless lists. But when you're hungry, you don't think in categories. You think of a dish, a craving, a memory.",
+      "p3": "The platform brings together vendors — restaurants, caterers, home cooks — and their customers around a more direct experience: describe what you're looking for, discover the dishes that match, and order in just a few taps."
+    },
+    "helpCenter": {
+      "title": "Help center",
+      "intro": "A question about an order, an account, a payment or signing up as a vendor? Find answers to the most frequently asked questions below.",
+      "faq": {
+        "order": {
+          "question": "How do I place an order?",
+          "answer": "Browse the catalog, add dishes to your cart, then confirm the payment. You'll receive a confirmation as soon as the vendor accepts the order."
+        },
+        "becomeVendor": {
+          "question": "How do I become a vendor?",
+          "answer": "Create a vendor account from the registration page, fill in your establishment's information, and add your first dishes. Our team will review your application within 48 hours."
+        },
+        "payments": {
+          "question": "What payment methods are accepted?",
+          "answer": "MTN Mobile Money, Orange Money and bank cards (Visa / Mastercard)."
+        },
+        "report": {
+          "question": "How do I report a problem?",
+          "answerPrefix": "Contact us by email or phone — the details are in the ",
+          "contactLink": "Contact us",
+          "answerSuffix": " section."
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact us",
+      "intro": "A question that isn't in the help center? Write to us or call us, we respond within 24 to 48 hours."
+    }
   }
 }

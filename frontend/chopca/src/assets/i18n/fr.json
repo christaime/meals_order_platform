@@ -1322,5 +1322,41 @@
     "errors": {
       "loadFailed": "Impossible de charger vos plats."
     }
+  },
+  "aboutPage": {
+    "ourStory": {
+      "title": "Notre histoire",
+      "p1": "MealMarket est né d'un constat simple : trouver un bon repas en ligne demande aujourd'hui plus d'efforts que de traverser la ville pour aller le chercher.",
+      "p2": "Les plateformes existantes obligent à naviguer entre filtres, catégories et listes interminables. Or, quand on a faim, on ne pense pas en catégories. On pense à un plat, à une envie, à un souvenir.",
+      "p3": "La plateforme rassemble des vendeurs — restaurants, traiteurs, cuisiniers à domicile — et leurs clients autour d'une expérience plus directe : décrire ce que l'on cherche, découvrir les plats qui y répondent, et commander en quelques gestes."
+    },
+    "helpCenter": {
+      "title": "Centre d'aide",
+      "intro": "Une question sur une commande, un compte, un paiement ou une inscription en tant que vendeur ? Consultez les réponses aux questions les plus fréquentes ci-dessous.",
+      "faq": {
+        "order": {
+          "question": "Comment passer une commande ?",
+          "answer": "Parcourez le catalogue, ajoutez les plats à votre panier, puis validez le paiement. Vous recevrez une confirmation dès que le vendeur accepte la commande."
+        },
+        "becomeVendor": {
+          "question": "Comment devenir vendeur ?",
+          "answer": "Créez un compte vendeur depuis la page d'inscription, renseignez les informations de votre établissement, et ajoutez vos premiers plats. La validation est effectuée par notre équipe sous 48 heures."
+        },
+        "payments": {
+          "question": "Quels moyens de paiement sont acceptés ?",
+          "answer": "MTN Mobile Money, Orange Money et cartes bancaires (Visa / Mastercard)."
+        },
+        "report": {
+          "question": "Comment signaler un problème ?",
+          "answerPrefix": "Contactez-nous par email ou par téléphone — les coordonnées sont dans la section ",
+          "contactLink": "Nous contacter",
+          "answerSuffix": "."
+        }
+      }
+    },
+    "contact": {
+      "title": "Nous contacter",
+      "intro": "Une question qui n'est pas dans le centre d'aide ? Écrivez-nous ou appelez-nous, nous répondons sous 24 à 48 heures."
+    }
   }
 }
