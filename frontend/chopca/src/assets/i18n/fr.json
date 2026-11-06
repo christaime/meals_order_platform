@@ -1468,5 +1468,64 @@
       "selectedForModeration": "Sélectionné pour modération",
       "selectForModeration": "Sélectionner pour modération"
     }
+  },
+  "authLoginCard": {
+    "badge": "Portail Officiel d'Authentification",
+    "title": "Connexion sécurisée",
+    "subtitle": "Bienvenue sur Chop ça! Accédez instantanément à votre espace gourmet, cuisine ou partenaire en un clic via nos tiers de confiance.",
+    "divider": "Connexion Rapide & Sécurisée",
+    "ctaLabel": "Continuer avec",
+    "trust": {
+      "title": "Chiffrement AES 256-bit & Confidentialité Totale",
+      "description": "Connexion instantanée sécurisée. Vos données personnelles sont chiffrées selon les standards bancaires et ne sont jamais cédées ni revendues."
+    },
+    "terms": {
+      "prefix": "En vous connectant, vous acceptez nos",
+      "cgu": "Conditions Générales d'Utilisation",
+      "conjunction": "et notre",
+      "privacy": "Politique de Confidentialité",
+      "suffix": "."
+    },
+    "help": {
+      "prefix": "Besoin d'aide ?",
+      "link": "Consultez l'assistance 24/7"
+    }
+  },
+  "authHeroPanel": {
+    "logoLabel": "Logo officiel ChopÇa!",
+    "platformTagline": "Plateforme Culinaire d'Élite",
+    "gastronomicHub": "Hub Gastronomique",
+    "headline": "Le goût authentique du Cameroun, livré avec passion.",
+    "subheadline": "Le marché gastronomique interconnectant gourmets raffinés, chefs locaux d'exception et maîtres des épices traditionnelles.",
+    "pillars": {
+      "gourmets": {
+        "eyebrow": "Pour les Gourmets",
+        "title": "Plaisir & Terroir",
+        "body": "Ndolé fumé, Koki soyeux, Bar braisé. Livraison géolocalisée 25-35 min via MoMo & OM.",
+        "metaLabel": "25-35 min"
+      },
+      "chefs": {
+        "eyebrow": "Cuisines & Chefs",
+        "title": "Croissance Directe",
+        "body": "Vitrine sans frais d'entrée, gestion des commandes en direct et reversements réguliers J+2.",
+        "metaLabel": "Paiements J+2"
+      },
+      "governance": {
+        "eyebrow": "Gouvernance",
+        "title": "Hygiène & Contrôle",
+        "body": "Supervision logistique rigoureuse, contrôle sanitaire des partenaires et sécurité des flux.",
+        "metaLabel": "HACCP actif"
+      }
+    },
+    "metrics": {
+      "gourmets": "Gourmets",
+      "kitchens": "Cuisines",
+      "excellence": "Avis d'excellence"
+    },
+    "testimonial": {
+      "quote": "« Chop ça! a permis à mon restaurant de toucher des centaines d'amateurs de cuisine camerounaise sans contrainte logistique. »",
+      "author": "Cheffe Mireille N. — Saveurs du Littoral",
+      "portraitAlt": "Portrait cheffe"
+    }
   }
 }

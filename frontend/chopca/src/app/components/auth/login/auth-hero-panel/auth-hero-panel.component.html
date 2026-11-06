@@ -16,15 +16,15 @@
       <div class="flex items-center gap-space-sm bg-surface-container-lowest/90
                   px-space-md py-space-xs rounded-full shadow-sm">
 
-        <app-logo size="sm" label="Logo officiel ChopÇa!"></app-logo>
+        <app-logo size="sm" [label]="'authHeroPanel.logoLabel' | translate"></app-logo>
         <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
         <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
-          Plateforme Culinaire d'Élite
+          {{ 'authHeroPanel.platformTagline' | translate }}
         </span>
       </div>
       <div class="flex items-center gap-space-xs text-secondary font-label-md text-label-md">
         <app-icon name="verified" size="md" />
-        <span>Hub Gastronomique</span>
+        <span>{{ 'authHeroPanel.gastronomicHub' | translate }}</span>
       </div>
     </div>
 
@@ -32,17 +32,16 @@
     <div class="flex flex-col gap-space-xs max-w-2xl">
       <h1 class="font-display text-headline-md lg:text-headline-lg text-primary
                  font-bold leading-tight">
-        Le goût authentique du Cameroun, livré avec passion.
+        {{ 'authHeroPanel.headline' | translate }}
       </h1>
       <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        Le marché gastronomique interconnectant gourmets raffinés,
-        chefs locaux d'exception et maîtres des épices traditionnelles.
+        {{ 'authHeroPanel.subheadline' | translate }}
       </p>
     </div>
 
     <!-- 3 role pillars -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm mt-space-xs">
-      @for (p of pillars; track p.title) {
+      @for (p of pillars; track p.titleKey) {
       <div class="bg-surface-container-lowest/90 p-space-sm rounded-lg shadow-sm
                     flex flex-col justify-between gap-space-sm">
         <div class="flex flex-col gap-space-xs">
@@ -52,23 +51,23 @@
           </div>
 
           <div [class]="pillarEyebrowClass(p.accent)">
-            {{ p.eyebrow }}
+            {{ p.eyebrowKey | translate }}
           </div>
 
           <h2 class="font-headline-sm text-headline-sm text-on-surface">
-            {{ p.title }}
+            {{ p.titleKey | translate }}
           </h2>
 
           <p class="font-body-sm text-body-sm text-on-surface-variant
                       leading-relaxed line-clamp-3">
-            {{ p.body }}
+            {{ p.bodyKey | translate }}
           </p>
         </div>
 
         <div class="flex items-center gap-space-xs font-label-sm text-label-sm
                       pt-space-xs bg-surface-container-low px-space-xs py-1 rounded">
           <app-icon [name]="p.metaIcon" size="sm" class="text-secondary" />
-          <span class="text-on-surface">{{ p.metaLabel }}</span>
+          <span class="text-on-surface">{{ p.metaLabelKey | translate }}</span>
         </div>
       </div>
       }
@@ -80,7 +79,7 @@
               bg-surface-container-lowest/80 backdrop-blur-sm p-space-md rounded-xl shadow-sm">
 
     <div class="grid grid-cols-3 gap-space-sm pb-space-xs">
-      @for (m of metrics; track m.label) {
+      @for (m of metrics; track m.labelKey) {
       <div class="flex flex-col">
         <div class="flex items-center gap-space-xs">
           <span [class]="metricValueClass(m.tone)">{{ m.value }}</span>
@@ -93,7 +92,7 @@
           }
         </div>
         <span class="font-label-sm text-label-sm text-on-surface-variant">
-            {{ m.label }}
+            {{ m.labelKey | translate }}
           </span>
       </div>
       }
@@ -102,16 +101,15 @@
     <div class="flex items-center gap-space-md bg-surface-container-low/80 p-space-sm rounded-lg">
       <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-surface-container-high">
         <img class="w-full h-full object-cover"
-             alt="Portrait cheffe"
+             [alt]="'authHeroPanel.testimonial.portraitAlt' | translate"
              src="assets/testimonial-cheffe.jpg" />
       </div>
       <div class="flex flex-col min-w-0">
         <p class="font-body-sm text-body-sm text-on-surface italic line-clamp-1">
-          « Chop ça! a permis à mon restaurant de toucher des centaines d'amateurs
-          de cuisine camerounaise sans contrainte logistique. »
+          {{ 'authHeroPanel.testimonial.quote' | translate }}
         </p>
         <span class="font-label-sm text-label-sm text-primary font-bold">
-          Cheffe Mireille N. — Saveurs du Littoral
+          {{ 'authHeroPanel.testimonial.author' | translate }}
         </span>
       </div>
     </div>

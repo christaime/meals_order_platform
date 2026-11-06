@@ -1468,5 +1468,64 @@
       "selectedForModeration": "Selected for moderation",
       "selectForModeration": "Select for moderation"
     }
+  },
+  "authLoginCard": {
+    "badge": "Official Authentication Portal",
+    "title": "Secure sign-in",
+    "subtitle": "Welcome to Chop ça! Access your gourmet, kitchen or partner space instantly in one click via our trusted third parties.",
+    "divider": "Fast & Secure Sign-in",
+    "ctaLabel": "Continue with",
+    "trust": {
+      "title": "AES 256-bit Encryption & Full Privacy",
+      "description": "Instant secure sign-in. Your personal data is encrypted to banking standards and is never shared or resold."
+    },
+    "terms": {
+      "prefix": "By signing in, you accept our",
+      "cgu": "Terms of Service",
+      "conjunction": "and our",
+      "privacy": "Privacy Policy",
+      "suffix": "."
+    },
+    "help": {
+      "prefix": "Need help?",
+      "link": "Contact 24/7 support"
+    }
+  },
+  "authHeroPanel": {
+    "logoLabel": "Official ChopÇa! logo",
+    "platformTagline": "Elite Culinary Platform",
+    "gastronomicHub": "Gastronomic Hub",
+    "headline": "The authentic taste of Cameroon, delivered with passion.",
+    "subheadline": "The gastronomic marketplace connecting refined food lovers, exceptional local chefs and masters of traditional spices.",
+    "pillars": {
+      "gourmets": {
+        "eyebrow": "For Food Lovers",
+        "title": "Pleasure & Terroir",
+        "body": "Smoked Ndolé, silky Koki, braised Bar. Geolocated delivery 25-35 min via MoMo & OM.",
+        "metaLabel": "25-35 min"
+      },
+      "chefs": {
+        "eyebrow": "Kitchens & Chefs",
+        "title": "Direct Growth",
+        "body": "Storefront with no entry fees, direct order management and regular payouts at D+2.",
+        "metaLabel": "D+2 payouts"
+      },
+      "governance": {
+        "eyebrow": "Governance",
+        "title": "Hygiene & Control",
+        "body": "Rigorous logistics oversight, sanitary control of partners and secure transaction flows.",
+        "metaLabel": "HACCP active"
+      }
+    },
+    "metrics": {
+      "gourmets": "Food lovers",
+      "kitchens": "Kitchens",
+      "excellence": "Excellence reviews"
+    },
+    "testimonial": {
+      "quote": "\"Chop ça! allowed my restaurant to reach hundreds of fans of Cameroonian cuisine without any logistics constraint.\"",
+      "author": "Cheffe Mireille N. — Flavors of the Littoral",
+      "portraitAlt": "Portrait of the chef"
+    }
   }
 }

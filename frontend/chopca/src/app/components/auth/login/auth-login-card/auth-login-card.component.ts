@@ -6,11 +6,12 @@ import {
   SocialProvider,
 } from '@components/shared';
 import { KEYCLOAK_SERVICE } from '@core/services/auth/keycloak.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-auth-login-card',
   standalone: true,
-  imports: [IconComponent, SocialLoginButtonsComponent],
+  imports: [IconComponent, SocialLoginButtonsComponent, TranslatePipe],
   templateUrl: './auth-login-card.component.html',
   styleUrl: './auth-login-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
